@@ -3,7 +3,7 @@ import { scale } from "react-native-size-matters"
 
 const MatchCard = () => {
     return (
-        <Div h={'23%'} w={"90%"} flexDir="row" rounded={"2xl"} bg="red">
+        <Div h={'25%'} w={"90%"} flexDir="row" rounded={"2xl"} bg="red" shadow={"2xl"} shadowColor="black">
             <Div flex={3} justifyContent="center" alignItems="center" roundedTopLeft={"2xl"} roundedBottomLeft={"2xl"} bg="blue">
                 <Text fontSize={'6xl'}>1</Text>
                 <Text>FRIDAY</Text>
