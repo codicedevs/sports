@@ -10,8 +10,8 @@ const DinamicModal = ({
 }: {
     type: modalType;
     isOpen: boolean;
-    children: React.ReactNode; // Mejora: tipado más claro para los hijos.
-    setOpen: (open: boolean) => void; // Callback para cambiar el estado del modal.
+    children: React.ReactNode;
+    setOpen: (open: boolean) => void;
 }) => {
     return (
         type === modalType.FULL ? (
