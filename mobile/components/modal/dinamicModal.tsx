@@ -1,18 +1,20 @@
 import { Button, Div, Modal, Overlay } from "react-native-magnus";
 import { modalType } from "./modal.type";
-import { verticalScale } from "react-native-size-matters";
+import { scale, verticalScale } from "react-native-size-matters";
+
+type DinamicModalProps = {
+    type: modalType;
+    isOpen: boolean;
+    children: React.ReactNode;
+    setOpen: (open: boolean) => void;
+};
 
 const DinamicModal = ({
     type,
     isOpen,
     children,
     setOpen,
-}: {
-    type: modalType;
-    isOpen: boolean;
-    children: React.ReactNode;
-    setOpen: (open: boolean) => void;
-}) => {
+}: DinamicModalProps) => {
     return (
         type === modalType.FULL ? (
             <Modal isVisible={isOpen}>
@@ -26,10 +28,22 @@ const DinamicModal = ({
         ) : (
             <Overlay visible={isOpen}>
                 <Div>
-                    {children}
-                </Div>
-                <Div position="absolute" bottom={verticalScale(-200)} justifyContent="center" w={"100%"}>
-                    <Button  onPress={() => setOpen(false)} alignSelf="center" color="blue">Cerrar</Button>
+                    <Div maxH={verticalScale(200)} h={verticalScale(200)}>{children}</Div>
+                    <Div
+                        position="absolute"
+                        bottom={verticalScale(-200)}
+                        left={scale(10)}
+                        right={scale(10)}
+                        justifyContent="center"
+                    >
+                        <Button
+                            onPress={() => setOpen(false)}
+                            alignSelf="center"
+                            color="blue"
+                        >
+                            Cerrar
+                        </Button>
+                    </Div>
                 </Div>
             </Overlay>
         )
