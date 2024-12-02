@@ -6,7 +6,8 @@
         {
           "fonts": [
             "./assets/fonts/Poppins-Bold.ttf",
-            "./assets/fonts/Poppins-Regular.ttf"
+            "./assets/fonts/Poppins-Regular.ttf",
+            "./assets/fonts/coolvetica.otf"
           ]
         }
       ]
