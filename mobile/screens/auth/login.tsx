@@ -14,8 +14,8 @@ import authService from '../../service/auth.service'
 import { UserInfo } from '../../types/user.type'
 
 const validationSchema = yup.object({
-    username: yup.string().required("Requerido").min(6, 'El usuario debe tener al menos 6 caracteres'),
-    pass: yup.string().required("Requerido").min(8, 'La contraseña debe tener al menos 8 caracteres'),
+    email: yup.string().required("Requerido").min(6, 'El usuario debe tener al menos 6 caracteres'),
+    password: yup.string().required("Requerido").min(8, 'La contraseña debe tener al menos 8 caracteres')
 })
 
 const LoginScreen = () => {
@@ -32,8 +32,8 @@ const LoginScreen = () => {
         formState: { errors },
     } = useForm<UserInfo>({ resolver: yupResolver(validationSchema) })
 
-    const login = async (data: { username: string, pass: string }) => {
-        const res = await authService.login(data.username, data.pass);
+    const login = async (data:UserInfo) => {
+        const res = await authService.login(data.email, data.password);
         if (res) {
             await AsyncStorage.setItem('refresh', res.refreshToken ?? '');
             await AsyncStorage.setItem('access', res.token ?? '');
@@ -78,11 +78,11 @@ const LoginScreen = () => {
                                     value={value}
                                 />
                                 <ErrorInputMessageContainer>
-                                    {errors.username && <ErrorMessageText>{errors.username.message as string}</ErrorMessageText>}
+                                    {errors.email && <ErrorMessageText>{errors.email.message as string}</ErrorMessageText>}
                                 </ErrorInputMessageContainer>
                             </>
                         )}
-                        name="username"
+                        name="email"
                     />
                     <Controller
                         control={control}
@@ -103,11 +103,11 @@ const LoginScreen = () => {
                                     }
                                 />
                                 <ErrorInputMessageContainer>
-                                    {errors.username && <ErrorMessageText>{errors.pass?.message as string}</ErrorMessageText>}
+                                    {errors.email && <ErrorMessageText>{errors.password?.message as string}</ErrorMessageText>}
                                 </ErrorInputMessageContainer>
                             </>
                         )}
-                        name="pass"
+                        name="password"
                     />
                     <Div mb={verticalScale(20)} alignSelf="flex-end">
                         <Text>Forgot password</Text>

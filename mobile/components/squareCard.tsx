@@ -6,33 +6,72 @@ import { LinearGradient } from "expo-linear-gradient";
 import Location from "../types/location.type";
 
 export interface SquareCardProps {
-  tittle: string;
+  title: string;
   location: Location;
   score: string;
-  backgroundimage: ImageSourcePropType
+  backgroundimage: ImageSourcePropType;
 }
 
-const SquareCard: React.FC<SquareCardProps> = ({ backgroundimage, tittle, location, score }) => {
+const SquareCard: React.FC<SquareCardProps> = ({
+  backgroundimage,
+  title,
+  location,
+  score,
+}) => {
   return (
-    <Div
-      w={scale(100)} 
-      h={verticalScale(120)} 
-      rounded="2xl"
-      overflow="hidden"
-    >
+    <Div w={scale(100)} h={verticalScale(100)} rounded="2xl" overflow="hidden">
       <ImageBackground
         source={backgroundimage}
         style={{ flex: 1, width: "100%", height: "100%" }}
         resizeMode="center"
       >
-        {/* Gradiente superpuesto */}
-        <LinearGradient
-          colors={["rgba(0, 0, 0, 0.8)", "transparent"]} // Degradado
-          style={{ flex: 1, justifyContent: "space-between", padding: 10 }}
+        {/* Contenedor de gradientes superpuestos */}
+        <Div
+          style={{
+            flex: 1,
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+          }}
         >
+          {/* Degradado superior */}
+          <LinearGradient
+            colors={[
+              "rgba(0, 0, 0, 0.6)", // Oscuro en la parte superior
+              "rgba(0, 0, 0, 0)", // Transparente en el centro
+            ]}
+            style={{
+              position: "absolute",
+              width: "100%",
+              height: "45%", // Cubre la mitad superior
+              top: 0, // Posición en la parte superior
+            }}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}
+          />
+
+          {/* Degradado inferior */}
+          <LinearGradient
+            colors={[
+              "rgba(0, 0, 0, 0)", // Transparente en el centro
+              "rgba(0, 0, 0, 0.6)", // Oscuro en la parte inferior
+            ]}
+            style={{
+              position: "absolute",
+              width: "100%",
+              height: "45%", // Cubre la mitad inferior
+              bottom: 0, // Posición en la parte inferior
+            }}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 0.5, y: 1 }}
+          />
+        </Div>
+
+        {/* Contenido superpuesto */}
+        <Div style={{ flex: 1, justifyContent: "space-between", padding: 10 }}>
           <Div alignItems="center">
             <Text fontWeight="bold" fontSize="md" color="white">
-              {tittle}
+              {title}
             </Text>
           </Div>
           <Div alignItems="center">
@@ -43,11 +82,10 @@ const SquareCard: React.FC<SquareCardProps> = ({ backgroundimage, tittle, locati
               {location.name}, {location.address}
             </Text>
           </Div>
-        </LinearGradient>
+        </Div>
       </ImageBackground>
     </Div>
   );
 };
 
 export default SquareCard;
-
