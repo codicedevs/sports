@@ -1,10 +1,18 @@
 import React from "react";
 import { Div, Text } from "react-native-magnus";
-import { ImageBackground } from "react-native";
+import { ImageBackground, ImageSourcePropType } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 import { LinearGradient } from "expo-linear-gradient";
+import Location from "../types/location.type";
 
-const SquareCard = ({ backgroundimage, tittle, location, score }) => {
+export interface SquareCardProps {
+  tittle: string;
+  location: Location;
+  score: string;
+  backgroundimage: ImageSourcePropType
+}
+
+const SquareCard: React.FC<SquareCardProps> = ({ backgroundimage, tittle, location, score }) => {
   return (
     <Div
       w={scale(100)} 
@@ -32,7 +40,7 @@ const SquareCard = ({ backgroundimage, tittle, location, score }) => {
               {score}
             </Text>
             <Text fontWeight="bold" fontSize="sm" color="white">
-              {location}
+              {location.name}, {location.address}
             </Text>
           </Div>
         </LinearGradient>
