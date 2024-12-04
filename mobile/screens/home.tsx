@@ -10,7 +10,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
   const [open, setOpen] = useState(false);
-
+  // a ver si se puede pushear
   const location1: Location = {
     _id: "1",
     name: "Location 1",
@@ -60,10 +60,6 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     },
   ];
 
-  const toggleModal = () => {
-    setOpen(!open);
-  };
-
   return (
     <View
       style={{
@@ -73,8 +69,6 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
         alignItems: "center",
       }}
     >
-      <Button onPress={toggleModal} title="Detalles" />
-      <Text>Home!</Text>
       <StatisticCard />
       <ScrollView
         horizontal
