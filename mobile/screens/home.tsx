@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Button, Text, View, ScrollView } from "react-native";
-import ResponseModal from "../components/modal/responseModal";
+// import ResponseModal from "../components/modal/responseModal";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
 import StatisticCard from "../components/statisticCard";
 import SquareCard, { SquareCardProps } from "../components/squareCard";
@@ -17,11 +17,11 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     address: "123 Street",
     location: {
       type: "Point",
-      coordinates: [40.7128, -74.0060], 
+      coordinates: [40.7128, -74.006],
     },
   };
 
-  const cardData: SquareCardProps[]= [
+  const cardData: SquareCardProps[] = [
     {
       title: "YESTERDAY",
       score: "LOYAL",
@@ -80,7 +80,8 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
-          gap: 10, marginTop: 35,
+          gap: 10,
+          marginTop: 35,
         }}
       >
         {cardData.map((data, index) => (
