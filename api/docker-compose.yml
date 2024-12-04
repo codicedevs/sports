@@ -1,0 +1,68 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "${SERVER_PORT}:${SERVER_PORT}"
+    env_file:
+      - .env
+    depends_on:
+      - mongo
+    networks:
+      - furbo-network
+    develop:
+      watch:
+        - action: sync+restart
+          path: .
+          target: /src
+          ignore:
+            - node_modules
+        - action: rebuild
+          path: package.json
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+      MONGO_INITDB_DATABASE: ${DB_DATABASE}
+    networks:
+      - furbo-network
+    volumes:
+      - mongo-data:/data/db
+
+  mongo-seed:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - mongo
+    networks:
+      - furbo-network
+    volumes:
+      - ./exported_data.json:/tmp/exported_data.json
+      - ./seed.js:/usr/src/app/seed.js
+    environment:
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_DATABASE=${DB_DATABASE}
+    command: >
+      sh -c "
+        echo 'Waiting for MongoDB to start...' &&
+        sleep 10 &&
+        node /usr/src/app/seed.js
+      "
+
+networks:
+  furbo-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local

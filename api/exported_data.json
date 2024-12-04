@@ -1,0 +1,100 @@
+[
+    {
+        "_id": {
+            "$oid": "6720ef0e3a78ebc10564e979"
+        },
+        "name": "diego",
+        "email": "orefici.diego@gmail.com",
+        "password": "$2a$08$ug2fAloR5tSSc.m3ctYM4.eyNGKJuF1bXkoC8hr58/wBcQbLCgGte",
+        "friends": [],
+        "roles": [
+            "user"
+        ],
+        "matches": [],
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "6720ef183a78ebc10564e97b"
+        },
+        "name": "diego1",
+        "email": "orefici.diego+1@gmail.com",
+        "password": "$2a$08$CqgchdaMM8zxEYuPxWecVeUvWt6yh6.lPqi1IqEdcbuGd6ftCMvQ2",
+        "friends": [],
+        "roles": [
+            "user"
+        ],
+        "matches": [],
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "6720ef213a78ebc10564e97d"
+        },
+        "name": "diego2",
+        "email": "orefici.diego+2@gmail.com",
+        "password": "$2a$08$JHddWgpu3hCG61SsNgGdU./JITDFdcaeaJB/jp8eOrhfpeJYvx9Qu",
+        "friends": [],
+        "roles": [
+            "user"
+        ],
+        "matches": [],
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "6720ef273a78ebc10564e981"
+        },
+        "name": "diego3",
+        "email": "orefici.diego+3@gmail.com",
+        "password": "$2a$08$AreaVxq42ezzsnXCGlWoXOiMo9YLunsARrntfP136g.m6UcPIw/gi",
+        "friends": [],
+        "roles": [
+            "user"
+        ],
+        "matches": [],
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "6720ef2e3a78ebc10564e983"
+        },
+        "name": "diego4",
+        "email": "orefici.diego+4@gmail.com",
+        "password": "$2a$08$yz0CvLZsA0VhtLwxtNLfzeSX3Mos4zrHrYnE1FO1L8Nkng4xW7ehe",
+        "friends": [],
+        "roles": [
+            "user"
+        ],
+        "matches": [],
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "6720ef333a78ebc10564e985"
+        },
+        "name": "diego5",
+        "email": "orefici.diego+5@gmail.com",
+        "password": "$2a$08$9G7GN80/FKCdPMM0fQE6XeyFiw0n0GUYug3867EIqiwNVGTnRmiJ6",
+        "friends": [],
+        "roles": [
+            "user"
+        ],
+        "matches": [],
+        "__v": 0
+    },
+    {
+        "_id": {
+            "$oid": "6720ef393a78ebc10564e987"
+        },
+        "name": "diego6",
+        "email": "orefici.diego+6@gmail.com",
+        "password": "$2a$08$6.F13Pac7YO0EW1PYVu7IObNr17sNdom3lrLr4H/CyJepFZiWLjve",
+        "friends": [],
+        "roles": [
+            "user"
+        ],
+        "matches": [],
+        "__v": 0
+    }
+]

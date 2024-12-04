@@ -12,18 +12,18 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
   const [open, setOpen] = useState(false);
-
+  // a ver si se puede pushear
   const location1: Location = {
     _id: "1",
     name: "Location 1",
     address: "123 Street",
     location: {
       type: "Point",
-      coordinates: [40.7128, -74.0060], 
+      coordinates: [40.7128, -74.006],
     },
   };
 
-  const cardData: SquareCardProps[]= [
+  const cardData: SquareCardProps[] = [
     {
       title: "YESTERDAY",
       score: "LOYAL",
@@ -62,10 +62,6 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     },
   ];
 
-  const toggleModal = () => {
-    setOpen(!open);
-  };
-
   return (
     <View
       style={{
@@ -73,6 +69,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
       }}
     >
       <Header/>
+      <StatisticCard />
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
