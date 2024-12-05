@@ -1,4 +1,4 @@
-import { css } from 'styled-components/native';
+import { css } from "styled-components/native";
 
 export const commonViewStyles = css`
   justify-content: center;
@@ -6,18 +6,22 @@ export const commonViewStyles = css`
 `;
 
 export const commonTitleStyles = css`
-    color: black;
-    font-weight: bold
-`
+  color: black;
+  font-weight: bold;
+`;
 
 export const flexEnd = css`
   align-self: flex-end;
-`
+`;
 
 export const flexRow = css`
-  flex-direction: row
-`
+  flex-direction: row;
+`;
 
 export const inheritBackground = css`
-  background-color: inherit
-`
+  background-color: inherit;
+`;
+export const commonImageStyle = css`
+  position: absolute;
+  resizemode: cover;
+`;

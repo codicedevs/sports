@@ -5,6 +5,8 @@ import { AppScreenProps, AppScreens } from "../navigation/screens";
 import StatisticCard from "../components/statisticCard";
 import SquareCard, { SquareCardProps } from "../components/squareCard";
 import Location from "../types/location.type";
+import { Div } from "react-native-magnus";
+import { customTheme } from "../utils/theme";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
@@ -61,15 +63,12 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   ];
 
   return (
-    <View
-      style={{
-        padding: 20,
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
+    <Div
+      flex={1}
+      justifyContent="center"
+      alignItems="center"
+      bg={customTheme.colors.primary}
     >
-      <StatisticCard />
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -88,7 +87,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
           />
         ))}
       </ScrollView>
-    </View>
+    </Div>
   );
 };
 

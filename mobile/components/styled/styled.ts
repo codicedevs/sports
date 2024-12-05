@@ -3,11 +3,12 @@ import Animated from "react-native-reanimated";
 import { scale, verticalScale } from "react-native-size-matters";
 import styled from "styled-components/native";
 import {
-    commonTitleStyles,
-    commonViewStyles,
-    flexEnd,
-    flexRow,
-    inheritBackground,
+  commonImageStyle,
+  commonTitleStyles,
+  commonViewStyles,
+  flexEnd,
+  flexRow,
+  inheritBackground,
 } from "./base";
 
 export const SpinnerContainer = styled(Div)`
@@ -50,20 +51,20 @@ export const LoadingText = styled(Text)`
 `;
 
 export const ModalContainer = styled(Div)`
-    height: 100%;
-    width: 100%;
-    ${commonViewStyles};
-    background-color: rgba(0, 0, 0, 0.5);
-`
+  height: 100%;
+  width: 100%;
+  ${commonViewStyles};
+  background-color: rgba(0, 0, 0, 0.5);
+`;
 
 export const ModalTextContainer = styled(Div)`
-    height: 50%;
-    width: 85%;
-    justify-content: space-evenly;
-    align-items: center;
-    background-color: white;
-    padding: ${({ theme }) => theme.spacing.medium}px
-`
+  height: 50%;
+  width: 85%;
+  justify-content: space-evenly;
+  align-items: center;
+  background-color: white;
+  padding: ${({ theme }) => theme.spacing.medium}px;
+`;
 
 // LOGIN
 export const LoginTitleContainer = styled(Div)`
@@ -132,7 +133,7 @@ export const LoginButtonText = styled(Text)`
   color: #ffffff;
   font-size: ${({ theme }) => theme.fontSize.medium}px;
   font-weight: bold;
-  font-family: Poppins-Bold
+  font-family: Poppins-Bold;
 `;
 
 export const ErrorInputMessageContainer = styled(Div)`
@@ -150,7 +151,7 @@ export const MainContainer = styled(Div)`
   ${commonViewStyles};
   padding-horizontal: ${scale(40)}px;
   padding-vertical: ${scale(20)}px;
-  height: ${scale(700)}px
+  height: ${scale(700)}px;
 `;
 
 export const CardContainer = styled(Div)`
@@ -246,4 +247,29 @@ export const MatchCardDetail = styled(Text)`
   font-size: ${({ theme }) => theme.fontSize.small}px;
   color: #555;
   margin-bottom: 5px;
+`;
+
+export const HomeImageStyle1 = styled.ImageBackground`
+  ${commonImageStyle};
+  top: ${scale(0)}px;
+  right: 0px;
+  width: ${scale(160)}px;
+  height: ${scale(260)}px;
+`;
+
+export const HomeImageStyle2 = styled.ImageBackground`
+  ${commonImageStyle};
+  right: 0px;
+  bottom: ${scale(-40)}px;
+  width: ${scale(230)}px;
+  height: ${scale(235)}px;
+`;
+
+export const CreateMatchImageStyle = styled.ImageBackground`
+  ${commonImageStyle};
+  top: ${scale(20)}px;
+  right: ${scale(-10)}px;
+  width: ${scale(240)}px;
+  height: ${scale(310)}px;
+  radius: 40px;
 `;

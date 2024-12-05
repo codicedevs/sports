@@ -1,29 +1,21 @@
-import { NavigationContainer } from '@react-navigation/native'
-import React from 'react'
-import VersionModal from '../components/modal/versionModal'
-import { useSession } from '../context/authProvider'
-import SplashScreen from '../screens/splash'
-import { AuthStackScreen, Principal } from './stacks'
-import { useFonts } from 'expo-font'
+import { NavigationContainer } from "@react-navigation/native";
+import React from "react";
+import VersionModal from "../components/modal/versionModal";
+import { useSession } from "../context/authProvider";
+import SplashScreen from "../screens/splash";
+import { AuthStackScreen, Principal } from "./stacks";
+import { useFonts } from "expo-font";
 
 const AppNavigator = () => {
-    const { currentUser } = useSession()
+  const { currentUser } = useSession();
 
-    const [loaded, error] = useFonts({
-        'coolvetica': require('../assets/fonts/coolvetica.otf')
-    });
+  return (
+    <NavigationContainer>
+      <VersionModal />
+      <SplashScreen />
+      {currentUser ? <Principal /> : <AuthStackScreen />}
+    </NavigationContainer>
+  );
+};
 
-    if (!loaded) {
-        return null;
-    }
-
-    return (
-        <NavigationContainer>
-            <VersionModal />
-            <SplashScreen />
-            {true ? <Principal /> : <AuthStackScreen />}
-        </NavigationContainer>
-    )
-}
-
-export default AppNavigator
+export default AppNavigator;

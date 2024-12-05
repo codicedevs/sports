@@ -4,38 +4,59 @@ import { BASE_URL } from "../utils/config";
 import { HttpService } from "./http.service";
 
 interface LoginProps {
-    token: string;
-    refreshToken: string;
-    user: any;
+  access_token: string;
+  refreshToken: string;
+  user: any;
 }
 
 export class AuthService extends HttpService {
-    constructor() {
-        super("auth");
+  constructor() {
+    super("auth");
+  }
+
+  async login(email: string, password: string) {
+    console.log(email);
+    console.log(password);
+    let loginProps: LoginProps | null = null;
+
+    const res = await axios.post<LoginProps>(`${BASE_URL}/auth/signin`, {
+      email: email,
+      password: password,
+    });
+    this.saveAccessToken(res.data.access_token);
+    this.saveRefreshToken(res.data.refreshToken);
+    loginProps = res.data;
+
+    return loginProps;
+  }
+
+  async signOut() {
+    try {
+      // Obtener el refresh token del almacenamiento local
+      const refreshToken = await AsyncStorage.getItem("refresh");
+      // Enviar el refresh token al backend para invalidarlo
+      if (refreshToken) {
+        const response = await axios.post(`${BASE_URL}/auth/logout`, {
+          refreshToken,
+        });
+      }
+
+      // Limpiar el almacenamiento local de tokens
+      await AsyncStorage.removeItem("access");
+      await AsyncStorage.removeItem("refresh");
+      //console.log("Sesión cerrada exitosamente");
+    } catch (error) {
+      //console.error("Error al cerrar sesión:", error);
+    } finally {
+      // Asegurarse de que los tokens se eliminen incluso si ocurre un error
+      await AsyncStorage.removeItem("access");
+      await AsyncStorage.removeItem("refresh");
     }
+  }
 
-    login = async (username: string, password: string) => {
-        let loginProps: LoginProps | null = null;
-        try {
-            const res = await axios.post<LoginProps>(`${BASE_URL}/auth/login`, { username, pass: password });
-            this.saveAccessToken(res.data.token);
-            this.saveRefreshToken(res.data.refreshToken);
-            loginProps = res.data;
-        } catch (err) {
-            console.error(err);
-        } finally {
-            return loginProps;
-        }
-    };
-
-    signOut = async () => {
-        await AsyncStorage.removeItem('access');
-        await AsyncStorage.removeItem('refresh');
-    };
-
-    whoami = async () => {
-        return this.get("whoami");
-    };
+  async whoami() {
+    return this.get("whoami");
+  }
 }
 
 export default new AuthService();

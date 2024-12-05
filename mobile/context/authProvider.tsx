@@ -1,40 +1,61 @@
-import React, { FC, ReactNode, useState } from "react";
+import React, { FC, ReactNode, useEffect, useState } from "react";
+import userService from "../service/user.service";
+import registerForPushNotificationsAsync from "../notifications/pushNotifications";
 
 export const AuthContext = React.createContext<{
-    currentUser: any;
-    setCurrentUser: (user: any) => void;
+  currentUser: any;
+  setCurrentUser: (user: any) => void;
+  pushToken: string | null;
 }>({
-    currentUser: 'null',
-    setCurrentUser: () => { }
-})
+  currentUser: "null",
+  setCurrentUser: () => {},
+  pushToken: null,
+});
 
 interface AppProviderProps {
-    children: ReactNode;
+  children: ReactNode;
 }
 
 export function useSession() {
-    const value = React.useContext(AuthContext);
-    if (process.env.NODE_ENV !== 'production') {
-        if (!value) {
-            throw new Error('useSession must be wrapped in a <SessionProvider />');
-        }
+  const value = React.useContext(AuthContext);
+  if (process.env.NODE_ENV !== "production") {
+    if (!value) {
+      throw new Error("useSession must be wrapped in a <SessionProvider />");
     }
-    return value;
+  }
+  return value;
 }
 
 const AppProvider: FC<AppProviderProps> = ({ children }) => {
-    const [currentUser, setCurrentUser] = useState<any>(null)
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [pushToken, setPushToken] = useState<string | null>(null);
 
-    return (
-        <AuthContext.Provider
-            value={{
-                currentUser,
-                setCurrentUser
-            }}
-        >
-            {children}
-        </AuthContext.Provider>
-    )
-}
+  useEffect(() => {
+    const registerPushToken = async () => {
+      if (currentUser) {
+        // Solo registramos el token si hay un usuario autenticado
+        const token = await registerForPushNotificationsAsync();
+        if (token) {
+          setPushToken(token);
+          await userService.updatePushToken(currentUser._id, token); // Enviamos el pushToken al backend
+        }
+      }
+    };
+
+    registerPushToken();
+  }, [currentUser]); // Se ejecuta cada vez que cambia el usuario
+
+  return (
+    <AuthContext.Provider
+      value={{
+        currentUser,
+        setCurrentUser,
+        pushToken,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
+};
 
 export default AppProvider;
