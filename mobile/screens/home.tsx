@@ -5,6 +5,8 @@ import { AppScreenProps, AppScreens } from "../navigation/screens";
 import StatisticCard from "../components/statisticCard";
 import SquareCard, { SquareCardProps } from "../components/squareCard";
 import Location from "../types/location.type";
+import Header from "../components/header";
+import SectionTitle from "../components/sectionTitle";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
@@ -64,18 +66,15 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     <View
       style={{
         padding: 20,
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
       }}
     >
+      <Header/>
       <StatisticCard />
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
-          gap: 10,
-          marginTop: 35,
+          gap: 10, marginTop: 10,
         }}
       >
         {cardData.map((data, index) => (
@@ -88,6 +87,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
           />
         ))}
       </ScrollView>
+      <SectionTitle title="PROXIMOS PARTIDOS"/>
     </View>
   );
 };

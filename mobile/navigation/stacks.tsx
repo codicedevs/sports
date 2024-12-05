@@ -56,7 +56,7 @@ export function TabStackScreen() {
 
 export function Principal() {
     return (
-        <Drawer.Navigator>
+        <Drawer.Navigator screenOptions={{ headerShown: false }}>
             <Drawer.Screen name="TabStackScreen" component={TabStackScreen} />
         </Drawer.Navigator>
     )
