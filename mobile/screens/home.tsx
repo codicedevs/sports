@@ -63,18 +63,20 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   ];
 
   return (
-    <Div
-      flex={1}
-      justifyContent="center"
-      alignItems="center"
-      bg={customTheme.colors.primary}
+    <View
+      style={{
+        padding: 20,
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
     >
+      <StatisticCard />
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
-          gap: 10,
-          marginTop: 35,
+          gap: 10, marginTop: 10,
         }}
       >
         {cardData.map((data, index) => (
@@ -87,7 +89,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
           />
         ))}
       </ScrollView>
-    </Div>
+    </View>
   );
 };
 

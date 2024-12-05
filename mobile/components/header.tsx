@@ -8,37 +8,23 @@ interface HeaderProps {
   text?: string;
 }
 
-const Header: React.FC<HeaderProps> = ({ text }) => {
-  const { currentUser } = useSession();
+export default function Header({ props }: HeaderProps) {
   return (
-    <Div
-      flexDir="row"
-      alignItems="center"
-      justifyContent="space-between"
-      px="xl"
-      py="md"
-      position="absolute"
-      top={scale(25)}
-      left={scale(-10)}
-    >
-      <Image
-        borderColor={customTheme.colors.tertiary}
-        borderWidth={2}
-        rounded="circle"
-        source={require("../assets/favicon.png")}
-        h={verticalScale(40)}
-        w={scale(40)}
-        resizeMode="contain"
-        right={scale(10)}
-      />
-      <Text
-        fontSize={customTheme.fontSize.small}
-        color={customTheme.colors.background}
-      >
-        {text ? text : `Bienvenido ${currentUser?.name}`}{" "}
-      </Text>
+    <Div justifyContent="space-between" flexDir="row" w={"100%"}>
+      <Div>
+        <Text style={{ fontFamily: "RobotoCondensed-Regular", fontSize: 19 }}>
+          Bienvenido
+        </Text>
+        <Text style={{ fontFamily: "RobotoCondensed-Bold", fontSize: 25 }}>
+          Martin
+        </Text>
+      </Div>
+      <Div>
+        <Image
+          style={{ width: 100, height: 100, marginTop: -25 }}
+          source={require("@assets/logo.png")}
+        />
+      </Div>
     </Div>
   );
-};
-
-export default Header;
+}
