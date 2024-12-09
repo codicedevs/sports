@@ -3,119 +3,111 @@ import React from "react";
 import { ImageBackground } from "react-native";
 import { Div, Text } from "react-native-magnus";
 import { scale, verticalScale } from "react-native-size-matters";
+import styled from "styled-components/native";
 
+// Styled Components
+const StyledImageBackground = styled(ImageBackground)`
+  flex: 2;
+  justify-content: center;
+  align-items: center;
+  border-top-left-radius: ${(props) => props.theme.borderRadius.medium}px;
+  border-bottom-left-radius: ${(props) => props.theme.borderRadius.medium}px;
+`;
+
+const StyledLinearGradientLeft = styled(LinearGradient)`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  border-top-left-radius: ${(props) => props.theme.borderRadius.medium}px;
+  border-bottom-left-radius: ${(props) => props.theme.borderRadius.medium}px;
+`;
+
+const BlackOverlay = styled.View`
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.6); /* Negro semitransparente */
+  border-top-left-radius: ${(props) => props.theme.borderRadius.medium}px;
+  border-bottom-left-radius: ${(props) => props.theme.borderRadius.medium}px;
+`;
+
+const StyledLinearGradientRight = styled(LinearGradient)`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+`;
+
+const RightImageBackground = styled(ImageBackground)`
+  position: absolute;
+  top: 0;
+  right: -90px;
+  width: 100%;
+  height: 110%;
+  opacity: 0.2;
+`;
+
+// Componente Principal
 const MatchCard = () => {
   return (
     <Div
-      h={verticalScale(140)}
-      w={"95%"}
+      h={verticalScale(150)}
+      w={scale(325)}
       flexDir="row"
       rounded={"lg"}
       bg="grey"
       shadow={"2xl"}
       shadowColor="gray"
       overflow="hidden"
-      ml={10}
+      ml={scale(12)}
     >
       {/* Parte izquierda */}
-
-      <ImageBackground
-        source={require("../../assets/cesped1.jpg")}
-        style={{
-          flex: 2,
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-        imageStyle={{
-          borderTopLeftRadius: 10,
-          borderBottomLeftRadius: 10,
-          opacity: 0.9,
-        }}
-      >
-          <LinearGradient
-    colors={["rgba(169, 169, 160, 0)", "rgba(169, 169, 169, 0.7)"]} 
-    style={{
-      position: "absolute",
-      top: 0,
-      bottom: 0,
-      left: 0,
-      right: 0,
-      borderTopLeftRadius: 10,
-      borderBottomLeftRadius: 10,
-    }}
-    start={{ x: 0, y: 0 }}
-    end={{ x: 0, y: 1 }}
-  />
-        <Div
-          style={{
-            position: "absolute",
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.6)", // Negro semitransparente
-            borderTopLeftRadius: 10,
-            borderBottomLeftRadius: 10,
-          }}
+      <StyledImageBackground source={require("../../assets/cesped1.jpg")}>
+        <StyledLinearGradientLeft
+          colors={["rgba(169, 169, 160, 0)", "rgba(169, 169, 169, 0.7)"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
         />
-        <Text fontSize={35} color="white" fontFamily="RobotoCondensed-Bold">
+        <BlackOverlay />
+        <Text fontSize={scale(30)} color="white" fontFamily="RobotoCondensed-Bold">
           2
         </Text>
-        <Text
-          fontSize={"md"}
-          color="white"
-          fontFamily="RobotoCondensed-Regular"
-        >
+        <Text fontSize="md" color="white" fontFamily="RobotoCondensed-Regular">
           MONDAY
         </Text>
-        <Text
-          fontSize={"sm"}
-          color="white"
-          fontFamily="RobotoCondensed-Regular"
-        >
+        <Text fontSize="sm" color="white" fontFamily="RobotoCondensed-Regular">
           10:00 PM
         </Text>
-      </ImageBackground>
+      </StyledImageBackground>
 
       {/* Parte derecha */}
       <Div flex={7} justifyContent="space-between">
-        <LinearGradient
+        <StyledLinearGradientRight
           colors={[
             "rgba(20, 20, 20, 8)", // Gris oscuro arriba
             "rgba(30, 30, 30, 0.7)", // Gris centro
             "rgba(20, 20, 20, 0.5)",
           ]}
-          style={{
-            position: "absolute",
-            width: "100%",
-            height: "100%", // Cubre toda la tarjeta
-            top: 0,
-          }}
           start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
+          end={{ x: 0.8, y: 1 }}
         />
         <Div style={{ flex: 1, position: "relative" }}>
-          <ImageBackground
-            source={require("../../assets/Escudorosariocentral.png")}
-            style={{
-              position: "absolute",
-              top: 0,
-              right: -90,
-              width: "100%",
-              height: "110%",
-            }}
-            imageStyle={{
-              opacity: 0.2,
-            }}
-          />
-
+          <RightImageBackground source={require("../../assets/Escudorosariocentral.png")} />
           <Div
-            style={{ flex: 1, zIndex: 1, justifyContent: "space-between" }}
+            style={{
+              flex: 1,
+              zIndex: 1,
+              justifyContent: "space-between",
+            }}
             p="lg"
           >
             <Div>
               <Text
-                fontSize={25}
+                fontSize={scale(18)}
                 color="white"
                 fontFamily="RobotoCondensed-Bold"
               >
@@ -136,14 +128,14 @@ const MatchCard = () => {
                 Detalles
               </Text>
               <Div
-                w={30}
-                h={30}
+                w={scale(25)}
+                h={scale(25)}
                 rounded="circle"
                 bg="black"
                 justifyContent="center"
                 alignItems="center"
               >
-                <Text fontSize={"md"} color="white" fontWeight="bold">
+                <Text fontSize={"md"} color="white" >
                   ?
                 </Text>
               </Div>
@@ -163,7 +155,7 @@ const MatchCard = () => {
             color="white"
             fontFamily="RobotoCondensed-Regular"
             textTransform="uppercase"
-            fontSize={12}
+            fontSize={scale(8)}
           >
             Abasto Fútbol 5
           </Text>
