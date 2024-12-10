@@ -171,11 +171,37 @@ export function TabStackScreen() {
 }
 
 export function Principal() {
-    return (
-        <Drawer.Navigator>
-            <Drawer.Screen name="TabStackScreen" component={TabStackScreen} />
-        </Drawer.Navigator>
-    )
+  return (
+    <Drawer.Navigator
+      drawerContent={(props) => <CustomDrawer {...props} />}
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Drawer.Screen name="TabStackScreen" component={TabStackScreen} />
+      <Drawer.Screen
+        name={AppScreens.HOME_SCREEN}
+        component={(props: any) => <HomeScreen {...props} />}
+      />
+      <Drawer.Screen
+        name={AppScreens.CREATE_MATCH}
+        component={(props: any) => <CreateMatchScreen {...props} />}
+      />
+      <Drawer.Screen
+        name={AppScreens.PETITIONS_SCREEN}
+        component={(props: any) => <PetitionsScreen {...props} />}
+      />
+      <Drawer.Screen
+        name={AppScreens.MY_MATCHES}
+        component={(props: any) => <MyMatchesScreen {...props} />}
+      />
+
+      <Drawer.Screen
+        name={AppScreens.ALL_MATCHES}
+        component={(props: any) => <AllMatches {...props} />}
+      />
+    </Drawer.Navigator>
+  );
 }
 
 export function AuthStackScreen() {

@@ -8,15 +8,17 @@ interface HeaderProps {
   text?: string;
 }
 
-export default function Header({ props }: HeaderProps) {
+const Header: React.FC<HeaderProps> = ({ text }) => {
+  const { currentUser } = useSession();
+
   return (
     <Div justifyContent="space-between" flexDir="row" w={"100%"}>
       <Div>
-        <Text style={{ fontFamily: "RobotoCondensed-Regular", fontSize: 19 }}>
+        <Text style={{ fontFamily: "RobotoCondensed-Regular", fontSize:customTheme.fontSize.medium }}>
           Bienvenido
         </Text>
-        <Text style={{ fontFamily: "RobotoCondensed-Bold", fontSize: 25 }}>
-          Martin
+        <Text style={{ fontFamily: "RobotoCondensed-Bold", fontSize:customTheme.fontSize.large }}>
+          {currentUser?.name}
         </Text>
       </Div>
       <Div>
@@ -27,4 +29,6 @@ export default function Header({ props }: HeaderProps) {
       </Div>
     </Div>
   );
-}
+};
+
+export default Header;

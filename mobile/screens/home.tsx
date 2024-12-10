@@ -7,6 +7,8 @@ import SquareCard, { SquareCardProps } from "../components/squareCard";
 import Location from "../types/location.type";
 import { Div } from "react-native-magnus";
 import { customTheme } from "../utils/theme";
+import Header from "../components/header";
+import SectionTitle from "../components/sectionTitle";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
@@ -63,20 +65,15 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   ];
 
   return (
-    <View
-      style={{
-        padding: 20,
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <StatisticCard />
+    <Div justifyContent="center" alignItems="center" p={20}>
+      <Header />
+      
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
-          gap: 10, marginTop: 10,
+          gap: 10,
+          marginTop: 10,
         }}
       >
         {cardData.map((data, index) => (
@@ -89,7 +86,8 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
           />
         ))}
       </ScrollView>
-    </View>
+      <SectionTitle title="PROXIMOS PARTIDOS" />
+    </Div>
   );
 };
 
