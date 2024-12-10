@@ -8,7 +8,7 @@ import { scale, verticalScale } from "react-native-size-matters";
 import { useSession } from "../context/authProvider";
 import userService from "../service/user.service";
 import useFetch from "../hooks/useGet";
-import SimpleMatchCard from "../components/cards/matchCard";
+import SimpleMatchCard from "../components/cards/matchCardVieja";
 import { QUERY_KEYS } from "../types/query.types";
 import Match from "../types/match.type";
 

@@ -3,7 +3,7 @@ import { ActivityIndicator, FlatList } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import Match from "../types/match.type";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
-import SimpleMatchCard from "../components/cards/matchCard";
+import SimpleMatchCard from "../components/cards/matchCardVieja";
 import useFetch from "../hooks/useGet";
 import { QUERY_KEYS } from "../types/query.types";
 import Header from "../components/header";
