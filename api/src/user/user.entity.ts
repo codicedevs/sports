@@ -2,8 +2,68 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { Document, Types } from "mongoose";
 import { Role } from "authorization/role.enum";
 import { Match } from "match/match.entity";
-import { FilterPlugin } from "filter/filter.plugin";
+import { Zone } from "zones/entities/zone.entity";
+import { Sport } from "sports/entities/sport.entity";
+import { SportMode } from "sport_modes/entities/sport_mode.entity";
 
+// Subschema: Interval
+@Schema({ _id: false })
+class Interval {
+  @Prop({ required: true, min: 0, max: 24 }) // Hora de inicio (0-24)
+  startHour: number;
+
+  @Prop({ required: true, min: 0, max: 24 }) // Hora de fin (0-24)
+  endHour: number;
+}
+
+export const IntervalSchema = SchemaFactory.createForClass(Interval);
+
+// Subschema: Availability
+@Schema({ _id: false })
+class Availability {
+  @Prop({
+    required: true,
+    enum: [
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
+      "Sunday",
+    ],
+  })
+  day: string;
+
+  @Prop({ type: [IntervalSchema], required: true }) // Array de intervalos
+  intervals: Interval[];
+}
+
+export const AvailabilitySchema = SchemaFactory.createForClass(Availability);
+// Subschema: Profile
+@Schema({ _id: false })
+export class Profile {
+  @Prop({ type: [AvailabilitySchema], required: true }) // Array de disponibilidades
+  availability: Availability[];
+
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Zone" }],
+  })
+  preferredZones?: Types.ObjectId[] | Zone[];
+
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Sport" }],
+  })
+  preferredSports?: Types.ObjectId[] | Sport[];
+  @Prop({
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: "SportMode" }],
+  })
+  preferredSportModes?: Types.ObjectId[] | SportMode[];
+
+}
+export const ProfileSchema = SchemaFactory.createForClass(Profile);
+
+// Main schema: User
 @Schema()
 export class User extends Document {
   @Prop({ unique: true, sparse: true }) // Nuevo campo: googleId, es opcional y único
@@ -38,10 +98,18 @@ export class User extends Document {
   roles: Role[];
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Match" }] })
-  matches: Types.ObjectId[] | Match[]; // Array of ObjectIds referencing Match
+  matches: Types.ObjectId[] | Match[];
+
+  @Prop({ type: ProfileSchema, required: false }) // El perfil es opcional
+  profile?: Profile;
 }
 
+// Creación de esquemas
+
+
 export const UserSchema = SchemaFactory.createForClass(User);
-UserSchema.plugin(FilterPlugin);
 
-
+// Anidando subesquemas
+AvailabilitySchema.add({ intervals: [IntervalSchema] });
+ProfileSchema.add({ availability: [AvailabilitySchema] });
+UserSchema.add({ profile: ProfileSchema });

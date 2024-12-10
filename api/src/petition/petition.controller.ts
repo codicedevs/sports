@@ -13,7 +13,10 @@ import { PetitionService } from "./petition.service";
 import { CreatePetitionDto } from "./petition.dto";
 import { UpdatePetitionDto } from "./petition.dto";
 import { ObjectId } from "mongodb";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
+@ApiBearerAuth()
+@ApiTags('petitions')
 @Controller("petitions")
 export class PetitionController {
   constructor(private readonly petitionService: PetitionService) {}

@@ -18,7 +18,10 @@ import { ObjectId } from "mongodb";
 import { MatchOwnerGuard } from "authentication/matchOwnerGuard";
 import { MatchPlayerGuard } from "authentication/matchPlayerGuard";
 import { Filter } from "types/types";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
+@ApiBearerAuth()
+@ApiTags('matches')
 @Controller("matches")
 export class MatchController {
     constructor(private readonly matchService: MatchService) { }
@@ -59,6 +62,41 @@ export class MatchController {
     @Get("/available")
     async getAvailableMatches() {
         return await this.matchService.getAvailableMatches();
+    }
+
+    @Get("/findForDate/:userId")
+    async findForDate(@Param("userId") userId: string){
+        if (!ObjectId.isValid(userId)) {
+            throw new BadRequestException("ID de usuario inválido");
+        }
+        const matches = await this.matchService.getMatchesForUserDate(userId);
+        return matches;
+    }
+
+    @Get("/findForZone/:userId")
+    async findForZone(@Param("userId") userId: string){
+        if (!ObjectId.isValid(userId)) {
+            throw new BadRequestException("ID de usuario inválido");
+        }
+        const matches = await this.matchService.getMatchesInUserZones(userId);
+        return matches;
+    }
+
+    @Get("/findForSportMode/:userId")
+    async findForSportMode(@Param("userId") userId: string){
+        if (!ObjectId.isValid(userId)) {
+            throw new BadRequestException("ID de usuario inválido");
+        }
+        const matches = await this.matchService.getMatchesByUserSportMode(userId);
+        return matches;
+    }
+    @Get("/findRecommendation/:userId")
+    async findRecommendation(@Param("userId") userId: string){
+        if (!ObjectId.isValid(userId)) {
+            throw new BadRequestException("ID de usuario inválido");
+        }
+        const matches = await this.matchService.getMatchesForUserRecommendation(userId);
+        return matches;
     }
 
     @Get(":id")

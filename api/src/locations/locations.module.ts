@@ -14,6 +14,6 @@ import { Match, MatchSchema } from "match/match.entity";
   ],
   controllers: [LocationsController],
   providers: [LocationsService],
-  exports: [LocationsService, MongooseModule],
+  exports: [LocationsService],
 })
 export class LocationsModule {}

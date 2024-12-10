@@ -12,7 +12,10 @@ import {
 import { LocationsService } from "./locations.service";
 import { CreateLocationDto } from "./location.dto";
 import { UpdateLocationDto } from "./location.dto";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
+@ApiBearerAuth()
+@ApiTags('locations')
 @Controller("locations")
 export class LocationsController {
   constructor(private readonly locationsService: LocationsService) {}

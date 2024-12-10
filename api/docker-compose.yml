@@ -16,7 +16,7 @@ services:
       watch:
         - action: sync+restart
           path: .
-          target: /src
+          target: /usr/src/app
           ignore:
             - node_modules
         - action: rebuild

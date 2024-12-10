@@ -7,8 +7,9 @@ import {
   IsOptional,
   IsArray,
 } from "class-validator";
-import { User } from "user/user.entity";
+import { Profile, User } from "user/user.entity";
 import { ObjectId } from "mongodb";
+
 
 export class CreateUserDto {
   @MinLength(4)
@@ -61,6 +62,9 @@ export class UpdateUserDto {
 
   @IsOptional()
   pushToken?: string;
+
+  @IsOptional()
+  profile?: Profile;
 }
 
 export class ResetPassDto {

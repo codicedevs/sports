@@ -13,6 +13,7 @@ import { SignInDto } from "./singin.dto";
 import { RecoverPasswordDto, ResetPassDto } from "user/user.dto";
 import { AuthGuard } from "./auth.guard";
 import { GoogleAuthService } from "./google-auth-service";
+import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 
 @Controller("auth")
 // @Public() // todos son publicos con este decorador!
@@ -26,6 +27,8 @@ export class AuthController {
    * @returns
    */
 
+  @ApiBearerAuth()
+  @ApiTags('authentication')
   @Public()
   @Post("signin")
   async signIn(@Body() signInDto: SignInDto) {

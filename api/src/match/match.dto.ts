@@ -8,6 +8,7 @@ import {
   MinLength,
 } from "class-validator";
 import { ObjectId } from "mongodb";
+import { SportMode } from "sport_modes/entities/sport_mode.entity";
 
 export class CreateMatchDto {
   @IsNotEmpty()
@@ -37,6 +38,9 @@ export class CreateMatchDto {
   @IsOptional() // Esto hace que los usuarios invitados sean opcionales
   @IsArray()
   invitedUsers?: string[];
+
+  @IsOptional()
+  sportMode?: ObjectId|SportMode;
 }
 
 export class UpdateMatchDto extends PartialType(CreateMatchDto) {
@@ -60,4 +64,7 @@ export class UpdateMatchDto extends PartialType(CreateMatchDto) {
   @IsOptional()
   @IsArray()
   users?: ObjectId[];
+
+  @IsOptional()
+  sportMode?: ObjectId|SportMode;
 }

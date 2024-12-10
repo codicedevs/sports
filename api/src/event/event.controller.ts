@@ -4,8 +4,11 @@ import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { Public } from 'authentication/public';
 import { ObjectId } from "mongodb";
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Public()
+@ApiBearerAuth()
+@ApiTags('events')
 @Controller('events')
 export class EventController {
     constructor(private readonly eventService: EventService) { }
