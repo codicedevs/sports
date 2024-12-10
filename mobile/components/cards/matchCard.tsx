@@ -5,9 +5,8 @@ import { Div, Text } from "react-native-magnus";
 import { scale, verticalScale } from "react-native-size-matters";
 import styled from "styled-components/native";
 
-// Styled Components
 const StyledImageBackground = styled(ImageBackground)`
-  flex: 2;
+  flex: 2.1;
   justify-content: center;
   align-items: center;
   border-top-left-radius: ${(props) => props.theme.borderRadius.medium}px;
@@ -45,23 +44,22 @@ const StyledLinearGradientRight = styled(LinearGradient)`
 const RightImageBackground = styled(ImageBackground)`
   position: absolute;
   top: 0;
-  right: -90px;
+  right: -30%;
   width: 100%;
-  height: 110%;
+  height: 100%;
   opacity: 0.2;
 `;
 
-// Componente Principal
 const MatchCard = () => {
   return (
     <Div
       h={verticalScale(150)}
       w={scale(325)}
       flexDir="row"
-      rounded={"lg"}
+      rounded="lg"
       bg="grey"
-      shadow={"2xl"}
-      shadowColor="gray"
+      shadow="2xl"
+      shadowColor="grey"
       overflow="hidden"
       ml={scale(12)}
     >
@@ -73,7 +71,11 @@ const MatchCard = () => {
           end={{ x: 0, y: 1 }}
         />
         <BlackOverlay />
-        <Text fontSize={scale(30)} color="white" fontFamily="RobotoCondensed-Bold">
+        <Text
+          fontSize={scale(30)}
+          color="white"
+          fontFamily="RobotoCondensed-Bold"
+        >
           2
         </Text>
         <Text fontSize="md" color="white" fontFamily="RobotoCondensed-Regular">
@@ -96,7 +98,9 @@ const MatchCard = () => {
           end={{ x: 0.8, y: 1 }}
         />
         <Div style={{ flex: 1, position: "relative" }}>
-          <RightImageBackground source={require("../../assets/Escudorosariocentral.png")} />
+          <RightImageBackground
+            source={require("../../assets/Escudorosariocentral.png")}
+          />
           <Div
             style={{
               flex: 1,
@@ -121,7 +125,7 @@ const MatchCard = () => {
               alignItems="center"
             >
               <Text
-                fontSize={"3xl"}
+                fontSize="3xl"
                 color="white"
                 fontFamily="RobotoCondensed-Regular"
               >
@@ -135,12 +139,12 @@ const MatchCard = () => {
                 justifyContent="center"
                 alignItems="center"
               >
-                <Text fontSize={"md"} color="white" >
+                <Text fontSize="md" color="white">
                   ?
                 </Text>
               </Div>
               <Text
-                fontSize={"3xl"}
+                fontSize="3xl"
                 color="white"
                 fontFamily="RobotoCondensed-Regular"
               >
