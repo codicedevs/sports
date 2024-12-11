@@ -75,7 +75,7 @@ const ModalAnimation = ({
 
     return (
         <View style={styles.container}>
-            <Button title="Mostrar Modal" onPress={showModal} />
+            
             {visible && (
                 <Animated.View style={[styles.modal, animatedStyle,StyleSheet.flatten(containerStyle) ]}>
                     {children}
