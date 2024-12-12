@@ -41,6 +41,9 @@ export class CreateMatchDto {
 
   @IsOptional()
   sportMode?: ObjectId|SportMode;
+
+  @IsOptional()
+  open?: boolean;
 }
 
 export class UpdateMatchDto extends PartialType(CreateMatchDto) {
@@ -67,4 +70,7 @@ export class UpdateMatchDto extends PartialType(CreateMatchDto) {
 
   @IsOptional()
   sportMode?: ObjectId|SportMode;
+
+  @IsOptional()
+  open?: boolean;
 }

@@ -37,6 +37,9 @@ export class Match extends Document {
   @Prop({type: mongoose.Schema.Types.ObjectId, ref: "SportMode" } )
   sportMode: Types.ObjectId|SportMode;
 
+  @Prop({required: true, default: true})
+  open: boolean
+
 }
 
 
