@@ -1,3 +1,4 @@
+// SoccerField.js
 import React, { useState, useRef } from 'react';
 import { StyleSheet, View, Text, Animated, Dimensions } from 'react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
@@ -13,13 +14,13 @@ const initialCircles = [
 export default function SoccerField() {
   const [circles, setCircles] = useState(initialCircles);
   const positions = useRef(
-    initialCircles.map(() => new Animated.ValueXY({ x: 0, y: 0 }))
+    initialCircles.map(() => new Animated.ValueXY())
   ).current;
 
   const handleGestureEnd = (gestureState, id, index) => {
     const { x, y } = gestureState;
 
-    const draggedCircle = circles.find((circle) => circle.id === id);
+    // Check for overlap with other circles
     const overlappingCircle = circles.find(
       (circle) =>
         circle.id !== id &&
@@ -27,43 +28,31 @@ export default function SoccerField() {
         Math.abs(circle.position.y - y) < 50
     );
 
-    if (overlappingCircle) {
-      // Swap positions in the state
-      const updatedCircles = circles.map((circle) =>
-        circle.id === id
-          ? { ...circle, position: overlappingCircle.position }
-          : circle.id === overlappingCircle.id
-          ? { ...circle, position: draggedCircle.position }
-          : circle
-      );
+    setCircles((prev) => {
+      if (overlappingCircle) {
+        // Swap positions
+        const updatedCircles = prev.map((circle) =>
+          circle.id === id
+            ? { ...circle, position: overlappingCircle.position }
+            : circle.id === overlappingCircle.id
+            ? { ...circle, position: prev.find((c) => c.id === id).position }
+            : circle
+        );
+        return updatedCircles;
+      } else {
+        // Reset to original position
+        return prev.map((circle) =>
+          circle.id === id ? { ...circle, position: circle.position } : circle
+        );
+      }
+    });
 
-      setCircles(updatedCircles);
-
-      // Update Animated.ValueXY positions for both swapped circles
-      const draggedIndex = circles.findIndex((circle) => circle.id === id);
-      const overlappingIndex = circles.findIndex(
-        (circle) => circle.id === overlappingCircle.id
-      );
-
-      Animated.timing(positions[draggedIndex], {
-        toValue: { x: overlappingCircle.position.x - draggedCircle.position.x, y: overlappingCircle.position.y - draggedCircle.position.y },
-        duration: 150,
-        useNativeDriver: false,
-      }).start();
-
-      Animated.timing(positions[overlappingIndex], {
-        toValue: { x: draggedCircle.position.x - overlappingCircle.position.x, y: draggedCircle.position.y - overlappingCircle.position.y },
-        duration: 150,
-        useNativeDriver: false,
-      }).start();
-    } else {
-      // Reset dragged circle to its original position
-      Animated.timing(positions[index], {
-        toValue: { x: 0, y: 0 },
-        duration: 150,
-        useNativeDriver: false,
-      }).start();
-    }
+    // Reset animated position
+    Animated.timing(positions[index], {
+      toValue: { x: 0, y: 0 },
+      duration: 150,
+      useNativeDriver: false,
+    }).start();
   };
 
   return (
