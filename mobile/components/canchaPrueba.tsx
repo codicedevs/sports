@@ -1,4 +1,3 @@
-// SoccerField.js
 import React, { useState, useRef } from 'react';
 import { StyleSheet, View, Text, Animated, Dimensions } from 'react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
@@ -14,13 +13,13 @@ const initialCircles = [
 export default function SoccerField() {
   const [circles, setCircles] = useState(initialCircles);
   const positions = useRef(
-    initialCircles.map(() => new Animated.ValueXY())
+    initialCircles.map((circle) => new Animated.ValueXY(circle.position))
   ).current;
 
   const handleGestureEnd = (gestureState, id, index) => {
     const { x, y } = gestureState;
 
-    // Check for overlap with other circles
+    const draggedCircle = circles.find((circle) => circle.id === id);
     const overlappingCircle = circles.find(
       (circle) =>
         circle.id !== id &&
@@ -28,31 +27,43 @@ export default function SoccerField() {
         Math.abs(circle.position.y - y) < 50
     );
 
-    setCircles((prev) => {
-      if (overlappingCircle) {
-        // Swap positions
-        const updatedCircles = prev.map((circle) =>
-          circle.id === id
-            ? { ...circle, position: overlappingCircle.position }
-            : circle.id === overlappingCircle.id
-            ? { ...circle, position: prev.find((c) => c.id === id).position }
-            : circle
-        );
-        return updatedCircles;
-      } else {
-        // Reset to original position
-        return prev.map((circle) =>
-          circle.id === id ? { ...circle, position: circle.position } : circle
-        );
-      }
-    });
+    if (overlappingCircle) {
+      // Swap positions in the state
+      const updatedCircles = circles.map((circle) =>
+        circle.id === id
+          ? { ...circle, position: overlappingCircle.position }
+          : circle.id === overlappingCircle.id
+          ? { ...circle, position: draggedCircle.position }
+          : circle
+      );
 
-    // Reset animated position
-    Animated.timing(positions[index], {
-      toValue: { x: 0, y: 0 },
-      duration: 150,
-      useNativeDriver: false,
-    }).start();
+      setCircles(updatedCircles);
+
+      // Update Animated.ValueXY positions for both swapped circles
+      const draggedIndex = circles.findIndex((circle) => circle.id === id);
+      const overlappingIndex = circles.findIndex(
+        (circle) => circle.id === overlappingCircle.id
+      );
+
+      Animated.timing(positions[draggedIndex], {
+        toValue: overlappingCircle.position,
+        duration: 150,
+        useNativeDriver: false,
+      }).start();
+
+      Animated.timing(positions[overlappingIndex], {
+        toValue: draggedCircle.position,
+        duration: 150,
+        useNativeDriver: false,
+      }).start();
+    } else {
+      // Reset dragged circle to its original position
+      Animated.timing(positions[index], {
+        toValue: draggedCircle.position,
+        duration: 150,
+        useNativeDriver: false,
+      }).start();
+    }
   };
 
   return (
@@ -89,8 +100,8 @@ export default function SoccerField() {
                   { translateX: positions[index].x },
                   { translateY: positions[index].y },
                 ],
-                left: circle.position.x,
-                top: circle.position.y,
+                left: 0, // Set to 0 since Animated handles the position
+                top: 0,
               },
             ]}
           >
