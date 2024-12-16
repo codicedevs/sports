@@ -4,6 +4,7 @@ import { CreateLocationDto } from "./location.dto";
 import { UpdateLocationDto } from "./location.dto";
 import { Location } from "./location.entity";
 import { Model } from "mongoose";
+import { ObjectId } from "mongodb";
 
 @Injectable()
 export class LocationsService {
@@ -47,7 +48,7 @@ export class LocationsService {
     return this.locationModel.find().exec();
   }
 
-  async findOne(id: string): Promise<Location> {
+  async findOne(id: ObjectId): Promise<Location> {
     const location = await this.locationModel.findById(id).exec();
     if (!location) {
       throw new NotFoundException(`Location with ID ${id} not found`);
