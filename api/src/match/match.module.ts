@@ -9,6 +9,7 @@ import { LocationsModule } from "locations/locations.module";
 import { MatchService } from "./match.service";
 import { JwtService } from "@nestjs/jwt";
 import { SportModesModule } from "sport_modes/sport_modes.module";
+import { PushNotificationService } from "services/pushNotificationservice";
 
 @Module({
     imports: [
@@ -19,10 +20,10 @@ import { SportModesModule } from "sport_modes/sport_modes.module";
         ]),
         PetitionModule,
         LocationsModule,
-        SportModesModule
+        SportModesModule,
     ],
     controllers: [MatchController],
-    providers: [MatchService, JwtService],
+    providers: [MatchService, JwtService, PushNotificationService],
     exports: [MatchService],
 })
 export class MatchModule { }
