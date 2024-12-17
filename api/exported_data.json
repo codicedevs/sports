@@ -1,241 +1,268 @@
-{ "users":
-    [
-    {
-        "_id": {
-            "$oid": "6720ef0e3a78ebc10564e979"
+{
+    "users": [
+        {
+            "_id": {
+                "$oid": "6720ef0e3a78ebc10564e979"
+            },
+            "name": "diego",
+            "email": "orefici.diego@gmail.com",
+            "password": "$2a$08$ug2fAloR5tSSc.m3ctYM4.eyNGKJuF1bXkoC8hr58/wBcQbLCgGte",
+            "friends": [],
+            "roles": [
+                "user"
+            ],
+            "matches": [],
+            "__v": 0,
+            "profile": {
+                "availability": [
+                    {
+                        "day": "Monday",
+                        "intervals": [
+                            {
+                                "startHour": 18,
+                                "endHour": 20
+                            },
+                            {
+                                "startHour": 12,
+                                "endHour": 15
+                            }
+                        ]
+                    },
+                    {
+                        "day": "Wednesday",
+                        "intervals": [
+                            {
+                                "startHour": 10,
+                                "endHour": 12
+                            },
+                            {
+                                "startHour": 18,
+                                "endHour": 20
+                            }
+                        ]
+                    }
+                ],
+                "preferredZones": [
+                    {
+                        "$oid": "6745f90ee4e9f7d95a3d8690"
+                    }
+                ],
+                "preferredSports": [
+                    {
+                        "$oid": "6751ca653be43773e5051cbd"
+                    }
+                ],
+                "preferredSportModes": [
+                    {
+                        "$oid": "6751cb8844b53be83b3554cc"
+                    }
+                ]
+            }
         },
-        "name": "diego",
-        "email": "orefici.diego@gmail.com",
-        "password": "$2a$08$ug2fAloR5tSSc.m3ctYM4.eyNGKJuF1bXkoC8hr58/wBcQbLCgGte",
-        "friends": [],
-        "roles": [
-            "user"
-        ],
-        "matches": [],
-        "__v": 0,
-        "profile": {
-            "availability": [
-                {
-                    "day": "Monday",
-                    "intervals": [
-                        {
-                            "startHour": 18,
-                            "endHour": 20
-                        }
-                    ]
-                },
-                {
-                    "day": "Wednesday",
-                    "intervals": [
-                        {
-                            "startHour": 10,
-                            "endHour": 12
-                        },
-                        {
-                            "startHour": 18,
-                            "endHour": 20
-                        }
-                    ]
-                }
+        {
+            "_id": {
+                "$oid": "6720ef183a78ebc10564e97b"
+            },
+            "name": "diego1",
+            "email": "orefici.diego+1@gmail.com",
+            "password": "$2a$08$CqgchdaMM8zxEYuPxWecVeUvWt6yh6.lPqi1IqEdcbuGd6ftCMvQ2",
+            "friends": [],
+            "roles": [
+                "user"
             ],
-            "preferredZones": [
-                "6745f90ee4e9f7d95a3d8690"
+            "matches": [],
+            "__v": 0
+        },
+        {
+            "_id": {
+                "$oid": "6720ef213a78ebc10564e97d"
+            },
+            "name": "diego2",
+            "email": "orefici.diego+2@gmail.com",
+            "password": "$2a$08$JHddWgpu3hCG61SsNgGdU./JITDFdcaeaJB/jp8eOrhfpeJYvx9Qu",
+            "friends": [],
+            "roles": [
+                "user"
             ],
-            "preferredSports": ["6751ca653be43773e5051cbd"],
-            "preferredSportModes": ["6751cb8844b53be83b3554cc"]
+            "matches": [],
+            "__v": 0
+        },
+        {
+            "_id": {
+                "$oid": "6720ef273a78ebc10564e981"
+            },
+            "name": "diego3",
+            "email": "orefici.diego+3@gmail.com",
+            "password": "$2a$08$AreaVxq42ezzsnXCGlWoXOiMo9YLunsARrntfP136g.m6UcPIw/gi",
+            "friends": [],
+            "roles": [
+                "user"
+            ],
+            "matches": [],
+            "__v": 0
+        },
+        {
+            "_id": {
+                "$oid": "6720ef2e3a78ebc10564e983"
+            },
+            "name": "diego4",
+            "email": "orefici.diego+4@gmail.com",
+            "password": "$2a$08$yz0CvLZsA0VhtLwxtNLfzeSX3Mos4zrHrYnE1FO1L8Nkng4xW7ehe",
+            "friends": [],
+            "roles": [
+                "user"
+            ],
+            "matches": [],
+            "__v": 0
+        },
+        {
+            "_id": {
+                "$oid": "6720ef333a78ebc10564e985"
+            },
+            "name": "diego5",
+            "email": "orefici.diego+5@gmail.com",
+            "password": "$2a$08$9G7GN80/FKCdPMM0fQE6XeyFiw0n0GUYug3867EIqiwNVGTnRmiJ6",
+            "friends": [],
+            "roles": [
+                "user"
+            ],
+            "matches": [],
+            "__v": 0
+        },
+        {
+            "_id": {
+                "$oid": "6720ef393a78ebc10564e987"
+            },
+            "name": "diego6",
+            "email": "orefici.diego+6@gmail.com",
+            "password": "$2a$08$6.F13Pac7YO0EW1PYVu7IObNr17sNdom3lrLr4H/CyJepFZiWLjve",
+            "friends": [],
+            "roles": [
+                "user"
+            ],
+            "matches": [],
+            "__v": 0
         }
-    },
-    {
-        "_id": {
-            "$oid": "6720ef183a78ebc10564e97b"
-        },
-        "name": "diego1",
-        "email": "orefici.diego+1@gmail.com",
-        "password": "$2a$08$CqgchdaMM8zxEYuPxWecVeUvWt6yh6.lPqi1IqEdcbuGd6ftCMvQ2",
-        "friends": [],
-        "roles": [
-            "user"
-        ],
-        "matches": [],
-        "__v": 0
-    },
-    {
-        "_id": {
-            "$oid": "6720ef213a78ebc10564e97d"
-        },
-        "name": "diego2",
-        "email": "orefici.diego+2@gmail.com",
-        "password": "$2a$08$JHddWgpu3hCG61SsNgGdU./JITDFdcaeaJB/jp8eOrhfpeJYvx9Qu",
-        "friends": [],
-        "roles": [
-            "user"
-        ],
-        "matches": [],
-        "__v": 0
-    },
-    {
-        "_id": {
-            "$oid": "6720ef273a78ebc10564e981"
-        },
-        "name": "diego3",
-        "email": "orefici.diego+3@gmail.com",
-        "password": "$2a$08$AreaVxq42ezzsnXCGlWoXOiMo9YLunsARrntfP136g.m6UcPIw/gi",
-        "friends": [],
-        "roles": [
-            "user"
-        ],
-        "matches": [],
-        "__v": 0
-    },
-    {
-        "_id": {
-            "$oid": "6720ef2e3a78ebc10564e983"
-        },
-        "name": "diego4",
-        "email": "orefici.diego+4@gmail.com",
-        "password": "$2a$08$yz0CvLZsA0VhtLwxtNLfzeSX3Mos4zrHrYnE1FO1L8Nkng4xW7ehe",
-        "friends": [],
-        "roles": [
-            "user"
-        ],
-        "matches": [],
-        "__v": 0
-    },
-    {
-        "_id": {
-            "$oid": "6720ef333a78ebc10564e985"
-        },
-        "name": "diego5",
-        "email": "orefici.diego+5@gmail.com",
-        "password": "$2a$08$9G7GN80/FKCdPMM0fQE6XeyFiw0n0GUYug3867EIqiwNVGTnRmiJ6",
-        "friends": [],
-        "roles": [
-            "user"
-        ],
-        "matches": [],
-        "__v": 0
-    },
-    {
-        "_id": {
-            "$oid": "6720ef393a78ebc10564e987"
-        },
-        "name": "diego6",
-        "email": "orefici.diego+6@gmail.com",
-        "password": "$2a$08$6.F13Pac7YO0EW1PYVu7IObNr17sNdom3lrLr4H/CyJepFZiWLjve",
-        "friends": [],
-        "roles": [
-            "user"
-        ],
-        "matches": [],
-        "__v": 0
-    }
-],
-"zones":[
-    {
-        "name": "Centro",
-        "location": {
-            "type": "Polygon",
-            "coordinates": [
-                [
+    ],
+    "zones": [
+        {
+            "name": "Centro",
+            "location": {
+                "type": "Polygon",
+                "coordinates": [
                     [
-                        -60.65007732951027,
-                        -32.930670563561755
-                    ],
-                    [
-                        -60.65885810873213,
-                        -32.96507292221493
-                    ],
-                    [
-                        -60.62212900539173,
-                        -32.971524835273485
-                    ],
-                    [
-                        -60.6207915543569,
-                        -32.968656919823495
-                    ],
-                    [
-                        -60.62177405801256,
-                        -32.96415215129511
-                    ],
-                    [
-                        -60.62079047816739,
-                        -32.960568830649215
-                    ],
-                    [
-                        -60.62432843765998,
-                        -32.95370820358119
-                    ],
-                    [
-                        -60.62726482741803,
-                        -32.9519714670291
-                    ],
-                    [
-                        -60.62884282083998,
-                        -32.94787053797429
-                    ],
-                    [
-                        -60.63104381047731,
-                        -32.94695285903589
-                    ],
-                    [
-                        -60.633484234820884,
-                        -32.94388149720361
-                    ],
-                    [
-                        -60.63506919948345,
-                        -32.940910277614
-                    ],
-                    [
-                        -60.64019601928277,
-                        -32.937127854000416
-                    ],
-                    [
-                        -60.65007732951027,
-                        -32.930670563561755
+                        [
+                            -60.65007732951027,
+                            -32.930670563561755
+                        ],
+                        [
+                            -60.65885810873213,
+                            -32.96507292221493
+                        ],
+                        [
+                            -60.62212900539173,
+                            -32.971524835273485
+                        ],
+                        [
+                            -60.6207915543569,
+                            -32.968656919823495
+                        ],
+                        [
+                            -60.62177405801256,
+                            -32.96415215129511
+                        ],
+                        [
+                            -60.62079047816739,
+                            -32.960568830649215
+                        ],
+                        [
+                            -60.62432843765998,
+                            -32.95370820358119
+                        ],
+                        [
+                            -60.62726482741803,
+                            -32.9519714670291
+                        ],
+                        [
+                            -60.62884282083998,
+                            -32.94787053797429
+                        ],
+                        [
+                            -60.63104381047731,
+                            -32.94695285903589
+                        ],
+                        [
+                            -60.633484234820884,
+                            -32.94388149720361
+                        ],
+                        [
+                            -60.63506919948345,
+                            -32.940910277614
+                        ],
+                        [
+                            -60.64019601928277,
+                            -32.937127854000416
+                        ],
+                        [
+                            -60.65007732951027,
+                            -32.930670563561755
+                        ]
                     ]
                 ]
-            ]
+            },
+            "_id": {
+                "$oid": "6745f90ee4e9f7d95a3d8690"
+            },
+            "__v": 0
+        }
+    ],
+    "sports": [
+        {
+            "_id": {
+                "$oid": "6751ca653be43773e5051cbd"
+            },
+            "name": "Fútbol",
+            "__v": 0
+        }
+    ],
+    "sportModes": [
+        {
+            "_id": {
+                "$oid": "6751cb8844b53be83b3554cc"
+            },
+            "name": "Fútbol 5",
+            "sport": {
+                "$oid": "6751ca653be43773e5051cbd"
+            },
+            "__v": 0
         },
-        "_id": "6745f90ee4e9f7d95a3d8690",
-        "__v": 0
-    }
-],
-"sports":[
-    {
-        "_id": "6751ca653be43773e5051cbd",
-        "name": "Fútbol",
-        "__v": 0
-    }
-],
-"sportModes":[
-    {
-        "_id": "6751cb8844b53be83b3554cc",
-        "name": "Fútbol 5",
-        "sport": "6751ca653be43773e5051cbd",
-        "__v": 0
-    },
-    {
-        "_id": "6751cc7f44b53be83b3554ce",
-        "name": "Fútbol 11",
-        "sport": "6751ca653be43773e5051cbd",
-        "__v": 0
-    }
-],
-"locations":[
-    {
-        "location": {
-            "type": "Point",
-            "coordinates": [
-                -60.64052992636799,
-                -32.964634281888706
-            ]
-        },
-        "_id": "674757e93fd68aaabd532a75",
-        "name": "Loyal La Paz",
-        "address": "La Paz 947",
-        "matches": [],
-        "__v": 0
-    }
-]
-
+        {
+            "_id": {
+                "$oid": "6751cc7f44b53be83b3554ce"
+            },
+            "name": "Fútbol 11",
+            "sport": {
+                "$oid": "6751ca653be43773e5051cbd"
+            },
+            "__v": 0
+        }
+    ],
+    "locations": [
+        {
+            "location": {
+                "type": "Point",
+                "coordinates": [
+                    -60.64052992636799,
+                    -32.964634281888706
+                ]
+            },
+            "_id": {
+                "$oid": "674757e93fd68aaabd532a75"
+            },
+            "name": "Loyal La Paz",
+            "address": "La Paz 947",
+            "matches": [],
+            "__v": 0
+        }
+    ]
 }

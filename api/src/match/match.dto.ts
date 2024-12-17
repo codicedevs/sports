@@ -7,6 +7,7 @@ import {
   IsString,
   MinLength,
 } from "class-validator";
+import { Location } from "locations/location.entity";
 import { ObjectId } from "mongodb";
 import { SportMode } from "sport_modes/entities/sport_mode.entity";
 
@@ -21,7 +22,7 @@ export class CreateMatchDto {
   date: string;
 
   @IsNotEmpty()
-  location: ObjectId;
+  location: ObjectId | Location;
 
   @IsNotEmpty()
   @IsNumber()
@@ -41,6 +42,14 @@ export class CreateMatchDto {
 
   @IsOptional()
   sportMode?: ObjectId|SportMode;
+
+  @IsOptional()
+  open?: boolean;
+}
+
+export class MatchDto extends CreateMatchDto {
+  dayOfWeek: number;
+  hour: number;
 }
 
 export class UpdateMatchDto extends PartialType(CreateMatchDto) {
@@ -67,4 +76,7 @@ export class UpdateMatchDto extends PartialType(CreateMatchDto) {
 
   @IsOptional()
   sportMode?: ObjectId|SportMode;
+
+  @IsOptional()
+  open?: boolean;
 }

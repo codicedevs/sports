@@ -5,7 +5,7 @@ import {
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { model, Model } from "mongoose";
-import { CreateMatchDto } from "./match.dto";
+import { CreateMatchDto, MatchDto, } from "./match.dto";
 import { UpdateMatchDto } from "./match.dto";
 import { Match } from "./match.entity";
 import { User } from "user/user.entity";
@@ -15,8 +15,11 @@ import { PetitionService } from "petition/petition.service";
 import { PetitionStatus } from "petition/petition.enum";
 import { Filter, FilterResponse } from "types/types";
 import * as moment from "moment-timezone"; // Para manejar zonas horarias
-import { match } from "assert";
 import { Zone } from "zones/entities/zone.entity";
+import { SportModesService } from "sport_modes/sport_modes.service";
+import { SportMode } from "sport_modes/entities/sport_mode.entity";
+import { PushNotificationService } from "services/pushNotificationservice";
+import { LocationsService } from "locations/locations.service";
 
 @Injectable()
 export class MatchService {
@@ -25,12 +28,15 @@ export class MatchService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Location.name) private readonly locationModel: Model<Location>,
     private readonly petitionService: PetitionService,
+    private readonly locationsService: LocationsService,
+    private readonly sportModesService: SportModesService,
+    private readonly pushNotificationService: PushNotificationService
   ) { }
 
   // Servicio para crear partido, con o sin invitaciones
   async createMatch(createMatchDto: CreateMatchDto): Promise<Match> {
     const { userId, invitedUsers, location, ...matchData } = createMatchDto;
-    
+
     // Verificar si el usuario creador existe
     const user = await this.userModel.findById(userId).exec();
     if (!user) {
@@ -52,7 +58,13 @@ export class MatchService {
       dayOfWeek: date.getDay(),
       hour: date.getHours(),
 
-    });
+    })
+    const matchDto: MatchDto = {
+      ...createMatchDto,
+      location: location,
+      dayOfWeek: date.getDay(),
+      hour: date.getHours(),
+    }
 
     const savedMatch = await match.save();
 
@@ -83,6 +95,31 @@ export class MatchService {
         });
       }
     }
+    if (match.open === true) {
+      const eligibleUsers: User[] = await this.getUsersForMatchRecommendations(matchDto)
+      // Filtrar usuarios con `expoPushToken`
+      const tokens = eligibleUsers
+        .map((user) => user.pushToken)
+        .filter((token) => !!token);
+
+
+      if (tokens.length > 0) {
+        const title = '¡Nuevo partido disponible!';
+        const body = `Un partido está abierto. ¡Únete ahora!`;
+
+        await this.pushNotificationService.sendPushNotification(
+          tokens,
+          title,
+          body,
+          { matchId: match.id }, // Puedes incluir más datos
+        );
+
+      }
+
+
+
+    }
+
 
     return savedMatch;
   }
@@ -289,7 +326,7 @@ export class MatchService {
     });
 
     // Paso 3: Construir la consulta
-    
+
 
     const matches = await this.matchModel.aggregate([
       {
@@ -351,7 +388,7 @@ export class MatchService {
         },
       }
     ]);
-    
+
 
     return matches;
   }
@@ -363,48 +400,48 @@ export class MatchService {
       .findById(userId)
       .select('profile.preferredSportModes') // Solo traer el campo necesario
       .exec();
-  
+
     if (!user || !user.profile?.preferredSportModes?.length) {
       throw new NotFoundException(
         'El usuario no tiene modos de deporte preferidos o no existe.',
       );
     }
-  
+
     const preferredSportModes = user.profile.preferredSportModes;
-  
+
     // Paso 2: Buscar los partidos que coincidan con los sportModes preferidos
     const matches = await this.matchModel
       .find({
         sportMode: { $in: preferredSportModes }, // Condición para buscar los sportModes preferidos
       })
       .exec();
-  
+
     return matches;
   }
-  
+
 
   async getMatchesForUserRecommendation(userId: string): Promise<Match[]> {
     // Obtener información del usuario
     const user = await this.userModel
       .findById(userId)
       .populate('profile.preferredZones profile.preferredSportModes')
-      .select('profile.availability profile.preferredZones profile.preferredSportModes')
+      .select('profile.availability profile.preferredZones profile.preferredSportModes profile.preferredSports')
       .exec();
-  
+
     if (!user) {
       throw new Error('User not found.');
     }
-  
+
     // Validar disponibilidad y zonas preferidas
     const availability = user.profile?.availability || [];
-    const preferredZones = (user.profile?.preferredZones as Zone[])|| [];
-  
+    const preferredZones = (user.profile?.preferredZones as Zone[]) || [];
+
     if (!availability.length || !preferredZones.length) {
       throw new Error('User has no availability or preferred zones.');
     }
-  
+
     // Procesar disponibilidad
-    const availabilityFilters = user.profile.availability.map((availability) => {
+    let availabilityFilters = user.profile.availability.map((availability) => {
       const { day, intervals } = availability;
 
       // Convertir día de la semana a índices
@@ -415,13 +452,24 @@ export class MatchService {
         intervals,
       };
     });
-   
-  
+
+    let preferredSportModes: SportMode[] = (user.profile?.preferredSportModes as SportMode[]) || []
+    if (preferredSportModes.length == 0) {
+      preferredSportModes = (await this.sportModesService.findForSports(user.profile.preferredSports as ObjectId[])) as SportMode[]
+    }
+
+
     // Crear coordenadas de zonas preferidas
     const zonePolygons = preferredZones.map((zone: Zone) => zone.location);
-  
+
     // Pipeline de agregación
     const matches = await this.matchModel.aggregate([
+      {
+        $match: {
+          open: true
+        }
+
+      },
       // Combinar con Location
       {
         $lookup: {
@@ -433,7 +481,8 @@ export class MatchService {
       },
       { $unwind: '$location' }, // Descomponer array de ubicación
       // Filtro por zonas
-      {
+
+      ...(zonePolygons.length > 0 ? [{
         $match: {
           'location.location': {
             $geoWithin: {
@@ -444,52 +493,138 @@ export class MatchService {
             },
           },
         },
-      },
-  
-      // Filtro por disponibilidad
-      {
-      $match: {
-        $or: availabilityFilters.map(({ dayIndex, intervals }) => ({
-          dayOfWeek: dayIndex,  // Usamos dayOfWeek que ya está en UTC-3
-          $or: intervals.map((interval) => ({
-            hour: { $gte: interval.startHour, $lt: interval.endHour }, // Usamos hour que ya está en UTC-3
-          })),
-        })),
-      },
-    },
+      }] : []),
 
-    {
-      $match: {
-        sportMode: { $in: user.profile.preferredSportModes.map((mode) => mode._id) }, // Asegúrate de que son ObjectId
+      // Filtro por disponibilidad
+      ...(availabilityFilters.length > 0 ? [{
+        $match: {
+          $or: availabilityFilters.map(({ dayIndex, intervals }) => ({
+            dayOfWeek: dayIndex,  // Usamos dayOfWeek que ya está en UTC-3
+            $or: intervals.map((interval) => ({
+              hour: { $gte: interval.startHour, $lt: interval.endHour }, // Usamos hour que ya está en UTC-3
+            })),
+          })),
+        },
+      },] : []),
+
+
+      {
+        $match: {
+          sportMode: { $in: preferredSportModes.map((mode: SportMode) => mode._id) }, // Asegúrate de que son ObjectId
+        },
       },
-    },
-    // Poblamos los campos relacionados
-    
-    {
-      $lookup: {
-        from: 'users', // Colección de Users
-        localField: 'users', // Campo en Match
-        foreignField: '_id', // Campo en Users
-        as: 'users', // Nombre de la propiedad a llenar
+
+      // Poblamos los campos relacionados
+
+      {
+        $lookup: {
+          from: 'users', // Colección de Users
+          localField: 'users', // Campo en Match
+          foreignField: '_id', // Campo en Users
+          as: 'users', // Nombre de la propiedad a llenar
+        },
       },
-    },
-    // Puedes hacer un unwind si lo necesitas para objetos relacionados
-    { $unwind: { path: '$users', preserveNullAndEmptyArrays: true } },
-    {
-      $lookup: {
-        from: 'sportmodes', // Colección de SportsModes
-        localField: 'sportMode', // Campo en Match
-        foreignField: '_id', // Campo en SportsModes
-        as: 'sportMode', // Nombre de la propiedad a llenar
+      // Puedes hacer un unwind si lo necesitas para objetos relacionados
+      { $unwind: { path: '$users', preserveNullAndEmptyArrays: true } },
+      {
+        $lookup: {
+          from: 'sportmodes', // Colección de SportsModes
+          localField: 'sportMode', // Campo en Match
+          foreignField: '_id', // Campo en SportsModes
+          as: 'sportMode', // Nombre de la propiedad a llenar
+        },
       },
-    },
-     
+
     ]);
-    
-  
+
+
     return matches;
   }
-  
+
+  async getUsersForMatchRecommendations(match: MatchDto): Promise<User[]> {
+    const day = this.getDay(match.dayOfWeek)
+    const hour = match.hour
+    const locationId = (match.location) as ObjectId
+    const location = await this.locationsService.findOne(locationId)
+    const sportModeId = new ObjectId(match.sportMode as ObjectId)
+    const sportMode = await this.sportModesService.findById(sportModeId)
+    const sportId = sportMode.sport
+    const users = await this.userModel.aggregate([
+      {
+        $match: {
+          $or: [
+            // Usuarios con preferredSportModes que incluyen sportModeId
+            { 'profile.preferredSportModes': sportModeId },
+            // Usuarios sin preferredSportModes y con preferredSports que coincidan con sportId
+            {
+              $and: [
+                { 'profile.preferredSportModes': { $exists: true } },
+                { 'profile.preferredSportModes': { $size: 0 } },
+                { 'profile.preferredSports': sportId },
+              ],
+            },
+          ],
+        },
+      },
+      {
+        $lookup: {
+          from: "zones",
+          localField: "profile.preferredZones",
+          foreignField: "_id",
+          as: "preferredZones"
+        }
+      },
+      {
+        $match: {
+          // Validar que alguna zona preferida del usuario contiene la ubicación del Match
+
+          $or: [
+            {
+              'preferredZones.location': {
+                $geoIntersects: {
+                  $geometry: location.location,
+                }
+              }
+            },
+            {
+              'preferredZones': { $size: 0 }
+            }
+          ]
+        },
+      },
+      {
+        $match: {
+          // Validar disponibilidad del usuario
+          $or: [{
+            'profile.availability': {
+              $elemMatch: {
+                day: day,
+                intervals: {
+                  $elemMatch: {
+                    startHour: { $lte: hour }, // Intervalo incluye la hora del Match
+                    endHour: { $gt: hour },
+                  },
+                },
+              },
+            }
+          },
+          {
+            $and: [
+              { 'profile.preferredSportModes': { $exists: true } },
+              { 'profile.availability': { $size: 0 } }
+            ]
+          }
+          ]
+        },
+      },
+
+    ])
+    return users;
+
+
+
+  }
+
   // Convertir día de la semana a índice (igual que antes)
   private getDayIndex(day: string): number {
     const days = [
@@ -504,5 +639,17 @@ export class MatchService {
     return days.indexOf(day); // MongoDB usa Domingo como 0, Lunes como 1, etc.
   }
 
-  
+  private getDay(index: number): string {
+    const days = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+    ];
+    return days[index]
+  }
+
 }  
