@@ -71,11 +71,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   ];
 
   return (
-    <View
-      style={{
-        padding: 20,
-      }}
-    >
+    <View style={{ flex: 1, padding:20, }} >
       <Header />
       <StatisticCard />
       <ScrollView
@@ -97,14 +93,14 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
         ))}
       </ScrollView>
       <Button onPress={handledStep}>
-        <Text>Crear Paartido</Text>
+        <Text>Crear Partido</Text>
       </Button>
       <ModalAnimation open={openStep} onFinish={() => SetopenStep(false)}>
-        <Index/>
+        <Index />
       </ModalAnimation>
       <SectionTitle title="PROXIMOS PARTIDOS" />
     </View>
-  );
-};
+  );}
+  
 
 export default HomeScreen;

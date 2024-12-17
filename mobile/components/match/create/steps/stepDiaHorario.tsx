@@ -27,8 +27,8 @@ const StepDiaHorario = ({
     formState: { errors },
   } = useForm({
     defaultValues: {
-      dia: initialData?.dia || dayjs().format("YYYY-MM-DD"), // Día inicial por defecto
-      horario: initialData?.horario || dayjs().format("HH:mm"), // Horario inicial por defecto
+      dia: initialData?.dia || dayjs().format("YYYY-MM-DD"), // Día hoy
+      horario: initialData?.horario || dayjs().format("HH:mm"), // Horario ahora
     },
     resolver: yupResolver(schema),
   });
