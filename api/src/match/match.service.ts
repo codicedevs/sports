@@ -7,7 +7,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { model, Model } from "mongoose";
 import { CreateMatchDto, MatchDto, } from "./match.dto";
 import { UpdateMatchDto } from "./match.dto";
-import { Match } from "./match.entity";
+import { Formations, Match, Player } from "./match.entity";
 import { User } from "user/user.entity";
 import { Location } from "locations/location.entity";
 import { ObjectId } from "mongodb";
@@ -620,9 +620,82 @@ export class MatchService {
 
     ])
     return users;
+  }
 
+  async addUserToFormation(userId: ObjectId, matchId: ObjectId, team: 1 | 2, position: number): Promise<Formations> {
+    const match = await this.matchModel.findById(matchId).exec();
+    if (!match) {
+      throw new Error("Match not found");
+    }
 
+    // Preparar nuevas formaciones
+    const newFormations: Formations = {
+      team1: [],
+      team2: [],
+    };
+    if(!match.formations) match.formations = newFormations
 
+    let userAlreadyIn = false;
+
+    // Helper para procesar los equipos
+    const processTeam = (players: Player[], targetTeam: Player[]) => {
+      for (const player of players) {
+        if (player.userId.toString() === userId.toString()) {
+          userAlreadyIn = true;
+          player.position = position; // Actualizar posición
+          team === 1 ? newFormations.team1.push(player) : newFormations.team2.push(player);
+        } else {
+          if (player.position !== position) //Si hay alguien en la misma posición y equipo no lo agregamos
+            targetTeam.push(player); // Conservar jugadores que no se modifican
+        }
+      }
+    };
+
+    // Procesar ambos equipos
+    processTeam(match.formations.team1, newFormations.team1);
+    processTeam(match.formations.team2, newFormations.team2);
+
+    // Si no estaba en ninguno de los equipos, agregarlo
+    if (!userAlreadyIn) {
+      const newPlayer: Player = { position, userId };
+      team === 1 ? newFormations.team1.push(newPlayer) : newFormations.team2.push(newPlayer);
+    }
+
+    // Actualizar el partido en la base de datos
+    match.formations = newFormations;
+    await match.save();
+
+    return newFormations;
+  }
+
+  async removeUserFromFormation(matchId: ObjectId, userId: ObjectId) {
+    const match = await this.matchModel.findById(matchId).exec();
+    if (!match) {
+      throw new Error("Match not found");
+    }
+    // Preparar nuevas formaciones
+    const newFormations: Formations = {
+      team1: [],
+      team2: [],
+    };
+    if(!match.formations) match.formations = newFormations
+    const processTeam = (players: Player[], targetTeam: Player[]) => {
+      for (const player of players) {
+        if (player.userId.toString() !== userId.toString()) {
+          targetTeam.push(player)
+        }
+      }
+    }
+
+    // Procesar ambos equipos
+    processTeam(match.formations.team1, newFormations.team1);
+    processTeam(match.formations.team2, newFormations.team2);
+
+    // Actualizar el partido en la base de datos
+    match.formations = newFormations;
+    await match.save();
+
+    return newFormations;
   }
 
   // Convertir día de la semana a índice (igual que antes)
