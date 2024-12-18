@@ -48,8 +48,8 @@ export function SettingsStackScreen() {
 export function TabStackScreen() {
     return (
         <Tab.Navigator screenOptions={{ headerShown: false }}>
-            <Tab.Screen name="HomeStack" component={HomeStackScreen} />
             <Tab.Screen name="SettingsStack" component={SettingsStackScreen} />
+            <Tab.Screen name="HomeStack" component={HomeStackScreen} />
         </Tab.Navigator>
     )
 }

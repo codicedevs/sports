@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { View, Text, StyleSheet, LayoutChangeEvent } from "react-native";
 import Animated, {
   useSharedValue,
@@ -65,18 +65,12 @@ const DraggableCircle: React.FC<{
   );
 };
 
-const MoreCircles: React.FC = () => {
+const DraggableCircles: React.FC = () => {
   const [circlesData, setCirclesData] = useState<CircleData[]>([
     { id: 1, color: "red" },
     { id: 2, color: "blue" },
     { id: 3, color: "green" },
     { id: 4, color: "yellow" },
-    { id: 5, color: "gray" },
-    { id: 6, color: "red" },
-    { id: 7, color: "blue" },
-    { id: 8, color: "green" },
-    { id: 9, color: "yellow" },
-    { id: 10, color: "gray" },
   ]);
 
   const circlePositions = useRef<{ [key: number]: Position }>({});
@@ -94,39 +88,18 @@ const MoreCircles: React.FC = () => {
   const findNearestCircle = (droppedId: number, x: number, y: number) => {
     let nearestCircle: CircleData | null = null;
     let minDistance = Infinity;
-  
-    console.log(`\n=== findNearestCircle ===`);
-    console.log(`Dropped Circle ID: ${droppedId}, Position: x=${x}, y=${y}`);
-    console.log("Current Circle Positions:", circlePositions.current);
-  
+
     Object.entries(circlePositions.current).forEach(([id, position]) => {
-      console.log(`\nChecking Circle ID: ${id}`);
-  
       if (parseInt(id) !== droppedId) {
-        console.log(`Position of Circle ${id}: x=${position.x}, y=${position.y}`);
         const distance = calculateDistance(x, y, position.x, position.y);
-        console.log(`Distance to Circle ${id}: ${distance}`);
-  
         if (distance < minDistance) {
-          console.log(
-            `Circle ${id} is closer. Updating nearestCircle (Previous minDistance: ${minDistance})`
-          );
           minDistance = distance;
           nearestCircle =
             circlesData.find((circle) => circle.id === parseInt(id)) || null;
         }
-      } else {
-        console.log(`Skipping Circle ${id} (same as dropped circle).`);
       }
     });
-  
-    console.log(
-      `\nNearest Circle Found: ${
-        nearestCircle ? `ID=${nearestCircle.id}, Color=${nearestCircle.color}` : "None"
-      }`
-    );
-    console.log(`Final minDistance: ${minDistance}`);
-  
+
     return nearestCircle;
   };
 
@@ -161,40 +134,12 @@ const MoreCircles: React.FC = () => {
   const handleLayout = (id: number, event: LayoutChangeEvent) => {
     const { x, y } = event.nativeEvent.layout;
     circlePositions.current[id] = { x, y };
-    console.log(`handleLayout: Circle ${id} position saved -> x=${x}, y=${y}`);
   };
-
-  const firtHalf = circlesData.slice(0,5)
-  const secondHalf = circlesData.slice(5,10)
 
   return (
     <GestureHandlerRootView style={styles.container}>
-      {/* <View style={styles.circlesContainer}> */}
-      <View style={{flexWrap:"wrap", flexDirection:"row"}}>
-        {firtHalf.map((circle) => (
-          <DraggableCircle
-          key={`${circle.id}-${renderKey}`}
-          id={circle.id}
-          color={circle.color}
-          onDrop={handleDrop}
-          onLayout={handleLayout}
-          />
-        ))}
-        </View>
-        <View style={{flexWrap:"wrap", flexDirection:"row"}}>
-         {secondHalf.map((circle) => (
-           <DraggableCircle
-           key={`${circle.id}-${renderKey}`}
-           id={circle.id}
-           color={circle.color}
-           onDrop={handleDrop}
-           onLayout={handleLayout}
-           />
-          ))}
-          </View>
-
-
-             {/* {firtHalf.map((circle) => (
+      <View style={styles.circlesContainer}>
+        {circlesData.map((circle) => (
           <DraggableCircle
           key={`${circle.id}-${renderKey}`}
             id={circle.id}
@@ -203,16 +148,7 @@ const MoreCircles: React.FC = () => {
             onLayout={handleLayout}
           />
         ))}
-         {secondHalf.map((circle) => (
-          <DraggableCircle
-          key={`${circle.id}-${renderKey}`}
-            id={circle.id}
-            color={circle.color}
-            onDrop={handleDrop}
-            onLayout={handleLayout}
-          />
-        ))} */}
-      {/* </View> */}
+      </View>
     </GestureHandlerRootView>
   );
 };
@@ -244,4 +180,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MoreCircles;
+export default DraggableCircles;
