@@ -108,6 +108,48 @@ export class MatchController {
         return match;
     }
 
+    @Put("/:matchId/formation/:userId")
+    async updateFormation(
+        @Param("matchId") matchId: string,
+        @Param("userId") userId: string,
+        @Body() body: {team:1|2, position:number},
+    ) {
+        if (!ObjectId.isValid(matchId)) {
+            throw new BadRequestException("ID de partido inválido");
+        }
+        if (!ObjectId.isValid(userId)) {
+            throw new BadRequestException("ID de usuario inválido");
+        }
+
+
+        const updatedMatch = await this.matchService.addUserToFormation(
+            new ObjectId(userId),
+            new ObjectId(matchId),
+            body.team,
+            body.position
+        );
+        return updatedMatch;
+    }
+
+    @Delete("/:matchId/formation/:userId")
+    async deleteUserFromFormation(
+        @Param("matchId") matchId: string,
+        @Param("userId") userId: string,
+    ) {
+        if (!ObjectId.isValid(matchId)) {
+            throw new BadRequestException("ID de partido inválido");
+        }
+        if (!ObjectId.isValid(userId)) {
+            throw new BadRequestException("ID de usuario inválido");
+        }
+
+        const updatedMatch = await this.matchService.removeUserFromFormation(
+            new ObjectId(matchId),
+            new ObjectId(userId)
+        );
+        return updatedMatch;
+    }
+
     @Put(":id")
     @UseGuards(MatchOwnerGuard) // solo el creador del partido puede editar el partido
     async update(
