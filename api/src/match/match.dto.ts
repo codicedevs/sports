@@ -10,6 +10,7 @@ import {
 import { Location } from "locations/location.entity";
 import { ObjectId } from "mongodb";
 import { SportMode } from "sport_modes/entities/sport_mode.entity";
+import { Formations } from "./match.entity";
 
 export class CreateMatchDto {
   @IsNotEmpty()
@@ -45,6 +46,9 @@ export class CreateMatchDto {
 
   @IsOptional()
   open?: boolean;
+
+  @IsOptional()
+  formations?: Formations;
 }
 
 export class MatchDto extends CreateMatchDto {
@@ -79,4 +83,7 @@ export class UpdateMatchDto extends PartialType(CreateMatchDto) {
 
   @IsOptional()
   open?: boolean;
+
+  @IsOptional()
+  formations?: Formations;
 }
