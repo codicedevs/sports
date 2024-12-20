@@ -7,6 +7,9 @@ import SquareCard, { SquareCardProps } from "../components/squareCard";
 import Location from "../types/location.type";
 import Header from "../components/header";
 import SectionTitle from "../components/sectionTitle";
+import { GoogleSignin, GoogleSigninButton } from '@react-native-google-signin/google-signin';
+
+GoogleSignin.configure();
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
@@ -21,6 +24,43 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
       type: "Point",
       coordinates: [40.7128, -74.006],
     },
+  };
+
+  const handleGoogleSignIn = async () => {
+  
+    try {
+      // Verificar si los servicios de Google Play están disponibles
+      await GoogleSignin.hasPlayServices();
+      // Intentar iniciar sesión con Google
+      const userInfo = await GoogleSignin.signIn();
+      // Sentry.captureMessage("Google Sign-In successful:") 
+      // Sentry.captureMessage(userInfo.user) 
+      console.log(userInfo)
+    } catch(e){
+
+    }
+  
+    //   if (res) {
+    //     // Guardar los tokens en AsyncStorage
+    //     await AsyncStorage.setItem("refresh", res.refreshToken ?? "");
+    //     await AsyncStorage.setItem("access", res.accessToken ?? "");
+  
+    //     setCurrentUser(res.user);
+    //   }
+    // } catch (error) {
+    //   // Manejo de errores específicos
+    //   if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+    //   // Sentry.captureMessage("Google Sign-In cancelled by user") 
+    //   } else if (error.code === statusCodes.IN_PROGRESS) {
+    //   // Sentry.captureMessage("Google Sign-In already in progress") 
+    //   } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+    //   // Sentry.captureMessage("Google Play services not available or outdated") 
+    //   } else {
+    //     // Sentry.captureException(error)
+    //   }
+    // }
+  
+    console.log("Google Sign-In process ended"); // Log final
   };
 
   const cardData: SquareCardProps[] = [
@@ -88,6 +128,12 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
         ))}
       </ScrollView>
       <SectionTitle title="PROXIMOS PARTIDOS"/>
+      <GoogleSigninButton
+              style={{ width: "100%", height: 48 }}
+              size={GoogleSigninButton.Size.Wide}
+              color={GoogleSigninButton.Color.Dark}
+              onPress={handleGoogleSignIn}
+            />
     </View>
   );
 };
