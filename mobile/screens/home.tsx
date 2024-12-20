@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { Button, Text, View, ScrollView } from "react-native";
-import ResponseModal from "../components/modal/responseModal";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
 import StatisticCard from "../components/statisticCard";
 import SquareCard, { SquareCardProps } from "../components/squareCard";
 import Location from "../types/location.type";
 import Header from "../components/header";
-import SectionTitle from "../components/sectionTitle";
+import SectionPhoto from "../components/SectionPhoto";
+import MatchCard from "../components/cards/matchCard";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
@@ -77,6 +77,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     >
       <Header />
       <StatisticCard />
+       <ScrollView>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -96,7 +97,18 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
           />
         ))}
       </ScrollView>
-      <SectionTitle title="PROXIMOS PARTIDOS" />
+      {/*Scrol vertical*/}
+     
+        <SectionPhoto backGroundImage={require("../assets/photoNew.png")} />
+        <MatchCard
+        ></MatchCard>
+        <MatchCard
+        ></MatchCard>
+        <MatchCard
+        ></MatchCard>
+        <MatchCard
+        ></MatchCard>
+      </ScrollView>
     </View>
   );
 };

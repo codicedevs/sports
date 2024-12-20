@@ -6,7 +6,7 @@ import { scale } from "react-native-size-matters";
 
 const StatisticCard = () => {
   return (
-    <Div w="100%" h={scale(110)} rounded="xl" overflow="hidden" >
+    <Div w="100%" h={scale(110)} rounded="xl" overflow="hidden" mb={scale(10)} >
       <Div
         flex={8.5}
         bg="#5D3C81"
