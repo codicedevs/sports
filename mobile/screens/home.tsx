@@ -17,6 +17,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     _id: "1",
     name: "Location 1",
     address: "123 Street",
+    hour: "19:00 PM",
     location: {
       type: "Point",
       coordinates: [40.7128, -74.006],
@@ -25,38 +26,44 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
 
   const cardData: SquareCardProps[] = [
     {
-      title: "YESTERDAY",
+      title: "Vie 8 dic",
       score: "LOYAL",
       location: location1,
-      backgroundimage: require("../assets/escudo1.png"),
+      hour: "19:00 PM",
+      backgroundimage: require("../assets/squarecard2.png"),
     },
     {
       title: "TODAY",
       score: "150 W 120",
       location: location1,
-      backgroundimage: require("../assets/escudo2.png"),
+      hour: "19:00 PM",
+      backgroundimage: require("../assets/squarecard1.png"),
     },
     {
       title: "NEVER",
       score: "0 W 800",
+      hour: "19:00 PM",
       location: location1,
-      backgroundimage: require("../assets/escudo3.png"),
+      backgroundimage: require("../assets/squaredcard3.png"),
     },
     {
       title: "NEVER",
       score: "0 W 800",
+      hour: "19:00 PM",
       location: location1,
       backgroundimage: require("../assets/escudo4.png"),
     },
     {
       title: "NEVER",
       score: "0 W 800",
+      hour: "19:00 PM",
       location: location1,
       backgroundimage: require("../assets/escudo5.png"),
     },
     {
       title: "NEVER",
       score: "0 W 800",
+      hour: "19:00 PM",
       location: location1,
       backgroundimage: require("../assets/escudo6.png"),
     },
@@ -68,13 +75,14 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
         padding: 20,
       }}
     >
-      <Header/>
+      <Header />
       <StatisticCard />
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
-          gap: 10, marginTop: 10,
+          gap: 10,
+          marginTop: 10,
         }}
       >
         {cardData.map((data, index) => (
@@ -82,12 +90,13 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
             key={index}
             title={data.title}
             score={data.score}
+            hour={data.hour}
             location={data.location}
             backgroundimage={data.backgroundimage}
           />
         ))}
       </ScrollView>
-      <SectionTitle title="PROXIMOS PARTIDOS"/>
+      <SectionTitle title="PROXIMOS PARTIDOS" />
     </View>
   );
 };
