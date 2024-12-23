@@ -67,20 +67,20 @@ const MatchCard = () => {
       {/* Parte izquierda */}
       <StyledImageBackground source={require("../../assets/texturaCard.png")}>
         <StyledLinearGradientLeft
-          colors={["rgba(124, 9, 247, 0.36)", "rgba(122, 0, 252, 0.39)"]}
+          colors={["rgba(152, 62, 248, 0.69)", "rgba(192, 138, 250, 0.33)"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
           
         />
         <BlackOverlay />
         <Text
-          fontSize={scale(30)}
+          fontSize={scale(35)}
           color="white"
           fontFamily="RobotoCondensed-Bold"
         >
           2
         </Text>
-        <Text fontSize={scale(11)} color="white" fontFamily="RobotoCondensed-Regular">
+        <Text fontSize={scale(11)} color="white" fontFamily="RobotoCondensed-Regular" mt="lg">
           MONDAY
         </Text>
         <Text fontSize={scale(11)} color="white" fontFamily="RobotoCondensed-Regular">
@@ -112,7 +112,7 @@ const MatchCard = () => {
             }}
             p="lg"
           >
-            <Div mt={scale(8)}>
+            <Div mt={scale(5)}>
               <Text
                 fontSize={scale(22)}
                 color="white"

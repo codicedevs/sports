@@ -1,12 +1,22 @@
 import React from "react";
-import { ImageBackground, StyleSheet } from "react-native";
+import { ImageBackground, StyleSheet, ViewStyle } from "react-native";
 import { Div, Text } from "react-native-magnus";
 import { scale } from "react-native-size-matters";
 
+interface StatisticCardProps {
+  style?: ViewStyle; // Permite pasar estilos personalizados
+}
 
-const StatisticCard = () => {
+const StatisticCard: React.FC<StatisticCardProps> = ({ style }) => {
   return (
-    <Div w="100%" h={scale(110)} rounded="xl" overflow="hidden" mb={scale(10)} >
+    <Div
+      w="100%"
+      h={scale(110)}
+      rounded="xl"
+      overflow="hidden"
+      mb={scale(10)}
+      style={style} // Aplica el estilo externo
+    >
       <Div
         flex={8.5}
         bg="#5D3C81"
@@ -14,14 +24,24 @@ const StatisticCard = () => {
         justifyContent="center"
         px={scale(18)}
       >
-        <Text fontSize="6xl" fontFamily="AcuminProCondensed" fontWeight="bold" color="#FFFFFF">
+        <Text
+          fontSize="6xl"
+          fontFamily="AcuminProCondensed"
+          fontWeight="bold"
+          color="#FFFFFF"
+        >
           TORNEO
         </Text>
-        <Text fontSize="6xl" fontFamily="AcuminProCondensed" fontWeight="bold" color="#FFFFFF">
+        <Text
+          fontSize="6xl"
+          fontFamily="AcuminProCondensed"
+          fontWeight="bold"
+          color="#FFFFFF"
+        >
           VETERANOS
         </Text>
 
-        {/* Imag Copa */}
+        {/* Imagen Copa */}
         <ImageBackground
           source={require("../assets/cup1.png")}
           style={styles.imageBackground}
@@ -56,6 +76,6 @@ const styles = StyleSheet.create({
     top: "20%",
     width: scale(70),
     height: scale(76),
-    paddingLeft: "29%"
+    paddingLeft: "29%",
   },
 });

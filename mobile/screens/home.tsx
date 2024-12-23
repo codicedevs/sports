@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Scale } from "react-native-size-matters";
 import { Button, Text, View, ScrollView } from "react-native";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
 import StatisticCard from "../components/statisticCard";
@@ -70,44 +71,43 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   ];
 
   return (
-    <View
-      style={{
-        padding: 20,
-      }}
-    >
+    <View style={{ flex: 1, padding: 8 }}>
       <Header />
-      <StatisticCard />
-       <ScrollView>
       <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
-          gap: 10,
-          marginTop: 10,
+          padding: 10,
+          gap: 12,
         }}
+        showsVerticalScrollIndicator={false}
       >
-        {cardData.map((data, index) => (
-          <SquareCard
-            key={index}
-            title={data.title}
-            score={data.score}
-            hour={data.hour}
-            location={data.location}
-            backgroundimage={data.backgroundimage}
-          />
-        ))}
-      </ScrollView>
-      {/*Scrol vertical*/}
-     
+        <StatisticCard style={{ flex: 1 }} />
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            gap: 10,
+            marginTop: 10,
+          }}
+        >
+          {cardData.map((data, index) => (
+            <SquareCard
+              key={index}
+              title={data.title}
+              score={data.score}
+              hour={data.hour}
+              location={data.location}
+              backgroundimage={data.backgroundimage}
+            />
+          ))}
+        </ScrollView>
+        {/*Scrol vertical*/}
+
         <SectionPhoto backGroundImage={require("../assets/photoNew.png")} />
-        <MatchCard
-        ></MatchCard>
-        <MatchCard
-        ></MatchCard>
-        <MatchCard
-        ></MatchCard>
-        <MatchCard
-        ></MatchCard>
+        <MatchCard></MatchCard>
+        <MatchCard></MatchCard>
+        <MatchCard></MatchCard>
+        <MatchCard></MatchCard>
       </ScrollView>
     </View>
   );
