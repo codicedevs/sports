@@ -4,7 +4,7 @@ import { Div, Text } from "react-native-magnus";
 import { scale } from "react-native-size-matters";
 
 interface StatisticCardProps {
-  style?: ViewStyle; // Permite pasar estilos personalizados
+  style?: ViewStyle;
 }
 
 const StatisticCard: React.FC<StatisticCardProps> = ({ style }) => {
@@ -15,20 +15,15 @@ const StatisticCard: React.FC<StatisticCardProps> = ({ style }) => {
       rounded="xl"
       overflow="hidden"
       mb={scale(10)}
-      style={style} // Aplica el estilo externo
+      style={style}
     >
-      <Div
-        flex={8.5}
-        bg="#5D3C81"
-        roundedTop="2xl"
-        justifyContent="center"
-        px={scale(18)}
-      >
+      <Div flex={8.5} bg="#5D3C81" roundedTop="2xl" justifyContent="center">
         <Text
           fontSize="6xl"
           fontFamily="AcuminProCondensed"
           fontWeight="bold"
           color="#FFFFFF"
+          mx={scale(10)}
         >
           TORNEO
         </Text>
@@ -37,6 +32,8 @@ const StatisticCard: React.FC<StatisticCardProps> = ({ style }) => {
           fontFamily="AcuminProCondensed"
           fontWeight="bold"
           color="#FFFFFF"
+          mb={scale(8)}
+          mx={scale(10)}
         >
           VETERANOS
         </Text>
@@ -72,7 +69,7 @@ export default StatisticCard;
 const styles = StyleSheet.create({
   imageBackground: {
     position: "absolute",
-    right: 0,
+    right: scale(0),
     top: "20%",
     width: scale(70),
     height: scale(76),

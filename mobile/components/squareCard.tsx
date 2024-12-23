@@ -41,10 +41,9 @@ const SquareCard: React.FC<SquareCardProps> = ({
             "rgba(0, 0, 0, 0.1)", // medio inf
             "rgba(0, 0, 0, 0.8)", // parte abajo
           ]}
-          locations={[0.16, 0.23, 0.77, 0.84]} 
+          locations={[0.16, 0.23, 0.77, 0.84]}
           style={styles.gradient}
         />
-
         {/* Contenido */}
         <Div style={styles.contentContainer}>
           {/* Título */}
@@ -61,7 +60,6 @@ const SquareCard: React.FC<SquareCardProps> = ({
     </Div>
   );
 };
-
 const styles = StyleSheet.create({
   imageBackground: {
     flex: 1,
@@ -76,7 +74,7 @@ const styles = StyleSheet.create({
   contentContainer: {
     flex: 1,
     justifyContent: "space-between",
-    padding: 8,
+    padding: scale(7),
   },
   titleText: {
     fontFamily: "RobotoCondensed-Black",

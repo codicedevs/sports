@@ -1,17 +1,22 @@
 import React from "react";
-import { Text, StyleSheet } from "react-native";
+import { Text, StyleSheet, ImageBackground } from "react-native";
 import { Div } from "react-native-magnus";
+import { scale } from "react-native-size-matters";
 
 interface HeaderProps {}
 
 export default function Header({ props }: HeaderProps) {
   return (
-    <Div style={styles.container}>
+    <Div style={styles.container} justifyContent="center">
       <Div>
         <Text style={styles.welcomeText}>BIENVENIDO</Text>
       </Div>
 
       <Text style={styles.titleText}>TOTITO</Text>
+      <ImageBackground
+        source={require("../assets/logo.png")}
+        style={styles.imageBackground}
+      ></ImageBackground>
     </Div>
   );
 }
@@ -19,20 +24,27 @@ export default function Header({ props }: HeaderProps) {
 const styles = StyleSheet.create({
   container: {
     width: "100%",
-    paddingHorizontal: 3,
-    paddingVertical: 5,
+    paddingHorizontal: scale(7),
+    paddingVertical: scale(3),
   },
   welcomeText: {
     fontFamily: "Inter",
-    fontSize: 13,
+    fontSize: scale(11),
     color: "#000",
     textTransform: "uppercase",
   },
   titleText: {
     fontFamily: "RobotoCondensed-Black",
-    fontSize: 30,
+    fontSize: scale(25),
     color: "#000",
-    lineHeight: 33,
+    lineHeight: scale(28),
     textTransform: "uppercase",
+  },
+
+  imageBackground: {
+    position: "absolute",
+    right: scale(0),
+    width: scale(80),
+    height: scale(80),
   },
 });
