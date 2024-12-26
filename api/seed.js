@@ -54,6 +54,7 @@ async function seedDatabase() {
         const sports = database.collection('sports');
         const sportmodes = database.collection('sportmodes');
         const locations = database.collection('locations');
+        const matches = database.collection('matches');
 
         let data = JSON.parse(fs.readFileSync('/tmp/exported_data.json', 'utf8'));
         let dataUsers = transformData(data.users);
@@ -61,12 +62,14 @@ async function seedDatabase() {
         let dataSports = transformData(data.sports);
         let dataSportModes = transformData(data.sportModes);
         let dataLocations = transformData(data.locations);
+        let dataMatches = transformData(data.matches);
 
         await users.deleteMany({});
         await zones.deleteMany({});
         await sports.deleteMany({});
         await sportmodes.deleteMany({});
         await locations.deleteMany({});
+        await matches.deleteMany({});
         console.log('Cleared existing data');
        
         const resultSports = await sports.insertMany(dataSports);
@@ -88,6 +91,10 @@ async function seedDatabase() {
         const resultLocations = await locations.insertMany(dataLocations);
 
         console.log(`${resultLocations.insertedCount} locations inserted`);
+
+        const resultMatches = await matches.insertMany(dataMatches);
+
+        console.log(`${resultMatches.insertedCount} matches inserted`);
 
         console.log('Data seeding completed successfully');
     } catch (error) {
