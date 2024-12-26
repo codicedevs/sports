@@ -1,23 +1,47 @@
-import { Image, StyleProp } from "react-native";
-import { Text } from "react-native-animatable";
+import React from "react";
+import { Text, StyleSheet, ImageBackground } from "react-native";
 import { Div } from "react-native-magnus";
+import { scale } from "react-native-size-matters";
 
-interface HeaderProps {
-}
+interface HeaderProps {}
 
 export default function Header({ props }: HeaderProps) {
-    return (
-        <Div justifyContent="space-between" flexDir="row" w={"100%"} >
-            <Div>
-                <Text style={{ fontFamily: "RobotoCondensed-Regular", fontSize: 19 }}>Bienvenido</Text>
-                <Text style={{ fontFamily: "RobotoCondensed-Bold", fontSize: 25 }}>Martin</Text>
-            </Div>
-            <Div>
-                <Image
-                    style={{ width: 100, height: 100, marginTop: -25 }}
-                    source={require('@assets/logo.png')}
-                />
-            </Div>
-        </Div>
-    )
+  return (
+    <Div style={styles.container} justifyContent="center">
+      <Div>
+        <Text style={styles.welcomeText}>BIENVENIDO</Text>
+      </Div>
+      <Text style={styles.titleText}>TOTITO</Text>
+      <ImageBackground
+        source={require("../assets/logo.png")}
+        style={styles.imageBackground}
+      ></ImageBackground>
+    </Div>
+  );
 }
+const styles = StyleSheet.create({
+  container: {
+    width: "100%",
+    paddingHorizontal: scale(7),
+    paddingVertical: scale(3),
+  },
+  welcomeText: {
+    fontFamily: "Inter",
+    fontSize: scale(11),
+    color: "#000",
+    textTransform: "uppercase",
+  },
+  titleText: {
+    fontFamily: "RobotoCondensed-Black",
+    fontSize: scale(25),
+    color: "#000",
+    lineHeight: scale(28),
+    textTransform: "uppercase",
+  },
+  imageBackground: {
+    position: "absolute",
+    right: scale(0),
+    width: scale(80),
+    height: scale(80),
+  },
+});
