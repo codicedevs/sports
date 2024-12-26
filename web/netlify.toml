@@ -1,8 +1,7 @@
 [build]
   command = "yarn build"
   publish = ".next"
+  functions = "netlify/functions"
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
