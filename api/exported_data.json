@@ -214,8 +214,40 @@
             },
             "name": "Loyal La Paz",
             "address": "La Paz 947",
-            "matches": [],
+            "matches": [{
+                "$oid": "67003e15c94369186bbdfb32"
+            }],
             "__v": 0
+        }
+    ],
+    "matches": [
+        {
+            "_id": {
+                "$oid": "67003e15c94369186bbdfb32"
+            },
+            "name": "Partido 1",
+            "date": {
+                "$date": "2029-10-05T14:48:00.000Z"
+            },
+            "location": {
+                "$oid": "674757e93fd68aaabd532a75"
+            },
+            "playersLimit": 10,
+            "userId": {
+                "$oid": "6720ef0e3a78ebc10564e979"
+            },
+            "users": [
+                {
+                    "$oid": "6720ef0e3a78ebc10564e979"
+                },
+                {
+                    "$oid": "6720ef183a78ebc10564e97b"
+                },
+                {
+                    "$oid": "6720ef213a78ebc10564e97d"
+                }
+            ],
+            "__v": 2
         }
     ]
 }
