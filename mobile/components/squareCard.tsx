@@ -12,7 +12,6 @@ export interface SquareCardProps {
   hour: string | number;
   backgroundimage: ImageSourcePropType;
 }
-
 const SquareCard: React.FC<SquareCardProps> = ({
   backgroundimage,
   title,

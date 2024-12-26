@@ -11,7 +11,6 @@ export default function Header({ props }: HeaderProps) {
       <Div>
         <Text style={styles.welcomeText}>BIENVENIDO</Text>
       </Div>
-
       <Text style={styles.titleText}>TOTITO</Text>
       <ImageBackground
         source={require("../assets/logo.png")}
@@ -20,7 +19,6 @@ export default function Header({ props }: HeaderProps) {
     </Div>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     width: "100%",
@@ -40,7 +38,6 @@ const styles = StyleSheet.create({
     lineHeight: scale(28),
     textTransform: "uppercase",
   },
-
   imageBackground: {
     position: "absolute",
     right: scale(0),

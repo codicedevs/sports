@@ -63,14 +63,12 @@ const MatchCard = () => {
       overflow="hidden"
       mt={scale(15)}
     >
-    
       {/* Parte izquierda */}
       <StyledImageBackground source={require("../../assets/texturaCard.png")}>
         <StyledLinearGradientLeft
           colors={["rgba(152, 62, 248, 0.69)", "rgba(192, 138, 250, 0.33)"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
-          
         />
         <BlackOverlay />
         <Text
@@ -80,10 +78,19 @@ const MatchCard = () => {
         >
           2
         </Text>
-        <Text fontSize={scale(11)} color="white" fontFamily="RobotoCondensed-Regular" mt="lg">
+        <Text
+          fontSize={scale(11)}
+          color="white"
+          fontFamily="RobotoCondensed-Regular"
+          mt="lg"
+        >
           MONDAY
         </Text>
-        <Text fontSize={scale(11)} color="white" fontFamily="RobotoCondensed-Regular">
+        <Text
+          fontSize={scale(11)}
+          color="white"
+          fontFamily="RobotoCondensed-Regular"
+        >
           10:00 PM
         </Text>
       </StyledImageBackground>
@@ -119,14 +126,11 @@ const MatchCard = () => {
                 fontFamily="RobotoCondensed-Bold"
                 textTransform="uppercase"
               >
-               El caño fútbol 5
+                El caño fútbol 5
               </Text>
             </Div>
-
-            
           </Div>
         </Div>
-
         <Div bg="black" p="lg">
           <Text
             color="white"

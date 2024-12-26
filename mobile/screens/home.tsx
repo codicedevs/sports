@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Scale } from "react-native-size-matters";
+import { scale, Scale } from "react-native-size-matters";
 import { Button, Text, View, ScrollView } from "react-native";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
 import StatisticCard from "../components/statisticCard";
@@ -75,8 +75,8 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
       <Header />
       <ScrollView
         contentContainerStyle={{
-          padding: 10,
-          gap: 12,
+          padding: scale(8),
+          gap: scale(10),
         }}
         showsVerticalScrollIndicator={false}
       >
@@ -86,8 +86,8 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{
-            gap: 10,
-            marginTop: 10,
+            gap: scale(8),
+            marginTop: scale(9),
           }}
         >
           {cardData.map((data, index) => (
