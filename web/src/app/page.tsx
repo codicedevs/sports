@@ -1,6 +1,11 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 import Image from "next/image";
 
+interface User {
+    _id: string;
+    name: string;
+}
+
 export default async function Home() {
     // Fetch los datos directamente en el componente (SSR)
     const res = await fetch('https://codice.dev:3000/matches', {
@@ -41,13 +46,13 @@ export default async function Home() {
                 <h1 className="text-2xl font-bold mb-4">Matches</h1>
                 <ul>
                     {match?.users?.length > 0 ? (
-                        match.users.map((user: any) => (
+                        match.users.map((user: User) => (
                             <li key={user._id} className="p-2 border-b">
                                 {user.name}
                             </li>
                         ))
                     ) : (
-                        <p>No matches found.</p>
+                        <p>No users found.</p>
                     )}
                 </ul>
             </main>
