@@ -1,0 +1,14 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #ffffff;
+  --primary: #5D3C81;
+  --secondary: #05F3FF;
+  --accent: #FEDF82;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
