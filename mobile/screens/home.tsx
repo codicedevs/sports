@@ -1,15 +1,16 @@
 import React, { useState } from "react";
+import { scale, Scale } from "react-native-size-matters";
 import { Button, Text, View, ScrollView } from "react-native";
-import ResponseModal from "../components/modal/responseModal";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
 import StatisticCard from "../components/statisticCard";
 import SquareCard, { SquareCardProps } from "../components/squareCard";
 import Location from "../types/location.type";
 import Header from "../components/header";
-import SectionTitle from "../components/sectionTitle";
 import { GoogleSignin, GoogleSigninButton } from '@react-native-google-signin/google-signin';
 
 GoogleSignin.configure();
+import SectionPhoto from "../components/SectionPhoto";
+import MatchCard from "../components/cards/matchCard";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
@@ -20,6 +21,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     _id: "1",
     name: "Location 1",
     address: "123 Street",
+    hour: "19:00 PM",
     location: {
       type: "Point",
       coordinates: [40.7128, -74.006],
@@ -65,69 +67,88 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
 
   const cardData: SquareCardProps[] = [
     {
-      title: "YESTERDAY",
+      title: "Vie 8 dic",
       score: "LOYAL",
       location: location1,
-      backgroundimage: require("../assets/escudo1.png"),
+      hour: "19:00 PM",
+      backgroundimage: require("../assets/squarecard2.png"),
     },
     {
       title: "TODAY",
       score: "150 W 120",
       location: location1,
-      backgroundimage: require("../assets/escudo2.png"),
+      hour: "19:00 PM",
+      backgroundimage: require("../assets/squarecard1.png"),
     },
     {
       title: "NEVER",
       score: "0 W 800",
+      hour: "19:00 PM",
       location: location1,
-      backgroundimage: require("../assets/escudo3.png"),
+      backgroundimage: require("../assets/squaredcard3.png"),
     },
     {
       title: "NEVER",
       score: "0 W 800",
+      hour: "19:00 PM",
       location: location1,
       backgroundimage: require("../assets/escudo4.png"),
     },
     {
       title: "NEVER",
       score: "0 W 800",
+      hour: "19:00 PM",
       location: location1,
       backgroundimage: require("../assets/escudo5.png"),
     },
     {
       title: "NEVER",
       score: "0 W 800",
+      hour: "19:00 PM",
       location: location1,
       backgroundimage: require("../assets/escudo6.png"),
     },
   ];
 
   return (
-    <View
-      style={{
-        padding: 20,
-      }}
-    >
-      <Header/>
-      <StatisticCard />
+    <View style={{ flex: 1, padding: 8 }}>
+      <Header />
       <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
-          gap: 10, marginTop: 10,
+          padding: scale(8),
+          gap: scale(10),
         }}
+        showsVerticalScrollIndicator={false}
       >
-        {cardData.map((data, index) => (
-          <SquareCard
-            key={index}
-            title={data.title}
-            score={data.score}
-            location={data.location}
-            backgroundimage={data.backgroundimage}
-          />
-        ))}
+        <StatisticCard style={{ flex: 1 }} />
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{
+            gap: scale(8),
+            marginTop: scale(9),
+          }}
+        >
+          {cardData.map((data, index) => (
+            <SquareCard
+              key={index}
+              title={data.title}
+              score={data.score}
+              hour={data.hour}
+              location={data.location}
+              backgroundimage={data.backgroundimage}
+            />
+          ))}
+        </ScrollView>
+        {/*Scrol vertical*/}
+
+        <SectionPhoto backGroundImage={require("../assets/photoNew.png")} />
+        <MatchCard></MatchCard>
+        <MatchCard></MatchCard>
+        <MatchCard></MatchCard>
+        <MatchCard></MatchCard>
       </ScrollView>
-      <SectionTitle title="PROXIMOS PARTIDOS"/>
       <GoogleSigninButton
               style={{ width: "100%", height: 48 }}
               size={GoogleSigninButton.Size.Wide}

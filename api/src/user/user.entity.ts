@@ -108,8 +108,3 @@ export class User extends Document {
 
 
 export const UserSchema = SchemaFactory.createForClass(User);
-
-// Anidando subesquemas
-AvailabilitySchema.add({ intervals: [IntervalSchema] });
-ProfileSchema.add({ availability: [AvailabilitySchema] });
-UserSchema.add({ profile: ProfileSchema });

@@ -9,9 +9,30 @@ const client = new MongoClient(uri);
 function transformData(data) {
     return data.map(item => {
         const transformedItem = { ...item };
+
+        // Convertir las referencias de preferredZones, preferredSports y preferredSportModes a ObjectId
+        if (item.profile && item.profile.preferredZones) {
+            transformedItem.profile.preferredZones = item.profile.preferredZones.map(zone => new ObjectId(zone.$oid));
+        }
+
+        if (item.profile && item.profile.preferredSports) {
+            transformedItem.profile.preferredSports = item.profile.preferredSports.map(sport => new ObjectId(sport.$oid));
+        }
+
+        if (item.profile && item.profile.preferredSportModes) {
+            transformedItem.profile.preferredSportModes = item.profile.preferredSportModes.map(mode => new ObjectId(mode.$oid));
+        }
+
+        // Convertir el campo sport a ObjectId si existe
+        if (item.sport && item.sport.$oid) {
+            transformedItem.sport = new ObjectId(item.sport.$oid);
+        }
+
+        // Convertir _id a ObjectId si es necesario
         if (item._id && item._id.$oid) {
             transformedItem._id = new ObjectId(item._id.$oid);
         }
+
         return transformedItem;
     });
 }
@@ -40,7 +61,6 @@ async function seedDatabase() {
         let dataSports = transformData(data.sports);
         let dataSportModes = transformData(data.sportModes);
         let dataLocations = transformData(data.locations);
-
 
         await users.deleteMany({});
         await zones.deleteMany({});
