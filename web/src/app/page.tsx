@@ -1,52 +1,33 @@
 
 import Image from "next/image";
-import { Fragment } from "react";
 
-interface User {
-    _id: string;
-    name: string;
-}
+export async function generateMetadata({ params, searchParams }, parent) {
+    const user = await fetch('https://jsonplaceholder.typicode.com/users/1').then((res) => res.json())
 
-export async function generateMetada() {
-    const res = await fetch('https://e2be-181-199-145-212.ngrok-free.app/matches/676d903e73a26a0de5f38bde', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NmY3MDU1YTI2ZmM3YWEyZWFiYjk0ZWYiLCJ1c2VybmFtZSI6ImRpZWdvKzEiLCJyb2xlcyI6WyJ1c2VyIl0sImlhdCI6MTczNTMxMTE1MiwiZXhwIjoxNzM1Mzk3NTUyfQ.5y94jC7n02mbYHScxjTeJ_0-87B4GhvqLiwbnH7jB7M'
-        },
-        cache: 'no-store'
-    });
-
-    const match = await res.json();
+    // const _parent = await parent
 
     return {
-        title: match.name,
+        title: user.title,
+        description: user.address.street,
+        authors: [{ name: user.username }, { name: 'Josh', url: 'https://nextjs.org' }],
         openGraph: {
-            title: match.name,
-            description: `Jugadores: ${match.users.map((user: User) => user.name).join(", ")}`,
-            type: 'website',
-            url: `https://tu-dominio.com/matches/${match._id}`,
-            image: '/logo-sports.png',
-            locale: 'es_ES'
+            images: ['https://via.placeholder.com/600/92c952', '/sports.png'],
         },
     }
 }
 
-export default async function Home() {
-    const res = await fetch('https://e2be-181-199-145-212.ngrok-free.app/matches/676d903e73a26a0de5f38bde', {
+export default async function Page() {    
+    const res = await fetch('https://jsonplaceholder.typicode.com/users/1', {
         method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NmY3MDU1YTI2ZmM3YWEyZWFiYjk0ZWYiLCJ1c2VybmFtZSI6ImRpZWdvKzEiLCJyb2xlcyI6WyJ1c2VyIl0sImlhdCI6MTczNTMxMTE1MiwiZXhwIjoxNzM1Mzk3NTUyfQ.5y94jC7n02mbYHScxjTeJ_0-87B4GhvqLiwbnH7jB7M'
-        },
-        cache: 'no-store'
+        cache: 'no-cache',
     });
 
+    
     if (!res.ok) {
         return <div>Error</div>;
     }
-
-    const match = await res.json();
+    
+    const user = await res.json();
 
     return (
         <div className="p-4">
@@ -58,7 +39,12 @@ export default async function Home() {
                     height={80}
                 />
             </nav>
-            <main>
+            {user && (
+                <>
+                    {user.name}
+                </>
+            )}
+            {/* <main>
                 {match ? (
                     <Fragment key={match._id}>
                         <h3 className="font-bold">Partido</h3>
@@ -76,7 +62,7 @@ export default async function Home() {
                 ) : (
                     <p>No users found.</p>
                 )}
-            </main>
+            </main> */}
         </div>
     );
 }
