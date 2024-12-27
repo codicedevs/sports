@@ -1,7 +1,7 @@
 
 import Image from "next/image";
 
-export async function generateMetadata({ params, searchParams }, parent) {
+export async function generateMetadata(_: any, parent: any) {
     const user = await fetch('https://jsonplaceholder.typicode.com/users/1').then((res) => res.json())
 
     // const _parent = await parent
@@ -16,17 +16,17 @@ export async function generateMetadata({ params, searchParams }, parent) {
     }
 }
 
-export default async function Page() {    
+export default async function Page() {
     const res = await fetch('https://jsonplaceholder.typicode.com/users/1', {
         method: 'GET',
         cache: 'no-cache',
     });
 
-    
+
     if (!res.ok) {
         return <div>Error</div>;
     }
-    
+
     const user = await res.json();
 
     return (
