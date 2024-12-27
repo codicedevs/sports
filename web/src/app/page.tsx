@@ -1,12 +1,35 @@
-"use client";
 
 import Image from "next/image";
 import { Fragment } from "react";
-import Head from "next/head";
 
 interface User {
     _id: string;
     name: string;
+}
+
+export async function generateMetada() {
+    const res = await fetch('https://e2be-181-199-145-212.ngrok-free.app/matches/676d903e73a26a0de5f38bde', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NmY3MDU1YTI2ZmM3YWEyZWFiYjk0ZWYiLCJ1c2VybmFtZSI6ImRpZWdvKzEiLCJyb2xlcyI6WyJ1c2VyIl0sImlhdCI6MTczNTMxMTE1MiwiZXhwIjoxNzM1Mzk3NTUyfQ.5y94jC7n02mbYHScxjTeJ_0-87B4GhvqLiwbnH7jB7M'
+        },
+        cache: 'no-store'
+    });
+
+    const match = await res.json();
+
+    return {
+        title: match.name,
+        openGraph: {
+            title: match.name,
+            description: `Jugadores: ${match.users.map((user: User) => user.name).join(", ")}`,
+            type: 'website',
+            url: `https://tu-dominio.com/matches/${match._id}`,
+            image: '/logo-sports.png',
+            locale: 'es_ES'
+        },
+    }
 }
 
 export default async function Home() {
@@ -20,40 +43,13 @@ export default async function Home() {
     });
 
     if (!res.ok) {
-        return (
-            <div>
-                <h1>Error loading matches</h1>
-                <p>Please try again later.</p>
-            </div>
-        );
+        return <div>Error</div>;
     }
 
     const match = await res.json();
-    console.log(match, 'match');
 
     return (
         <div className="p-4">
-            {/* Dynamic meta tags */}
-            <Head>
-                {/* Meta tags for SEO */}
-                <title>{`Partido: ${match.name}`}</title>
-                <meta name="description" content={`Jugadores: ${match.users.map((user: User) => user.name).join(", ")}`} />
-                <meta name="keywords" content={`Partido, ${match.name}, ${match.location.name}, ${match.users.map((user: User) => user.name).join(", ")}`} />
-
-                {/* Open Graph tags */}
-                <meta property="og:title" content={`Partido: ${match.name}`} />
-                <meta property="og:description" content={`Jugadores: ${match.users.map((user: User) => user.name).join(", ")}`} />
-                <meta property="og:type" content="website" />
-                <meta property="og:url" content={`https://tu-dominio.com/matches/${match._id}`} />
-                <meta property="og:image" content="/logo-sports.png" />
-                <meta property="og:locale" content="es_ES" />
-
-                {/* Twitter Card tags */}
-                <meta name="twitter:card" content="summary_large_image" />
-                <meta name="twitter:title" content={`Partido: ${match.name}`} />
-                <meta name="twitter:description" content={`Jugadores: ${match.users.map((user: User) => user.name).join(", ")}`} />
-                <meta name="twitter:image" content="/logo-sports.png" />
-            </Head>
             <nav className="w-full flex justify-center items-center mb-4">
                 <Image
                     src="/logo-sports.png"
