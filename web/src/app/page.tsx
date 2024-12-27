@@ -35,9 +35,24 @@ export default async function Home() {
         <div className="p-4">
             {/* Dynamic meta tags */}
             <Head>
+                {/* Meta tags for SEO */}
                 <title>{`Partido: ${match.name}`}</title>
                 <meta name="description" content={`Jugadores: ${match.users.map((user: User) => user.name).join(", ")}`} />
                 <meta name="keywords" content={`Partido, ${match.name}, ${match.location.name}, ${match.users.map((user: User) => user.name).join(", ")}`} />
+
+                {/* Open Graph tags */}
+                <meta property="og:title" content={`Partido: ${match.name}`} />
+                <meta property="og:description" content={`Jugadores: ${match.users.map((user: User) => user.name).join(", ")}`} />
+                <meta property="og:type" content="website" />
+                <meta property="og:url" content={`https://tu-dominio.com/matches/${match._id}`} />
+                <meta property="og:image" content="/logo-sports.png" />
+                <meta property="og:locale" content="es_ES" />
+
+                {/* Twitter Card tags */}
+                <meta name="twitter:card" content="summary_large_image" />
+                <meta name="twitter:title" content={`Partido: ${match.name}`} />
+                <meta name="twitter:description" content={`Jugadores: ${match.users.map((user: User) => user.name).join(", ")}`} />
+                <meta name="twitter:image" content="/logo-sports.png" />
             </Head>
             <nav className="w-full flex justify-center items-center mb-4">
                 <Image
