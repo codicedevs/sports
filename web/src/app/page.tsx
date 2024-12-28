@@ -1,7 +1,7 @@
 
 import Image from "next/image";
 
-export async function generateMetadata(_: any, parent: any) {
+export async function generateMetadata() {
     const user = await fetch('https://jsonplaceholder.typicode.com/users/1').then((res) => res.json())
 
     // const _parent = await parent
