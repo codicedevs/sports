@@ -9,7 +9,7 @@ import {
 } from "@nestjs/common";
 import { Public } from "./public";
 import { AuthService } from "./authentication.service";
-import { SignInDto } from "./singin.dto";
+import { SignInDto, SsoAuthInfoDto } from "./singin.dto";
 import { RecoverPasswordDto, ResetPassDto } from "user/user.dto";
 import { AuthGuard } from "./auth.guard";
 import { GoogleAuthService } from "./google-auth-service";
@@ -50,12 +50,29 @@ export class AuthController {
    */
   @Public()
   @Post("google")
-  async googleLogin(@Body("token") token: string) {
+  async googleLogin(@Body() userInfo: SsoAuthInfoDto) {
+    console.log('📥 [googleLogin] Iniciando autenticación con Google SSO');
+    console.log('👉 Datos recibidos:', userInfo);
+  
     try {
-      const result = await this.googleAuthService.loginWithGoogle(token);
-      return result; // Devolvemos el JWT y el usuario al frontend
+      const result = await this.googleAuthService.signInSSO(userInfo);
+      console.log('✅ [googleLogin] Autenticación exitosa:', result);
+      return result; 
     } catch (error) {
-      return { message: "Error de autenticación", error };
+      console.error('❌ [googleLogin] Error durante la autenticación:', error);
+  
+      // Desglose del error
+      console.error('📝 Mensaje de error:', error.message || 'No hay mensaje');
+      console.error('🛠️ Stack:', error.stack || 'No hay stack trace');
+      console.error('🔑 Claves del error:', Object.keys(error));
+  
+      throw {
+        message: error.message || 'Error desconocido durante la autenticación',
+        stack: error.stack || 'No stack trace available',
+        details: error.response || error,
+      };
+    } finally {
+      console.log('🔚 [googleLogin] Finalizó el método googleLogin');
     }
   }
 
