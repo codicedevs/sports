@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { scale, Scale } from "react-native-size-matters";
-import { Button, Text, View, ScrollView } from "react-native";
+import { Text, View, ScrollView } from "react-native";
+import { Button } from "react-native-magnus";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
 import StatisticCard from "../components/statisticCard";
 import SquareCard, { SquareCardProps } from "../components/squareCard";
@@ -8,12 +8,16 @@ import Location from "../types/location.type";
 import Header from "../components/header";
 import SectionPhoto from "../components/SectionPhoto";
 import MatchCard from "../components/cards/matchCard";
+import ModalAnimation from "../components/cards/animatedCard";
+import Index from "../components/matche";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
+  // Estados para manejar los modales y pasos
+  const [openStep, setOpenStep] = useState(false);
   const [open, setOpen] = useState(false);
-  // a ver si se puede pushear
+
   const location1: Location = {
     _id: "1",
     name: "Location 1",
@@ -24,6 +28,10 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
       coordinates: [40.7128, -74.006],
     },
   };
+
+  function handleStep() {
+    setOpenStep(true);
+  }
 
   const cardData: SquareCardProps[] = [
     {
@@ -72,22 +80,27 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
 
   return (
     <View style={{ flex: 1, padding: 8 }}>
+      {/* Encabezado */}
       <Header />
+
+      {/* Scroll principal */}
       <ScrollView
         contentContainerStyle={{
-          padding: scale(8),
-          gap: scale(10),
+          padding: 10,
+          gap: 12,
         }}
         showsVerticalScrollIndicator={false}
       >
+        {/* Tarjeta de estadísticas */}
         <StatisticCard style={{ flex: 1 }} />
 
+        {/* Scroll horizontal de tarjetas */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{
-            gap: scale(8),
-            marginTop: scale(9),
+            gap: 10,
+            marginTop: 10,
           }}
         >
           {cardData.map((data, index) => (
@@ -101,13 +114,25 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
             />
           ))}
         </ScrollView>
-        {/*Scrol vertical*/}
 
+        {/* Foto de sección */}
         <SectionPhoto backGroundImage={require("../assets/photoNew.png")} />
-        <MatchCard></MatchCard>
-        <MatchCard></MatchCard>
-        <MatchCard></MatchCard>
-        <MatchCard></MatchCard>
+
+        {/* Tarjetas de partidos */}
+        <MatchCard />
+        <MatchCard />
+        <MatchCard />
+        <MatchCard />
+
+        {/* Botón para abrir el Modal */}
+        <Button onPress={handleStep} mt={10} bg="blue600">
+          <Text style={{ color: "white" }}>Crear Partido</Text>
+        </Button>
+
+        {/* Modal con los Steps */}
+        <ModalAnimation open={openStep} onFinish={() => setOpenStep(false)}>
+          <Index />
+        </ModalAnimation>
       </ScrollView>
     </View>
   );

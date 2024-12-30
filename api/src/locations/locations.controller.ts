@@ -14,6 +14,7 @@ import { CreateLocationDto } from "./location.dto";
 import { UpdateLocationDto } from "./location.dto";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { ObjectId } from "mongodb";
+import { Public } from "authentication/public";
 
 @ApiBearerAuth()
 @ApiTags('locations')
@@ -25,7 +26,8 @@ export class LocationsController {
   create(@Body() createLocationDto: CreateLocationDto) {
     return this.locationsService.create(createLocationDto);
   }
-
+  
+  @Public()
   @Get()
   findAll() {
     return this.locationsService.findAll();

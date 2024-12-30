@@ -19,17 +19,22 @@ import { MatchOwnerGuard } from "authentication/matchOwnerGuard";
 import { MatchPlayerGuard } from "authentication/matchPlayerGuard";
 import { Filter } from "types/types";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { Public } from "authentication/public";
 
 @ApiBearerAuth()
 @ApiTags('matches')
 @Controller("matches")
 export class MatchController {
     constructor(private readonly matchService: MatchService) { }
-
+@Public()
     @Post()
     async createMatch(@Body() createMatchDto: CreateMatchDto) {
-        const newMatch = await this.matchService.createMatch(createMatchDto);
-        return newMatch;
+        try{
+            const newMatch = await this.matchService.createMatch(createMatchDto);
+            return newMatch;
+        } catch(e){
+            throw e
+        }
     }
 
     @Post(":matchId/users/:userId")
@@ -48,7 +53,7 @@ export class MatchController {
 
         return updatedMatch;
     }
-
+    
     @Get()
     async findAll(@Query() filter: Filter) {                        
         return await this.matchService.findAll(filter);
