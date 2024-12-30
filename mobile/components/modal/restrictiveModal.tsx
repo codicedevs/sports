@@ -3,9 +3,47 @@ import { Text } from "react-native";
 import { Overlay, Button, Div } from "react-native-magnus";
 import { useSession } from "../../context/authProvider";
 import { customTheme } from "../../utils/theme";
+import { GoogleSignin, GoogleSigninButton } from "@react-native-google-signin/google-signin";
+import authService from "../../service/auth.service";
 
 const RestrictiveModal = () => {
     const { isModalVisible, hideModal } = useSession();
+
+    GoogleSignin.configure();
+
+    const handleGoogleSignIn = async () => {
+        console.log(1)
+        try {
+            // Verificar si los servicios de Google Play están disponibles
+            await GoogleSignin.hasPlayServices();
+            const userInfo = await GoogleSignin.signIn();
+            const res = await authService.loginSSO(userInfo)
+        } catch (e) {
+            console.log(e, ' ocurrio un error ')
+        }
+
+        //   if (res) {
+        //     // Guardar los tokens en AsyncStorage
+        //     await AsyncStorage.setItem("refresh", res.refreshToken ?? "");
+        //     await AsyncStorage.setItem("access", res.accessToken ?? "");
+
+        //     setCurrentUser(res.user);
+        //   }
+        // } catch (error) {
+        //   // Manejo de errores específicos
+        //   if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+        //   // Sentry.captureMessage("Google Sign-In cancelled by user") 
+        //   } else if (error.code === statusCodes.IN_PROGRESS) {
+        //   // Sentry.captureMessage("Google Sign-In already in progress") 
+        //   } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        //   // Sentry.captureMessage("Google Play services not available or outdated") 
+        //   } else {
+        //     // Sentry.captureException(error)
+        //   }
+        // }
+
+        console.log("Google Sign-In process ended"); // Log final
+    };
 
     if (!isModalVisible) return
     return (
@@ -32,6 +70,12 @@ const RestrictiveModal = () => {
                 <Text style={{ fontSize: customTheme.fontSize.medium, textAlign: "center", marginBottom: 15 }}>
                     ¡Debes iniciar sesión para acceder a esta funcionalidad!
                 </Text>
+                <GoogleSigninButton
+                    style={{ width: "100%", height: 48 }}
+                    size={GoogleSigninButton.Size.Wide}
+                    color={GoogleSigninButton.Color.Dark}
+                    onPress={handleGoogleSignIn}
+                />
                 <Button
                     alignSelf="center"
                     px="xl"
