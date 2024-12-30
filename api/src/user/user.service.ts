@@ -4,7 +4,7 @@ import {
     NotFoundException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model, Types } from "mongoose";
+import { HydratedDocument, Model, Types } from "mongoose";
 import { User } from "./user.entity";
 import { CreateUserDto, UpdateUserDto } from "./user.dto";
 import * as bcrypt from "bcryptjs";
@@ -115,8 +115,11 @@ export class UserService {
     /**
      * @param createUserDto
      */
-    async create(createUserDto: CreateUserDto): Promise<User> {
-        const hashedPassword = await bcrypt.hash(createUserDto.password, 8);
+    async create(createUserDto: CreateUserDto): Promise<HydratedDocument<User>> {
+        let hashedPassword: string | undefined = undefined;
+        if (createUserDto.password) {
+            hashedPassword = await bcrypt.hash(createUserDto.password, 8);
+        }
         const user = new this.userModel({
             ...createUserDto,
             password: hashedPassword,

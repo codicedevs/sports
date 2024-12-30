@@ -18,8 +18,9 @@ export class CreateUserDto {
   @IsEmail()
   email: string;
 
+  @IsOptional()
   @MinLength(8)
-  password: string;
+  password?: string;
 
   @IsOptional()
   @IsArray()
@@ -32,7 +33,8 @@ export class CreateUserDto {
   @IsOptional()
   roles?: Role[];
 
-  pushToken: string;
+  @IsOptional()
+  pushToken?: string;
 }
 
 export class UpdateUserDto {
