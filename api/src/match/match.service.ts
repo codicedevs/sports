@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { model, Model } from "mongoose";
+import { model, Model, Types } from "mongoose";
 import { CreateMatchDto, MatchDto, } from "./match.dto";
 import { UpdateMatchDto } from "./match.dto";
 import { Formations, Match, Player } from "./match.entity";
@@ -12,7 +12,7 @@ import { User } from "user/user.entity";
 import { Location } from "locations/location.entity";
 import { ObjectId } from "mongodb";
 import { PetitionService } from "petition/petition.service";
-import { PetitionStatus } from "petition/petition.enum";
+import { PetitionModelType, PetitionStatus } from "petition/petition.enum";
 import { Filter, FilterResponse } from "types/types";
 import * as moment from "moment-timezone"; // Para manejar zonas horarias
 import { Zone } from "zones/entities/zone.entity";
@@ -36,15 +36,22 @@ export class MatchService {
   // Servicio para crear partido, con o sin invitaciones
   async createMatch(createMatchDto: CreateMatchDto): Promise<Match> {
     const { userId, invitedUsers, location, ...matchData } = createMatchDto;
-
+    if (!Types.ObjectId.isValid(userId)) {
+      throw new BadRequestException("ID de usuario inválido");
+    }
     // Verificar si el usuario creador existe
     const user = await this.userModel.findById(userId).exec();
     if (!user) {
       throw new NotFoundException("Usuario no encontrado");
     }
 
+    if (!Types.ObjectId.isValid(location as Types.ObjectId)) {
+      throw new BadRequestException("ID de location inválida");
+    }
     // Verificar si la location existe
+    
     const locationExist = await this.locationModel.findById(location).exec();
+    
     if (!locationExist) {
       throw new NotFoundException("Ubicación no encontrada");
     }
@@ -90,7 +97,10 @@ export class MatchService {
         await this.petitionService.create({
           emitter: user.id, // El creador del partido es el emisor
           receiver: new ObjectId(invitedUserId), // Convertir receiver a ObjectId
-          match: savedMatch.id,
+          reference: {
+            id: savedMatch.id,
+            type: PetitionModelType.match
+          },
           status: PetitionStatus.Pending,
         });
       }
@@ -116,10 +126,7 @@ export class MatchService {
 
       }
 
-
-
     }
-
 
     return savedMatch;
   }

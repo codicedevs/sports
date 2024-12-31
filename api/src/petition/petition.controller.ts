@@ -14,6 +14,8 @@ import { CreatePetitionDto } from "./petition.dto";
 import { UpdatePetitionDto } from "./petition.dto";
 import { ObjectId } from "mongodb";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { PetitionModelType } from "./petition.enum";
+import { Types } from "mongoose";
 
 @ApiBearerAuth()
 @ApiTags('petitions')
@@ -22,8 +24,17 @@ export class PetitionController {
   constructor(private readonly petitionService: PetitionService) {}
 
   @Post()
-  async createPetition(@Body("petition") petition: CreatePetitionDto) {
-    return this.petitionService.create(petition);
+  async createPetition(@Body() petition: CreatePetitionDto) {
+    if (!ObjectId.isValid(petition.emitter)) {
+      throw new BadRequestException("ID de emisor inválido");
+    }
+    if (!ObjectId.isValid(petition.receiver)) {
+      throw new BadRequestException("ID de receptor inválido");
+    }
+    const emitter = new Types.ObjectId(petition.emitter)
+    const receiver = new Types.ObjectId(petition.receiver)
+    
+    return this.petitionService.create({emitter, receiver, ...petition});
   }
 
   //Aceptar una peticion
@@ -32,7 +43,7 @@ export class PetitionController {
     if (!ObjectId.isValid(petitionId)) {
       throw new BadRequestException("ID de petición inválido");
     }
-    return this.petitionService.acceptPetition(new ObjectId(petitionId));
+    return this.petitionService.acceptPetition(new Types.ObjectId(petitionId));
   }
 
   //Rechazar peticion
@@ -45,14 +56,16 @@ export class PetitionController {
   }
 
   //comprobar si un usuario ya peticiono para unirse a un partido
-  @Get("existing/:emitterId/:matchId")
+  @Get("existing/:emitterId/:modelType/:targetId")
   async getExistingPetition(
     @Param("emitterId") emitterId: string,
-    @Param("matchId") matchId: string,
+    @Param("targetId") targetId: string,
+    @Param("modelType") modelType: PetitionModelType,
   ) {
     const existingPetition = await this.petitionService.findExistingPetition(
       emitterId,
-      matchId,
+      targetId,
+      modelType
     );
 
     return existingPetition;
