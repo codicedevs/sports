@@ -5,6 +5,7 @@ import { Match } from "match/match.entity";
 import { Zone } from "zones/entities/zone.entity";
 import { Sport } from "sports/entities/sport.entity";
 import { SportMode } from "sport_modes/entities/sport_mode.entity";
+import { Group } from "groups/entities/group.entity";
 
 // Subschema: Interval
 @Schema({ _id: false })
@@ -41,7 +42,6 @@ class Availability {
 
 export const AvailabilitySchema = SchemaFactory.createForClass(Availability);
 // Subschema: Profile
-@Schema({ _id: false })
 export class Profile {
   @Prop({ type: [AvailabilitySchema], required: true }) // Array de disponibilidades
   availability: Availability[];
@@ -102,6 +102,10 @@ export class User extends Document {
 
   @Prop({ type: ProfileSchema, required: false }) // El perfil es opcional
   profile?: Profile;
+
+  @Prop({type:[{type: mongoose.Schema.Types.ObjectId, ref: "Group"}]})
+  groups?: Types.ObjectId[] | Group[]; 
+
 }
 
 // Creación de esquemas
