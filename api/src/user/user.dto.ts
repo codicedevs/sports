@@ -7,8 +7,8 @@ import {
   IsOptional,
   IsArray,
 } from "class-validator";
+import { Types } from "mongoose";
 import { Profile, User } from "user/user.entity";
-import { ObjectId } from "mongodb";
 
 
 export class CreateUserDto {
@@ -23,10 +23,10 @@ export class CreateUserDto {
 
   @IsOptional()
   @IsArray()
-  friends?: ObjectId[]; // Array of ObjectIds referencing User documents
+  friends?: Types.ObjectId[]; // Array of ObjectIds referencing User documents
 
   @IsOptional()
-  matches?: ObjectId[];
+  matches?: Types.ObjectId[];
 
   @IsEnum(Role, { each: true })
   @IsOptional()
@@ -52,7 +52,7 @@ export class UpdateUserDto {
   friends?: User[];
 
   @IsOptional()
-  matches?: ObjectId[];
+  matches?: Types.ObjectId[];
 
   @IsOptional()
   resetKey?: string;

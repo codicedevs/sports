@@ -12,7 +12,6 @@ import {
 import { PetitionService } from "./petition.service";
 import { CreatePetitionDto } from "./petition.dto";
 import { UpdatePetitionDto } from "./petition.dto";
-import { ObjectId } from "mongodb";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { PetitionModelType } from "./petition.enum";
 import { Types } from "mongoose";
@@ -25,10 +24,10 @@ export class PetitionController {
 
   @Post()
   async createPetition(@Body() petition: CreatePetitionDto) {
-    if (!ObjectId.isValid(petition.emitter)) {
+    if (!Types.ObjectId.isValid(petition.emitter)) {
       throw new BadRequestException("ID de emisor inválido");
     }
-    if (!ObjectId.isValid(petition.receiver)) {
+    if (!Types.ObjectId.isValid(petition.receiver)) {
       throw new BadRequestException("ID de receptor inválido");
     }
     const emitter = new Types.ObjectId(petition.emitter)
@@ -40,7 +39,7 @@ export class PetitionController {
   //Aceptar una peticion
   @Put("accept/:petitionId")
   async acceptPetition(@Param("petitionId") petitionId: string) {
-    if (!ObjectId.isValid(petitionId)) {
+    if (!Types.ObjectId.isValid(petitionId)) {
       throw new BadRequestException("ID de petición inválido");
     }
     return this.petitionService.acceptPetition(new Types.ObjectId(petitionId));
@@ -49,10 +48,10 @@ export class PetitionController {
   //Rechazar peticion
   @Put("decline/:petitionId")
   async declinePetition(@Param("petitionId") petitionId: string) {
-    if (!ObjectId.isValid(petitionId)) {
+    if (!Types.ObjectId.isValid(petitionId)) {
       throw new BadRequestException("ID de petición inválido");
     }
-    return this.petitionService.declinePetition(new ObjectId(petitionId));
+    return this.petitionService.declinePetition(new Types.ObjectId(petitionId));
   }
 
   //comprobar si un usuario ya peticiono para unirse a un partido

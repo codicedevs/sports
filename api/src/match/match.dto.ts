@@ -8,9 +8,9 @@ import {
   MinLength,
 } from "class-validator";
 import { Location } from "locations/location.entity";
-import { ObjectId } from "mongodb";
 import { SportMode } from "sport_modes/entities/sport_mode.entity";
 import { Formations } from "./match.entity";
+import { Types } from "mongoose";
 
 export class CreateMatchDto {
   @IsNotEmpty()
@@ -23,7 +23,7 @@ export class CreateMatchDto {
   date: string;
 
   @IsNotEmpty()
-  location: ObjectId | Location;
+  location: Types.ObjectId | Location;
 
   @IsNotEmpty()
   @IsNumber()
@@ -31,18 +31,18 @@ export class CreateMatchDto {
 
   @IsNotEmpty()
   @IsString()
-  userId: ObjectId;
+  userId: Types.ObjectId;
 
   @IsOptional()
   @IsArray() // Esto asegura que cada elemento en el array es un UserDto
-  users?: ObjectId[];
+  users?: Types.ObjectId[];
 
   @IsOptional() // Esto hace que los usuarios invitados sean opcionales
   @IsArray()
   invitedUsers?: string[];
 
   @IsOptional()
-  sportMode?: ObjectId|SportMode;
+  sportMode?: Types.ObjectId|SportMode;
 
   @IsOptional()
   open?: boolean;
@@ -68,7 +68,7 @@ export class UpdateMatchDto extends PartialType(CreateMatchDto) {
 
   @IsNotEmpty()
   @IsString()
-  location?: ObjectId;
+  location?: Types.ObjectId;
 
   @IsNotEmpty()
   @IsNumber()
@@ -76,10 +76,10 @@ export class UpdateMatchDto extends PartialType(CreateMatchDto) {
 
   @IsOptional()
   @IsArray()
-  users?: ObjectId[];
+  users?: Types.ObjectId[];
 
   @IsOptional()
-  sportMode?: ObjectId|SportMode;
+  sportMode?: Types.ObjectId|SportMode;
 
   @IsOptional()
   open?: boolean;

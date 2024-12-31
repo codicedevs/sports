@@ -10,7 +10,6 @@ import { UpdateMatchDto } from "./match.dto";
 import { Formations, Match, Player } from "./match.entity";
 import { User } from "user/user.entity";
 import { Location } from "locations/location.entity";
-import { ObjectId } from "mongodb";
 import { PetitionService } from "petition/petition.service";
 import { PetitionModelType, PetitionStatus } from "petition/petition.enum";
 import { Filter, FilterResponse } from "types/types";
@@ -96,7 +95,7 @@ export class MatchService {
         // Crear la petición asegurando que receiver y match sean ObjectId
         await this.petitionService.create({
           emitter: user.id, // El creador del partido es el emisor
-          receiver: new ObjectId(invitedUserId), // Convertir receiver a ObjectId
+          receiver: new Types.ObjectId(invitedUserId), // Convertir receiver a ObjectId
           reference: {
             id: savedMatch.id,
             type: PetitionModelType.match
@@ -131,7 +130,7 @@ export class MatchService {
     return savedMatch;
   }
 
-  async addUserToMatch(matchId: ObjectId, userId: ObjectId): Promise<Match> {
+  async addUserToMatch(matchId: Types.ObjectId, userId: Types.ObjectId): Promise<Match> {
     const match = await this.matchModel.findById(matchId).exec();
     const user = await this.userModel.findById(userId).exec();
 
@@ -150,8 +149,8 @@ export class MatchService {
   }
 
   async removeUserFromMatch(
-    matchId: ObjectId,
-    userId: ObjectId,
+    matchId: Types.ObjectId,
+    userId: Types.ObjectId,
   ): Promise<Match> {
     // Buscar el partido por su ID
     const match = await this.matchModel.findById(matchId).exec();
@@ -203,7 +202,7 @@ export class MatchService {
     }
   }
 
-  async findOne(id: ObjectId): Promise<Match> {
+  async findOne(id: Types.ObjectId): Promise<Match> {
     const match = await this.matchModel
       .findById(id)
       .populate("location")
@@ -216,7 +215,7 @@ export class MatchService {
     return match;
   }
 
-  async update(id: ObjectId, updateMatchDto: UpdateMatchDto): Promise<Match> {
+  async update(id: Types.ObjectId, updateMatchDto: UpdateMatchDto): Promise<Match> {
     const match = await this.matchModel
       .findByIdAndUpdate(id, updateMatchDto, {
         new: true,
@@ -230,7 +229,7 @@ export class MatchService {
     return match;
   }
 
-  async remove(id: ObjectId): Promise<void> {
+  async remove(id: Types.ObjectId): Promise<void> {
     // 1. Buscar el partido y poblar la lista de usuarios asociados al partido
     const match = await this.matchModel
       .findById(id)
@@ -246,7 +245,7 @@ export class MatchService {
 
     // 2. Aseguramos que el campo `users` es un array de documentos completos de User
     const users = match.users as unknown as Array<
-      User & { matches: ObjectId[] }
+      User & { matches: Types.ObjectId[] }
     >; // Conversión explícita para evitar errores de tipo
 
     // 3. Para cada usuario, remover el partido de su lista de matches y guardar cambios
@@ -462,7 +461,7 @@ export class MatchService {
 
     let preferredSportModes: SportMode[] = (user.profile?.preferredSportModes as SportMode[]) || []
     if (preferredSportModes.length == 0) {
-      preferredSportModes = (await this.sportModesService.findForSports(user.profile.preferredSports as ObjectId[])) as SportMode[]
+      preferredSportModes = (await this.sportModesService.findForSports(user.profile.preferredSports as Types.ObjectId[])) as SportMode[]
     }
 
 
@@ -551,9 +550,9 @@ export class MatchService {
   async getUsersForMatchRecommendations(match: MatchDto): Promise<User[]> {
     const day = this.getDay(match.dayOfWeek)
     const hour = match.hour
-    const locationId = (match.location) as ObjectId
+    const locationId = (match.location) as Types.ObjectId
     const location = await this.locationsService.findOne(locationId)
-    const sportModeId = new ObjectId(match.sportMode as ObjectId)
+    const sportModeId = new Types.ObjectId(match.sportMode as Types.ObjectId)
     const sportMode = await this.sportModesService.findById(sportModeId)
     const sportId = sportMode.sport
     const users = await this.userModel.aggregate([
@@ -629,7 +628,7 @@ export class MatchService {
     return users;
   }
 
-  async addUserToFormation(userId: ObjectId, matchId: ObjectId, team: 1 | 2, position: number): Promise<Formations> {
+  async addUserToFormation(userId: Types.ObjectId, matchId: Types.ObjectId, team: 1 | 2, position: number): Promise<Formations> {
     const match = await this.matchModel.findById(matchId).exec();
     if (!match) {
       throw new Error("Match not found");
@@ -675,7 +674,7 @@ export class MatchService {
     return newFormations;
   }
 
-  async removeUserFromFormation(matchId: ObjectId, userId: ObjectId) {
+  async removeUserFromFormation(matchId: Types.ObjectId, userId: Types.ObjectId) {
     const match = await this.matchModel.findById(matchId).exec();
     if (!match) {
       throw new Error("Match not found");
