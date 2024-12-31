@@ -8,7 +8,7 @@ import { PetitionService } from 'petition/petition.service';
 import { NotFoundException } from '@nestjs/common';
 import { CreateMatchDto } from './match.dto';
 import * as mongoose from 'mongoose';
-import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 
 describe('MatchService', () => {
   let service: MatchService;
@@ -58,9 +58,9 @@ describe('MatchService', () => {
     it('should create a match successfully', async () => {
       // Arrange
       const createMatchDto: CreateMatchDto = {
-        userId: new ObjectId("123456789123456789112233"),
+        userId: new Types.ObjectId("123456789123456789112233"),
         invitedUsers: ['invitedUser1', 'invitedUser2'],
-        location: new ObjectId("123456789123456789112233"),
+        location: new Types.ObjectId("123456789123456789112233"),
         date: '2024-12-10T18:00:00',
         name: "aa",
         playersLimit: 22
@@ -86,9 +86,9 @@ describe('MatchService', () => {
     it('should throw NotFoundException if user does not exist', async () => {
       // Arrange
       const createMatchDto: CreateMatchDto = {
-        userId: new ObjectId("123456789123456789112233"),
+        userId: new Types.ObjectId("123456789123456789112233"),
         invitedUsers: ['invitedUser1', 'invitedUser2'],
-        location: new ObjectId("123456789123456789112233"),
+        location: new Types.ObjectId("123456789123456789112233"),
         date: '2024-12-10T18:00:00',
         name: "aa",
         playersLimit: 22
@@ -101,9 +101,9 @@ describe('MatchService', () => {
     it('should throw NotFoundException if location does not exist', async () => {
       // Arrange
       const createMatchDto: CreateMatchDto = {
-        userId: new ObjectId("123456789123456789112233"),
+        userId: new Types.ObjectId("123456789123456789112233"),
         invitedUsers: ['invitedUser1', 'invitedUser2'],
-        location: new ObjectId("123456789123456789112233"),
+        location: new Types.ObjectId("123456789123456789112233"),
         date: '2024-12-10T18:00:00',
         name: "aa",
         playersLimit: 22

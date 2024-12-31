@@ -5,7 +5,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { SportMode } from './entities/sport_mode.entity';
 import { Model, Types } from 'mongoose';
 import { FindManyFilter } from 'filter/filter.dto';
-import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class SportModesService {
@@ -25,7 +24,7 @@ export class SportModesService {
     return this.sportModeModel.find(filter).exec();
   }
 
-  async findById(id: ObjectId): Promise<SportMode>  {
+  async findById(id: Types.ObjectId): Promise<SportMode>  {
     return this.sportModeModel.findById(id);
   }
 

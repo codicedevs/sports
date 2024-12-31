@@ -9,10 +9,25 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Petition } from "./petition.entity";
 import { Match } from "match/match.entity";
 import { User } from "user/user.entity";
-import { Model, Types } from "mongoose";
-import { PetitionStatus } from "./petition.enum";
+import { HydratedDocument, Model, Types } from "mongoose";
+import { PetitionModelType, PetitionStatus } from "./petition.enum";
 import { FindManyFilter } from "filter/filter.dto";
 import { PushNotificationService } from "services/pushNotificationservice";
+import { Group } from "groups/entities/group.entity";
+type ModelHandlers = {
+  [key in PetitionModelType]: {
+    model: Model<any>;
+    validate: (target: any, emitterId: Types.ObjectId) => Promise<void>;
+  };
+};
+const translate: Record<PetitionModelType, string> = {
+  Group: "grupo",
+  Match: "partido",
+};
+const plural: Record<PetitionModelType, string> = {
+  Group: "groups",
+  Match: "matches",
+};
 
 @Injectable()
 export class PetitionService {
@@ -20,19 +35,43 @@ export class PetitionService {
     @InjectModel(Petition.name) private readonly petitionModel: Model<Petition>,
     @InjectModel(Match.name) private readonly matchModel: Model<Match>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
+    @InjectModel(Group.name) private readonly gorupModel: Model<Group>,
     private readonly notificationService: PushNotificationService,
-  ) {}
+  ) { }
+
+  modelHandlers: ModelHandlers = {
+    [PetitionModelType.match]: {
+      model: this.matchModel,
+      validate: async (target, emitterId) => {
+        if (!target) {
+          throw new NotFoundException("PARTIDO no encontrado");
+        }
+      },
+    },
+    [PetitionModelType.group]: {
+      model: this.gorupModel,
+      validate: async (target) => {
+        if (!target) {
+          throw new NotFoundException("GRUPO no encontrado");
+        }
+      },
+    },
+  };
+
+
 
   async create(createPetitionDto: CreatePetitionDto): Promise<Petition> {
-    const { emitter, receiver, match } = createPetitionDto;
+    const { emitter, receiver, reference } = createPetitionDto;
+    const targetId = reference.id
+    const modelType = reference.type
+    
     // Verificar que el usuario solicitante, destinatario, y partido existan
 
     const emitterExist = await this.userModel.findById(emitter).exec();
-    //console.log("emisor", emitterExist);
     const receiverExist = await this.userModel.findById(receiver).exec();
-    //console.log("receptor", receiverExist);
-    const matchExist = await this.matchModel.findById(match).exec();
-    //console.log("partido", match);
+
+    //TODO: Abstract logic onto guards, should exist guard
+
 
     if (!emitterExist) {
       throw new NotFoundException("EMISOR de la peticion no encontrado");
@@ -42,12 +81,18 @@ export class PetitionService {
       throw new NotFoundException("RECEPTOR de la peticion no encontrado");
     }
 
-    if (!matchExist) {
-      throw new NotFoundException("PARTIDO no encontrado");
+    // Obtener el modelo y la función de validación correspondiente
+    const handler = this.modelHandlers[modelType];
+    if (!handler) {
+      throw new BadRequestException("Tipo de referencia no soportado");
     }
+    const target = await handler.model.findById(targetId).exec();
+
+    // Validar el modelo objetivo (group o match)
+    await handler.validate(target, emitterExist._id as Types.ObjectId);
 
     // Verificar si el emisor es el creador del partido
-    const isEmitterCreator = new Types.ObjectId(matchExist.userId).equals(
+    const isEmitterCreator = new Types.ObjectId(target.userId).equals(
       emitterExist.id,
     );
 
@@ -55,7 +100,10 @@ export class PetitionService {
     const existingPetition = await this.petitionModel
       .findOne({
         emitter: new Types.ObjectId(emitter),
-        match: new Types.ObjectId(match),
+        reference: {
+          id: new Types.ObjectId(targetId),
+          type: modelType
+        }
       })
       .exec();
 
@@ -63,18 +111,18 @@ export class PetitionService {
       existingPetition &&
       existingPetition.status == PetitionStatus.Declined
     ) {
-      throw new BadRequestException("ANDA PA'ALLA BOBO");
+      throw new BadRequestException("Petición previamente rechazada");
     } else if (existingPetition && !isEmitterCreator) {
       // Si no es el creador y ya existe una solicitud, se lanza la excepción
       throw new BadRequestException(
-        "Ya existe una petición de este usuario para este partido",
+        `Ya existe una petición de este usuario para este ${translate[modelType]}`,
       );
     }
 
     // Verificar si el partido ya ha alcanzado el límite de jugadores, si ya tiene el cupo lleno no podemos enviar solicitud para jugar
-    if (matchExist.users.length >= matchExist.playersLimit) {
+    if (target.users.length >= target.playersLimit) {
       throw new BadRequestException(
-        "El partido ya ha alcanzado el límite de jugadores",
+        "Ya ha alcanzado el límite de jugadores",
       );
     }
 
@@ -82,21 +130,21 @@ export class PetitionService {
     const newPetition = new this.petitionModel({
       emitter: emitterExist._id,
       receiver: receiverExist._id,
-      match: matchExist._id,
+      reference: {
+        id: target._id,
+        type: modelType,
+      },
       status: PetitionStatus.Pending,
     });
-
     await newPetition.save();
 
-    // Enviar notificación al receptor (receiver) de la petición
     if (receiverExist.pushToken) {
       const message = isEmitterCreator
-        ? `${emitterExist.name} ha solicitado que te unas a su partido.`
-        : `${emitterExist.name} ha solicitado unirse a tu partido.`;
-
+        ? `${emitterExist.name} ha solicitado que te unas a su ${translate[modelType]}.`
+        : `${emitterExist.name} ha solicitado unirse a tu ${translate[modelType]}.`;
       await this.notificationService.sendPushNotification(
         [receiverExist.pushToken],
-        "Nueva solicitud para unirse al partido",
+        `Nueva solicitud para unirse al ${translate[modelType]}`,
         message,
         { petitionId: newPetition._id.toString() },
       );
@@ -105,29 +153,37 @@ export class PetitionService {
     return newPetition;
   }
 
-  async acceptPetition(petitionId: Types.ObjectId): Promise<Match> {
+  async acceptPetition(petitionId: Types.ObjectId): Promise<Match | Group> {
     // Buscar la petición por su ID
-    const petition = await this.petitionModel
+    
+    const petition: Petition = await this.petitionModel
       .findById(petitionId)
       .populate("emitter")
       .populate("receiver")
-      .populate("match")
+      .populate("reference.id")
       .exec();
 
     if (!petition) {
       throw new NotFoundException("Solicitud no encontrada");
     }
+    
+    const modelType = petition?.reference?.type
+    const targetId = petition?.reference?.id
 
     // Ahora 'match' y 'emitter' son objetos completos, no solo IDs
 
-    const match = await this.matchModel.findById(petition.match._id).exec();
-    const emitter = await this.userModel.findById(petition.emitter._id).exec();
-    const receiver = await this.userModel
+    const handler = this.modelHandlers[modelType];
+    if (!handler) {
+      throw new BadRequestException("Tipo de referencia no soportado");
+    }
+    const target = await handler.model.findById(targetId).exec();
+    const emitter: User = await this.userModel.findById(petition.emitter._id).exec();
+    const receiver: User = await this.userModel
       .findById(petition.receiver._id)
       .exec();
 
-    if (!match) {
-      throw new NotFoundException("Partido no encontrado");
+    if (!target) {
+      throw new NotFoundException("Recurso no encontrado");
     }
 
     if (!emitter) {
@@ -143,50 +199,51 @@ export class PetitionService {
     }
 
     // Verificar si el partido ya ha alcanzado el límite de jugadores
-    if (match.users.length >= match.playersLimit) {
+    if (target.users.length >= target.playersLimit) {
       throw new BadRequestException(
         "No se puede aceptar la solicitud porque el partido ya ha alcanzado el límite de jugadores",
       );
     }
+    
 
     // Si el emisor es el creador del partido, agregar al receptor en lugar del emisor
-    if (match.userId.equals(petition.emitter._id)) {
-      match.users.push(petition.receiver._id);
+    if ((target.userId as Types.ObjectId).equals(petition.emitter._id as Types.ObjectId)) {
+      (target.users).push(petition.receiver._id);
 
-      // Agregar el partido al array de partidos del receiver si no es el dueño
-      if (!match.userId.equals(petition.receiver._id)) {
-        if (!receiver.matches.includes(match.id)) {
-          receiver.matches.push(match.id); // Agregar el partido al array de `matches` del receiver
+      // Agregar el partido al array de partidos o grupos del receiver si no es el dueño
+      if (!(target.userId as Types.ObjectId).equals(petition.receiver._id)) {
+        if (!receiver[plural[modelType]].includes(target.id)) {
+          receiver[plural[modelType]].push(target.id); // Agregar el partido al array de `matches` o `groups` del receiver
           await receiver.save(); // Guardar los cambios en el receptor
         }
       }
     } else {
       // En caso contrario, agregar al emisor al partido
-      match.users.push(petition.emitter._id);
+      target.users.push(petition.emitter._id);
 
       // Agregar el partido al array de partidos del emisor
-      if (!emitter.matches.includes(match.id)) {
-        emitter.matches.push(match.id); // Agregar el partido al array de `matches` del emisor
+      if (!emitter.matches.includes(target.id)) {
+        emitter.matches.push(target.id); // Agregar el partido al array de `matches` del emisor
         await emitter.save(); // Guardar los cambios en el emisor
       }
     }
     // Marcar la solicitud como aceptada
     petition.status = PetitionStatus.Accepted;
 
-    await match.save();
+    await target.save();
     await petition.save();
 
     // Enviar notificación al emisor (emitter) de que su petición ha sido aceptada
     if (emitter.pushToken) {
+      const notificationMessage = `Tu solicitud para unirte al ${translate[modelType]} ha sido aceptada.`
       await this.notificationService.sendPushNotification(
         [emitter.pushToken],
         "Solicitud Aceptada",
-        `Tu solicitud para unirte al partido ha sido aceptada.`,
-        { matchId: match._id.toString() },
+        notificationMessage,
+        { id: target._id.toString() }
       );
     }
-
-    return match;
+    return target;
   }
 
   async declinePetition(petitionId: Types.ObjectId): Promise<Petition> {
@@ -211,7 +268,7 @@ export class PetitionService {
       await this.notificationService.sendPushNotification(
         [emitter.pushToken],
         "Solicitud Rechazada",
-        `Tu solicitud para unirte al partido ha sido rechazada.`,
+        `Tu solicitud para unirte ha sido rechazada.`,
         { petitionId: petition._id.toString() },
       );
     }
@@ -221,12 +278,16 @@ export class PetitionService {
 
   async findExistingPetition(
     emitterId: string,
-    matchId: string,
+    targetId: string,
+    modelType: PetitionModelType
   ): Promise<Petition | null> {
     const existingPetition = await this.petitionModel
       .findOne({
         emitter: new Types.ObjectId(emitterId),
-        match: new Types.ObjectId(matchId),
+        reference:{
+          id: new Types.ObjectId(targetId),
+          type: modelType
+        }
       })
       .exec();
 

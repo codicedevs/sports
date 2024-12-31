@@ -13,7 +13,7 @@ import { LocationsService } from "./locations.service";
 import { CreateLocationDto } from "./location.dto";
 import { UpdateLocationDto } from "./location.dto";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { ObjectId } from "mongodb";
+import { Types } from "mongoose";
 
 @ApiBearerAuth()
 @ApiTags('locations')
@@ -33,7 +33,7 @@ export class LocationsController {
 
   @Get(":id")
   async findOne(@Param("id") id: string) {
-    return this.locationsService.findOne(new ObjectId(id));
+    return this.locationsService.findOne(new Types.ObjectId(id));
   }
 
   @Get("nearby")

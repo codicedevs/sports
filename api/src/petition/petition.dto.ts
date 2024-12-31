@@ -1,7 +1,8 @@
 import { IsNotEmpty, IsEnum, IsMongoId } from "class-validator";
-import { PetitionStatus } from "petition/petition.enum";
+import { PetitionModelType, PetitionStatus } from "petition/petition.enum";
 import { Types } from "mongoose";
 import { PartialType } from "@nestjs/mapped-types";
+import { Reference } from "./petition.entity";
 
 export class CreatePetitionDto {
   @IsNotEmpty()
@@ -12,12 +13,11 @@ export class CreatePetitionDto {
   @IsMongoId()
   readonly receiver: Types.ObjectId;
 
-  @IsNotEmpty()
-  @IsMongoId()
-  readonly match: Types.ObjectId;
+  reference: Reference;
 
   @IsEnum(PetitionStatus)
   readonly status: PetitionStatus = PetitionStatus.Pending;
+
 }
 
 export class UpdatePetitionDto extends PartialType(CreatePetitionDto) {

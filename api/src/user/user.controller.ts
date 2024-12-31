@@ -20,8 +20,8 @@ import { Role } from "../authorization/role.enum";
 import { Roles } from "../authorization/role.decorator";
 import { UserService } from "./user.service";
 import { Public } from "authentication/public";
-import { ObjectId } from "mongodb";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { Types } from "mongoose";
 
 // All these endpoints are globally protected by the auth guard that requires a token
 
@@ -50,10 +50,10 @@ export class UserController {
      */
     @Get(":id")
     async getById(@Param("id") id: string) {
-        if (!ObjectId.isValid(id)) {
+        if (!Types.ObjectId.isValid(id)) {
             throw new BadRequestException("ID inválido");
         }
-        const objectId = new ObjectId(id);
+        const objectId = new Types.ObjectId(id);
         const user = await this.userService.findByIdOrFail(objectId);
         return user;
     }
@@ -69,7 +69,7 @@ export class UserController {
     // Endpoint para obtener las peticiones de un usuario por su ID
     @Get(":id/petitions")
     async getUserPetitions(@Param("id") userId: string) {
-        if (!ObjectId.isValid(userId)) {
+        if (!Types.ObjectId.isValid(userId)) {
             throw new BadRequestException("ID de usuario inválido");
         }
 
@@ -79,12 +79,12 @@ export class UserController {
     // Obtener los partidos de un usuario
     @Get(":userId/matches")
     async getUserMatches(@Param("userId") userId: string): Promise<Match[]> {
-        if (!ObjectId.isValid(userId)) {
+        if (!Types.ObjectId.isValid(userId)) {
             throw new BadRequestException("ID de usuario inválido");
         }
 
         const userWithMatches = await this.userService.getMatchesByUser(
-            new ObjectId(userId),
+            new Types.ObjectId(userId),
         );
         return userWithMatches; // Devolver solo los partidos del usuario
     }
@@ -92,11 +92,11 @@ export class UserController {
     //Obtener un usuario con su lista de amigos
     @Get(":userId/friends")
     async getUserWithFriends(@Param("userId") userId: string) {
-        if (!ObjectId.isValid(userId)) {
+        if (!Types.ObjectId.isValid(userId)) {
             throw new BadRequestException("ID de usuario inválido");
         }
         const userWithFriends = await this.userService.getUserFriends(
-            new ObjectId(userId),
+            new Types.ObjectId(userId),
         );
         if (!userWithFriends) {
             throw new NotFoundException("Usuario no encontrado");
@@ -120,12 +120,12 @@ export class UserController {
         @Param("userId") userId: string,
         @Param("friendId") friendId: string,
     ) {
-        if (!ObjectId.isValid(userId) || !ObjectId.isValid(friendId)) {
+        if (!Types.ObjectId.isValid(userId) || !Types.ObjectId.isValid(friendId)) {
             throw new BadRequestException("ID de usuario o amigo inválido");
         }
         const updatedUser = await this.userService.addFriend(
-            new ObjectId(userId),
-            new ObjectId(friendId),
+            new Types.ObjectId(userId),
+            new Types.ObjectId(friendId),
         );
 
         return updatedUser;
@@ -138,10 +138,10 @@ export class UserController {
      */
     @Put(":id")
     async update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
-        if (!ObjectId.isValid(id)) {
+        if (!Types.ObjectId.isValid(id)) {
             throw new BadRequestException("ID inválido");
         }
-        const objectId = new ObjectId(id);
+        const objectId = new Types.ObjectId(id);
         const updatedUser = await this.userService.update(objectId, updateUserDto);
         return updatedUser;
     }
@@ -151,7 +151,7 @@ export class UserController {
         @Param("userId") userId: string,
         @Body("pushToken") pushToken: string,
     ): Promise<{ success: boolean; message?: string }> {
-        if (!ObjectId.isValid(userId)) {
+        if (!Types.ObjectId.isValid(userId)) {
             throw new BadRequestException("ID de usuario inválido");
         }
         const user = await this.userService.updatePushToken(userId, pushToken);
@@ -170,10 +170,10 @@ export class UserController {
     @Delete(":id")
     @Roles(Role.Admin)
     async delete(@Param("id") id: string) {
-        if (!ObjectId.isValid(id)) {
+        if (!Types.ObjectId.isValid(id)) {
             throw new BadRequestException("ID inválido");
         }
-        const objectId = new ObjectId(id);
+        const objectId = new Types.ObjectId(id);
         const deletedUser = await this.userService.delete(objectId);
         return deletedUser;
     }
@@ -185,13 +185,13 @@ export class UserController {
         @Param("userId") userId: string,
         @Param("friendId") friendId: string,
     ) {
-        if (!ObjectId.isValid(userId) || !ObjectId.isValid(friendId)) {
+        if (!Types.ObjectId.isValid(userId) || !Types.ObjectId.isValid(friendId)) {
             throw new BadRequestException("ID de usuario o amigo inválido");
         }
 
         const updatedUser = await this.userService.removeFriend(
-            new ObjectId(userId),
-            new ObjectId(friendId),
+            new Types.ObjectId(userId),
+            new Types.ObjectId(friendId),
         );
         if (!updatedUser) {
             throw new NotFoundException("Usuario no encontrado");

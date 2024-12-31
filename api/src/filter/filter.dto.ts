@@ -1,25 +1,20 @@
-import { IsInt, IsOptional } from "class-validator";
-import {
-  FindManyOptions,
-  FindOneOptions,
-  FindOptionsRelations,
-  FindOptionsWhere,
-} from "typeorm";
+import { IsInt, IsOptional, IsObject } from "class-validator";
 
-export class FindOneFilter<T> implements FindOneOptions<T> {
+export class FindOneFilter<T> {
   @IsOptional()
-  relations?: FindOptionsRelations<T>;
+  @IsObject()
+  relations?: Record<string, boolean>;
+
   @IsOptional()
-  where?: FindOptionsWhere<T> | FindOptionsWhere<T>[];
+  @IsObject()
+  where?: Record<string, any> | Record<string, any>[];
 }
 
-export class FindManyFilter<T>
-  extends FindOneFilter<T>
-  implements FindManyOptions<T>
-{
+export class FindManyFilter<T> extends FindOneFilter<T> {
   @IsOptional()
   @IsInt()
   skip?: number;
+
   @IsOptional()
   @IsInt()
   take?: number;

@@ -16,7 +16,7 @@ import { SportsModule } from './sports/sports.module';
 import { SportModesModule } from './sport_modes/sport_modes.module';
 import { SentryGlobalFilter } from '@sentry/nestjs/setup';
 import { APP_FILTER } from '@nestjs/core';
-
+import { GroupsModule } from './groups/groups.module';
 @Module({
   imports: [
     SentryModule.forRoot(),
@@ -36,6 +36,7 @@ import { APP_FILTER } from '@nestjs/core';
     ZonesModule,
     SportsModule,
     SportModesModule,
+    GroupsModule
   ],
   controllers: [AppController],
   providers: [
