@@ -9,7 +9,8 @@ const schema = yup.object().shape({
   deporte: yup.string().required("El tipo de deporte es obligatorio"),
   jugadores: yup
     .number()
-    .transform((value) => (isNaN(value) ? undefined : value)) // Transforma NaN a undefined
+    .required("La cantidad de jugadores es obligatoria") 
+    .transform((value) => (isNaN(value) ? 0 : value)) // Transforma NaN a undefined
     .nullable()
     .min(1, "Debe haber al menos un jugador")
     .max(22, "No puede haber más de 22 jugadores"), // Opcional, pero validado si existe
@@ -19,8 +20,8 @@ const StepDeporteJugadores = ({
   initialData,
   onNext,
 }: {
-  initialData?: { deporte: string; jugadores?: number | null };
-  onNext: (data: { deporte: string; jugadores?: number | null }) => void;
+  initialData?: { deporte: string; jugadores: number  };
+  onNext: (data: { deporte: string; jugadores: number  }) => void;
 }) => {
   const {
     control,
@@ -29,7 +30,7 @@ const StepDeporteJugadores = ({
   } = useForm({
     defaultValues: {
       deporte: initialData?.deporte || "",
-      jugadores: initialData?.jugadores !== undefined ? Number(initialData.jugadores) : null,
+      jugadores: initialData?.jugadores !== undefined ? Number(initialData.jugadores) : 0,
     },
     resolver: yupResolver(schema),
   });

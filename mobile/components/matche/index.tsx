@@ -20,13 +20,13 @@ type Step2Data = {
 
 type Step3Data = {
   deporte: string;
-  jugadores: number;
+  jugadores: number ; 
 };
 
 type FormData = {
-  step1Data?: Step1Data;
-  step2Data?: Step2Data;
-  step3Data?: Step3Data;
+  step1Data: Step1Data;
+  step2Data: Step2Data;
+  step3Data: Step3Data;
 };
 
 const Index = () => {
@@ -37,7 +37,7 @@ const Index = () => {
     step2Data: { location: "" },
     step3Data: { deporte: "", jugadores: 0 },
   });
-
+  
   const opacity = useSharedValue(1); // Controla la opacidad del contenido
 
   useEffect(() => {
@@ -45,7 +45,7 @@ const Index = () => {
     opacity.value = withTiming(1, { duration: 600 }); // Aplica la animación
   }, [counterSteps]);
 
-  const handleNext = (data: any) => {
+  const handleNext = ( data: Step1Data | Step2Data | Step3Data) => {
     setFormData((prev) => ({
       ...prev,
       [`step${counterSteps}Data`]: data,
@@ -98,42 +98,18 @@ const Index = () => {
     CreateMatch();
   }, [formData.step3Data]);
 
-  return (
-    <Animated.View style={animatedStyle}>
-      <Div>
-        {counterSteps === 1 && (
-          <StepDiaHorario
-            initialData={formData.step1Data || { dia: "", horario: "" }}
-            onNext={(data) => handleNext(data)}
-          />
-        )}
-        {counterSteps === 2 && (
-          <StepLocation
-            initialData={{ location: "67002eb59cc0bd3b9c067174" }}
-            onNext={(data) => handleNext(data)}
-            onBack={handlePreviousStep}
-          />
-        )}
+  const steps = [
+    <StepDiaHorario initialData={formData.step1Data} onNext={handleNext} />,
+    <StepLocation initialData={formData.step2Data} onNext={handleNext} onBack={handlePreviousStep} />,
+    <StepDeporteJugadores
+      initialData={formData.step3Data}
+      onNext={handleNext}
+    />,
+  ];
 
-        {counterSteps === 3 && (
-          <>
-            <Button onPress={CreateMatch} block color="blue">
-              Crear Partido
-            </Button>
-            <StepDeporteJugadores
-              initialData={{
-                deporte: formData.step3Data?.deporte || "",
-                jugadores: formData.step3Data?.jugadores ?? null,
-              }}
-              onNext={(data) => handleNext(data)} /// hacer uin select pa elegir deportes cargados
-            />
-          </>
-        )}
-      </Div>
-    </Animated.View>
+  return (
+    <Animated.View style={animatedStyle}>{steps[counterSteps - 1]}</Animated.View>
   );
 };
 
 export default Index;
-
-//dia y horiario // location (opcional// tipo deporte cant jug
