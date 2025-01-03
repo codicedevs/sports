@@ -25,6 +25,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     availability: [],
     preferredZones: [],
   });
+  const [counterSteps, setCounterSteps] = useState(0)
 
   const location1: Location = {
     _id: "1",
@@ -41,27 +42,26 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     setUserInfo((prev) => ({ ...prev, ...info }));
   };
 
+  const handleNext = (data: any) => {
+    setUserInfo((prev) => ({ ...prev, ...data }));
+    if (counterSteps < steps.length - 1) {
+      setCounterSteps((prev) => prev + 1);
+    } else {
+      handleModalClose();
+    }
+  };
+  
   const steps = [
-    <StepSport
-      key="1"
-      userInfo={userInfo}
-      setUserInfo={updateUserInfo}
-    />,
-    <StepAvailability
-      key="2"
-      userInfo={userInfo}
-      setUserInfo={updateUserInfo}
-    />,
-    <StepZones
-      key="3"
-      userInfo={userInfo}
-      setUserInfo={updateUserInfo}
-    />,
+    <StepSport userInfo={userInfo} setUserInfo={setUserInfo} onNext={handleNext} />,
+    <StepAvailability userInfo={userInfo} setUserInfo={setUserInfo} onNext={handleNext} />,
+    <StepZones userInfo={userInfo} setUserInfo={setUserInfo} onNext={handleNext} />,
   ];
+  
 
   const handleModalClose = () => {
     console.log("Información final del usuario:", userInfo);
     setModalVisible(false);
+    setCounterSteps(0);
   };
 
   const cardData: SquareCardProps[] = [
@@ -156,6 +156,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
         steps={steps}
         visible={modalVisible}
         onClose={handleModalClose}
+        currentStep={counterSteps}
       />
     </>
   );

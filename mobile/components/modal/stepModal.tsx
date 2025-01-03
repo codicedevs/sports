@@ -1,36 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Modal, View, StyleSheet } from 'react-native';
 import { MotiView, AnimatePresence } from 'moti';
 
 type StepModalProps = {
-  steps: React.ReactNode[]; // Array de componentes para cada paso
+  steps: React.ReactNode[];
   visible: boolean;
   onClose: () => void;
+  currentStep: number; 
 };
 
-const StepModal: React.FC<StepModalProps> = ({ steps, visible, onClose }) => {
-  const [currentStep, setCurrentStep] = useState(0);
+const StepModal: React.FC<StepModalProps> = ({ steps, visible, onClose, currentStep }) => {
   const [isClosing, setIsClosing] = useState(false); // Para controlar la animación de cierre
 
-  // Reiniciar los pasos al cerrar el modal
+  // Reiniciar la animación de cierre al cerrar el modal
   useEffect(() => {
     if (!visible) {
-      setCurrentStep(0);
       setIsClosing(false);
     }
   }, [visible]);
 
-  const handleNextStep = () => {
-    if (isClosing) return; // Evita interacción durante el cierre
-
-    if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      // Iniciar animación de cierre
-      setIsClosing(true);
-    }
-  };
-
+  /**
+   * Finalizar animación de cierre
+   */
   const handleAnimationComplete = () => {
     if (isClosing) {
       onClose(); // Cierra el modal después de la animación de salida
@@ -42,7 +33,7 @@ const StepModal: React.FC<StepModalProps> = ({ steps, visible, onClose }) => {
     <Modal visible={visible} transparent animationType="none">
       <View style={styles.overlay}>
         <AnimatePresence>
-          {(visible || isClosing) && (
+          {visible && (
             <MotiView
               key={currentStep}
               style={styles.modalContainer}
@@ -61,26 +52,14 @@ const StepModal: React.FC<StepModalProps> = ({ steps, visible, onClose }) => {
                 width: '10%',
                 height: '10%',
               }}
-              onDidAnimate={handleAnimationComplete} // Detecta el fin de la animación
+              onDidAnimate={handleAnimationComplete}
               transition={{
                 type: 'spring',
-                damping: 15, // Amortiguación (menor valor, más rebote)
-                stiffness: 200, // Rigidez (mayor valor, animación más rápida)
+                damping: 15,
+                stiffness: 200,
               }}
             >
-              {steps[currentStep]}
-              <TouchableOpacity
-                onPress={handleNextStep}
-                style={[
-                  styles.button,
-                  isClosing && styles.buttonDisabled,
-                ]}
-                disabled={isClosing}
-              >
-                <Text style={styles.buttonText}>
-                  {currentStep < steps.length - 1 ? 'Siguiente' : 'Cerrar'}
-                </Text>
-              </TouchableOpacity>
+             {currentStep < steps.length ? steps[currentStep] : null}
             </MotiView>
           )}
         </AnimatePresence>
