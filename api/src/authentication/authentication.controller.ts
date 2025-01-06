@@ -6,6 +6,8 @@ import {
   Headers,
   UseGuards,
   Get,
+  Req,
+  BadRequestException,
 } from "@nestjs/common";
 import { Public } from "./public";
 import { AuthService } from "./authentication.service";
@@ -14,6 +16,9 @@ import { RecoverPasswordDto, ResetPassDto } from "user/user.dto";
 import { AuthGuard } from "./auth.guard";
 import { GoogleAuthService } from "./google-auth-service";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
+import { UserService } from "user/user.service";
+import { JwtPayload } from "jsonwebtoken";
+import { Types } from "mongoose";
 
 @Controller("auth")
 // @Public() // todos son publicos con este decorador!
@@ -21,6 +26,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly googleAuthService: GoogleAuthService,
+    private readonly userService: UserService
   ) {}
   /**
    * @param signInDto
@@ -53,19 +59,19 @@ export class AuthController {
   async googleLogin(@Body() userInfo: SsoAuthInfoDto) {
     console.log('📥 [googleLogin] Iniciando autenticación con Google SSO');
     console.log('👉 Datos recibidos:', userInfo);
-  
+
     try {
       const result = await this.googleAuthService.signInSSO(userInfo);
       console.log('✅ [googleLogin] Autenticación exitosa:', result);
-      return result; 
+      return result;
     } catch (error) {
       console.error('❌ [googleLogin] Error durante la autenticación:', error);
-  
+
       // Desglose del error
       console.error('📝 Mensaje de error:', error.message || 'No hay mensaje');
       console.error('🛠️ Stack:', error.stack || 'No hay stack trace');
       console.error('🔑 Claves del error:', Object.keys(error));
-  
+
       throw {
         message: error.message || 'Error desconocido durante la autenticación',
         stack: error.stack || 'No stack trace available',
@@ -74,6 +80,24 @@ export class AuthController {
     } finally {
       console.log('🔚 [googleLogin] Finalizó el método googleLogin');
     }
+  }
+
+  @Get('whoami')
+  async whoamiUser(@Req() request: Request) {
+    const { sub } = request['user'] as JwtPayload;
+    console.log(sub)
+    // Convertir `sub` a ObjectId
+    let objectId: Types.ObjectId;
+    try {
+      objectId = new Types.ObjectId(sub);
+    } catch (error) {
+      throw new BadRequestException('ID de usuario inválido');
+    }
+
+    const user = await this.userService.findByIdOrFail(objectId);
+    const { password, resetKey, resetKeyTimeStamp, ...userWithoutPass } = user;
+
+    return userWithoutPass;
   }
 
   /**
