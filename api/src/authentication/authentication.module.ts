@@ -6,7 +6,6 @@ import { AuthGuard } from "./auth.guard";
 import { EmailService } from "email/email.service";
 import { jwtSetting } from "settings";
 import { UserModule } from "user/user.module";
-
 import { GoogleAuthService } from "./google-auth-service";
 import { BlacklistService } from "./blackList.service";
 @Module({

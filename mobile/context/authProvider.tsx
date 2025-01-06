@@ -3,9 +3,15 @@ import React, { FC, ReactNode, useState } from "react";
 export const AuthContext = React.createContext<{
     currentUser: any;
     setCurrentUser: (user: any) => void;
+    isModalVisible: boolean;
+    showModal: () => void;
+    hideModal: () => void;
 }>({
     currentUser: 'null',
-    setCurrentUser: () => { }
+    setCurrentUser: () => { },
+    isModalVisible: false,
+    showModal: () => { },
+    hideModal: () => { },
 })
 
 interface AppProviderProps {
@@ -23,13 +29,20 @@ export function useSession() {
 }
 
 const AppProvider: FC<AppProviderProps> = ({ children }) => {
-    const [currentUser, setCurrentUser] = useState<any>(null)
+    const [currentUser, setCurrentUser] = useState<any>(null);
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
+    const showModal = () => setIsModalVisible(true);
+    const hideModal = () => setIsModalVisible(false);
 
     return (
         <AuthContext.Provider
             value={{
                 currentUser,
-                setCurrentUser
+                setCurrentUser,
+                isModalVisible,
+                showModal,
+                hideModal,
             }}
         >
             {children}
