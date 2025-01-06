@@ -1,15 +1,27 @@
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 import Image from "next/image";
 
 export async function generateMetadata() {
-    const user = await fetch('https://jsonplaceholder.typicode.com/users/1').then((res) => res.json())
+    const match = await fetch('https://codice.dev:3000/matches/6772c91a790633512b4bdbee', {
+        method: 'GET',
+        cache: 'no-cache',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzIwZWYwZTNhNzhlYmMxMDU2NGU5NzkiLCJ1c2VybmFtZSI6ImRpZWdvIiwicm9sZXMiOlsidXNlciJdLCJpYXQiOjE3MzYxNzgxNTUsImV4cCI6MTczNjI2NDU1NX0.oyCZhydg-68MWV6zOY3FNkfkNwGPT7jDgd2aUIxU4hE'
+        }
+    }).then((res) => res.json())
 
     // const _parent = await parent
+    
+    console.log(match)
 
     return {
-        title: user.title,
-        description: user.address.street,
-        authors: [{ name: user.username }, { name: 'Josh', url: 'https://nextjs.org' }],
+        title: match.name,
+        description: match.location.address,
+        authors: [{ name: match.name }, { name: 'Josh', url: 'https://codice.dev:3000' }],
         openGraph: {
             images: ['https://via.placeholder.com/600/92c952', '/sports.png'],
         },
@@ -17,17 +29,21 @@ export async function generateMetadata() {
 }
 
 export default async function Page() {
-    const res = await fetch('https://jsonplaceholder.typicode.com/users/1', {
+    const res = await fetch('https://codice.dev:3000/matches/6772c91a790633512b4bdbee', {
         method: 'GET',
         cache: 'no-cache',
-    });
-
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzIwZWYwZTNhNzhlYmMxMDU2NGU5NzkiLCJ1c2VybmFtZSI6ImRpZWdvIiwicm9sZXMiOlsidXNlciJdLCJpYXQiOjE3MzYxNzgxNTUsImV4cCI6MTczNjI2NDU1NX0.oyCZhydg-68MWV6zOY3FNkfkNwGPT7jDgd2aUIxU4hE'
+        }
+    }); 
 
     if (!res.ok) {
         return <div>Error</div>;
     }
 
-    const user = await res.json();
+    const match = await res.json();
 
     return (
         <div className="p-4">
@@ -39,9 +55,9 @@ export default async function Page() {
                     height={80}
                 />
             </nav>
-            {user && (
+            {match && (
                 <>
-                    {user.name}
+                    {match.name}
                 </>
             )}
             {/* <main>
