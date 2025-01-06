@@ -13,7 +13,6 @@ const RestrictiveModal = () => {
 
     const handleGoogleSignIn = async () => {
         try {
-            // Verificar si los servicios de Google Play están disponibles
             await GoogleSignin.hasPlayServices();
             const userInfo = await GoogleSignin.signIn();
             const res = await authService.loginSSO(userInfo)
@@ -21,27 +20,6 @@ const RestrictiveModal = () => {
         } catch (e) {
             console.log(e, ' ocurrio un error ')
         }
-
-        //   if (res) {
-        //     // Guardar los tokens en AsyncStorage
-        //     await AsyncStorage.setItem("refresh", res.refreshToken ?? "");
-        //     await AsyncStorage.setItem("access", res.accessToken ?? "");
-
-        //     setCurrentUser(res.user);
-        //   }
-        // } catch (error) {
-        //   // Manejo de errores específicos
-        //   if (error.code === statusCodes.SIGN_IN_CANCELLED) {
-        //   // Sentry.captureMessage("Google Sign-In cancelled by user") 
-        //   } else if (error.code === statusCodes.IN_PROGRESS) {
-        //   // Sentry.captureMessage("Google Sign-In already in progress") 
-        //   } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        //   // Sentry.captureMessage("Google Play services not available or outdated") 
-        //   } else {
-        //     // Sentry.captureException(error)
-        //   }
-        // }
-
         console.log("Google Sign-In process ended"); // Log final
     };
 
