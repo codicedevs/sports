@@ -263,7 +263,9 @@ export const StepZones: React.FC<StepZonesProps> = ({
       console.log('Por favor selecciona una zona.');
       return;
     }
-    onNext({ preferredZones: [selectedZone] });
+    console.log(userInfo)
+    console.log(selectedZone)
+    // onNext({ preferredZones: [selectedZone] });
   };
 
   return (

@@ -1,5 +1,6 @@
 
 import Petition from "../types/petition.type";
+import { UserPreferences } from "../types/preferences.type";
 import { User } from "../types/user.type";
 import { HttpService } from "./http.service";
 
@@ -20,6 +21,10 @@ class UserService extends HttpService {
   getUserFriends = (id: string) => {
     return this.get(`${id}/friends`);
   };
+
+  updatePreferences = (profile: UserPreferences) => {
+    return this.put("6720ef393a78ebc10564e987", profile);
+  }
 
   getUserPetitions = async (userId: string): Promise<Petition[]> => {
     const response = await this.get(`/${userId}/petitions`);

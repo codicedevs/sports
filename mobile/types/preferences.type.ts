@@ -7,7 +7,8 @@ export interface Interval {
  
   export interface Availability {
     day: 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
-    intervals: Interval[]; 
+    startTime: string;
+    endTime: string;
   }
   
 
