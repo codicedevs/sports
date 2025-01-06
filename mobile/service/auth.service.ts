@@ -29,6 +29,10 @@ export class AuthService extends HttpService {
         }
     };
 
+    whoAmI = () => {
+        return this.get("/whoami")
+    }
+
     loginSSO = async (userInfo: AuthSSOData) => {
         let loginProps: LoginProps | null = null;
         try {

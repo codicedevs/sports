@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Text } from "react-native";
 import { Overlay, Button, Div } from "react-native-magnus";
 import { useSession } from "../../context/authProvider";
@@ -10,15 +10,17 @@ const RestrictiveModal = () => {
     const { isModalVisible, hideModal, setCurrentUser } = useSession();
 
     GoogleSignin.configure();
-
     const handleGoogleSignIn = async () => {
         try {
             await GoogleSignin.hasPlayServices();
             const userInfo = await GoogleSignin.signIn();
             const res = await authService.loginSSO(userInfo)
-            setCurrentUser(res)
+            if (res) {
+                setCurrentUser(res)
+                hideModal()
+            }
         } catch (e) {
-            console.log(e, ' ocurrio un error ')
+            console.log(e, 'Ocurrio un error ')
         }
         console.log("Google Sign-In process ended"); // Log final
     };
