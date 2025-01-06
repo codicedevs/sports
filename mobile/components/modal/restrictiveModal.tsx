@@ -7,17 +7,17 @@ import { GoogleSignin, GoogleSigninButton } from "@react-native-google-signin/go
 import authService from "../../service/auth.service";
 
 const RestrictiveModal = () => {
-    const { isModalVisible, hideModal } = useSession();
+    const { isModalVisible, hideModal, setCurrentUser } = useSession();
 
     GoogleSignin.configure();
 
     const handleGoogleSignIn = async () => {
-        console.log(1)
         try {
             // Verificar si los servicios de Google Play están disponibles
             await GoogleSignin.hasPlayServices();
             const userInfo = await GoogleSignin.signIn();
             const res = await authService.loginSSO(userInfo)
+            setCurrentUser(res)
         } catch (e) {
             console.log(e, ' ocurrio un error ')
         }
