@@ -41,9 +41,6 @@ export class GoogleAuthService {
     accessToken: string;
     refreshToken: string;
   }>  {
-    console.log(info,' STALA');
-    console.log(info.data,' STALA2');
-    console.log(info.data.user,' STALA3');
     let user = await this.userModel.findOne({ email: info.data.user.email }).exec();
 
     if (!user) {

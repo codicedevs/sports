@@ -31,7 +31,6 @@ export class AuthService extends HttpService {
 
     loginSSO = async (userInfo: AuthSSOData) => {
         let loginProps: LoginProps | null = null;
-        console.log(userInfo)
         try {
             const res = await this.post('/google', userInfo)
             this.saveAccessToken(res.data.token);
