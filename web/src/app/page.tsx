@@ -16,8 +16,6 @@ export async function generateMetadata() {
 
     // const _parent = await parent
     
-    console.log(match)
-
     return {
         title: match.name,
         description: match.location.address,
