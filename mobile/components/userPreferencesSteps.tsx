@@ -1,8 +1,13 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Platform } from 'react-native';
-import { Button, Div, Input, Select } from 'react-native-magnus';
-import { Availability, UserPreferences } from '../types/preferences.type';
+import { Button, Select } from 'react-native-magnus';
+import { UserPreferences } from '../types/preferences.type';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import sportService from '../service/sport.service';
+import sportModesService from '../service/sport-modes.service';
+import { Picker } from '@react-native-picker/picker';
+import zonesService from '../service/zones.service';
+import userService from '../service/user.service';
 
 interface StepSportProps {
   userInfo: UserPreferences;
@@ -10,38 +15,35 @@ interface StepSportProps {
   onNext: (data: any) => void;
 }
 
-const SPORT_MODES: Record<string, { label: string; value: string }[]> = {
-  football: [
-    { label: 'Friendly', value: 'friendly' },
-    { label: 'Competitive', value: 'competitive' },
-    { label: 'Training', value: 'training' },
-  ],
-  basketball: [
-    { label: 'Street', value: 'street' },
-    { label: 'Competitive', value: 'competitive' },
-    { label: 'Training', value: 'training' },
-  ],
-  tennis: [
-    { label: 'Single', value: 'single' },
-    { label: 'Double', value: 'double' },
-    { label: 'Training', value: 'training' },
-  ],
-};
-
-export const StepSport: React.FC<StepSportProps> = ({
-  userInfo,
-  setUserInfo,
-  onNext,
-}) => {
+// Componente StepSport
+export const StepSport: React.FC<StepSportProps> = ({ userInfo, setUserInfo, onNext }) => {
   const [localSport, setLocalSport] = useState(userInfo.sport || '');
   const [localSportMode, setLocalSportMode] = useState(userInfo.sportMode || '');
+  const [sports, setSports] = useState([]);
+  const [sportModes, setSportModes] = useState([]);
   const sportSelectRef = useRef<any>(null);
   const sportModeSelectRef = useRef<any>(null);
 
   const handleSportChange = (value: string) => {
     setLocalSport(value);
-    setLocalSportMode(''); // Reiniciar SportMode al cambiar Sport
+    setLocalSportMode('');
   };
+
+  const bringSports = async () => {
+    try {
+      const resMode = await sportModesService.getSportModes();
+      const res = await sportService.getSports();
+      setSports(res.data);
+      console.log(res.data)
+      setSportModes(resMode.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  useEffect(() => {
+    bringSports();
+  }, []);
 
   const handleNext = () => {
     if (!localSport) {
@@ -57,55 +59,32 @@ export const StepSport: React.FC<StepSportProps> = ({
 
   return (
     <View style={{ padding: 20 }}>
-      {/* Selección de Deporte */}
-      <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Selecciona un Deporte</Text>
-      <Button onPress={() => sportSelectRef.current?.open()} mt="md">
-        {localSport || 'Seleccionar Deporte'}
-      </Button>
+      <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Selecciona un Deporte</Text>
+      <View style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, marginBottom: 20 }}>
+        <Picker selectedValue={localSport} onValueChange={(itemValue) => handleSportChange(itemValue)}>
+          <Picker.Item label="Seleccionar Deporte" value="" />
+          {sports.map((sport: any) => (
+            <Picker.Item key={sport._id} label={sport.name} value={sport._id} />
+          ))}
+        </Picker>
+      </View>
 
-      <Select
-        ref={sportSelectRef}
-        onSelect={(value) => handleSportChange(value)}
-        value={localSport}
-        title="Selecciona un Deporte"
-        data={[
-          { label: 'Football', value: 'football' },
-          { label: 'Basketball', value: 'basketball' },
-          { label: 'Tennis', value: 'tennis' },
-        ]}
-        renderItem={(item) => (
-          <Select.Option value={item.value} py="md" px="xl">
-            <Text>{item.label}</Text>
-          </Select.Option>
-        )}
-      />
-
-      {/* Selección de SportMode (aparece solo si hay Sport seleccionado) */}
       {localSport && (
         <>
-          <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 20 }}>
-            Selecciona un Modo de Deporte
-          </Text>
-          <Button onPress={() => sportModeSelectRef.current?.open()} mt="md">
-            {localSportMode || 'Seleccionar Modo'}
-          </Button>
-
-          <Select
-            ref={sportModeSelectRef}
-            onSelect={(value) => setLocalSportMode(value)}
-            value={localSportMode}
-            title="Selecciona un Modo"
-            data={SPORT_MODES[localSport] || []}
-            renderItem={(item) => (
-              <Select.Option value={item.value} py="md" px="xl">
-                <Text>{item.label}</Text>
-              </Select.Option>
-            )}
-          />
+          <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Selecciona un Modo de Deporte</Text>
+          <View style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, marginBottom: 20 }}>
+            <Picker selectedValue={localSportMode} onValueChange={(itemValue) => setLocalSportMode(itemValue)}>
+              <Picker.Item label="Seleccionar Modo" value="" />
+              {sportModes
+                .filter((mode: any) => mode.sport === localSport)
+                .map((mode: any) => (
+                  <Picker.Item key={mode._id} label={mode.name} value={mode._id} />
+                ))}
+            </Picker>
+          </View>
         </>
       )}
 
-      {/* Botón Siguiente */}
       <Button mt="lg" onPress={handleNext}>
         Siguiente
       </Button>
@@ -113,27 +92,57 @@ export const StepSport: React.FC<StepSportProps> = ({
   );
 };
 
+// Componente StepAvailability
 interface StepAvailabilityProps {
   userInfo: UserPreferences;
   setUserInfo: (info: Partial<UserPreferences>) => void;
   onNext: (data: any) => void;
 }
 
+// Opciones de días de la semana
+const daysOfWeek = [
+  { label: 'Lunes', value: 'monday' },
+  { label: 'Martes', value: 'tuesday' },
+  { label: 'Miércoles', value: 'wednesday' },
+  { label: 'Jueves', value: 'thursday' },
+  { label: 'Viernes', value: 'friday' },
+  { label: 'Sábado', value: 'saturday' },
+  { label: 'Domingo', value: 'sunday' },
+];
+
 export const StepAvailability: React.FC<StepAvailabilityProps> = ({
   userInfo,
   setUserInfo,
   onNext,
 }) => {
-  const [day, setDay] = useState(userInfo.availability?.[0]?.day || '');
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [selectedDay, setSelectedDay] = useState(userInfo.availability?.[0]?.day || '');
   const [startHour, setStartHour] = useState(new Date());
   const [endHour, setEndHour] = useState(new Date());
   const [showStartPicker, setShowStartPicker] = useState(false);
   const [showEndPicker, setShowEndPicker] = useState(false);
 
+  /**
+   * Manejar selección de horas
+   */
+  const onChangeStartHour = (event: any, selectedDate?: Date) => {
+    setShowStartPicker(false);
+    if (selectedDate) {
+      setStartHour(selectedDate);
+    }
+  };
+
+  const onChangeEndHour = (event: any, selectedDate?: Date) => {
+    setShowEndPicker(false);
+    if (selectedDate) {
+      setEndHour(selectedDate);
+    }
+  };
+
+  /**
+   * Validar y avanzar
+   */
   const handleNext = () => {
-    if (!day && !selectedDate) {
+    if (!selectedDay) {
       console.log('Por favor selecciona un día.');
       return;
     }
@@ -144,7 +153,7 @@ export const StepAvailability: React.FC<StepAvailabilityProps> = ({
     onNext({
       availability: [
         {
-          day: day || selectedDate.toISOString().split('T')[0], // Prioriza día del select si existe
+          day: selectedDay,
           intervals: [
             {
               startHour: startHour.getHours(),
@@ -156,86 +165,93 @@ export const StepAvailability: React.FC<StepAvailabilityProps> = ({
     });
   };
 
-    /**
-   * Actualizar hora de inicio
-   */
-    const onChangeStartHour = (event: any, selectedDate?: Date) => {
-      setShowStartPicker(false);
-      if (selectedDate) {
-        setStartHour(selectedDate);
-      }
-    };
-  
-    /**
-     * Actualizar hora de fin
-     */
-    const onChangeEndHour = (event: any, selectedDate?: Date) => {
-      setShowEndPicker(false);
-      if (selectedDate) {
-        setEndHour(selectedDate);
-      }
-    };
+  return (
+    <View style={{ padding: 20 }}>
+      {/* Selección de Día */}
+      <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Selecciona un Día</Text>
+      <View style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 8, marginBottom: 20 }}>
+        <Picker
+          selectedValue={selectedDay}
+          onValueChange={(itemValue) => setSelectedDay(itemValue)}
+        >
+          <Picker.Item label="Seleccionar un día" value="" />
+          {daysOfWeek.map((day) => (
+            <Picker.Item key={day.value} label={day.label} value={day.value} />
+          ))}
+        </Picker>
+      </View>
 
-    const onChangeDate = (event: any, selectedDate?: Date) => {
-      setShowDatePicker(false);
-      if (selectedDate) {
-        setSelectedDate(selectedDate);
-      }
-    };
-
-    return (
-      <View style={{ padding: 20 }}>
-        {/* Selección de Día */}
-        <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Selecciona un Día</Text>
-        <Button onPress={() => setShowDatePicker(true)} mt="md">
-        {selectedDate.toLocaleDateString() || 'Seleccionar Fecha'}
+      {/* Hora de Inicio */}
+      <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>Hora de Inicio</Text>
+      <Button
+        mt="md"
+        onPress={() => setShowStartPicker(true)}
+        style={{
+          backgroundColor: '#007AFF',
+          borderRadius: 8,
+          paddingVertical: 10,
+          paddingHorizontal: 20,
+        }}
+      >
+        {`${startHour.getHours()}:${startHour
+          .getMinutes()
+          .toString()
+          .padStart(2, '0')}`}
       </Button>
-      {showDatePicker && (
+      {showStartPicker && (
         <DateTimePicker
-        minimumDate={new Date()}
-          value={selectedDate}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={onChangeDate}
+          value={startHour}
+          mode="time"
+          display="default"
+          onChange={onChangeStartHour}
         />
       )}
-  
-        {/* Hora de Inicio */}
-        <Text style={{ fontSize: 18, marginTop: 20 }}>Hora de Inicio</Text>
-        <Button mt="md" onPress={() => setShowStartPicker(true)}>
-          {`${startHour.getHours()}:${startHour.getMinutes().toString().padStart(2, '0')}`}
-        </Button>
-        {showStartPicker && (
-          <DateTimePicker
-            value={startHour}
-            mode="time"
-            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-            onChange={onChangeStartHour}
-          />
-        )}
-  
-        {/* Hora de Fin */}
-        <Text style={{ fontSize: 18, marginTop: 20 }}>Hora de Fin</Text>
-        <Button mt="md" onPress={() => setShowEndPicker(true)}>
-          {`${endHour.getHours()}:${endHour.getMinutes().toString().padStart(2, '0')}`}
-        </Button>
-        {showEndPicker && (
-          <DateTimePicker
-            value={endHour}
-            mode="time"
-            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-            onChange={onChangeEndHour}
-          />
-        )}
-  
-        {/* Botón Siguiente */}
-        <Button mt="lg" onPress={handleNext}>
-          Siguiente
-        </Button>
-      </View>
-    );
-};
 
+      {/* Hora de Fin */}
+      <Text style={{ fontSize: 18, fontWeight: 'bold', marginTop: 20, marginBottom: 10 }}>
+        Hora de Fin
+      </Text>
+      <Button
+        mt="md"
+        onPress={() => setShowEndPicker(true)}
+        style={{
+          backgroundColor: '#007AFF',
+          borderRadius: 8,
+          paddingVertical: 10,
+          paddingHorizontal: 20,
+        }}
+      >
+        {`${endHour.getHours()}:${endHour
+          .getMinutes()
+          .toString()
+          .padStart(2, '0')}`}
+      </Button>
+      {showEndPicker && (
+        <DateTimePicker
+          value={endHour}
+          mode="time"
+          display="default"
+          onChange={onChangeEndHour}
+        />
+      )}
+
+      {/* Botón Siguiente */}
+      <Button
+        mt="lg"
+        onPress={handleNext}
+        style={{
+          backgroundColor: '#28A745',
+          borderRadius: 8,
+          paddingVertical: 10,
+          paddingHorizontal: 20,
+          marginTop: 30,
+        }}
+      >
+        Siguiente
+      </Button>
+    </View>
+  );
+};
 
 interface StepZonesProps {
   userInfo: UserPreferences;
@@ -243,57 +259,96 @@ interface StepZonesProps {
   onNext: (data: any) => void;
 }
 
-const ZONES = [
-  { label: 'Zona Norte', value: 'north' },
-  { label: 'Zona Sur', value: 'south' },
-  { label: 'Zona Este', value: 'east' },
-  { label: 'Zona Oeste', value: 'west' },
-];
-
-export const StepZones: React.FC<StepZonesProps> = ({
-  userInfo,
-  setUserInfo,
-  onNext,
-}) => {
+export const StepZones: React.FC<StepZonesProps> = ({ userInfo, setUserInfo, onNext }) => {
   const [selectedZone, setSelectedZone] = useState(userInfo.preferredZones?.[0] || '');
-  const zoneSelectRef = useRef<any>(null);
+  const [zones, setZones] = useState<
+    { _id: string; name: string }[]
+  >([]);
 
-  const handleNext = () => {
+  /**
+   * Obtener las zonas desde el servicio
+   */
+  const getZones = async () => {
+    try {
+      const res = await zonesService.getZones();
+      setZones(res.data); // Se asume que res.data es un array con las zonas
+    } catch (e) {
+      console.log('Error al obtener las zonas:', e);
+    }
+  };
+
+  useEffect(() => {
+    getZones();
+  }, []);
+
+  const generatePreference = async () => {
+    const profile = {
+      sport: userInfo.sport,
+      sportMode: userInfo.sportMode,
+      availability: userInfo.availability,
+      preferredZones: selectedZone
+    }
+
+    try {
+      await userService.updatePreferences({profile})
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  /**
+   * Validación antes de continuar
+   */
+  const handleNext = async () => {
     if (!selectedZone) {
       console.log('Por favor selecciona una zona.');
       return;
     }
-    console.log(userInfo)
-    console.log(selectedZone)
-    // onNext({ preferredZones: [selectedZone] });
+    await generatePreference()
+    onNext({ preferredZones: [selectedZone] });
   };
 
   return (
     <View style={{ padding: 20 }}>
-      {/* Selección de Zona */}
-      <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Selecciona una Zona</Text>
-      <Button onPress={() => zoneSelectRef.current?.open()} mt="md">
-        {selectedZone || 'Seleccionar Zona'}
-      </Button>
+      {/* Título */}
+      <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>
+        Selecciona una Zona
+      </Text>
 
-      <Select
-        ref={zoneSelectRef}
-        onSelect={(value) => setSelectedZone(value)}
-        value={selectedZone}
-        title="Selecciona una Zona"
-        data={ZONES}
-        renderItem={(item) => (
-          <Select.Option value={item.value} py="md" px="xl">
-            <Text>{item.label}</Text>
-          </Select.Option>
-        )}
-      />
+      {/* Picker para Selección de Zonas */}
+      <View
+        style={{
+          borderWidth: 1,
+          borderColor: '#ccc',
+          borderRadius: 8,
+          marginBottom: 20,
+        }}
+      >
+        <Picker
+          selectedValue={selectedZone}
+          onValueChange={(itemValue) => setSelectedZone(itemValue)}
+          mode="dropdown"
+        >
+          <Picker.Item label="Seleccionar Zona" value="" />
+          {zones.map((zone) => (
+            <Picker.Item key={zone._id} label={zone.name} value={zone._id} />
+          ))}
+        </Picker>
+      </View>
 
-      {/* Botón Finalizar */}
-      <Button mt="lg" onPress={handleNext}>
-        Finalizar
+      {/* Botón Siguiente */}
+      <Button
+        mt="lg"
+        onPress={handleNext}
+        style={{
+          backgroundColor: '#28A745',
+          borderRadius: 8,
+          paddingVertical: 10,
+          paddingHorizontal: 20,
+        }}
+      >
+        Siguiente
       </Button>
     </View>
   );
 };
-
