@@ -1,6 +1,9 @@
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-import Image from "next/image";
+interface User {
+    name: string;
+    email: string;
+}
 
 export async function generateMetadata() {
     const match = await fetch('https://codice.dev:3000/matches/6772c91a790633512b4bdbee', {
@@ -13,56 +16,29 @@ export async function generateMetadata() {
         },
     }).then(res => res.json());
 
-    console.log(match);
-    
+    const userNames = match.users.map((user: User) => user.name).join(',');
 
-    const userNames = match.users.map((user: any) => user.name).join(',');
-
-    <meta property="og:image" content="https://tricota.com.ar/img/og.jpg"></meta>
+    const imageUrl = `https://4159-181-199-145-53.ngrok-free.app/api/image?users=${encodeURIComponent(userNames)}`;
 
     return {
         title: match.name,
         description: match.location.address,
         openGraph: {
-            images: [`/api/image?users=${encodeURIComponent(userNames)}`],
+            images: [
+                {
+                    url: imageUrl, // URL de la imagen
+                    width: 1200,  // Ancho recomendado por Open Graph
+                    height: 630,  // Alto recomendado por Open Graph
+                    alt: `Canchas de fútbol para el match ${match.name}`,
+                },
+            ],
         },
     };
 }
 
 
-export default async function Page() {
-    const res = await fetch('https://codice.dev:3000/matches/6772c91a790633512b4bdbee', {
-        method: 'GET',
-        cache: 'no-cache',
-        headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2NzIwZWYwZTNhNzhlYmMxMDU2NGU5NzkiLCJ1c2VybmFtZSI6ImRpZWdvIiwicm9sZXMiOlsidXNlciJdLCJpYXQiOjE3MzYxNzgxNTUsImV4cCI6MTczNjI2NDU1NX0.oyCZhydg-68MWV6zOY3FNkfkNwGPT7jDgd2aUIxU4hE'
-        }
-    });
-
-    if (!res.ok) {
-        return <div>Error</div>;
-    }
-
-    const match = await res.json();
-
-    return (
-        <div className="p-4">
-            <nav className="w-full flex justify-center items-center mb-4">
-                <Image
-                    src="/logo-sports.png"
-                    alt="Sports"
-                    width={80}
-                    height={80}
-                />
-            </nav>
-            {match && (
-                <>
-                    {match.name}
-                </>
-            )}
-        </div>
-    );
+export default function Page() {
+    return <p>Sports</p>
 }
+
 
