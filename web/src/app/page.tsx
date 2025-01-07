@@ -18,7 +18,7 @@ export async function generateMetadata() {
 
     const userNames = match.users.map((user: User) => user.name).join(',');
 
-    const imageUrl = `https://4159-181-199-145-53.ngrok-free.app/api/image?users=${encodeURIComponent(userNames)}`;
+    const imageUrl = `https://4159-181-199-145-53.ngrok-free.app/api/image?users=${encodeURIComponent(userNames)},diego`;    
 
     return {
         title: match.name,
@@ -27,8 +27,8 @@ export async function generateMetadata() {
             images: [
                 {
                     url: imageUrl, // URL de la imagen
-                    width: 1200,  // Ancho recomendado por Open Graph
-                    height: 630,  // Alto recomendado por Open Graph
+                    width: 713,  // Ancho recomendado por Open Graph
+                    height: 1000,  // Alto recomendado por Open Graph
                     alt: `Canchas de fútbol para el match ${match.name}`,
                 },
             ],
