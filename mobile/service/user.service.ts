@@ -22,7 +22,7 @@ class UserService extends HttpService {
     return this.get(`${id}/friends`);
   };
 
-  updatePreferences = (profile: UserPreferences) => {
+  updatePreferences = (profile: { profile: UserPreferences })  => {
     return this.put("6720ef393a78ebc10564e987", profile);
   }
 
