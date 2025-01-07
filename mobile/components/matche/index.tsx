@@ -76,10 +76,10 @@ const Index = () => {
           name: "cccccccccccccc",
           date: formData.step1Data.dia,
           //horario: formData.step1Data.horario,
-          location: "67002eb59cc0bd3b9c067174",
+          location: formData.step2Data.location,
           sportMode: "676efe9ce1e21de23e0e7ab4",
           playersLimit: formData.step3Data.jugadores,
-          userId: "66fc580c32617aadfac71feb",
+          userId: "6772aa80377f4e04b405b99f",
         };
 
         console.log("Enviando datos:", newLoad); // Debug
