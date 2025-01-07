@@ -9,7 +9,7 @@ import { RolesGuard } from "authorization/roles.guard";
 import { getProtocolConfig } from "utilities/getProtocolConfig";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
 
-//const { key, cert, protocol } = getProtocolConfig();
+const { key, cert, protocol } = getProtocolConfig();
 
 //CONTAINS IMPLEMENTATION TO BOOTSTRAP THE APPLICATION. THIS IS THE STARTING POINT OF YOUR APPLICATION
 
@@ -17,7 +17,7 @@ async function bootstrap() {
     process.env.TZ = "America/Argentina/Buenos_Aires";
     const app = await NestFactory.create(
         AppModule,
-       // protocol == "https" ? { httpsOptions: { key, cert } } : undefined
+       protocol == "https" ? { httpsOptions: { key, cert } } : undefined
     );
     
     app.useGlobalPipes(new ValidationPipe({
@@ -40,6 +40,6 @@ async function bootstrap() {
     //app.useGlobalFilters(new GlobalExceptionFilter()); // maneja errores de request//pero pisa los dto
     await app.listen(serverSetting.PORT);
     //console.log(`la app esta corriendo en el puerto ${protocol}${serverSetting.PORT}`);
-    console.log(`la app esta corriendo en el puerto http ${serverSetting.PORT}`);
+    console.log(`la app esta corriendo en el puerto ${protocol} ${serverSetting.PORT}`);
 }
 bootstrap();

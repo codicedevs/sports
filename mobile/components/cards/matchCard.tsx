@@ -1,9 +1,10 @@
 import { LinearGradient } from "expo-linear-gradient";
 import React from "react";
-import { ImageBackground } from "react-native";
+import { ImageBackground, TouchableOpacity } from "react-native";
 import { Div, Text } from "react-native-magnus";
 import { scale, verticalScale } from "react-native-size-matters";
 import styled from "styled-components/native";
+import { useSession } from "../../context/authProvider";
 
 const StyledImageBackground = styled(ImageBackground)`
   flex: 2.1;
@@ -51,98 +52,107 @@ const RightImageBackground = styled(ImageBackground)`
 `;
 
 const MatchCard = () => {
-  return (
-    <Div
-      h={verticalScale(125)}
-      w={scale(315)}
-      flexDir="row"
-      rounded="2xl"
-      bg="grey"
-      shadow="2xl"
-      shadowColor="grey"
-      overflow="hidden"
-      mt={scale(15)}
-    >
-      {/* Parte izquierda */}
-      <StyledImageBackground source={require("../../assets/texturaCard.png")}>
-        <StyledLinearGradientLeft
-          colors={["rgba(152, 62, 248, 0.69)", "rgba(192, 138, 250, 0.33)"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
-        />
-        <BlackOverlay />
-        <Text
-          fontSize={scale(35)}
-          color="white"
-          fontFamily="RobotoCondensed-Bold"
-        >
-          2
-        </Text>
-        <Text
-          fontSize={scale(11)}
-          color="white"
-          fontFamily="RobotoCondensed-Regular"
-          mt="lg"
-        >
-          MONDAY
-        </Text>
-        <Text
-          fontSize={scale(11)}
-          color="white"
-          fontFamily="RobotoCondensed-Regular"
-        >
-          10:00 PM
-        </Text>
-      </StyledImageBackground>
 
-      {/* Parte derecha */}
-      <Div flex={7} justifyContent="space-between">
-        <StyledLinearGradientRight
-          colors={[
-            "rgba(20, 20, 20, 0.59)", // Gris oscuro arriba
-            "rgba(83, 80, 80, 0.5)", // Gris centro
-            "rgba(20, 20, 20, 0.57)",
-          ]}
-          locations={[0.2, 0.5, 0.8]} // Controla dónde se aplican los colores
-          start={{ x: 0, y: 0 }} // Inicia el gradiente desde la parte superior
-          end={{ x: 0, y: 1 }} // Termina el gradiente hacia la parte inferior
-        />
-        <Div style={{ flex: 1, position: "relative" }}>
-          <RightImageBackground
-            source={require("../../assets/escudocentral.png")}
+  const {currentUser, showModal} = useSession()
+
+  return (
+    <TouchableOpacity onPress={() => {
+      !currentUser?
+      showModal():
+      null
+    }}>
+      <Div
+        h={verticalScale(125)}
+        w={scale(315)}
+        flexDir="row"
+        rounded="2xl"
+        bg="grey"
+        shadow="2xl"
+        shadowColor="grey"
+        overflow="hidden"
+        mt={scale(15)}
+      >
+        {/* Parte izquierda */}
+        <StyledImageBackground source={require("../../assets/texturaCard.png")}>
+          <StyledLinearGradientLeft
+            colors={["rgba(152, 62, 248, 0.69)", "rgba(192, 138, 250, 0.33)"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
           />
-          <Div
-            style={{
-              flex: 1,
-              zIndex: 1,
-              justifyContent: "space-between",
-            }}
-            p="lg"
-          >
-            <Div mt={scale(5)}>
-              <Text
-                fontSize={scale(22)}
-                color="white"
-                fontFamily="RobotoCondensed-Bold"
-                textTransform="uppercase"
-              >
-                El caño fútbol 5
-              </Text>
-            </Div>
-          </Div>
-        </Div>
-        <Div bg="black" p="lg">
+          <BlackOverlay />
           <Text
+            fontSize={scale(35)}
+            color="white"
+            fontFamily="RobotoCondensed-Bold"
+          >
+            2
+          </Text>
+          <Text
+            fontSize={scale(11)}
             color="white"
             fontFamily="RobotoCondensed-Regular"
-            textTransform="uppercase"
-            fontSize={scale(9)}
+            mt="lg"
           >
-            Abasto Fútbol 5
+            MONDAY
           </Text>
+          <Text
+            fontSize={scale(11)}
+            color="white"
+            fontFamily="RobotoCondensed-Regular"
+          >
+            10:00 PM
+          </Text>
+        </StyledImageBackground>
+
+        {/* Parte derecha */}
+        <Div flex={7} justifyContent="space-between">
+          <StyledLinearGradientRight
+            colors={[
+              "rgba(20, 20, 20, 0.59)", // Gris oscuro arriba
+              "rgba(83, 80, 80, 0.5)", // Gris centro
+              "rgba(20, 20, 20, 0.57)",
+            ]}
+            locations={[0.2, 0.5, 0.8]} // Controla dónde se aplican los colores
+            start={{ x: 0, y: 0 }} // Inicia el gradiente desde la parte superior
+            end={{ x: 0, y: 1 }} // Termina el gradiente hacia la parte inferior
+          />
+          <Div style={{ flex: 1, position: "relative" }}>
+            <RightImageBackground
+              source={require("../../assets/escudocentral.png")}
+            />
+            <Div
+              style={{
+                flex: 1,
+                zIndex: 1,
+                justifyContent: "space-between",
+              }}
+              p="lg"
+            >
+              <Div mt={scale(5)}>
+                <Text
+                  fontSize={scale(22)}
+                  color="white"
+                  fontFamily="RobotoCondensed-Bold"
+                  textTransform="uppercase"
+                >
+                  El caño fútbol 5
+                </Text>
+              </Div>
+            </Div>
+          </Div>
+          <Div bg="black" p="lg">
+            <Text
+              color="white"
+              fontFamily="RobotoCondensed-Regular"
+              textTransform="uppercase"
+              fontSize={scale(9)}
+            >
+              Abasto Fútbol 5
+            </Text>
+          </Div>
         </Div>
       </Div>
-    </Div>
+    </TouchableOpacity>
   );
 };
 

@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { scale } from "react-native-size-matters";
 import { Button, Text, View, ScrollView } from "react-native";
+import React, { useEffect, useState } from "react";
+import { scale } from "react-native-size-matters";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
 import StatisticCard from "../components/statisticCard";
 import SquareCard, { SquareCardProps } from "../components/squareCard";
@@ -14,6 +14,8 @@ import MatchCard from "../components/cards/matchCard";
 import StepModal from "../components/modal/stepModal";
 import { UserPreferences } from "../types/preferences.type";
 import { StepAvailability, StepSport, StepZones } from "../components/userPreferencesSteps";
+import authService from "../service/auth.service";
+import { useSession } from "../context/authProvider";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
@@ -27,6 +29,23 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   });
   const [counterSteps, setCounterSteps] = useState(0)
 
+  const [open, setOpen] = useState(false);
+  const { setCurrentUser } = useSession();
+
+  const checkUser = async () => {
+    try {
+      const res = await authService.whoAmI()
+      setCurrentUser(res)
+    }
+    catch (e) { 
+      console.log(e)
+    }
+  }
+
+  useEffect(() => {
+    checkUser()
+  }, [])
+  // a ver si se puede pushear
   const location1: Location = {
     _id: "1",
     name: "Location 1",
