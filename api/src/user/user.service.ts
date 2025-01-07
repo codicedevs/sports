@@ -134,14 +134,22 @@ export class UserService {
      * @returns
      */
     async update(id: ObjectId, updateUserDto: UpdateUserDto): Promise<User> {
-        const user = await this.findByIdOrFail(id); // chequea si user existe
-
-        // If the DTO contains a new password, hash it before updating
+        const user = await this.findByIdOrFail(id); // chequea si el usuario existe
+    
+        // Si el DTO contiene una nueva contraseña, hashearla antes de actualizar
         if (updateUserDto.password) {
             const hashedPassword = await bcrypt.hash(updateUserDto.password, 8);
             updateUserDto.password = hashedPassword;
         }
-
+    
+        // Si el DTO contiene un perfil, agregarlo o actualizarlo
+        if (updateUserDto.profile) {
+            updateUserDto.profile = {
+                ...(user.profile || {}), // Si no existe, inicializarlo como un objeto vacío
+                ...updateUserDto.profile, // Actualizar con los nuevos valores
+            };
+        }
+    
         return this.userModel
             .findByIdAndUpdate(id, updateUserDto, { new: true })
             .exec();
