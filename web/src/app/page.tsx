@@ -16,7 +16,9 @@ export async function generateMetadata() {
     console.log(match);
     
 
-    const userNames = match.users.map(user => user.name).join(',');
+    const userNames = match.users.map((user: any) => user.name).join(',');
+
+    <meta property="og:image" content="https://tricota.com.ar/img/og.jpg"></meta>
 
     return {
         title: match.name,
