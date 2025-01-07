@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Modal, View, StyleSheet } from 'react-native';
+import { Modal, View, StyleSheet, TouchableWithoutFeedback } from 'react-native';
 import { MotiView, AnimatePresence } from 'moti';
 
 type StepModalProps = {
@@ -12,58 +12,64 @@ type StepModalProps = {
 const StepModal: React.FC<StepModalProps> = ({ steps, visible, onClose, currentStep }) => {
   const [isClosing, setIsClosing] = useState(false); // Para controlar la animación de cierre
 
-  // Reiniciar la animación de cierre al cerrar el modal
   useEffect(() => {
     if (!visible) {
       setIsClosing(false);
     }
   }, [visible]);
 
-  /**
-   * Finalizar animación de cierre
-   */
   const handleAnimationComplete = () => {
     if (isClosing) {
-      onClose(); // Cierra el modal después de la animación de salida
+      onClose();
       setIsClosing(false);
     }
   };
 
+  const handleOverlayPress = () => {
+    setIsClosing(true); // Inicia la animación de salida
+  };
+
   return (
     <Modal visible={visible} transparent animationType="none">
-      <View style={styles.overlay}>
-        <AnimatePresence>
-          {visible && (
-            <MotiView
-              key={currentStep}
-              style={styles.modalContainer}
-              from={{
-                opacity: 0,
-                width: '0%',
-                height: '0%',
-              }}
-              animate={{
-                opacity: 1,
-                width: '90%',
-                height: '60%',
-              }}
-              exit={{
-                opacity: 0,
-                width: '10%',
-                height: '10%',
-              }}
-              onDidAnimate={handleAnimationComplete}
-              transition={{
-                type: 'spring',
-                damping: 15,
-                stiffness: 200,
-              }}
-            >
-             {currentStep < steps.length ? steps[currentStep] : null}
-            </MotiView>
-          )}
-        </AnimatePresence>
-      </View>
+      <TouchableWithoutFeedback onPress={handleOverlayPress}>
+        <View style={styles.overlay}>
+          <AnimatePresence>
+            {visible && (
+              <MotiView
+                key={currentStep}
+                style={styles.modalContainer}
+                from={{
+                  opacity: 0,
+                  width: '0%',
+                  height: '0%',
+                }}
+                animate={{
+                  opacity: 1,
+                  width: '90%',
+                  height: '60%',
+                }}
+                exit={{
+                  opacity: 0,
+                  width: '10%',
+                  height: '10%',
+                }}
+                onDidAnimate={handleAnimationComplete}
+                transition={{
+                  type: 'spring',
+                  damping: 15,
+                  stiffness: 200,
+                }}
+              >
+                <TouchableWithoutFeedback>
+                  <View style={styles.content}>
+                    {currentStep < steps.length ? steps[currentStep] : null}
+                  </View>
+                </TouchableWithoutFeedback>
+              </MotiView>
+            )}
+          </AnimatePresence>
+        </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 };
@@ -82,21 +88,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
-    position:"absolute"
+    position: 'absolute',
   },
-  button: {
-    marginTop: 20,
-    backgroundColor: '#007AFF',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 8,
-  },
-  buttonDisabled: {
-    backgroundColor: '#A0A0A0', // Botón deshabilitado durante la animación
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
+  content: {
+    width: '100%',
+    height: '100%',
   },
 });
 
