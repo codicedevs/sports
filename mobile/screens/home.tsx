@@ -81,6 +81,12 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     console.log("Información final del usuario:", userInfo);
     setModalVisible(false);
     setCounterSteps(0);
+    setUserInfo({
+      sport: '',
+      sportMode: '',
+      availability: [],
+      preferredZones: [],
+    });
   };
 
   const cardData: SquareCardProps[] = [
@@ -160,7 +166,6 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
               />
             ))}
           </ScrollView>
-
           <SectionPhoto backGroundImage={require("../assets/photoNew.png")} />
           <MatchCard />
           <MatchCard />
