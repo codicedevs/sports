@@ -30,7 +30,7 @@ export class HttpService extends HttpBase {
     async refreshAccessToken(): Promise<string | null> {
         try {
             const refreshToken = await this.getRefreshToken()
-            const resp = await axios.post<{ accessToken: string }>(`${BASE_URL}/auth/refresh`, undefined, { headers: { "refresh-token": refreshToken } })
+            const resp = await axios.post<{ accessToken: string }>(`${BASE_URL}/auth/refresh-token`, undefined, { headers: { "refresh-token": refreshToken } })
             return resp.data.accessToken
         }
         catch (err) {

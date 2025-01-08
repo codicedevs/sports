@@ -76,7 +76,7 @@ export class User extends Document {
   email: string;
 
   @Prop({ required: false })
-  password: string;
+  password?: string;
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }] })
   friends: Types.ObjectId[];

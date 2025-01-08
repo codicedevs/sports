@@ -1,15 +1,21 @@
-import React, { useState } from "react";
 import { Text, View, ScrollView } from "react-native";
 import { Button } from "react-native-magnus";
+import React, { useEffect, useState } from "react";
+import { scale } from "react-native-size-matters";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
 import StatisticCard from "../components/statisticCard";
 import SquareCard, { SquareCardProps } from "../components/squareCard";
 import Location from "../types/location.type";
 import Header from "../components/header";
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+
+GoogleSignin.configure();
 import SectionPhoto from "../components/SectionPhoto";
 import MatchCard from "../components/cards/matchCard";
 import ModalAnimation from "../components/cards/animatedCard";
 import Index from "../components/matche";
+import authService from "../service/auth.service";
+import { useSession } from "../context/authProvider";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
@@ -18,6 +24,22 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   const [openStep, setOpenStep] = useState(false);
   const [open, setOpen] = useState(false);
 
+  const { setCurrentUser } = useSession();
+
+  const checkUser = async () => {
+    try {
+      const res = await authService.whoAmI()
+      setCurrentUser(res)
+    }
+    catch (e) { 
+      console.log(e)
+    }
+  }
+
+  useEffect(() => {
+    checkUser()
+  }, [])
+  // a ver si se puede pushear
   const location1: Location = {
     _id: "1",
     name: "Location 1",
