@@ -18,7 +18,6 @@ import { MatchOwnerGuard } from "authentication/matchOwnerGuard";
 import { MatchPlayerGuard } from "authentication/matchPlayerGuard";
 import { Filter } from "types/types";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { Public } from "authentication/public";
 import { Types } from "mongoose";
 import { create } from "domain";
 
@@ -27,13 +26,13 @@ import { create } from "domain";
 @Controller("matches")
 export class MatchController {
     constructor(private readonly matchService: MatchService) { }
-@Public()
+
     @Post()
     async createMatch(@Body() createMatchDto: CreateMatchDto) {
-        try{
+        try {
             const newMatch = await this.matchService.createMatch(createMatchDto);
             return newMatch;
-        } catch(e){
+        } catch (e) {
             throw e
         }
     }
@@ -54,9 +53,9 @@ export class MatchController {
 
         return updatedMatch;
     }
-    
+
     @Get()
-    async findAll(@Query() filter: Filter) {                        
+    async findAll(@Query() filter: Filter) {
         return await this.matchService.findAll(filter);
     }
 
@@ -64,14 +63,14 @@ export class MatchController {
     async findAllByStatus() {
         return await this.matchService.findAllByStatus();
     }
-  
+
     @Get("/available")
     async getAvailableMatches() {
         return await this.matchService.getAvailableMatches();
     }
 
     @Get("/findForDate/:userId")
-    async findForDate(@Param("userId") userId: string){
+    async findForDate(@Param("userId") userId: string) {
         if (!Types.ObjectId.isValid(userId)) {
             throw new BadRequestException("ID de usuario inválido");
         }
@@ -80,7 +79,7 @@ export class MatchController {
     }
 
     @Get("/findForZone/:userId")
-    async findForZone(@Param("userId") userId: string){
+    async findForZone(@Param("userId") userId: string) {
         if (!Types.ObjectId.isValid(userId)) {
             throw new BadRequestException("ID de usuario inválido");
         }
@@ -89,7 +88,7 @@ export class MatchController {
     }
 
     @Get("/findForSportMode/:userId")
-    async findForSportMode(@Param("userId") userId: string){
+    async findForSportMode(@Param("userId") userId: string) {
         if (!Types.ObjectId.isValid(userId)) {
             throw new BadRequestException("ID de usuario inválido");
         }
@@ -97,7 +96,7 @@ export class MatchController {
         return matches;
     }
     @Get("/findRecommendation/:userId")
-    async findRecommendation(@Param("userId") userId: string){
+    async findRecommendation(@Param("userId") userId: string) {
         if (!Types.ObjectId.isValid(userId)) {
             throw new BadRequestException("ID de usuario inválido");
         }
@@ -118,7 +117,7 @@ export class MatchController {
     async updateFormation(
         @Param("matchId") matchId: string,
         @Param("userId") userId: string,
-        @Body() body: {team:1|2, position:number},
+        @Body() body: { team: 1 | 2, position: number },
     ) {
         if (!Types.ObjectId.isValid(matchId)) {
             throw new BadRequestException("ID de partido inválido");

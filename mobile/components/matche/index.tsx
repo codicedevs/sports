@@ -67,13 +67,10 @@ const Index = () => {
 
   async function CreateMatch() {
     if (!!formData.step1Data && !!formData.step2Data && !!formData.step3Data) {
-      console.log("AAAAAAAAAAAAAAAA", formData.step1Data);
-      console.log("BBBBBBBBBBBBBBBBBBBB", formData.step2Data);
-      console.log("CCCCCCCCCCCCCCCCCC", formData.step3Data);
       setLoading(true);
       try {
         const newLoad = {
-          name: "cccccccccccccc",
+          name: "Default",
           date: formData.step1Data.dia,
           //horario: formData.step1Data.horario,
           location: formData.step2Data.location,
