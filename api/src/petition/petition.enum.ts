@@ -3,3 +3,7 @@ export enum PetitionStatus {
     Accepted = "accepted",
     Declined = "declined"
 }
+export enum PetitionModelType{
+    match = "Match",
+    group = "Group"
+}
