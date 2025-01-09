@@ -29,8 +29,12 @@ export class MatchController {
 
     @Post()
     async createMatch(@Body() createMatchDto: CreateMatchDto) {
-        const newMatch = await this.matchService.createMatch(createMatchDto);
-        return newMatch;
+        try {
+            const newMatch = await this.matchService.createMatch(createMatchDto);
+            return newMatch;
+        } catch (e) {
+            throw e
+        }
     }
 
     @Post(":matchId/users/:userId")
@@ -51,7 +55,7 @@ export class MatchController {
     }
 
     @Get()
-    async findAll(@Query() filter: Filter) {                        
+    async findAll(@Query() filter: Filter) {
         return await this.matchService.findAll(filter);
     }
 
@@ -59,14 +63,14 @@ export class MatchController {
     async findAllByStatus() {
         return await this.matchService.findAllByStatus();
     }
-  
+
     @Get("/available")
     async getAvailableMatches() {
         return await this.matchService.getAvailableMatches();
     }
 
     @Get("/findForDate/:userId")
-    async findForDate(@Param("userId") userId: string){
+    async findForDate(@Param("userId") userId: string) {
         if (!Types.ObjectId.isValid(userId)) {
             throw new BadRequestException("ID de usuario inválido");
         }
@@ -75,7 +79,7 @@ export class MatchController {
     }
 
     @Get("/findForZone/:userId")
-    async findForZone(@Param("userId") userId: string){
+    async findForZone(@Param("userId") userId: string) {
         if (!Types.ObjectId.isValid(userId)) {
             throw new BadRequestException("ID de usuario inválido");
         }
@@ -84,7 +88,7 @@ export class MatchController {
     }
 
     @Get("/findForSportMode/:userId")
-    async findForSportMode(@Param("userId") userId: string){
+    async findForSportMode(@Param("userId") userId: string) {
         if (!Types.ObjectId.isValid(userId)) {
             throw new BadRequestException("ID de usuario inválido");
         }
@@ -92,7 +96,7 @@ export class MatchController {
         return matches;
     }
     @Get("/findRecommendation/:userId")
-    async findRecommendation(@Param("userId") userId: string){
+    async findRecommendation(@Param("userId") userId: string) {
         if (!Types.ObjectId.isValid(userId)) {
             throw new BadRequestException("ID de usuario inválido");
         }
@@ -113,7 +117,7 @@ export class MatchController {
     async updateFormation(
         @Param("matchId") matchId: string,
         @Param("userId") userId: string,
-        @Body() body: {team:1|2, position:number},
+        @Body() body: { team: 1 | 2, position: number },
     ) {
         if (!Types.ObjectId.isValid(matchId)) {
             throw new BadRequestException("ID de partido inválido");

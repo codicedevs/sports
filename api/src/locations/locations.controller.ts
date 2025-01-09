@@ -25,7 +25,7 @@ export class LocationsController {
   create(@Body() createLocationDto: CreateLocationDto) {
     return this.locationsService.create(createLocationDto);
   }
-
+  
   @Get()
   findAll() {
     return this.locationsService.findAll();
