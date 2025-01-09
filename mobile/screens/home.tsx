@@ -1,4 +1,5 @@
-import { Button, Text, View, ScrollView } from "react-native";
+import { Text, View, ScrollView } from "react-native";
+import { Button } from "react-native-magnus";
 import React, { useEffect, useState } from "react";
 import { scale } from "react-native-size-matters";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
@@ -14,6 +15,8 @@ import MatchCard from "../components/cards/matchCard";
 import StepModal from "../components/modal/stepModal";
 import { UserPreferences } from "../types/preferences.type";
 import { StepAvailability, StepSport, StepZones } from "../components/userPreferencesSteps";
+import ModalAnimation from "../components/cards/animatedCard";
+import Index from "../components/matche";
 import authService from "../service/auth.service";
 import { useSession } from "../context/authProvider";
 
@@ -29,7 +32,10 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   });
   const [counterSteps, setCounterSteps] = useState(0)
 
+  // Estados para manejar los modales y pasos
+  const [openStep, setOpenStep] = useState(false);
   const [open, setOpen] = useState(false);
+
   const { setCurrentUser } = useSession();
 
   const checkUser = async () => {
@@ -88,6 +94,9 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
       preferredZones: [],
     });
   };
+  function handleStep() {
+    setOpenStep(true);
+  }
 
   const cardData: SquareCardProps[] = [
     {
@@ -135,54 +144,61 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   ];
 
   return (
-    <>
-      <View style={{ flex: 1, padding: 8 }}>
-        <Header />
+    <View style={{ flex: 1, padding: 8 }}>
+      {/* Encabezado */}
+      <Header />
+
+      {/* Scroll principal */}
+      <ScrollView
+        contentContainerStyle={{
+          padding: 10,
+          gap: 12,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Tarjeta de estadísticas */}
+        <StatisticCard style={{ flex: 1 }} />
+
+        {/* Scroll horizontal de tarjetas */}
         <ScrollView
           contentContainerStyle={{
-            padding: scale(8),
-            gap: scale(10),
+            gap: 10,
+            marginTop: 10,
           }}
           showsVerticalScrollIndicator={false}
         >
-          <StatisticCard style={{ flex: 1 }} />
-
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{
-              gap: scale(8),
-              marginTop: scale(9),
-            }}
-          >
-            {cardData.map((data, index) => (
-              <SquareCard
-                key={index}
-                title={data.title}
-                score={data.score}
-                hour={data.hour}
-                location={data.location}
-                backgroundimage={data.backgroundimage}
-              />
-            ))}
-          </ScrollView>
-          <SectionPhoto backGroundImage={require("../assets/photoNew.png")} />
-          <MatchCard />
-          <MatchCard />
-          <MatchCard />
-          <MatchCard />
+          {cardData.map((data, index) => (
+            <SquareCard
+              key={index}
+              title={data.title}
+              score={data.score}
+              hour={data.hour}
+              location={data.location}
+              backgroundimage={data.backgroundimage}
+            />
+          ))}
         </ScrollView>
-        <Button title="Abrir Modal" onPress={() => setModalVisible(true)} />
-      </View>
-      
-      {/* Modal con Steps */}
-      <StepModal
-        steps={steps}
-        visible={modalVisible}
-        onClose={handleModalClose}
-        currentStep={counterSteps}
-      />
-    </>
+
+        {/* Foto de sección */}
+        <SectionPhoto backGroundImage={require("../assets/photoNew.png")} />
+
+        {/* Tarjetas de partidos */}
+        <MatchCard />
+        <MatchCard />
+        <MatchCard />
+        <MatchCard />
+
+        {/* Botón para abrir el Modal */}
+        <Button onPress={handleStep} mt={10} bg="blue600">
+          <Text style={{ color: "white" }}>Crear Partido</Text>
+        </Button>
+
+        {/* Modal con los Steps */}
+        <ModalAnimation open={openStep} onFinish={() => setOpenStep(false)}>
+          <Index />
+        </ModalAnimation>
+      </ScrollView>
+    </View>
   );
 };
 

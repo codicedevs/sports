@@ -3,8 +3,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { CreateLocationDto } from "./location.dto";
 import { UpdateLocationDto } from "./location.dto";
 import { Location } from "./location.entity";
-import { Model } from "mongoose";
-import { ObjectId } from "mongodb";
+import { Model, Types } from "mongoose";
 
 @Injectable()
 export class LocationsService {
@@ -48,7 +47,7 @@ export class LocationsService {
     return this.locationModel.find().exec();
   }
 
-  async findOne(id: ObjectId): Promise<Location> {
+  async findOne(id: Types.ObjectId): Promise<Location> {
     const location = await this.locationModel.findById(id).exec();
     if (!location) {
       throw new NotFoundException(`Location with ID ${id} not found`);

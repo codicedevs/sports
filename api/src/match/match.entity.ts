@@ -74,4 +74,3 @@ export class Match extends Document {
 export const MatchSchema = SchemaFactory.createForClass(Match);
 MatchSchema.plugin(FilterPlugin);
 MatchSchema.index({ dayOfWeek: 1, hour: 1 });
-MatchSchema.index({ location: '2dsphere' });

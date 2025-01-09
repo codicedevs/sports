@@ -2,9 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateEventDto } from './dto/create-event.dto';
 import { UpdateEventDto } from './dto/update-event.dto';
 import { Event } from './entities/event.entity';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class EventService {
@@ -20,7 +19,7 @@ export class EventService {
         return await this.eventModel.find()
     }
 
-    async findOne(id: ObjectId): Promise<Event> {
+    async findOne(id: Types.ObjectId): Promise<Event> {
         const event = await this.eventModel.findById(id).populate('matches').exec();
 
         if (!event) {
@@ -30,7 +29,7 @@ export class EventService {
         return event;
     }
 
-    async update(id: ObjectId, updateEventDto: UpdateEventDto) {
+    async update(id: Types.ObjectId, updateEventDto: UpdateEventDto) {
         const event = await this.eventModel.findByIdAndUpdate(id, updateEventDto, { new: true }).exec();
 
         if (!event) {
@@ -40,7 +39,7 @@ export class EventService {
         return event;
     }
 
-    async remove(id: ObjectId): Promise<Event> {
+    async remove(id: Types.ObjectId): Promise<Event> {
         const event = this.eventModel.findByIdAndDelete(id).exec();
 
         if (!event) {
