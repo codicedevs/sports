@@ -140,7 +140,15 @@ export class UserService {
             const hashedPassword = await bcrypt.hash(updateUserDto.password, 8);
             updateUserDto.password = hashedPassword;
         }
-
+    
+        // Si el DTO contiene un perfil, agregarlo o actualizarlo
+        if (updateUserDto.profile) {
+            updateUserDto.profile = {
+                ...(user.profile || {}), // Si no existe, inicializarlo como un objeto vacío
+                ...updateUserDto.profile, // Actualizar con los nuevos valores
+            };
+        }
+    
         return this.userModel
             .findByIdAndUpdate(id, updateUserDto, { new: true })
             .exec();

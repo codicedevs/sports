@@ -12,6 +12,9 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 GoogleSignin.configure();
 import SectionPhoto from "../components/SectionPhoto";
 import MatchCard from "../components/cards/matchCard";
+import StepModal from "../components/modal/stepModal";
+import { UserPreferences } from "../types/preferences.type";
+import { StepAvailability, StepSport, StepZones } from "../components/userPreferencesSteps";
 import ModalAnimation from "../components/cards/animatedCard";
 import Index from "../components/matche";
 import authService from "../service/auth.service";
@@ -20,6 +23,15 @@ import { useSession } from "../context/authProvider";
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [userInfo, setUserInfo] = useState<UserPreferences>({
+    sport: '',
+    sportMode: '',
+    availability: [],
+    preferredZones: [],
+  });
+  const [counterSteps, setCounterSteps] = useState(0)
+
   // Estados para manejar los modales y pasos
   const [openStep, setOpenStep] = useState(false);
   const [open, setOpen] = useState(false);
@@ -51,6 +63,37 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     },
   };
 
+  const updateUserInfo = (info: Partial<UserPreferences>) => {
+    setUserInfo((prev) => ({ ...prev, ...info }));
+  };
+
+  const handleNext = (data: any) => {
+    setUserInfo((prev) => ({ ...prev, ...data }));
+    if (counterSteps < steps.length - 1) {
+      setCounterSteps((prev) => prev + 1);
+    } else {
+      handleModalClose();
+    }
+  };
+  
+  const steps = [
+    <StepSport userInfo={userInfo} setUserInfo={setUserInfo} onNext={handleNext} />,
+    <StepAvailability userInfo={userInfo} setUserInfo={setUserInfo} onNext={handleNext} />,
+    <StepZones userInfo={userInfo} setUserInfo={setUserInfo} onNext={handleNext} />,
+  ];
+  
+
+  const handleModalClose = () => {
+    console.log("Información final del usuario:", userInfo);
+    setModalVisible(false);
+    setCounterSteps(0);
+    setUserInfo({
+      sport: '',
+      sportMode: '',
+      availability: [],
+      preferredZones: [],
+    });
+  };
   function handleStep() {
     setOpenStep(true);
   }
@@ -118,12 +161,11 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
 
         {/* Scroll horizontal de tarjetas */}
         <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
           contentContainerStyle={{
             gap: 10,
             marginTop: 10,
           }}
+          showsVerticalScrollIndicator={false}
         >
           {cardData.map((data, index) => (
             <SquareCard
