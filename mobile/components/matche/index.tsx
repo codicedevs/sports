@@ -77,7 +77,7 @@ const Index = () => {
           date: formData.step1Data.dia,
           //horario: formData.step1Data.horario,
           location: formData.step2Data.location,
-          sportMode: "676efe9ce1e21de23e0e7ab4",
+          sportMode: formData.step3Data.deporte,
           playersLimit: formData.step3Data.jugadores,
           userId: "6772aa80377f4e04b405b99f",
         };
