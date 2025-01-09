@@ -1,27 +1,28 @@
-import React from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Div, Input, Text, Button, Icon } from "react-native-magnus";
+import { Div, Input, Text, Button, Icon, Select } from "react-native-magnus";
+import sportmodeService from "../../../service/sportmode.service";
 
-// Esquema de validación con Yup
+// 📝 **Esquema de validación con Yup**
 const schema = yup.object().shape({
   deporte: yup.string().required("El tipo de deporte es obligatorio"),
   jugadores: yup
     .number()
-    .required("La cantidad de jugadores es obligatoria") 
-    .transform((value) => (isNaN(value) ? 0 : value)) // Transforma NaN a undefined
+    .required("La cantidad de jugadores es obligatoria")
+    .transform((value) => (isNaN(value) ? 0 : value))
     .nullable()
     .min(1, "Debe haber al menos un jugador")
-    .max(22, "No puede haber más de 22 jugadores"), // Opcional, pero validado si existe
+    .max(22, "No puede haber más de 22 jugadores"),
 });
 
 const StepDeporteJugadores = ({
   initialData,
   onNext,
 }: {
-  initialData?: { deporte: string; jugadores: number  };
-  onNext: (data: { deporte: string; jugadores: number  }) => void;
+  initialData?: { deporte: string; jugadores: number };
+  onNext: (data: { deporte: string; jugadores: number }) => void;
 }) => {
   const {
     control,
@@ -34,6 +35,23 @@ const StepDeporteJugadores = ({
     },
     resolver: yupResolver(schema),
   });
+
+  const [sportMode, setSportMode] = useState<{ _id: string; name: string }[]>([]);
+  const selectRef = useRef(null); // Referencia para abrir el Select
+
+  // 📥 **Traer deportes desde el servicio**
+  const bringSports = async () => {
+    try {
+      const res = await sportmodeService.getAll();
+      setSportMode(res);
+    } catch (error) {
+      console.error("Error al traer los deportes:", error);
+    }
+  };
+
+  useEffect(() => {
+    bringSports();
+  }, []);
 
   const onSubmit = (data: any) => {
     onNext(data);
@@ -54,12 +72,47 @@ const StepDeporteJugadores = ({
           name="deporte"
           control={control}
           render={({ field: { onChange, value } }) => (
-            <Input
-              placeholder="Ej: Fútbol, Básquet, etc."
-              value={value}
-              onChangeText={onChange}
-              borderColor={errors.deporte ? "red500" : "gray400"}
-            />
+            <>
+              <Button
+                block
+                borderWidth={1}
+                bg="white"
+                color="gray900"
+                borderColor={errors.deporte ? "red500" : "gray300"}
+                onPress={() => {
+                  if (selectRef.current) {
+                    selectRef.current.open();
+                  }
+                }}
+                suffix={<Icon name="chevron-down" color="gray500" ml="md" />}
+              >
+                {value
+                  ? sportMode.find((item) => item._id === value)?.name || "Selecciona un deporte"
+                  : "Selecciona un deporte"}
+              </Button>
+
+              {/* Select de deportes */}
+              <Select
+                ref={selectRef}
+                title="Selecciona un deporte"
+                value={value}
+                onSelect={(selectedValue) => {
+                  onChange(selectedValue);
+                }}
+                mt="md"
+                pb="2xl"
+                roundedTop="xl"
+                data={sportMode.map((item) => ({
+                  label: item.name,
+                  value: item._id,
+                }))}
+                renderItem={(item) => (
+                  <Select.Option value={item.value} py="md" px="xl">
+                    <Text>{item.label}</Text>
+                  </Select.Option>
+                )}
+              />
+            </>
           )}
         />
         {errors.deporte && (
@@ -72,7 +125,7 @@ const StepDeporteJugadores = ({
       {/* Campo Cantidad de Jugadores */}
       <Div mb="lg">
         <Text mb="sm" fontSize="lg">
-          Cantidad de Jugadores (Opcional)
+          Cantidad de Jugadores
         </Text>
         <Controller
           name="jugadores"
@@ -82,7 +135,7 @@ const StepDeporteJugadores = ({
               placeholder="Ej: 5, 11, 22"
               keyboardType="numeric"
               value={value !== null ? value.toString() : ""}
-              onChangeText={(text) => onChange(text ? Number(text) : null)} // Convierte a número o null
+              onChangeText={(text) => onChange(text ? Number(text) : null)}
               borderColor={errors.jugadores ? "red500" : "gray400"}
             />
           )}
@@ -94,7 +147,7 @@ const StepDeporteJugadores = ({
         )}
       </Div>
 
-      
+      {/* Botón Siguiente */}
       <Button
         block
         mt="lg"
