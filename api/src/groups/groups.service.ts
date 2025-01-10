@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateGroupDto } from './dto/create-group.dto';
 import { UpdateGroupDto } from './dto/update-group.dto';
 import { InjectModel } from '@nestjs/mongoose';
@@ -28,7 +28,7 @@ export class GroupsService {
     const savedGroup = await group.save()
     user.groups.push(savedGroup.id)
     await user.save();
-    
+
 
     if (invitedUsers && invitedUsers.length > 0) {
       for (const invitedUserId of invitedUsers) {
@@ -89,7 +89,8 @@ export class GroupsService {
 
   async removeUserFromGroup(
     groupId: Types.ObjectId,
-    userId: Types.ObjectId
+    userId: Types.ObjectId,
+    emitterId: Types.ObjectId
   ): Promise<Group> {
     const group = await this.groupModel.findById(groupId).exec()
     const user = await this.userModel.findById(userId).exec();
@@ -101,6 +102,26 @@ export class GroupsService {
     }
     if (!user) {
       throw new NotFoundException("User not found");
+    }
+    const groupAdmin = new Types.ObjectId(group.userId as Types.ObjectId)
+    const emitterIsAdmin = emitterId.equals(groupAdmin)
+    if (!emitterId.equals(userId) && !emitterIsAdmin) {
+      throw new ForbiddenException("No tienes permiso para eliminar miembros de este grupo");
+    }
+    // Ver si es el admin el que se va del grupo
+    if (emitterIsAdmin && emitterId.equals(userId)) {
+      if (group.users.length <= 1) {
+        throw new ForbiddenException("No puedes irte del grupo porque eres el único miembro");
+      }
+
+      //Otro pasa a ser el admin
+      if (groupAdmin.equals(new Types.ObjectId(group.users[0]))) {
+        group.userId = group.users[1]
+      }
+      else {
+        group.userId = group.users[0]
+      }
+
     }
     // Verificar si el usuario está en la lista de usuarios del grupo
     const userIndex = group.users.findIndex(
@@ -137,15 +158,15 @@ export class GroupsService {
   async findOne(id: Types.ObjectId): Promise<Group> {
     const group = await this.groupModel.findById(id).populate("users").exec();
 
-    if(!group){
+    if (!group) {
       throw new NotFoundException(`Grupo #${id} not found`)
     }
     return group;
   }
 
-  async update(id: Types.ObjectId, updateGroupDto: UpdateGroupDto) :Promise<Group>{
-    const group = await this.groupModel.findByIdAndUpdate(id, updateGroupDto, {new: true}).exec();
-    if(!group){
+  async update(id: Types.ObjectId, updateGroupDto: UpdateGroupDto): Promise<Group> {
+    const group = await this.groupModel.findByIdAndUpdate(id, updateGroupDto, { new: true }).exec();
+    if (!group) {
       throw new NotFoundException(`Group #${id} not found`)
     }
     return group
@@ -153,8 +174,8 @@ export class GroupsService {
 
   async remove(id: Types.ObjectId) {
     // 1. Buscar el grupo y poblar la lista de usuarios asociados al grupo
-    const group = await this.groupModel.findById(id).populate({path:"users", select: "groups"}).exec()
-    if(!group){
+    const group = await this.groupModel.findById(id).populate({ path: "users", select: "groups" }).exec()
+    if (!group) {
       throw new NotFoundException(`Grupo con ID ${id} no encontrado`)
     }
     // 2. Aseguramos que el campo `users` es un array de documentos completos de User
@@ -178,5 +199,46 @@ export class GroupsService {
 
 
     return `This action removes a #${id} group`;
+  }
+
+  async removerUserFromGroup(groupId: Types.ObjectId, userId: Types.ObjectId,) {
+    const group = await this.groupModel.findById(groupId).exec();
+    if (!group) {
+      throw new NotFoundException("Grupo no encontrado");
+    }
+
+    // Buscar el usuario por su ID
+    const user = await this.userModel.findById(userId).exec();
+    if (!user) {
+      throw new NotFoundException("Usuario no encontrado");
+    }
+
+    // Verificar si el usuario está en la lista de usuarios del grupo
+    const userIndex = group.users.findIndex(
+      (u) => u.toString() === userId.toString(),
+    );
+
+    if (userIndex === -1) {
+      throw new BadRequestException("El usuario no está en el partido");
+    }
+
+    // Eliminar el usuario de la lista de usuarios del partido
+    group.users.splice(userIndex, 1);
+
+    // Guardar el grupo actualizado
+    await group.save();
+
+    // Eliminar el groupId del array de grupos del usuario
+    const groupIndex = user.groups.findIndex(
+      (m) => m.toString() === groupId.toString(), // Comparar como cadenas
+    );
+    // Remover el grupo de la lista de grupos del usuario
+    if (groupIndex !== -1) {
+      user.matches.splice(groupIndex, 1);
+    }
+    // Guardar el usuario actualizado
+    await user.save();
+
+    return group;
   }
 }
