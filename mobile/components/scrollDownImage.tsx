@@ -55,7 +55,7 @@ const Scrolldown = () => {
       {/* Contenedor de la imagen */}
       <Animated.View style={[styles.imageContainer, { height: imageHeight }]}>
         <Image
-          source={{ uri: 'https://via.placeholder.com/400x300' }}
+          source={require("../assets/photoNew.png")}
           style={styles.image}
         />
         {/* Capa de desenfoque */}
@@ -136,6 +136,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
+    backgroundColor:"red"
   },
   blurOverlay: {
     ...StyleSheet.absoluteFillObject,
