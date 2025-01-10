@@ -16,6 +16,8 @@ import { SportsModule } from './sports/sports.module';
 import { SportModesModule } from './sport_modes/sport_modes.module';
 import { SentryGlobalFilter } from '@sentry/nestjs/setup';
 import { APP_FILTER } from '@nestjs/core';
+import { MessagesModule } from './messages/messages.module';
+import { ChatroomModule } from './chatroom/chatroom.module';
 
 @Module({
   imports: [
@@ -36,6 +38,8 @@ import { APP_FILTER } from '@nestjs/core';
     ZonesModule,
     SportsModule,
     SportModesModule,
+    MessagesModule,
+    ChatroomModule,
   ],
   controllers: [AppController],
   providers: [
