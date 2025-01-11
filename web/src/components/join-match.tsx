@@ -17,7 +17,7 @@ function JoinMatch(
     }: {
         match: Match,
         token: string | null,
-        fetchMatch: () => void
+        fetchMatch?: () => void
     }
 ) {
     const [open, setOpen] = useState(false)
@@ -39,7 +39,9 @@ function JoinMatch(
     async function joinPlayer(user: UserCredential["user"]) {
         try {
             await joinPlayerToMatch(match._id, user.uid, token!)
-            fetchMatch()
+            if (fetchMatch) {
+                fetchMatch()
+            }
             setHasJoined(true)
             toast.success('Te has unido al partido 💛!')
         } catch (error) {
