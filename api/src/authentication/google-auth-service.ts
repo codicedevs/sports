@@ -4,12 +4,18 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
 import { JwtService } from "@nestjs/jwt";
 import { User } from "user/user.entity";
+import { SsoAuthInfoDto } from "./singin.dto";
+import { UserService } from "user/user.service";
+import { Repository } from "typeorm";
+import { jwtSetting } from "settings";
+import { InjectRepository } from "@nestjs/typeorm";
 
 @Injectable()
 export class GoogleAuthService {
   private client: OAuth2Client;
 
   constructor(
+    private userService: UserService,
     @InjectModel(User.name) private userModel: Model<User>,
     private jwtService: JwtService,
   ) {
@@ -30,29 +36,36 @@ export class GoogleAuthService {
   }
 
   // Método para manejar el inicio de sesión o registro de un usuario con Google
-  async loginWithGoogle(googleToken: string) {
-    const payload = await this.verifyGoogleToken(googleToken);
+  async signInSSO(info: SsoAuthInfoDto): Promise<{
+    user: Partial<User>;
+    accessToken: string;
+    refreshToken: string;
+  }>  {
+    let user = await this.userModel.findOne({ email: info.data.user.email }).exec();
 
-    // Verificar si el usuario ya existe en la base de datos
-    let user = await this.userModel.findOne({ googleId: payload.sub });
-
-    // Si el usuario no existe, lo creamos
     if (!user) {
-      user = new this.userModel({
-        googleId: payload.sub,
-        email: payload.email,
-        name: payload.name,
-        avatar: payload.picture,
+      user = await this.userService.create({
+        email: info.data.user.email,
+        name: info.data.user.name,
       });
-      await user.save();
     }
 
-    // Generar un JWT para el usuario autenticado
-    const token = this.jwtService.sign({
-      userId: user._id,
-      email: user.email,
+    const payload = { sub: user.id, username: user.name, roles: user.roles };
+    const refreshToken = await this.jwtService.signAsync(payload, {
+      secret: jwtSetting.JWT_REFRESH_SECRET,
+      expiresIn: jwtSetting.JWT_REFRESH_EXPIRES,
     });
-
-    return { token, user };
+    const access_token = await this.jwtService.signAsync(payload);
+    const {
+      password: pass,
+      resetKey,
+      resetKeyTimeStamp,
+      ...userWithoutPass
+    } = user;
+    return {
+      user: userWithoutPass,
+      accessToken: access_token,
+      refreshToken: refreshToken,
+    };
   }
 }

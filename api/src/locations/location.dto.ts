@@ -1,6 +1,6 @@
 import { PartialType } from "@nestjs/mapped-types";
 import { IsArray, IsNotEmpty, IsOptional, IsString } from "class-validator";
-import { ObjectId } from "mongodb";
+import { Types } from "mongoose";
 
 export class CreateLocationDto {
   @IsNotEmpty()
@@ -18,7 +18,7 @@ export class CreateLocationDto {
 
 export class LocationDto extends CreateLocationDto {
   @IsArray()
-  matches?: ObjectId[];
+  matches?: Types.ObjectId[];
 }
 
 export class UpdateLocationDto extends PartialType(CreateLocationDto) {
@@ -36,5 +36,5 @@ export class UpdateLocationDto extends PartialType(CreateLocationDto) {
 
   @IsOptional()
   @IsArray()
-  matches?: ObjectId[];
+  matches?: Types.ObjectId[];
 }

@@ -28,6 +28,9 @@
             "./assets/fonts/RobotoCondensed-ThinItalic.ttf"
           ]
         }
+      ],
+      [
+        "@react-native-google-signin/google-signin"
       ]
     ],
     "name": "mobile",
@@ -37,7 +40,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/beardman.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -45,10 +48,12 @@
       "supportsTablet": true
     },
     "android": {
+      "googleServicesFile": "./google-services.json",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.admincodice.mobile"
     },
     "web": {
       "favicon": "./assets/favicon.png"
