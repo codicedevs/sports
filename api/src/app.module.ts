@@ -19,6 +19,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { MessagesModule } from './messages/messages.module';
 import { ChatroomModule } from './chatroom/chatroom.module';
 
+import { GroupsModule } from './groups/groups.module';
 @Module({
   imports: [
     SentryModule.forRoot(),
@@ -40,6 +41,7 @@ import { ChatroomModule } from './chatroom/chatroom.module';
     SportModesModule,
     MessagesModule,
     ChatroomModule,
+    GroupsModule
   ],
   controllers: [AppController],
   providers: [

@@ -4,12 +4,11 @@ import {
     NotFoundException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { Model, Types } from "mongoose";
+import { HydratedDocument, Model, Types } from "mongoose";
 import { User } from "./user.entity";
 import { CreateUserDto, UpdateUserDto } from "./user.dto";
 import * as bcrypt from "bcryptjs";
 import { FindManyFilter } from "filter/filter.dto";
-import { ObjectId } from "mongodb";
 import { Petition } from "petition/petition.entity";
 import { Match } from "match/match.entity";
 
@@ -56,7 +55,7 @@ export class UserService {
      * @param id
      * @returns
      */
-    async findByIdOrFail(id: ObjectId): Promise<User> {
+    async findByIdOrFail(id: Types.ObjectId): Promise<User> {
         const user = await this.userModel.findById(id).exec();
         if (!user) {
             throw new NotFoundException("Usuario no encontrado");
@@ -65,7 +64,7 @@ export class UserService {
     }
 
     //obtener todos los partidos del usuario
-    async getMatchesByUser(userId: ObjectId): Promise<Match[]> {
+    async getMatchesByUser(userId: Types.ObjectId): Promise<Match[]> {
         //buscar al user por ID y hacer populate de los partidos
         const user = await this.userModel
             .findById(userId)
@@ -115,8 +114,11 @@ export class UserService {
     /**
      * @param createUserDto
      */
-    async create(createUserDto: CreateUserDto): Promise<User> {
-        const hashedPassword = await bcrypt.hash(createUserDto.password, 8);
+    async create(createUserDto: CreateUserDto): Promise<HydratedDocument<User>> {
+        let hashedPassword: string | undefined = undefined;
+        if (createUserDto.password) {
+            hashedPassword = await bcrypt.hash(createUserDto.password, 8);
+        }
         const user = new this.userModel({
             ...createUserDto,
             password: hashedPassword,
@@ -130,7 +132,7 @@ export class UserService {
      * @param updateUserDto
      * @returns
      */
-    async update(id: ObjectId, updateUserDto: UpdateUserDto): Promise<User> {
+    async update(id: Types.ObjectId, updateUserDto: UpdateUserDto): Promise<User> {
         const user = await this.findByIdOrFail(id); // chequea si user existe
 
         // If the DTO contains a new password, hash it before updating
@@ -138,7 +140,15 @@ export class UserService {
             const hashedPassword = await bcrypt.hash(updateUserDto.password, 8);
             updateUserDto.password = hashedPassword;
         }
-
+    
+        // Si el DTO contiene un perfil, agregarlo o actualizarlo
+        if (updateUserDto.profile) {
+            updateUserDto.profile = {
+                ...(user.profile || {}), // Si no existe, inicializarlo como un objeto vacío
+                ...updateUserDto.profile, // Actualizar con los nuevos valores
+            };
+        }
+    
         return this.userModel
             .findByIdAndUpdate(id, updateUserDto, { new: true })
             .exec();
@@ -163,13 +173,13 @@ export class UserService {
      * @param id
      * @returns
      */
-    async delete(id: ObjectId): Promise<User> {
+    async delete(id: Types.ObjectId): Promise<User> {
         const user = await this.findByIdOrFail(id); // Ensure user exists
         await this.userModel.findByIdAndDelete(id).exec();
         return user; // Return the deleted user
     }
 
-    async addFriend(userId: ObjectId, friendId: ObjectId): Promise<User> {
+    async addFriend(userId: Types.ObjectId, friendId: Types.ObjectId): Promise<User> {
         const user = await this.userModel.findById(userId).exec();
         if (!user) {
             throw new NotFoundException("Usuario no encontrado");
@@ -186,7 +196,7 @@ export class UserService {
         return user.save();
     }
 
-    async getUserFriends(userId: ObjectId): Promise<User> {
+    async getUserFriends(userId: Types.ObjectId): Promise<User> {
         const user = await this.userModel
             .findById(userId)
             .populate("friends")
@@ -194,7 +204,7 @@ export class UserService {
         return user;
     }
 
-    async removeFriend(userId: ObjectId, friendId: ObjectId): Promise<User> {
+    async removeFriend(userId: Types.ObjectId, friendId: Types.ObjectId): Promise<User> {
         const user = await this.userModel.findById(userId).exec();
         if (!user) {
             throw new NotFoundException("Usuario no encontrado");

@@ -6,9 +6,9 @@ import { AuthGuard } from "./auth.guard";
 import { EmailService } from "email/email.service";
 import { jwtSetting } from "settings";
 import { UserModule } from "user/user.module";
-
 import { GoogleAuthService } from "./google-auth-service";
 import { BlacklistService } from "./blackList.service";
+import { UserService } from "user/user.service";
 @Module({
   imports: [
     JwtModule.register({
@@ -24,6 +24,7 @@ import { BlacklistService } from "./blackList.service";
     EmailService,
     GoogleAuthService,
     BlacklistService,
+    UserService
   ],
   exports: [AuthService],
 })
