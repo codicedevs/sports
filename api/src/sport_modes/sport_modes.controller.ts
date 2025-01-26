@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { SportModesService } from './sport_modes.service';
 import { CreateSportModeDto } from './dto/create-sport_mode.dto';
 import { UpdateSportModeDto } from './dto/update-sport_mode.dto';
-import { ObjectId } from 'mongodb';
+import { Types } from 'mongoose';
 
 @Controller('sport-modes')
 export class SportModesController {
@@ -19,7 +19,7 @@ export class SportModesController {
   }
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.sportModesService.findById(new ObjectId(id));
+    return this.sportModesService.findById(new Types.ObjectId(id));
   }
  
   @Patch(':id')

@@ -1,9 +1,10 @@
-import { CreatePetitionDto } from "../types/petition.type";
+
+import { CreateMatchDto } from "../types/match.type";
 import { HttpService } from "./http.service";
 
-class PetitionService extends HttpService {
+class MatchService extends HttpService {
   constructor() {
-    super("petitions");
+    super("matches");
   }
 
   getAll = async () => {
@@ -11,23 +12,24 @@ class PetitionService extends HttpService {
     return res.data;
   };
 
-  create = async (petition: CreatePetitionDto) => {
-    const res = await this.post(`/`, { petition });
+  create = async (match: CreateMatchDto) => {
+    console.log(match)
+    const res = await this.post(`/`, match);
     return res.data;
   };
 
-  acceptPetition = async (petitionId: string) => {
-    return this.put(`/accept/${petitionId}`);
+  acceptCreatematch = async (matchId: string) => {
+    return this.put(`/accept/${matchId}`);
   };
 
-  declinePetition = async (petitionId: string) => {
-    return this.put(`/decline/${petitionId}`);
+  declineCreatematch = async (matchId: string) => {
+    return this.put(`/decline/${matchId}`);
   };
 
-  getExistingPetition = async (emitterId: string, matchId: string) => {
+  getExistingMatch = async (emitterId: string, matchId: string) => {
     const res = await this.get(`/existing/${emitterId}/${matchId}`);
     return res.data;
   };
 }
 
-export default new PetitionService();
+export default new MatchService();
