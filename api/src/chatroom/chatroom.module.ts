@@ -5,15 +5,22 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Chatroom, ChatroomSchema } from './entities/chatroom.entity';
 import { Match, MatchSchema } from 'match/match.entity';
 import { User, UserSchema } from 'user/user.entity';
+import { Group, GroupSchema } from 'groups/entities/group.entity';
+import { Message, MessageSchema } from 'messages/entities/message.entity';
+import { MessagesModule } from 'messages/messages.module';
 
 @Module({
   imports: [
+    MessagesModule,
     MongooseModule.forFeature([
       { name: Chatroom.name, schema: ChatroomSchema },
       { name: Match.name, schema: MatchSchema },
-      { name: User.name, schema: UserSchema }
+      { name: User.name, schema: UserSchema },
+      { name: Group.name, schema: GroupSchema },
+      { name: Message.name, schema: MessageSchema }
     ])],
   controllers: [ChatroomController],
   providers: [ChatroomService],
+  exports: [ChatroomService]
 })
 export class ChatroomModule { }

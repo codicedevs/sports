@@ -7,3 +7,7 @@ export class CreateMessageDto {
     senderId: string
     message: string
 }
+export class SendMessageDto {
+    senderId: string
+    message: string
+}

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { HydratedDocument, Model, Types } from 'mongoose';
@@ -7,6 +7,17 @@ import { Chatroom } from 'chatroom/entities/chatroom.entity';
 import { User } from 'user/user.entity';
 import { Message } from './entities/message.entity';
 import { Filter, FilterResponse } from 'types/types';
+import { ChatroomModelType } from 'chatroom/chatroom.enum';
+
+const translate: Record<ChatroomModelType, string> = {
+  Match: "partido",
+  Group: "grupo"
+};
+
+const plural: Record<ChatroomModelType, string> = {
+  Match: "matches",
+  Group: "groups"
+};
 
 @Injectable()
 export class MessagesService {
@@ -30,18 +41,34 @@ export class MessagesService {
     if (!chatroomExists) {
       throw new NotFoundException("Chatroom no encontrado");
     }
-    const message = new this.messageModel({ senderId: senderExists._id, chatroomId: chatroomExists._id, ...createMessageDto })
+
+    if(!senderExists[plural[chatroomExists.reference.type]].includes(chatroomExists.reference.id )){
+      throw new UnauthorizedException(`El usuario no pertenece a este ${translate[chatroomExists.reference.type]}`)
+    }
+
+    const message : HydratedDocument<Message> = new this.messageModel({ senderId: senderExists._id, chatroomId: chatroomExists._id, ...createMessageDto })
+    chatroomExists.messages.push(message._id as Types.ObjectId)
+    await chatroomExists.save();
     return message.save()
 
   }
 
   async findAll(filter: Filter): Promise<FilterResponse<HydratedDocument<Message>>> {
-    const results = await this.messageModel.find(filter)
+    // Construye la consulta con paginación
+    const results = await  this.messageModel.find(filter).exec()
+    const totalCount = await this.messageModel.countDocuments(filter.where || {});
+
+
+    // Retorna los resultados con metadatos de paginación
     return {
-      results,
-      total: await this.messageModel.countDocuments(filter)
-    }
-  }
+        results,
+        totalCount,
+        page: filter.page || 1,
+        limit: filter.limit || 0,
+    };
+}
+
+
 
   async findById(id: string) {
     if (!Types.ObjectId.isValid(id)) {

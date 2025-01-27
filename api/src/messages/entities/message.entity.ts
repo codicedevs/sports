@@ -1,5 +1,6 @@
 import { Schema, Prop, SchemaFactory } from "@nestjs/mongoose";
 import { Chatroom } from "chatroom/entities/chatroom.entity";
+import { FilterPlugin } from "filter/filter.plugin";
 import mongoose, { Types, Document } from "mongoose";
 import { User } from "user/user.entity";
 
@@ -15,3 +16,4 @@ export class Message extends Document {
     message: string;
 }
 export const MessageSchema = SchemaFactory.createForClass(Message);
+MessageSchema.plugin(FilterPlugin);

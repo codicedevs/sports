@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { ChatroomModelType } from "chatroom/chatroom.enum";
+import { FilterPlugin } from "filter/filter.plugin";
 import { Message } from "messages/entities/message.entity";
 import mongoose, { Types, Document } from "mongoose";
 
@@ -21,6 +22,7 @@ export class Chatroom extends Document {
     @Prop({ type: ReferenceSchema })
     reference: Reference
     @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: () => Message }] })
-    messages: Types.ObjectId[] | Message[]
+    messages: Types.ObjectId[]
 }
 export const ChatroomSchema = SchemaFactory.createForClass(Chatroom)
+ChatroomSchema.plugin(FilterPlugin);
