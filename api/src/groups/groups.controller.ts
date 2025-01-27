@@ -48,7 +48,7 @@ export class GroupsController {
     return this.groupsService.remove(objectId);
   }
 
-  @Patch(':groupId/users/:userId')
+  @Patch(':groupId/users/:userId/remove')
   async removeUser(@Param('groupId') groupId: string, @Param('userId') userId: string, @JwtDecorator() payload: JwtPayload) {
     if (!Types.ObjectId.isValid(groupId)) {
       throw new BadRequestException("ID de grupo inválido");

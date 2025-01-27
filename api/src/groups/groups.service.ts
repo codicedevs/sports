@@ -8,6 +8,9 @@ import { Group } from './entities/group.entity';
 import { PetitionService } from 'petition/petition.service';
 import { PetitionModelType, PetitionStatus } from 'petition/petition.enum';
 import { Filter, FilterResponse } from 'types/types';
+import { Chatroom } from 'chatroom/entities/chatroom.entity';
+import { ChatroomService } from 'chatroom/chatroom.service';
+import { ChatroomModelType } from 'chatroom/chatroom.enum';
 
 @Injectable()
 export class GroupsService {
@@ -15,6 +18,7 @@ export class GroupsService {
     @InjectModel(Group.name) private readonly groupModel: Model<Group>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly petitionService: PetitionService,
+    private readonly chatroomService: ChatroomService,
   ) { }
   async create(createGroupDto: CreateGroupDto) {
     const { userId, invitedUsers, ...groupData } = createGroupDto;
@@ -26,6 +30,11 @@ export class GroupsService {
     }
     const group = new this.groupModel({ userId: user._id, users: [user._id], ...groupData })
     const savedGroup = await group.save()
+    //Creo un chatroom
+    await this.chatroomService.create({reference: {
+      type: ChatroomModelType.group,
+      id: savedGroup._id as Types.ObjectId
+    }})
     user.groups.push(savedGroup.id)
     await user.save();
 
@@ -83,7 +92,7 @@ export class GroupsService {
     const results = await this.groupModel.find(filter).limit(0)
     return {
       results,
-      total: await this.groupModel.countDocuments(filter)
+      totalCount: await this.groupModel.countDocuments(filter)
     }
   }
 

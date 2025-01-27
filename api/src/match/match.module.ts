@@ -10,6 +10,7 @@ import { MatchService } from "./match.service";
 import { JwtService } from "@nestjs/jwt";
 import { SportModesModule } from "sport_modes/sport_modes.module";
 import { PushNotificationService } from "services/pushNotificationservice";
+import { ChatroomModule } from "chatroom/chatroom.module";
 
 @Module({
     imports: [
@@ -21,6 +22,7 @@ import { PushNotificationService } from "services/pushNotificationservice";
         PetitionModule,
         LocationsModule,
         SportModesModule,
+        ChatroomModule,
     ],
     controllers: [MatchController],
     providers: [MatchService, JwtService, PushNotificationService],
