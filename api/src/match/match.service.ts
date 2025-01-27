@@ -19,6 +19,8 @@ import { SportModesService } from "sport_modes/sport_modes.service";
 import { SportMode } from "sport_modes/entities/sport_mode.entity";
 import { PushNotificationService } from "services/pushNotificationservice";
 import { LocationsService } from "locations/locations.service";
+import { ChatroomService } from "chatroom/chatroom.service";
+import { ChatroomModelType } from "chatroom/chatroom.enum";
 
 @Injectable()
 export class MatchService {
@@ -29,7 +31,8 @@ export class MatchService {
     private readonly petitionService: PetitionService,
     private readonly locationsService: LocationsService,
     private readonly sportModesService: SportModesService,
-    private readonly pushNotificationService: PushNotificationService
+    private readonly pushNotificationService: PushNotificationService,
+    private readonly chatroomService: ChatroomService
   ) { }
 
   // Servicio para crear partido, con o sin invitaciones
@@ -177,7 +180,13 @@ export class MatchService {
     match.users.splice(userIndex, 1);
 
     // Guardar el partido actualizado
-    await match.save();
+    const savedMatch = await match.save();
+
+    //Creo un chatroom
+        await this.chatroomService.create({reference: {
+          type: ChatroomModelType.match,
+          id: savedMatch._id as Types.ObjectId
+        }})
 
     // Eliminar el matchId del array de partidos del usuario
     const matchIndex = user.matches.findIndex(
@@ -198,7 +207,7 @@ export class MatchService {
     const results = await this.matchModel.find(filter).limit(0)
     return {
       results,
-      total: await this.matchModel.countDocuments(filter)
+      totalCount: await this.matchModel.countDocuments(filter)
     }
   }
 
