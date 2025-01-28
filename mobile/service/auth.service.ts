@@ -15,10 +15,11 @@ export class AuthService extends HttpService {
         super("auth");
     }
 
-    login = async (username: string, password: string) => {
+    login = async (email: string, password: string) => {
+        console.log('funciona')
         let loginProps: LoginProps | null = null;
         try {
-            const res = await axios.post<LoginProps>(`${BASE_URL}/auth/login`, { username, pass: password });
+            const res = await this.post<LoginProps>(`${BASE_URL}/auth/signin`, { email, password: password });
             this.saveAccessToken(res.data.token);
             this.saveRefreshToken(res.data.refreshToken);
             loginProps = res.data;
