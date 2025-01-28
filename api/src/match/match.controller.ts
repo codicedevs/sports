@@ -37,23 +37,6 @@ export class MatchController {
         }
     }
 
-    @Post(":matchId/users/:userId")
-    async addUserToMatch(
-        @Param("matchId") matchId: string, // Use string as ObjectId is stored as string
-        @Param("userId") userId: string,
-    ) {
-        if (!Types.ObjectId.isValid(matchId) || !Types.ObjectId.isValid(userId)) {
-            throw new BadRequestException("ID de partido o usuario inválido");
-        }
-
-        const updatedMatch = await this.matchService.addUserToMatch(
-            new Types.ObjectId(matchId),
-            new Types.ObjectId(userId),
-        );
-
-        return updatedMatch;
-    }
-
     @Get()
     async findAll(@Query() filter: Filter) {
         return await this.matchService.findAll(filter);
@@ -113,7 +96,7 @@ export class MatchController {
         return match;
     }
 
-    @Put("/:matchId/formation/:userId")
+    @Patch("/:matchId/formation/:userId/add")
     async updateFormation(
         @Param("matchId") matchId: string,
         @Param("userId") userId: string,
@@ -136,7 +119,7 @@ export class MatchController {
         return updatedMatch;
     }
 
-    @Delete("/:matchId/formation/:userId")
+    @Patch("/:matchId/formation/:userId/remove")
     async deleteUserFromFormation(
         @Param("matchId") matchId: string,
         @Param("userId") userId: string,
@@ -155,6 +138,41 @@ export class MatchController {
         return updatedMatch;
     }
 
+  
+    @Patch(":matchId/users/:userId/add")
+    async addUserToMatch(
+        @Param("matchId") matchId: string, // Use string as ObjectId is stored as string
+        @Param("userId") userId: string,
+    ) {
+        if (!Types.ObjectId.isValid(matchId) || !Types.ObjectId.isValid(userId)) {
+            throw new BadRequestException("ID de partido o usuario inválido");
+        }
+
+        const updatedMatch = await this.matchService.addUserToMatch(
+            new Types.ObjectId(matchId),
+            new Types.ObjectId(userId),
+        );
+
+        return updatedMatch;
+    }
+
+    @Patch(":matchId/users/:userId/remove")
+    @UseGuards(MatchPlayerGuard)
+    async removeUserFromMatch(
+        @Param("matchId") matchId: string,
+        @Param("userId") userId: string,
+    ) {
+        const match = new Types.ObjectId(matchId);
+        const user = new Types.ObjectId(userId);
+
+        const updatedMatch = await this.matchService.removeUserFromMatch(
+            match,
+            user,
+        );
+
+        return updatedMatch;
+    }
+    
     @Put(":id")
     @UseGuards(MatchOwnerGuard) // solo el creador del partido puede editar el partido
     async update(
@@ -169,23 +187,6 @@ export class MatchController {
             new Types.ObjectId(id),
             updateMatchDto,
         );
-        return updatedMatch;
-    }
-
-    @Patch(":matchId/users/:userId")
-    @UseGuards(MatchPlayerGuard)
-    async removeUserFromMatch(
-        @Param("matchId") matchId: string,
-        @Param("userId") userId: string,
-    ) {
-        const match = new Types.ObjectId(matchId);
-        const user = new Types.ObjectId(userId);
-
-        const updatedMatch = await this.matchService.removeUserFromMatch(
-            match,
-            user,
-        );
-
         return updatedMatch;
     }
 
