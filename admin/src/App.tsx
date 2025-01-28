@@ -4,6 +4,11 @@ import store from "./store";
 import HomePage from "./pages/home";
 import LoginPage from "./pages/login";
 import { authLoader } from "./pages/loaders/authLoader";
+import Dashboard from "./pages/dashboard";
+import { ConfigProvider } from "antd";
+import DashboardHome from "./views/dashboardHome";
+import Settings from "./views/settings";
+import Users from "./views/users";
 
 const router = createBrowserRouter([
   {
@@ -16,14 +21,32 @@ const router = createBrowserRouter([
   },
   {
     path: "/protected",
-    element: <h1>Protected</h1>,
+    element: <Dashboard />,
     loader: authLoader,
+    children: [
+      { path: "", element: <DashboardHome /> },
+      { path: "settings", element: <Settings /> },
+      { path: "profile", element: <Users /> },
+    ],
   },
 ]);
 
 const App = () => (
   <Provider store={store}>
-    <RouterProvider router={router} />
+    <ConfigProvider
+      theme={{
+        token: {
+          // Seed Token
+          colorPrimary: "#56116b",
+          borderRadius: 2,
+
+          // Alias Token
+          colorBgContainer: "#f6ffed",
+        },
+      }}
+    >
+      <RouterProvider router={router} />
+    </ConfigProvider>
   </Provider>
 );
 
