@@ -38,17 +38,10 @@ export class MatchService {
   // Servicio para crear partido, con o sin invitaciones
   async createMatch(createMatchDto: CreateMatchDto): Promise<Match> {
     const { userId, invitedUsers, location, ...matchData } = createMatchDto;
-    if (!Types.ObjectId.isValid(userId)) {
-      throw new BadRequestException("ID de usuario inválido");
-    }
     // Verificar si el usuario creador existe
     const user = await this.userModel.findById(userId).exec();
     if (!user) {
       throw new NotFoundException("Usuario no encontrado");
-    }
-
-    if (!Types.ObjectId.isValid(location as Types.ObjectId)) {
-      throw new BadRequestException("ID de location inválida");
     }
     // Verificar si la location existe
     

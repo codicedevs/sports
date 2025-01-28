@@ -15,6 +15,8 @@ import { UpdatePetitionDto } from "./petition.dto";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { PetitionModelType } from "./petition.enum";
 import { Types } from "mongoose";
+import { ValidateObjectIdPipe } from "pipes/validate-object-id.pipe";
+import { types } from "util";
 
 @ApiBearerAuth()
 @ApiTags('petitions')
@@ -38,27 +40,21 @@ export class PetitionController {
 
   //Aceptar una peticion
   @Put("accept/:petitionId")
-  async acceptPetition(@Param("petitionId") petitionId: string) {
-    if (!Types.ObjectId.isValid(petitionId)) {
-      throw new BadRequestException("ID de petición inválido");
-    }
+  async acceptPetition(@Param("petitionId", new ValidateObjectIdPipe()) petitionId: string) {
     return this.petitionService.acceptPetition(new Types.ObjectId(petitionId));
   }
 
   //Rechazar peticion
   @Put("decline/:petitionId")
-  async declinePetition(@Param("petitionId") petitionId: string) {
-    if (!Types.ObjectId.isValid(petitionId)) {
-      throw new BadRequestException("ID de petición inválido");
-    }
+  async declinePetition(@Param("petitionId", new ValidateObjectIdPipe()) petitionId: string) {
     return this.petitionService.declinePetition(new Types.ObjectId(petitionId));
   }
 
   //comprobar si un usuario ya peticiono para unirse a un partido
   @Get("existing/:emitterId/:modelType/:targetId")
   async getExistingPetition(
-    @Param("emitterId") emitterId: string,
-    @Param("targetId") targetId: string,
+    @Param("emitterId", new ValidateObjectIdPipe("emisor")) emitterId: string,
+    @Param("targetId", new ValidateObjectIdPipe("target")) targetId: string,
     @Param("modelType") modelType: PetitionModelType,
   ) {
     const existingPetition = await this.petitionService.findExistingPetition(

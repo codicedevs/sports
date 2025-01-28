@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, BadRequestException } from '@nestjs/common';
 import { ChatroomService } from './chatroom.service';
 import { CreateChatroomDto } from './dto/create-chatroom.dto';
 import { UpdateChatroomDto } from './dto/update-chatroom.dto';
@@ -6,6 +6,8 @@ import { Filter } from 'types/types';
 import { CreateMessageDto, SendMessageDto } from 'messages/dto/create-message.dto';
 import { MessagesService } from 'messages/messages.service';
 import { ChatroomModelType } from './chatroom.enum';
+import { ValidateObjectIdPipe } from 'pipes/validate-object-id.pipe';
+import { Types } from 'mongoose';
 
 @Controller('chatroom')
 export class ChatroomController {
@@ -15,8 +17,11 @@ export class ChatroomController {
 
 
   @Post(':chatroomId/send')
-  send(@Param('chatroomId') chatroomId: string,
+  send(@Param('chatroomId', new ValidateObjectIdPipe("chatroom")) chatroomId: string,
     @Body() sendMessageDto: SendMessageDto) {
+    if (!Types.ObjectId.isValid(sendMessageDto.senderId)) {
+          throw new BadRequestException(`ID de sender inválido`);
+        }
     return this.messagesService.create({ chatroomId, ...(sendMessageDto) })
   }
 
@@ -25,12 +30,12 @@ export class ChatroomController {
     return this.chatroomService.findAll(filter);
   }
   @Get('user/:userId')
-  getLastMessage(@Param('userId') userId: string) {
+  getLastMessage(@Param('userId', new ValidateObjectIdPipe("user")) userId: string) {
     return this.chatroomService.getUserChatroomsWithLastMessage(userId, [ChatroomModelType.group])
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', new ValidateObjectIdPipe()) id: string) {
     return this.chatroomService.findOne(id);
   }
 
