@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { GroupsService } from './groups.service';
 import { GroupsController } from './groups.controller';
 import { PushNotificationService } from 'services/pushNotificationservice';
@@ -7,6 +7,7 @@ import { PetitionModule } from 'petition/petition.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'user/user.entity';
 import { Group, GroupSchema } from './entities/group.entity';
+import { ChatroomModule } from 'chatroom/chatroom.module';
 
 @Module({
   imports: [
@@ -14,7 +15,8 @@ import { Group, GroupSchema } from './entities/group.entity';
       { name: User.name, schema: UserSchema },
       { name: Group.name, schema: GroupSchema },
     ]),
-    PetitionModule
+    forwardRef(() => ChatroomModule),
+    forwardRef(() => PetitionModule),
   ],
   controllers: [GroupsController],
   providers: [GroupsService, JwtService, PushNotificationService],

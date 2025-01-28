@@ -1,5 +1,4 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-// import DetailsScreen from "../screens/details";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { FadeWrapper } from "../components/fadeView";
@@ -14,11 +13,12 @@ const SettingsStack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator()
 const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
+const HomeStack = createNativeStackNavigator()
 
 
 export function HomeStackScreen() {
     return (
-        <Drawer.Navigator
+        <HomeStack.Navigator
             screenOptions={{
                 headerShown: false
             }}>
@@ -28,7 +28,7 @@ export function HomeStackScreen() {
                 </FadeWrapper>
             )} />
             <Drawer.Screen name={AppScreens.TRIAL1_SCREEN} component={Trialscreen} />
-        </Drawer.Navigator>
+        </HomeStack.Navigator>
     );
 }
 

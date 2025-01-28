@@ -1,12 +1,14 @@
-import React from 'react'
-import { Text, View } from 'react-native'
+import React, { useState, useRef } from 'react';
+import { View, Text, TouchableOpacity, Animated, StyleSheet } from 'react-native';
+import CircleDropdown from '../components/circleDropdown';
+import Scrolldown from '../components/scrollDownImage';
 
 const Trialscreen = () => {
-    return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            <Text>Deslizando el dedo tambien abris el drawer cornudo</Text>
-        </View>
-    )
-}
+  
+  return (
+//    <CircleDropdown /> circulos con el drop down
+<Scrolldown />
+  );
+};
 
-export default Trialscreen
+export default Trialscreen;
