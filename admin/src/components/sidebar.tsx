@@ -21,12 +21,12 @@ export default function Sidebar() {
               padding: "10px 20px",
             }}
           >
-            Dashboard
+            Dashboard General
           </Link>
         </li>
         <li>
           <Link
-            to="settings"
+            to="partidos"
             style={{
               color: "white",
               textDecoration: "none",
@@ -34,7 +34,7 @@ export default function Sidebar() {
               padding: "10px 20px",
             }}
           >
-            Settings
+            Partidos
           </Link>
         </li>
         <li>
@@ -47,7 +47,7 @@ export default function Sidebar() {
               padding: "10px 20px",
             }}
           >
-            Profile
+            Usuarios
           </Link>
         </li>
       </ul>

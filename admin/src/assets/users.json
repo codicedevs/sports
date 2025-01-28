@@ -1,0 +1,72 @@
+[
+  {
+    "id": "1",
+    "firstName": "Juan",
+    "lastName": "Pérez",
+    "phone": "1122334455",
+    "mail": "juan.perez@example.com"
+  },
+  {
+    "id": "2",
+    "firstName": "Ana",
+    "lastName": "Gómez",
+    "phone": "2233445566",
+    "mail": "ana.gomez@example.com"
+  },
+  {
+    "id": "3",
+    "firstName": "Lucas",
+    "lastName": "Núñez",
+    "phone": "3344556677",
+    "mail": "lucas.nunez@example.com"
+  },
+  {
+    "id": "4",
+    "firstName": "Marta",
+    "lastName": "Díaz",
+    "phone": "4455667788",
+    "mail": "marta.diaz@example.com"
+  },
+  {
+    "id": "5",
+    "firstName": "Antonio",
+    "lastName": "Moreno",
+    "phone": "5566778899",
+    "mail": "antonio.moreno@example.com"
+  },
+  {
+    "id": "6",
+    "firstName": "Laura",
+    "lastName": "Iglesias",
+    "phone": "6677889900",
+    "mail": "laura.iglesias@example.com"
+  },
+  {
+    "id": "7",
+    "firstName": "Tomás",
+    "lastName": "Castillo",
+    "phone": "7788990011",
+    "mail": "tomas.castillo@example.com"
+  },
+  {
+    "id": "8",
+    "firstName": "Carla",
+    "lastName": "Espinoza",
+    "phone": "8899001122",
+    "mail": "carla.espinoza@example.com"
+  },
+  {
+    "id": "9",
+    "firstName": "Ricardo",
+    "lastName": "Balbín",
+    "phone": "9900112233",
+    "mail": "ricardo.balbin@example.com"
+  },
+  {
+    "id": "10",
+    "firstName": "Sofía",
+    "lastName": "Guerrera",
+    "phone": "0011223344",
+    "mail": "sofia.guerrera@example.com"
+  }
+]

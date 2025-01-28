@@ -9,6 +9,7 @@ import { ConfigProvider } from "antd";
 import DashboardHome from "./views/dashboardHome";
 import Settings from "./views/settings";
 import Users from "./views/users";
+import Matches from "./views/matches";
 
 const router = createBrowserRouter([
   {
@@ -25,7 +26,7 @@ const router = createBrowserRouter([
     loader: authLoader,
     children: [
       { path: "", element: <DashboardHome /> },
-      { path: "settings", element: <Settings /> },
+      { path: "partidos", element: <Matches /> },
       { path: "profile", element: <Users /> },
     ],
   },
