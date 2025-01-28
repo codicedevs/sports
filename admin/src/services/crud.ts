@@ -6,6 +6,10 @@ export class CrudService extends HttpBase {
     super(`${API_URL}/${baseURL}`);
   }
 
+  async find(): Promise<any> {
+    return this.get("");
+  }
+
   getAccessToken(): any {
     return localStorage.getItem("jwt");
   }
