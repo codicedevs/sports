@@ -1,154 +1,51 @@
-import { Text, View, ScrollView } from "react-native";
+import React, { useState, useEffect } from "react";
+import { Text, View, ScrollView, Modal, StyleSheet } from "react-native";
 import { Button } from "react-native-magnus";
-import React, { useEffect, useState } from "react";
-import { scale } from "react-native-size-matters";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
+import Header from "../components/header";
 import StatisticCard from "../components/statisticCard";
 import SquareCard, { SquareCardProps } from "../components/squareCard";
-import Location from "../types/location.type";
-import Header from "../components/header";
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
-
-GoogleSignin.configure();
 import SectionPhoto from "../components/SectionPhoto";
 import MatchCard from "../components/cards/matchCard";
-import StepModal from "../components/modal/stepModal";
-import { UserPreferences } from "../types/preferences.type";
-import { StepAvailability, StepSport, StepZones } from "../components/userPreferencesSteps";
 import ModalAnimation from "../components/cards/animatedCard";
 import Index from "../components/matche";
-import authService from "../service/auth.service";
 import { useSession } from "../context/authProvider";
+import authService from "../service/auth.service";
+import LottieView from "lottie-react-native";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
-  const [userInfo, setUserInfo] = useState<UserPreferences>({
-    sport: '',
-    sportMode: '',
-    availability: [],
-    preferredZones: [],
-  });
-  const [counterSteps, setCounterSteps] = useState(0)
-
-  // Estados para manejar los modales y pasos
   const [openStep, setOpenStep] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [newModalVisible, setNewModalVisible] = useState(false);
 
   const { setCurrentUser } = useSession();
 
   const checkUser = async () => {
     try {
-      const res = await authService.whoAmI()
-      setCurrentUser(res)
+      const res = await authService.whoAmI();
+      setCurrentUser(res);
+    } catch (e) {
+      console.log(e);
     }
-    catch (e) { 
-      console.log(e)
-    }
-  }
+  };
 
   useEffect(() => {
-    checkUser()
-  }, [])
-  // a ver si se puede pushear
-  const location1: Location = {
-    _id: "1",
-    name: "Location 1",
-    address: "123 Street",
-    hour: "19:00 PM",
-    location: {
-      type: "Point",
-      coordinates: [40.7128, -74.006],
-    },
-  };
+    checkUser();
+  }, []);
 
-  const updateUserInfo = (info: Partial<UserPreferences>) => {
-    setUserInfo((prev) => ({ ...prev, ...info }));
-  };
-
-  const handleNext = (data: any) => {
-    setUserInfo((prev) => ({ ...prev, ...data }));
-    if (counterSteps < steps.length - 1) {
-      setCounterSteps((prev) => prev + 1);
-    } else {
-      handleModalClose();
-    }
-  };
-  
-  const steps = [
-    <StepSport userInfo={userInfo} setUserInfo={setUserInfo} onNext={handleNext} />,
-    <StepAvailability userInfo={userInfo} setUserInfo={setUserInfo} onNext={handleNext} />,
-    <StepZones userInfo={userInfo} setUserInfo={setUserInfo} onNext={handleNext} />,
-  ];
-  
-
-  const handleModalClose = () => {
-    console.log("Información final del usuario:", userInfo);
-    setModalVisible(false);
-    setCounterSteps(0);
-    setUserInfo({
-      sport: '',
-      sportMode: '',
-      availability: [],
-      preferredZones: [],
-    });
-  };
-  function handleStep() {
+  const handleStep = () => {
     setOpenStep(true);
-  }
+  };
 
   const cardData: SquareCardProps[] = [
-    {
-      title: "Vie 8 dic",
-      score: "LOYAL",
-      location: location1,
-      hour: "19:00 PM",
-      backgroundimage: require("../assets/squarecard2.png"),
-    },
-    {
-      title: "TODAY",
-      score: "150 W 120",
-      location: location1,
-      hour: "19:00 PM",
-      backgroundimage: require("../assets/squarecard1.png"),
-    },
-    {
-      title: "NEVER",
-      score: "0 W 800",
-      hour: "19:00 PM",
-      location: location1,
-      backgroundimage: require("../assets/squaredcard3.png"),
-    },
-    {
-      title: "NEVER",
-      score: "0 W 800",
-      hour: "19:00 PM",
-      location: location1,
-      backgroundimage: require("../assets/escudo4.png"),
-    },
-    {
-      title: "NEVER",
-      score: "0 W 800",
-      hour: "19:00 PM",
-      location: location1,
-      backgroundimage: require("../assets/escudo5.png"),
-    },
-    {
-      title: "NEVER",
-      score: "0 W 800",
-      hour: "19:00 PM",
-      location: location1,
-      backgroundimage: require("../assets/escudo6.png"),
-    },
+    // Datos de las tarjetas
   ];
 
   return (
     <View style={{ flex: 1, padding: 8 }}>
-      {/* Encabezado */}
       <Header />
-
-      {/* Scroll principal */}
       <ScrollView
         contentContainerStyle={{
           padding: 10,
@@ -156,11 +53,9 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
         }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Tarjeta de estadísticas */}
         <StatisticCard style={{ flex: 1 }} />
-
-        {/* Scroll horizontal de tarjetas */}
         <ScrollView
+          horizontal
           contentContainerStyle={{
             gap: 10,
             marginTop: 10,
@@ -178,22 +73,54 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
             />
           ))}
         </ScrollView>
-
-        {/* Foto de sección */}
         <SectionPhoto backGroundImage={require("../assets/photoNew.png")} />
-
-        {/* Tarjetas de partidos */}
         <MatchCard />
         <MatchCard />
         <MatchCard />
         <MatchCard />
-
-        {/* Botón para abrir el Modal */}
+        <Button
+          onPress={() => navigation.navigate(AppScreens.TRIAL1_SCREEN)}
+          mt={10}
+          bg="blue600"
+        >
+          <Text style={{ color: "white" }}>Ir a Trial1 Screen</Text>
+        </Button>
         <Button onPress={handleStep} mt={10} bg="blue600">
           <Text style={{ color: "white" }}>Crear Partido</Text>
         </Button>
-
-        {/* Modal con los Steps */}
+        <Button
+          onPress={() => setNewModalVisible(true)}
+          mt={10}
+          bg="green600"
+        >
+          <Text style={{ color: "white" }}>Abrir Nuevo Modal</Text>
+        </Button>
+        <Modal
+          transparent
+          visible={newModalVisible}
+          animationType="slide"
+          onRequestClose={() => setNewModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              {/* Animación Lottie */}
+              <LottieView
+                source={require("../assets/lottie animation/prueba.json")} // Ruta de tu archivo .json
+                autoPlay
+                loop
+                style={{ width: 200, height: 200 }}
+              />
+             
+              <Button
+                onPress={() => setNewModalVisible(false)}
+                mt={10}
+                bg="red600"
+              >
+                <Text style={{ color: "white" }}>Cerrar Modal</Text>
+              </Button>
+            </View>
+          </View>
+        </Modal>
         <ModalAnimation open={openStep} onFinish={() => setOpenStep(false)}>
           <Index />
         </ModalAnimation>
@@ -201,5 +128,31 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalContent: {
+    width: "80%",
+    padding: 20,
+    backgroundColor: "white",
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  modalText: {
+    fontSize: 14,
+    textAlign: "center",
+    marginBottom: 20,
+  },
+});
 
 export default HomeScreen;

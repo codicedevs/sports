@@ -9,6 +9,9 @@ import { PushNotificationService } from "services/pushNotificationservice";
 import { Group, GroupSchema } from "groups/entities/group.entity";
 import { MatchService } from "match/match.service";
 import { GroupsService } from "groups/groups.service";
+import { ChatroomService } from "chatroom/chatroom.service";
+import { Chatroom, ChatroomSchema } from "chatroom/entities/chatroom.entity";
+import { Message, MessageSchema } from "messages/entities/message.entity";
 
 @Module({
   imports: [
@@ -17,10 +20,12 @@ import { GroupsService } from "groups/groups.service";
       { name: Match.name, schema: MatchSchema },
       { name: User.name, schema: UserSchema },
       { name: Group.name, schema: GroupSchema },
+      { name: Chatroom.name, schema: ChatroomSchema },
+      { name: Message.name, schema: MessageSchema },
     ])
   ],
   controllers: [PetitionController],
-  providers: [PetitionService, PushNotificationService, GroupsService],
+  providers: [PetitionService, PushNotificationService, GroupsService, ChatroomService],
   exports:[PetitionService]
 })
 export class PetitionModule {}

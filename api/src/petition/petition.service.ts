@@ -208,6 +208,9 @@ export class PetitionService {
 
     // Si el emisor es el creador del partido, agregar al receptor en lugar del emisor
     if ((target.userId as Types.ObjectId).equals(petition.emitter._id as Types.ObjectId)) {
+      if(target.users.includes(petition.receiver._id)){
+        throw new BadRequestException(`El usuario ya se encuentra en el ${translate[modelType]}`)
+      }
       (target.users).push(petition.receiver._id);
 
       // Agregar el partido al array de partidos o grupos del receiver si no es el dueño
@@ -218,12 +221,15 @@ export class PetitionService {
         }
       }
     } else {
+      if(target.users.includes(petition.emitter._id)){
+        throw new BadRequestException(`El usuario ya se encuentra en el ${translate[modelType]}`)
+      }
       // En caso contrario, agregar al emisor al partido
       target.users.push(petition.emitter._id);
 
       // Agregar el partido al array de partidos del emisor
-      if (!emitter.matches.includes(target.id)) {
-        emitter.matches.push(target.id); // Agregar el partido al array de `matches` del emisor
+      if (!emitter[plural[modelType]].includes(target.id)) {
+        emitter[plural[modelType]].push(target.id); // Agregar el grupo/partido al array de `matches`/groups del emisor
         await emitter.save(); // Guardar los cambios en el emisor
       }
     }
