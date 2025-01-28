@@ -21,6 +21,7 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { Types } from "mongoose";
 import { create } from "domain";
 import { ValidateObjectIdPipe } from "pipes/validate-object-id.pipe";
+import { Public } from "authentication/public";
 
 @ApiBearerAuth()
 @ApiTags('matches')
@@ -78,6 +79,7 @@ export class MatchController {
         return matches;
     }
 
+    @Public()
     @Get(":id")
     async findOne(@Param("id", new ValidateObjectIdPipe()) id: string) {
         const match = await this.matchService.findOne(new Types.ObjectId(id));
@@ -112,6 +114,7 @@ export class MatchController {
     }
 
 
+    @Public()
     @Patch(":matchId/users/:userId/add")
     async addUserToMatch(
         @Param("matchId", new ValidateObjectIdPipe("partido")) matchId: string, // Use string as ObjectId is stored as string
@@ -125,6 +128,7 @@ export class MatchController {
         return updatedMatch;
     }
 
+    @Public()
     @Patch(":matchId/users/:userId/remove")
     @UseGuards(MatchPlayerGuard)
     async removeUserFromMatch(
