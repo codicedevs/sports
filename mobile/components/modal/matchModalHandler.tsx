@@ -1,33 +1,44 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Button, Div, Overlay, Select, Text, Input } from "react-native-magnus";
+import React, { useEffect, useState } from 'react';
+import { Button, Div, Overlay, Text, Input } from "react-native-magnus";
+import SelectDropdown from 'react-native-select-dropdown';
 import sportService from '../../service/sport.service';
 import useFetch from '../../hooks/useGet';
 import { QUERY_KEYS } from '../../types/query.types';
 import sportmodeService from '../../service/sportmode.service';
+import { StyleSheet } from 'react-native';
 
 const MatchModalHandler = ({ id, open, setOpen }: { id?: number; open: boolean; setOpen: React.Dispatch<React.SetStateAction<boolean>> }) => {
   // States for selects
-  const [selectedSport, setSelectedSport] = useState(null);
-  const [selectValue2, setSelectValue2] = useState(null);
+  const [selectedSport, setSelectedSport] = useState('');
+  const [selectedSportMode, setSelectedSportMode] = useState('');
   const [selectValue3, setSelectValue3] = useState(null);
 
-  // Refs for selects
-  const selectRef1 = useRef(null);
-  const selectRef2 = useRef(null);
-  const selectRef3 = useRef(null);
-
-  const bringSportModesById = async () => {
-
-  }
+  const fetchSportModesById = async () => {
+    if(selectedSport){
+      setSelectedSportMode('')
+      const res = await sportmodeService.getById(selectedSport)
+      return res
+    } else {
+      const res = await sportmodeService.getAll()
+      return res
+    }
+  } 
 
   // Get info
-  const { data: sports } = useFetch({ fn: sportService.getAll, key: [QUERY_KEYS.SPORTS] })
-  const { data: sportModes } = useFetch({ fn: sportmodeService.getAll, key: [QUERY_KEYS.SPORT_MODES] })
-  //convendria usar un servicio que pase el id del sport q selecciona actualmente y con eso q vaya cambiando el sportmode en el select
-
-  if (!sports || !sportModes) return
-  const futbol = sports.data.filter((item) => item.name = "Fútbol")
-  console.log(sports.data, "como viene")
+  const { data: sports } = useFetch({ fn: sportService.getAll, key: [QUERY_KEYS.SPORTS] });
+  const { data: sportModes } = useFetch({ fn: fetchSportModesById, key: [QUERY_KEYS.SPORT_MODES, selectedSport] });
+  
+  useEffect(() => {
+    if(sports){
+      setSelectedSport(sports.data[0]._id)
+    }
+    if(selectedSport && sportModes){
+      setSelectedSportMode(sportModes.data[0]._id)
+    }
+  }, [sports ,selectedSport])
+  
+  if (!sports || !sportModes) return null;
+  console.log(sportModes,"STALA")
   return (
     <Overlay visible={open} onBackdropPress={() => setOpen(false)} p="lg" rounded="lg">
       <Div>
@@ -38,87 +49,132 @@ const MatchModalHandler = ({ id, open, setOpen }: { id?: number; open: boolean; 
         {/* Select 1 */}
         <Div mb="lg">
           <Text mb="sm">Select Option 1</Text>
-          <Button
-            bg="white"
-            borderColor="gray300"
-            borderWidth={1}
-            onPress={() => selectRef1.current?.open()}
-          >
-            {selectedSport ? selectedSport : 'Choose an option'}
-          </Button>
-          <Select
-            ref={selectRef1}
-            value={selectedSport}
-            onSelect={(value) => setSelectedSport(value)}
-            title="Select Option 1"
-            roundedTop="xl"
-            data={sports.data.map((item) => ({
-              label: item.name,
-              value: item._id,
-            }))}
-            renderItem={(item) => (
-              <Select.Option value={item.value} py="md" px="xl">
-                {item.label}
-              </Select.Option>
+          <SelectDropdown
+            data={sports.data.map((item) => item.name)}
+            onSelect={(selectedItem, index) => {
+              setSelectedSport(sports.data[index]._id);
+            }}
+            defaultValueByIndex={0}
+            defaultButtonText="Choose an option"
+            buttonTextAfterSelection={(selectedItem, index) => selectedItem}
+            rowTextForSelection={(item, index) => item}
+            buttonStyle={styles.dropdownButtonStyle}
+            buttonTextStyle={styles.dropdownButtonTxtStyle}
+            dropdownStyle={styles.dropdownMenuStyle}
+            rowTextStyle={styles.dropdownItemTxtStyle}
+            renderDropdownIcon={isOpened => (
+              <Text style={styles.dropdownButtonArrowStyle}>
+                {isOpened ? '▲' : '▼'}
+              </Text>
             )}
+            renderItem={(item, index, isSelected) => {
+              return (
+                <Div style={{ ...styles.dropdownItemStyle, ...(isSelected && { backgroundColor: '#D2D9DF' }) }}>
+
+                  <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
+                </Div>
+              );
+            }}
+            renderButton={(selectedItem, isOpened) => {
+              return (
+                <Div style={styles.dropdownButtonStyle}>
+                  <Text style={styles.dropdownButtonTxtStyle}>
+                    {selectedItem ? selectedItem : 'Choose an option'}
+                  </Text>
+                  <Text style={styles.dropdownButtonArrowStyle}>
+                    {isOpened ? '▲' : '▼'}
+                  </Text>
+                </Div>
+              );
+            }}
           />
         </Div>
 
         {/* Select 2 */}
         <Div mb="lg">
           <Text mb="sm">Select Option 2</Text>
-          <Button
-            bg="white"
-            borderColor="gray300"
-            borderWidth={1}
-            onPress={() => selectRef2.current?.open()}
-          >
-            {selectValue2 ? selectValue2 : 'Choose an option'}
-          </Button>
-          <Select
-            ref={selectRef2}
-            value={selectValue2}
-            onSelect={(value) => setSelectValue2(value)}
-            title="Select Option 2"
-            roundedTop="xl"
-            data={sportModes.data.map((item) => ({
-              label: item.name,
-              value: item._id,
-            }))}
-            renderItem={(item) => (
-              <Select.Option value={item.value} py="md" px="xl">
-                {item.label}
-              </Select.Option>
+          <SelectDropdown
+            data={sportModes.data.map((item) => item.name)}
+            onSelect={(selectedItem, index) => {
+              setSelectedSportMode(sportModes.data[index]._id);
+            }}
+            defaultValueByIndex={0}
+            defaultButtonText="Choose an option"
+            buttonTextAfterSelection={(selectedItem, index) => selectedItem}
+            rowTextForSelection={(item, index) => item}
+            buttonStyle={styles.dropdownButtonStyle}
+            buttonTextStyle={styles.dropdownButtonTxtStyle}
+            dropdownStyle={styles.dropdownMenuStyle}
+            rowTextStyle={styles.dropdownItemTxtStyle}
+            renderDropdownIcon={isOpened => (
+              <Text style={styles.dropdownButtonArrowStyle}>
+                {isOpened ? '▲' : '▼'}
+              </Text>
             )}
+            renderItem={(item, index, isSelected) => {
+              return (
+                <Div style={{ ...styles.dropdownItemStyle, ...(isSelected && { backgroundColor: '#D2D9DF' }) }}>
+
+                  <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
+                </Div>
+              );
+            }}
+            renderButton={(selectedItem, isOpened) => {
+              return (
+                <Div style={styles.dropdownButtonStyle}>
+                  <Text style={styles.dropdownButtonTxtStyle}>
+                    {selectedItem ? selectedItem : 'Choose an option'}
+                  </Text>
+                  <Text style={styles.dropdownButtonArrowStyle}>
+                    {isOpened ? '▲' : '▼'}
+                  </Text>
+                </Div>
+              );
+            }}
           />
         </Div>
 
         {/* Select 3 */}
         <Div mb="lg">
           <Text mb="sm">Select Option 3</Text>
-          <Button
-            bg="white"
-            borderColor="gray300"
-            borderWidth={1}
-            onPress={() => selectRef3.current?.open()}
-          >
-            {selectValue3 ? selectValue3 : 'Choose an option'}
-          </Button>
-          <Select
-            ref={selectRef3}
-            value={selectValue3}
-            onSelect={(value) => setSelectValue3(value)}
-            title="Select Option 3"
-            roundedTop="xl"
-            data={[
-              { label: 'Privado', value: 'private' },
-              { label: 'Publico', value: 'public' },
-            ]}
-            renderItem={(item) => (
-              <Select.Option value={item.value} py="md" px="xl">
-                {item.label}
-              </Select.Option>
+          <SelectDropdown
+            data={['Privado', 'Publico']}
+            onSelect={(selectedItem, index) => {
+              setSelectValue3(selectedItem === 'Privado' ? 'private' : 'public');
+            }}
+            defaultValueByIndex={0}
+            defaultButtonText="Choose an option"
+            buttonTextAfterSelection={(selectedItem, index) => selectedItem}
+            rowTextForSelection={(item, index) => item}
+            buttonStyle={styles.dropdownButtonStyle}
+            buttonTextStyle={styles.dropdownButtonTxtStyle}
+            dropdownStyle={styles.dropdownMenuStyle}
+            rowTextStyle={styles.dropdownItemTxtStyle}
+            renderDropdownIcon={isOpened => (
+              <Text style={styles.dropdownButtonArrowStyle}>
+                {isOpened ? '▲' : '▼'}
+              </Text>
             )}
+            renderItem={(item, index, isSelected) => {
+              return (
+                <Div style={{ ...styles.dropdownItemStyle, ...(isSelected && { backgroundColor: '#D2D9DF' }) }}>
+
+                  <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
+                </Div>
+              );
+            }}
+            renderButton={(selectedItem, isOpened) => {
+              return (
+                <Div style={styles.dropdownButtonStyle}>
+                  <Text style={styles.dropdownButtonTxtStyle}>
+                    {selectedItem ? selectedItem : 'Choose an option'}
+                  </Text>
+                  <Text style={styles.dropdownButtonArrowStyle}>
+                    {isOpened ? '▲' : '▼'}
+                  </Text>
+                </Div>
+              );
+            }}
           />
         </Div>
 
@@ -151,5 +207,44 @@ const MatchModalHandler = ({ id, open, setOpen }: { id?: number; open: boolean; 
     </Overlay>
   );
 };
+
+const styles = StyleSheet.create({
+  dropdownButtonStyle: {
+    width: 200,
+    height: 50,
+    backgroundColor: '#E9ECEF',
+    borderRadius: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+  },
+  dropdownButtonTxtStyle: {
+    fontSize: 18,
+    fontWeight: '500',
+    color: '#151E26',
+  },
+  dropdownButtonArrowStyle: {
+    fontSize: 18,
+  },
+  dropdownMenuStyle: {
+    backgroundColor: '#E9ECEF',
+    borderRadius: 8,
+  },
+  dropdownItemStyle: {
+    width: '100%',
+    flexDirection: 'row',
+    paddingHorizontal: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 8,
+  },
+  dropdownItemTxtStyle: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: '500',
+    color: 'black',
+  },
+});
 
 export default MatchModalHandler;
