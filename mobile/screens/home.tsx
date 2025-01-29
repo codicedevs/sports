@@ -7,18 +7,15 @@ import StatisticCard from "../components/statisticCard";
 import SquareCard, { SquareCardProps } from "../components/squareCard";
 import Location from "../types/location.type";
 import Header from "../components/header";
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
-
-GoogleSignin.configure();
 import SectionPhoto from "../components/SectionPhoto";
 import MatchCard from "../components/cards/matchCard";
-import StepModal from "../components/modal/stepModal";
 import { UserPreferences } from "../types/preferences.type";
 import { StepAvailability, StepSport, StepZones } from "../components/userPreferencesSteps";
 import ModalAnimation from "../components/cards/animatedCard";
 import Index from "../components/matche";
 import authService from "../service/auth.service";
 import { useSession } from "../context/authProvider";
+import MatchModalHandler from "../components/modal/matchModalHandler";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
@@ -31,12 +28,13 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     preferredZones: [],
   });
   const [counterSteps, setCounterSteps] = useState(0)
+  const [openMatchModal, setOpenMatchModal ] = useState(false)
 
   // Estados para manejar los modales y pasos
   const [openStep, setOpenStep] = useState(false);
   const [open, setOpen] = useState(false);
 
-  const { setCurrentUser } = useSession();
+  const { setCurrentUser,currentUser, showModal } = useSession();
 
   const checkUser = async () => {
     try {
@@ -82,6 +80,13 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     <StepZones userInfo={userInfo} setUserInfo={setUserInfo} onNext={handleNext} />,
   ];
   
+  const checkCurrentUser = (fn) => {
+    if(!currentUser){
+      showModal
+    } else {
+      fn()
+    }
+  }
 
   const handleModalClose = () => {
     console.log("Información final del usuario:", userInfo);
@@ -190,13 +195,21 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
 
         {/* Botón para abrir el Modal */}
         <Button onPress={handleStep} mt={10} bg="blue600">
-          <Text style={{ color: "white" }}>Crear Partido</Text>
+          <Text style={{ color: "white" }}>Crear Partidooo</Text>
         </Button>
 
         {/* Modal con los Steps */}
         <ModalAnimation open={openStep} onFinish={() => setOpenStep(false)}>
           <Index />
         </ModalAnimation>
+        <Button onPress={() => {
+          !currentUser?
+          showModal():
+          setOpenMatchModal(!openMatchModal)
+          }}>
+          <Text>Abrir modal del partido</Text>
+        </Button>
+        <MatchModalHandler open={openMatchModal} setOpen={setOpenMatchModal} />
       </ScrollView>
     </View>
   );
