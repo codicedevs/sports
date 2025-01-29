@@ -1,5 +1,5 @@
 async function joinPlayerToMatch(matchId: string, userId: string, token: string): Promise<any> {    
-    const res = await fetch(`https://codice.dev:3000/matches/${matchId}/users/6720ef2e3a78ebc10564e983`, {
+    const res = await fetch(`https://codice.dev:3000/matches/${matchId}/users/6720ef333a78ebc10564e985`, {
         method: 'POST',
         cache: 'no-cache',
         headers: {

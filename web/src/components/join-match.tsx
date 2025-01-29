@@ -8,6 +8,7 @@ import { auth, googleProvider } from "../../lib/sso"
 import { toast } from "react-toastify"
 import joinPlayerToMatch from "@/services/join-player"
 import whatsapp from "../../assets/wsapp.svg"
+import googleSignIn from "@/services/google-sign-in"
 
 function JoinMatch(
     {
@@ -30,8 +31,27 @@ function JoinMatch(
 
     async function gmailSSO() {
         try {
-            const result = await signInWithPopup(auth, googleProvider);
-            joinPlayer(result.user)
+            const result = await signInWithPopup(auth, googleProvider);        
+            
+            const data = {
+                idToken: result.user.getIdToken(),
+                scopes: [],
+                serverAuthCode: '1',
+                user: {
+                    email: result.user.email,
+                    familyName: result.user.displayName,
+                    givenName: result.user.displayName,
+                    id: result.user.uid,
+                    name: result.user.displayName,
+                    photo: result.user.photoURL
+                }
+            }
+
+            const user = await googleSignIn(data)    
+            console.log(user);
+            
+            
+            // joinPlayer(result.user)
         } catch (error) {
             console.error("Error de autenticación:", error);
         }
