@@ -13,21 +13,21 @@ import { Formations } from "./match.entity";
 import { Types } from "mongoose";
 
 export class CreateMatchDto {
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MinLength(4)
-  name: string;
+  name?: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  date: string;
+  date?: string;
 
-  @IsNotEmpty()
-  location: Types.ObjectId | Location;
+  @IsOptional()
+  location?: Types.ObjectId | Location;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
-  playersLimit: number;
+  playersLimit?: number;
 
   @IsNotEmpty()
   @IsString()
@@ -52,8 +52,8 @@ export class CreateMatchDto {
 }
 
 export class MatchDto extends CreateMatchDto {
-  dayOfWeek: number;
-  hour: number;
+  dayOfWeek?: number;
+  hour?: number;
 }
 
 export class UpdateMatchDto extends PartialType(CreateMatchDto) {

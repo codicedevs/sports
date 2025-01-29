@@ -31,35 +31,34 @@ export const FormationsSchema = SchemaFactory.createForClass(Formations);
 
 @Schema()
 export class Match extends Document {
-  @Prop({ required: true })
-  name: string;
+  @Prop()
+  name?: string;
 
-  @Prop({ required: true })
-  date: Date;
+  @Prop()
+  date?: Date;
 
-  @Prop({ required: Number })
-  dayOfWeek: number; // Almacenamos el día de la semana (0=Domingo, 1=Lunes, etc.)
+  @Prop()
+  dayOfWeek?: number; // Almacenamos el día de la semana (0=Domingo, 1=Lunes, etc.)
 
-  @Prop({ required: Number })
-  hour: number; // Almacenamos la hora del día (0 a 23)
+  @Prop()
+  hour?: number; // Almacenamos la hora del día (0 a 23)
 
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Location",
-    required: true,
   })
-  location: Types.ObjectId | Location;
+  location?: Types.ObjectId | Location;
 
-  @Prop({ required: true })
-  playersLimit: number;
+  @Prop()
+  playersLimit?: number;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "User", required: true })
   userId: Types.ObjectId; // Reference to the user who owns this partido
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }] })
-  users: Types.ObjectId[]; // Array users reference
+  users?: Types.ObjectId[]; // Array users reference
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "SportMode" })
+  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "SportMode", required: true })
   sportMode: Types.ObjectId | SportMode;
 
   @Prop({ required: true, default: true })

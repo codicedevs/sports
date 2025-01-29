@@ -120,7 +120,7 @@ export class PetitionService {
     }
 
     // Verificar si el partido ya ha alcanzado el límite de jugadores, si ya tiene el cupo lleno no podemos enviar solicitud para jugar
-    if (target.users.length >= target.playersLimit) {
+    if (target.playersLimit && target.users.length >= target.playersLimit) {
       throw new BadRequestException(
         "Ya ha alcanzado el límite de jugadores",
       );
@@ -199,7 +199,7 @@ export class PetitionService {
     }
 
     // Verificar si el partido ya ha alcanzado el límite de jugadores
-    if (target.users.length >= target.playersLimit) {
+    if (target.playersLimit && target.users.length >= target.playersLimit) {
       throw new BadRequestException(
         "No se puede aceptar la solicitud porque el partido ya ha alcanzado el límite de jugadores",
       );
