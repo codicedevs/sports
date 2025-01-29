@@ -5,6 +5,7 @@ import { UpdateEventDto } from './dto/update-event.dto';
 import { Public } from 'authentication/public';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Types } from 'mongoose';
+import { ValidateObjectIdPipe } from 'pipes/validate-object-id.pipe';
 
 @Public()
 @ApiBearerAuth()
@@ -24,23 +25,17 @@ export class EventController {
     }
 
     @Get(':id')
-    findOne(@Param('id') id: Types.ObjectId) {
-        if (!Types.ObjectId.isValid(id)) throw new BadRequestException("ID de evento inválido");
-
+    findOne(@Param('id', new ValidateObjectIdPipe()) id: Types.ObjectId) {
         return this.eventService.findOne(new Types.ObjectId(id));
     }
 
     @Patch(':id')
-    update(@Param('id') id: Types.ObjectId, @Body() updateEventDto: UpdateEventDto) {
-        if (!Types.ObjectId.isValid(id)) throw new BadRequestException("ID de evento inválido");
-
+    update(@Param('id', new ValidateObjectIdPipe()) id: Types.ObjectId, @Body() updateEventDto: UpdateEventDto) {
         return this.eventService.update(new Types.ObjectId(id), updateEventDto);
     }
 
     @Delete(':id')
-    remove(@Param('id') id: Types.ObjectId) {
-        if (!Types.ObjectId.isValid(id)) throw new BadRequestException("ID de evento inválido");
-
+    remove(@Param('id', new ValidateObjectIdPipe()) id: Types.ObjectId) {
         return this.eventService.remove(new Types.ObjectId(id));
     }
 }

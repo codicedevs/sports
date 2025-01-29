@@ -6,6 +6,7 @@ import { Filter } from 'types/types';
 import { Types } from 'mongoose';
 import { JwtPayload } from "jsonwebtoken";
 import { JwtDecorator } from 'decorators/jwt-payload.decorator';
+import { ValidateObjectIdPipe } from 'pipes/validate-object-id.pipe';
 
 @Controller('groups')
 export class GroupsController {
@@ -22,40 +23,25 @@ export class GroupsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new BadRequestException("ID inválido");
-    }
+  findOne(@Param('id', new ValidateObjectIdPipe()) id: string) {
     const objectId = new Types.ObjectId(id);
     return this.groupsService.findOne(objectId);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateGroupDto: UpdateGroupDto) {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new BadRequestException("ID inválido");
-    }
+  update(@Param('id', new ValidateObjectIdPipe()) id: string, @Body() updateGroupDto: UpdateGroupDto) {
     const objectId = new Types.ObjectId(id);
     return this.groupsService.update(objectId, updateGroupDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new BadRequestException("ID inválido");
-    }
+  remove(@Param('id', new ValidateObjectIdPipe()) id: string) {
     const objectId = new Types.ObjectId(id);
     return this.groupsService.remove(objectId);
   }
 
-  @Patch(':groupId/users/:userId')
-  async removeUser(@Param('groupId') groupId: string, @Param('userId') userId: string, @JwtDecorator() payload: JwtPayload) {
-    if (!Types.ObjectId.isValid(groupId)) {
-      throw new BadRequestException("ID de grupo inválido");
-    }
-    if (!Types.ObjectId.isValid(userId)) {
-      throw new BadRequestException("ID de usuario inválido");
-    }
+  @Patch(':groupId/users/:userId/remove')
+  async removeUser(@Param('groupId', new ValidateObjectIdPipe("grupo")) groupId: string, @Param('userId', new ValidateObjectIdPipe("usuario")) userId: string, @JwtDecorator() payload: JwtPayload) {
     const group = new Types.ObjectId(groupId);
     const user = new Types.ObjectId(userId);
     const emitter = new Types.ObjectId(payload.sub);

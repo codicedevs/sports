@@ -6,6 +6,8 @@ export interface Filter {
 }
 
 export interface FilterResponse<T> {
-    total: number;
+    totalCount: number;
     results: T[];
+    page?: number;
+    limit?: number,
 }
