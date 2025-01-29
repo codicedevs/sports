@@ -34,7 +34,7 @@ export class MatchController {
         if (!Types.ObjectId.isValid(createMatchDto.userId)) {
             throw new BadRequestException(`ID de usuario inválido`);
         }
-        if (!Types.ObjectId.isValid(createMatchDto.location as Types.ObjectId)) {
+        if (createMatchDto.location && !Types.ObjectId.isValid(createMatchDto.location as Types.ObjectId)) {
             throw new BadRequestException(`ID de location inválido`);
         }
         const newMatch = await this.matchService.createMatch(createMatchDto);
