@@ -38,11 +38,8 @@ const App = () => (
       theme={{
         token: {
           // Seed Token
-          colorPrimary: "#56116b",
+          colorPrimary: "#2222dd",
           borderRadius: 2,
-
-          // Alias Token
-          colorBgContainer: "#f6ffed",
         },
       }}
     >
