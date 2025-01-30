@@ -28,11 +28,13 @@ export function HomeStackScreen() {
                     <HomeScreen {...props} />
                 </FadeWrapper>
             )} />
-              <HomeStack.Screen name={AppScreens.MATCH_DETAIL} component={(props) => (
+              <HomeStack.Screen options={{ tabBarStyle: { display: "none" } }} name={AppScreens.MATCH_DETAIL} component={(props) => (
+                //CUANDO HAGA EL CUSTOM TAB PUEDO HACER Q NO APAREZCA EN ESTA TAB EN ESPECIFICO
                 <FadeWrapper>
                     <MatchDetail {...props} />
                 </FadeWrapper>
-            )} />
+            )} 
+            />
             <HomeStack.Screen name={AppScreens.TRIAL1_SCREEN} component={Trialscreen} />
             
         </HomeStack.Navigator>
