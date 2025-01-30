@@ -112,7 +112,7 @@ function JoinMatch() {
 
     return (
         <>
-            <Match match={match} />
+            {match && <Match match={match} />}
             <div className={`fixed bg-[#0a2b1d] bottom-0 w-full rounded-t-lg duration-300 transition-all ${open ? 'h-1/3' : 'h-14'}`}>
                 <button onClick={toggle} className={`p-4  w-full transition-all ${open ? 'text-right' : 'text-center'}`}>
                     <p className="font-semibold text-white text-sm">
