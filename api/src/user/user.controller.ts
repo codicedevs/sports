@@ -22,6 +22,7 @@ import { UserService } from "./user.service";
 import { Public } from "authentication/public";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { Types } from "mongoose";
+import { ValidateObjectIdPipe } from "pipes/validate-object-id.pipe";
 
 // All these endpoints are globally protected by the auth guard that requires a token
 
@@ -49,10 +50,7 @@ export class UserController {
      * @returns
      */
     @Get(":id")
-    async getById(@Param("id") id: string) {
-        if (!Types.ObjectId.isValid(id)) {
-            throw new BadRequestException("ID inválido");
-        }
+    async getById(@Param("id", new ValidateObjectIdPipe()) id: string) {
         const objectId = new Types.ObjectId(id);
         const user = await this.userService.findByIdOrFail(objectId);
         return user;
@@ -68,21 +66,13 @@ export class UserController {
 
     // Endpoint para obtener las peticiones de un usuario por su ID
     @Get(":id/petitions")
-    async getUserPetitions(@Param("id") userId: string) {
-        if (!Types.ObjectId.isValid(userId)) {
-            throw new BadRequestException("ID de usuario inválido");
-        }
-
+    async getUserPetitions(@Param("id", new ValidateObjectIdPipe()) userId: string) {
         return this.userService.getUserPetitions(userId);
     }
 
     // Obtener los partidos de un usuario
     @Get(":userId/matches")
-    async getUserMatches(@Param("userId") userId: string): Promise<Match[]> {
-        if (!Types.ObjectId.isValid(userId)) {
-            throw new BadRequestException("ID de usuario inválido");
-        }
-
+    async getUserMatches(@Param("userId", new ValidateObjectIdPipe()) userId: string): Promise<Match[]> {
         const userWithMatches = await this.userService.getMatchesByUser(
             new Types.ObjectId(userId),
         );
@@ -91,10 +81,7 @@ export class UserController {
 
     //Obtener un usuario con su lista de amigos
     @Get(":userId/friends")
-    async getUserWithFriends(@Param("userId") userId: string) {
-        if (!Types.ObjectId.isValid(userId)) {
-            throw new BadRequestException("ID de usuario inválido");
-        }
+    async getUserWithFriends(@Param("userId", new ValidateObjectIdPipe()) userId: string) {
         const userWithFriends = await this.userService.getUserFriends(
             new Types.ObjectId(userId),
         );
@@ -117,12 +104,9 @@ export class UserController {
     // Agregar un amigo
     @Post(":userId/friends/:friendId")
     async addFriend(
-        @Param("userId") userId: string,
-        @Param("friendId") friendId: string,
+        @Param("userId", new ValidateObjectIdPipe("usuario")) userId: string,
+        @Param("friendId", new ValidateObjectIdPipe("amigo")) friendId: string,
     ) {
-        if (!Types.ObjectId.isValid(userId) || !Types.ObjectId.isValid(friendId)) {
-            throw new BadRequestException("ID de usuario o amigo inválido");
-        }
         const updatedUser = await this.userService.addFriend(
             new Types.ObjectId(userId),
             new Types.ObjectId(friendId),
@@ -137,10 +121,7 @@ export class UserController {
      * @returns
      */
     @Put(":id")
-    async update(@Param("id") id: string, @Body() updateUserDto: UpdateUserDto) {
-        if (!Types.ObjectId.isValid(id)) {
-            throw new BadRequestException("ID inválido");
-        }
+    async update(@Param("id", new ValidateObjectIdPipe()) id: string, @Body() updateUserDto: UpdateUserDto) {
         const objectId = new Types.ObjectId(id);
         const updatedUser = await this.userService.update(objectId, updateUserDto);
         return updatedUser;
@@ -148,12 +129,9 @@ export class UserController {
 
     @Patch("update-push-token/:userId")
     async updatePushToken(
-        @Param("userId") userId: string,
+        @Param("userId", new ValidateObjectIdPipe()) userId: string,
         @Body("pushToken") pushToken: string,
     ): Promise<{ success: boolean; message?: string }> {
-        if (!Types.ObjectId.isValid(userId)) {
-            throw new BadRequestException("ID de usuario inválido");
-        }
         const user = await this.userService.updatePushToken(userId, pushToken);
 
         if (!user) {
@@ -169,10 +147,7 @@ export class UserController {
      */
     @Delete(":id")
     @Roles(Role.Admin)
-    async delete(@Param("id") id: string) {
-        if (!Types.ObjectId.isValid(id)) {
-            throw new BadRequestException("ID inválido");
-        }
+    async delete(@Param("id", new ValidateObjectIdPipe()) id: string) {
         const objectId = new Types.ObjectId(id);
         const deletedUser = await this.userService.delete(objectId);
         return deletedUser;
@@ -182,13 +157,9 @@ export class UserController {
 
     @Delete(":userId/friends/:friendId")
     async removeFriend(
-        @Param("userId") userId: string,
-        @Param("friendId") friendId: string,
+        @Param("userId", new ValidateObjectIdPipe("usuario")) userId: string,
+        @Param("friendId", new ValidateObjectIdPipe("amigo")) friendId: string,
     ) {
-        if (!Types.ObjectId.isValid(userId) || !Types.ObjectId.isValid(friendId)) {
-            throw new BadRequestException("ID de usuario o amigo inválido");
-        }
-
         const updatedUser = await this.userService.removeFriend(
             new Types.ObjectId(userId),
             new Types.ObjectId(friendId),

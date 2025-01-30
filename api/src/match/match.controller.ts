@@ -20,6 +20,8 @@ import { Filter } from "types/types";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { Types } from "mongoose";
 import { create } from "domain";
+import { ValidateObjectIdPipe } from "pipes/validate-object-id.pipe";
+import { Public } from "authentication/public";
 
 @ApiBearerAuth()
 @ApiTags('matches')
@@ -29,29 +31,14 @@ export class MatchController {
 
     @Post()
     async createMatch(@Body() createMatchDto: CreateMatchDto) {
-        try {
-            const newMatch = await this.matchService.createMatch(createMatchDto);
-            return newMatch;
-        } catch (e) {
-            throw e
+        if (!Types.ObjectId.isValid(createMatchDto.userId)) {
+            throw new BadRequestException(`ID de usuario inválido`);
         }
-    }
-
-    @Post(":matchId/users/:userId")
-    async addUserToMatch(
-        @Param("matchId") matchId: string, // Use string as ObjectId is stored as string
-        @Param("userId") userId: string,
-    ) {
-        if (!Types.ObjectId.isValid(matchId) || !Types.ObjectId.isValid(userId)) {
-            throw new BadRequestException("ID de partido o usuario inválido");
+        if (createMatchDto.location && !Types.ObjectId.isValid(createMatchDto.location as Types.ObjectId)) {
+            throw new BadRequestException(`ID de location inválido`);
         }
-
-        const updatedMatch = await this.matchService.addUserToMatch(
-            new Types.ObjectId(matchId),
-            new Types.ObjectId(userId),
-        );
-
-        return updatedMatch;
+        const newMatch = await this.matchService.createMatch(createMatchDto);
+        return newMatch;
     }
 
     @Get()
@@ -70,63 +57,41 @@ export class MatchController {
     }
 
     @Get("/findForDate/:userId")
-    async findForDate(@Param("userId") userId: string) {
-        if (!Types.ObjectId.isValid(userId)) {
-            throw new BadRequestException("ID de usuario inválido");
-        }
+    async findForDate(@Param("userId", new ValidateObjectIdPipe("usuario")) userId: string) {
         const matches = await this.matchService.getMatchesForUserDate(userId);
         return matches;
     }
 
     @Get("/findForZone/:userId")
-    async findForZone(@Param("userId") userId: string) {
-        if (!Types.ObjectId.isValid(userId)) {
-            throw new BadRequestException("ID de usuario inválido");
-        }
+    async findForZone(@Param("userId", new ValidateObjectIdPipe("usuario")) userId: string) {
         const matches = await this.matchService.getMatchesInUserZones(userId);
         return matches;
     }
 
     @Get("/findForSportMode/:userId")
-    async findForSportMode(@Param("userId") userId: string) {
-        if (!Types.ObjectId.isValid(userId)) {
-            throw new BadRequestException("ID de usuario inválido");
-        }
+    async findForSportMode(@Param("userId", new ValidateObjectIdPipe("usuario")) userId: string) {
         const matches = await this.matchService.getMatchesByUserSportMode(userId);
         return matches;
     }
     @Get("/findRecommendation/:userId")
-    async findRecommendation(@Param("userId") userId: string) {
-        if (!Types.ObjectId.isValid(userId)) {
-            throw new BadRequestException("ID de usuario inválido");
-        }
+    async findRecommendation(@Param("userId", new ValidateObjectIdPipe("usuario")) userId: string) {
         const matches = await this.matchService.getMatchesForUserRecommendation(userId);
         return matches;
     }
 
+    @Public()
     @Get(":id")
-    async findOne(@Param("id") id: string) {
-        if (!Types.ObjectId.isValid(id)) {
-            throw new BadRequestException("ID de partido inválido");
-        }
+    async findOne(@Param("id", new ValidateObjectIdPipe()) id: string) {
         const match = await this.matchService.findOne(new Types.ObjectId(id));
         return match;
     }
 
-    @Put("/:matchId/formation/:userId")
+    @Patch("/:matchId/formation/:userId/add")
     async updateFormation(
-        @Param("matchId") matchId: string,
-        @Param("userId") userId: string,
+        @Param("matchId", new ValidateObjectIdPipe("partido")) matchId: string,
+        @Param("userId", new ValidateObjectIdPipe("usuario")) userId: string,
         @Body() body: { team: 1 | 2, position: number },
     ) {
-        if (!Types.ObjectId.isValid(matchId)) {
-            throw new BadRequestException("ID de partido inválido");
-        }
-        if (!Types.ObjectId.isValid(userId)) {
-            throw new BadRequestException("ID de usuario inválido");
-        }
-
-
         const updatedMatch = await this.matchService.addUserToFormation(
             new Types.ObjectId(userId),
             new Types.ObjectId(matchId),
@@ -136,18 +101,11 @@ export class MatchController {
         return updatedMatch;
     }
 
-    @Delete("/:matchId/formation/:userId")
+    @Patch("/:matchId/formation/:userId/remove")
     async deleteUserFromFormation(
-        @Param("matchId") matchId: string,
-        @Param("userId") userId: string,
+        @Param("matchId", new ValidateObjectIdPipe("partido")) matchId: string,
+        @Param("userId", new ValidateObjectIdPipe("usuario")) userId: string,
     ) {
-        if (!Types.ObjectId.isValid(matchId)) {
-            throw new BadRequestException("ID de partido inválido");
-        }
-        if (!Types.ObjectId.isValid(userId)) {
-            throw new BadRequestException("ID de usuario inválido");
-        }
-
         const updatedMatch = await this.matchService.removeUserFromFormation(
             new Types.ObjectId(matchId),
             new Types.ObjectId(userId)
@@ -155,28 +113,27 @@ export class MatchController {
         return updatedMatch;
     }
 
-    @Put(":id")
-    @UseGuards(MatchOwnerGuard) // solo el creador del partido puede editar el partido
-    async update(
-        @Param("id") id: string,
-        @Body() updateMatchDto: UpdateMatchDto,
-    ) {
-        if (!Types.ObjectId.isValid(id)) {
-            throw new BadRequestException("ID de partido inválido");
-        }
 
-        const updatedMatch = await this.matchService.update(
-            new Types.ObjectId(id),
-            updateMatchDto,
+    @Public()
+    @Patch(":matchId/users/:userId/add")
+    async addUserToMatch(
+        @Param("matchId", new ValidateObjectIdPipe("partido")) matchId: string, // Use string as ObjectId is stored as string
+        @Param("userId", new ValidateObjectIdPipe("usuario")) userId: string,
+    ) {
+        const updatedMatch = await this.matchService.addUserToMatch(
+            new Types.ObjectId(matchId),
+            new Types.ObjectId(userId),
         );
+
         return updatedMatch;
     }
 
-    @Patch(":matchId/users/:userId")
+    @Public()
+    @Patch(":matchId/users/:userId/remove")
     @UseGuards(MatchPlayerGuard)
     async removeUserFromMatch(
-        @Param("matchId") matchId: string,
-        @Param("userId") userId: string,
+        @Param("matchId", new ValidateObjectIdPipe("partido")) matchId: string,
+        @Param("userId", new ValidateObjectIdPipe("usuario")) userId: string,
     ) {
         const match = new Types.ObjectId(matchId);
         const user = new Types.ObjectId(userId);
@@ -189,12 +146,22 @@ export class MatchController {
         return updatedMatch;
     }
 
+    @Put(":id")
+    @UseGuards(MatchOwnerGuard) // solo el creador del partido puede editar el partido
+    async update(
+        @Param("id", new ValidateObjectIdPipe()) id: string,
+        @Body() updateMatchDto: UpdateMatchDto,
+    ) {
+        const updatedMatch = await this.matchService.update(
+            new Types.ObjectId(id),
+            updateMatchDto,
+        );
+        return updatedMatch;
+    }
+
     @Delete(":id")
     @UseGuards(MatchOwnerGuard) // Aplica el nuevo guard aquí
-    async remove(@Param("id") id: string) {
-        if (!Types.ObjectId.isValid(id)) {
-            throw new BadRequestException("ID de partido inválido");
-        }
+    async remove(@Param("id", new ValidateObjectIdPipe()) id: string) {
         await this.matchService.remove(new Types.ObjectId(id));
         return { message: "Partido eliminado" };
     }
