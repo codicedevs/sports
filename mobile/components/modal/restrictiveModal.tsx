@@ -3,27 +3,27 @@ import { Text } from "react-native";
 import { Overlay, Button, Div } from "react-native-magnus";
 import { useSession } from "../../context/authProvider";
 import { customTheme } from "../../utils/theme";
-import { GoogleSignin, GoogleSigninButton } from "@react-native-google-signin/google-signin";
+// import { GoogleSignin, GoogleSigninButton } from "@react-native-google-signin/google-signin";
 import authService from "../../service/auth.service";
 
 const RestrictiveModal = () => {
     const { isModalVisible, hideModal, setCurrentUser } = useSession();
 
-    GoogleSignin.configure();
-    const handleGoogleSignIn = async () => {
-        try {
-            await GoogleSignin.hasPlayServices();
-            const userInfo = await GoogleSignin.signIn();
-            const res = await authService.loginSSO(userInfo)
-            if (res) {
-                setCurrentUser(res)
-                hideModal()
-            }
-        } catch (e) {
-            console.log(e, 'Ocurrio un error ')
-        }
-        console.log("Google Sign-In process ended"); // Log final
-    };
+    // GoogleSignin.configure();
+    // const handleGoogleSignIn = async () => {
+    //     try {
+    //         await GoogleSignin.hasPlayServices();
+    //         const userInfo = await GoogleSignin.signIn();
+    //         const res = await authService.loginSSO(userInfo)
+    //         if (res) {
+    //             setCurrentUser(res)
+    //             hideModal()
+    //         }
+    //     } catch (e) {
+    //         console.log(e, 'Ocurrio un error ')
+    //     }
+    //     console.log("Google Sign-In process ended"); // Log final
+    // };
 
     if (!isModalVisible) return
     return (
@@ -50,12 +50,12 @@ const RestrictiveModal = () => {
                 <Text style={{ fontSize: customTheme.fontSize.medium, textAlign: "center", marginBottom: 15 }}>
                     ¡Debes iniciar sesión para acceder a esta funcionalidad!
                 </Text>
-                <GoogleSigninButton
+                {/* <GoogleSigninButton
                     style={{ width: "100%", height: 48 }}
                     size={GoogleSigninButton.Size.Wide}
                     color={GoogleSigninButton.Color.Dark}
                     onPress={handleGoogleSignIn}
-                />
+                /> */}
                 <Button
                     alignSelf="center"
                     px="xl"
