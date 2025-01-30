@@ -8,7 +8,7 @@ class LocationService extends HttpService {
 
   getAll = async () => {
     const res = await this.get(`/`);
-    return res.data;
+    return res;
   };
 
   create = async (location: Location) => {

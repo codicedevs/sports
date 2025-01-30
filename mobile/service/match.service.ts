@@ -13,9 +13,8 @@ class MatchService extends HttpService {
   };
 
   create = async (match: CreateMatchDto) => {
-    console.log(match)
     const res = await this.post(`/`, match);
-    return res.data;
+    return res;
   };
 
   acceptCreatematch = async (matchId: string) => {
