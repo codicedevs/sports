@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { SportsService } from './sports.service';
 import { CreateSportDto } from './dto/create-sport.dto';
 import { UpdateSportDto } from './dto/update-sport.dto';
+import { ValidateObjectIdPipe } from 'pipes/validate-object-id.pipe';
+import { Types } from 'mongoose';
 
 @Controller('sports')
 export class SportsController {
@@ -18,8 +20,8 @@ export class SportsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.sportsService.findOne(+id);
+  findOne(@Param('id', new ValidateObjectIdPipe()) id: string) {
+    return this.sportsService.findOne(new Types.ObjectId(id));
   }
 
   @Patch(':id')
