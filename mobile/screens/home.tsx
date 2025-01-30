@@ -27,13 +27,17 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     preferredZones: [],
   });
   const [counterSteps, setCounterSteps] = useState(0)
-  const [openMatchModal, setOpenMatchModal ] = useState(false)
+  const [openMatchModal, setOpenMatchModal] = useState(false)
 
   // Estados para manejar los modales y pasos
   const [openStep, setOpenStep] = useState(false);
   const [newModalVisible, setNewModalVisible] = useState(false);
 
-  const { setCurrentUser,currentUser, showModal } = useSession();
+  const { setCurrentUser, currentUser, showModal } = useSession();
+
+  const goToMatchDetail = (id: string) => {
+    navigation.navigate(AppScreens.MATCH_DETAIL, { id });
+  };
 
   const checkUser = async () => {
     try {
@@ -60,20 +64,12 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
       handleModalClose();
     }
   };
-  
+
   const steps = [
     <StepSport userInfo={userInfo} setUserInfo={setUserInfo} onNext={handleNext} />,
     <StepAvailability userInfo={userInfo} setUserInfo={setUserInfo} onNext={handleNext} />,
     <StepZones userInfo={userInfo} setUserInfo={setUserInfo} onNext={handleNext} />,
   ];
-  
-  const checkCurrentUser = (fn) => {
-    if(!currentUser){
-      showModal
-    } else {
-      fn()
-    }
-  }
 
   const handleModalClose = () => {
     console.log("Información final del usuario:", userInfo);
@@ -155,13 +151,8 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               {/* Animación Lottie */}
-              <LottieView
-                source={require("../assets/lottie animation/prueba.json")} // Ruta de tu archivo .json
-                autoPlay
-                loop
-                style={{ width: 200, height: 200 }}
-              />
-             
+
+
               <Button
                 onPress={() => setNewModalVisible(false)}
                 mt={10}
@@ -176,13 +167,13 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
           <Index />
         </ModalAnimation>
         <Button onPress={() => {
-          !currentUser?
-          showModal():
-          setOpenMatchModal(!openMatchModal)
-          }}>
+          !currentUser ?
+            showModal() :
+            setOpenMatchModal(!openMatchModal)
+        }}>
           <Text>Abrir modal del partido</Text>
         </Button>
-        <MatchModalHandler open={openMatchModal} setOpen={setOpenMatchModal} />
+        <MatchModalHandler goToMatchDetail={goToMatchDetail} open={openMatchModal} setOpen={setOpenMatchModal} />
       </ScrollView>
     </View>
   );
