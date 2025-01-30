@@ -16,7 +16,6 @@ export class AuthService extends HttpService {
     }
 
     login = async (email: string, password: string) => {
-        console.log('funciona')
         let loginProps: LoginProps | null = null;
         try {
             const res = await this.post<LoginProps>(`${BASE_URL}/auth/signin`, { email, password: password });

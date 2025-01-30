@@ -17,7 +17,6 @@ class SportModeService extends HttpService {
   }
 
   getModesBySportId = async (id:string) => {
-    console.log(id,"QUE SUCEDE")
     return await this.get(`/sport/${id}`)
   }
 }

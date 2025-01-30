@@ -90,7 +90,6 @@ const MatchModalHandler = ({ goToMatchDetail, open, setOpen }: { goToMatchDetail
         //estoy trayendo mal el current user, tengo q guardar bien la informacion del usuario.
       })
       goToMatchDetail(res.data._id)
-      // {"__v": 0, "_id": "679bc32e74c334081a1dd979", "date": "2025-01-30T18:19:58.767Z", "dayOfWeek": 4, "hour": 15, "name": "BORRAR-3", "open": true, "playersLimit": 10, "sportMode": "6751cb8844b53be83b3554cc", "userId": "6720ef183a78ebc10564e97b", "users": ["6720ef183a78ebc10564e97b"]}
     } catch (e) {
 
     }
@@ -340,21 +339,6 @@ const MatchModalHandler = ({ goToMatchDetail, open, setOpen }: { goToMatchDetail
             }}
           />
         </Div>
-
-        {/* <Div mb="lg">
-          <Text mb="sm">Hora</Text>
-          <Button onPress={() => setShowTimePicker(true)}>Seleccionar Horario</Button>
-          {showTimePicker &&
-            <DateTimePicker
-              value={time}
-              mode="time" // Puedes cambiar a "time" o "datetime"
-              display="spinner" // "default", "spinner", "calendar", "clock"
-              onTouchCancel={() => setShowTimePicker(false)}
-              onChange={onChangeTime}
-            />
-          }
-        </Div> */}
-
         {/* Buttons */}
         <Div row justifyContent="space-between" mt="lg">
           <Button bg="red600" color="white" onPress={() => setOpen(false)} rounded="lg">
