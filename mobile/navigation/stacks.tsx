@@ -8,6 +8,7 @@ import SettingsScreen from "../screens/settings";
 import Trialscreen from "../screens/trial";
 import Trialscreen2 from "../screens/trial2";
 import { AppScreens } from "./screens";
+import MatchDetail from "../screens/matchDetail";
 
 const SettingsStack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator()
@@ -22,12 +23,18 @@ export function HomeStackScreen() {
             screenOptions={{
                 headerShown: false
             }}>
-            <Drawer.Screen name={AppScreens.HOME_SCREEN} component={(props) => (
+            <HomeStack.Screen name={AppScreens.HOME_SCREEN} component={(props) => (
                 <FadeWrapper>
                     <HomeScreen {...props} />
                 </FadeWrapper>
             )} />
-            <Drawer.Screen name={AppScreens.TRIAL1_SCREEN} component={Trialscreen} />
+              <HomeStack.Screen name={AppScreens.MATCH_DETAIL} component={(props) => (
+                <FadeWrapper>
+                    <MatchDetail {...props} />
+                </FadeWrapper>
+            )} />
+            <HomeStack.Screen name={AppScreens.TRIAL1_SCREEN} component={Trialscreen} />
+            
         </HomeStack.Navigator>
     );
 }
