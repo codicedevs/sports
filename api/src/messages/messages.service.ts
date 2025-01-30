@@ -27,12 +27,7 @@ export class MessagesService {
     @InjectModel(Message.name) private readonly messageModel: Model<Message>,
   ) { }
   async create(createMessageDto: CreateMessageDto) {
-    if (!Types.ObjectId.isValid(createMessageDto.chatroomId)) {
-      throw new BadRequestException(`ID de chatroom inválido`);
-    }
-    if (!Types.ObjectId.isValid(createMessageDto.senderId)) {
-      throw new BadRequestException(`ID de sender inválido`);
-    }
+
     const senderExists = await this.userModel.findById(new Types.ObjectId(createMessageDto.senderId)).exec()
     if (!senderExists) {
       throw new NotFoundException("Usuario no encontrado");
@@ -42,11 +37,11 @@ export class MessagesService {
       throw new NotFoundException("Chatroom no encontrado");
     }
 
-    if(!senderExists[plural[chatroomExists.reference.type]].includes(chatroomExists.reference.id )){
+    if (!senderExists[plural[chatroomExists.reference.type]].includes(chatroomExists.reference.id)) {
       throw new UnauthorizedException(`El usuario no pertenece a este ${translate[chatroomExists.reference.type]}`)
     }
 
-    const message : HydratedDocument<Message> = new this.messageModel({ senderId: senderExists._id, chatroomId: chatroomExists._id, ...createMessageDto })
+    const message: HydratedDocument<Message> = new this.messageModel({ senderId: senderExists._id, chatroomId: chatroomExists._id, ...createMessageDto })
     chatroomExists.messages.push(message._id as Types.ObjectId)
     await chatroomExists.save();
     return message.save()
@@ -55,33 +50,26 @@ export class MessagesService {
 
   async findAll(filter: Filter): Promise<FilterResponse<HydratedDocument<Message>>> {
     // Construye la consulta con paginación
-    const results = await  this.messageModel.find(filter).exec()
+    const results = await this.messageModel.find(filter).exec()
     const totalCount = await this.messageModel.countDocuments(filter.where || {});
 
 
     // Retorna los resultados con metadatos de paginación
     return {
-        results,
-        totalCount,
-        page: filter.page || 1,
-        limit: filter.limit || 0,
+      results,
+      totalCount,
+      page: filter.page || 1,
+      limit: filter.limit || 0,
     };
-}
+  }
 
 
 
   async findById(id: string) {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new BadRequestException(`ID de mensaje inválido`);
-    }
     return await this.messageModel.findById(new Types.ObjectId(id)).exec();
   }
 
   async update(id: string, updateMessageDto: UpdateMessageDto) {
-    if (!Types.ObjectId.isValid(id)) {
-      throw new BadRequestException(`ID de mensaje inválido`);
-    }
-
     const message = await this.messageModel.findById(id).exec();
     if (!message) {
       throw new NotFoundException("Mensaje no encontrado");

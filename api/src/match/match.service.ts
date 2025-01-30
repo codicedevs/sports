@@ -38,48 +38,51 @@ export class MatchService {
   // Servicio para crear partido, con o sin invitaciones
   async createMatch(createMatchDto: CreateMatchDto): Promise<Match> {
     const { userId, invitedUsers, location, ...matchData } = createMatchDto;
-    if (!Types.ObjectId.isValid(userId)) {
-      throw new BadRequestException("ID de usuario inválido");
-    }
     // Verificar si el usuario creador existe
     const user = await this.userModel.findById(userId).exec();
     if (!user) {
       throw new NotFoundException("Usuario no encontrado");
     }
-
-    if (!Types.ObjectId.isValid(location as Types.ObjectId)) {
-      throw new BadRequestException("ID de location inválida");
-    }
     // Verificar si la location existe
     
-    const locationExist = await this.locationModel.findById(location).exec();
-    
-    if (!locationExist) {
-      throw new NotFoundException("Ubicación no encontrada");
+    let locationExist = null
+    if(location){
+      locationExist = await this.locationModel.findById(location).exec();
+      if (!locationExist) {
+        throw new NotFoundException("Ubicación no encontrada");
+      }
     }
-    const date = moment.tz(matchData.date, 'America/Argentina/Buenos_Aires').toDate();
+    
+    let date = null
+    if(matchData.date){
+      date = moment.tz(matchData.date, 'America/Argentina/Buenos_Aires').toDate();
+    }
+    
     // Crear el partido e incluir al creador en la lista de users
     const match = new this.matchModel({
       ...matchData,
       userId: user._id,
       users: [user._id],
       location: location,
-      dayOfWeek: date.getDay(),
-      hour: date.getHours(),
+      dayOfWeek: date && date.getDay(),
+      hour: date && date.getHours(),
 
     })
     const matchDto: MatchDto = {
       ...createMatchDto,
       location: location,
-      dayOfWeek: date.getDay(),
-      hour: date.getHours(),
+      dayOfWeek: date && date.getDay(),
+      hour: date && date.getHours(),
     }
 
     const savedMatch = await match.save();
 
     // Agregar el partido al array de matches de la location
-    locationExist.matches.push(savedMatch.id);
-    await locationExist.save();
+
+    if(locationExist){
+      locationExist.matches.push(savedMatch.id);
+      await locationExist.save();
+    }
 
     // Agregar el partido al array de matches del creador (usuario)
     user.matches.push(savedMatch.id);
@@ -309,7 +312,10 @@ export class MatchService {
     return await this.matchModel
       .find({
         date: { $gte: now },
-        $expr: { $lt: [{ $size: "$users" }, "$playersLimit"] },
+        $or: [
+          { playersLimit: null }, // Permitir partidos sin límite de jugadores
+          { $expr: { $lt: [{ $size: "$users" }, "$playersLimit"] } } // Comparar solo si playersLimit existe
+        ]
       })
       .populate("location");
   }
@@ -557,6 +563,9 @@ export class MatchService {
   }
 
   async getUsersForMatchRecommendations(match: MatchDto): Promise<User[]> {
+    if(!match.location || !match.date || !match.sportMode){
+      return []
+    }
     const day = this.getDay(match.dayOfWeek)
     const hour = match.hour
     const locationId = (match.location) as Types.ObjectId

@@ -51,9 +51,6 @@ export class ChatroomService {
   };
 
   async create(createChatroomDto: CreateChatroomDto) {
-    if (!Types.ObjectId.isValid(createChatroomDto.reference.id)) {
-      throw new BadRequestException(`ID inválido`);
-    }
     const targetId = new Types.ObjectId(createChatroomDto.reference.id)
     const modelType = createChatroomDto.reference.type
     const handler = this.modelHandlers[modelType];
@@ -71,10 +68,6 @@ export class ChatroomService {
     return chatroom.save()
   }
   async getLastMessage(chatroomId: Types.ObjectId) {
-    if (!Types.ObjectId.isValid(chatroomId)) {
-      throw new BadRequestException(`ID de chatroom inválido`);
-    }
-
     const lastMessage = await this.messageModel
       .findOne({ chatroomId })
       .sort({ createdAt: -1 }) // Ordenar por fecha de creación descendente
@@ -89,10 +82,6 @@ export class ChatroomService {
 
 
   async getUserChatroomsWithLastMessage(userId: string, models?: ChatroomModelType[]) {
-    if (!Types.ObjectId.isValid(userId)) {
-      throw new BadRequestException('ID de usuario inválido');
-    }
-
     const user = await this.userModel.findById(new Types.ObjectId(userId)).exec();
     if (!user) {
       throw new NotFoundException('Usuario no encontrado');
@@ -149,7 +138,6 @@ export class ChatroomService {
   }
 
   async findOne(id: string) {
-    if (!Types.ObjectId.isValid(id)) throw new BadRequestException("ID de chatroom inválido");
     const chatroom = await this.chatroomModel.findById(new Types.ObjectId(id)).populate('messages').exec();
 
     if (!chatroom) {
