@@ -10,6 +10,7 @@ import DashboardHome from "./views/dashboardHome";
 import Settings from "./views/settings";
 import Users from "./views/users";
 import Matches from "./views/matches";
+import CreateUser from "./components/CreateUser";
 
 const router = createBrowserRouter([
   {
@@ -23,11 +24,14 @@ const router = createBrowserRouter([
   {
     path: "/protected",
     element: <Dashboard />,
-    loader: authLoader,
     children: [
       { path: "", element: <DashboardHome /> },
       { path: "partidos", element: <Matches /> },
-      { path: "profile", element: <Users /> },
+      {
+        path: "profile",
+        element: <Users />,
+        children: [{ path: " crearUsuario", element: <CreateUser /> }],
+      },
     ],
   },
 ]);
