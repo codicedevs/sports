@@ -79,21 +79,21 @@ const MatchModalHandler = ({ goToMatchDetail, open, setOpen }: { goToMatchDetail
   }, [sportModes])
 
   const createMatch = async () => {
-try{
-    const res = await matchService.create({
-      name: "BORRAR-3",
-      date: date,
-      // location: selectedLocation,
-      playersLimit: 10,
-      userId: "6720ef183a78ebc10564e97b",
-      sportMode: selectedSportMode
-      //estoy trayendo mal el current user, tengo q guardar bien la informacion del usuario.
-    })
+    try {
+      const res = await matchService.create({
+        name: "BORRAR-3",
+        date: date,
+        // location: selectedLocation,
+        playersLimit: 10,
+        userId: "6720ef183a78ebc10564e97b",
+        sportMode: selectedSportMode
+        //estoy trayendo mal el current user, tengo q guardar bien la informacion del usuario.
+      })
+      goToMatchDetail(res.data._id)
+      // {"__v": 0, "_id": "679bc32e74c334081a1dd979", "date": "2025-01-30T18:19:58.767Z", "dayOfWeek": 4, "hour": 15, "name": "BORRAR-3", "open": true, "playersLimit": 10, "sportMode": "6751cb8844b53be83b3554cc", "userId": "6720ef183a78ebc10564e97b", "users": ["6720ef183a78ebc10564e97b"]}
+    } catch (e) {
 
-    // {"__v": 0, "_id": "679bc32e74c334081a1dd979", "date": "2025-01-30T18:19:58.767Z", "dayOfWeek": 4, "hour": 15, "name": "BORRAR-3", "open": true, "playersLimit": 10, "sportMode": "6751cb8844b53be83b3554cc", "userId": "6720ef183a78ebc10564e97b", "users": ["6720ef183a78ebc10564e97b"]}
-  } catch(e){
-
-  }
+    }
   }
 
   if (!sports || !sportModes) return null;
@@ -101,7 +101,7 @@ try{
     <Overlay visible={open} onBackdropPress={() => setOpen(false)} p="lg" rounded="lg">
       <Div>
         <Text fontSize="xl" mb="md" textAlign="center">
-          {id ? 'Editar partido' : 'Crear partido'}
+          {'Crear partido'}
         </Text>
 
         {/* Select 1 */}
