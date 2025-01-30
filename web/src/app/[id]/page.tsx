@@ -5,9 +5,7 @@ import JoinMatch from "@/components/join-match";
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
     try {
-        // if i don't put an await here, the console will throw a warning
-        const p = await params;
-        const match = await getMatch(p.id);
+        const match = await getMatch(params.id);
 
         return {
             title: match.name,
