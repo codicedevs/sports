@@ -10,7 +10,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body>
-                <div className="h-screen bg-[#115e2a]">
+                <div className="h-[100dvh] bg-[#115e2a]">
                     <div className="grid place-items-center px-4 pt-8">
                         <span className="text-6xl rotate-180 animate-bounce">⚽</span>
                     </div>

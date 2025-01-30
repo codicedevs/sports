@@ -6,10 +6,10 @@ async function googleSignIn(data: any): Promise<any> {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({data}),
     })
 
-    if (!res.ok) {
+    if (!res.ok) {        
         throw new Error(await res.json())
     }
     return await res.json()
