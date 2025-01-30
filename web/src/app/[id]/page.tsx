@@ -3,9 +3,13 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 import getMatch from "@/services/get-match";
 import JoinMatch from "@/components/join-match";
 
-export async function generateMetadata({ params }: { params: { id: string } }) {
+type Params = Promise<{ id: string }>;
+
+export async function generateMetadata(props: { params: Params }) {
     try {
-        const match = await getMatch(params.id);
+        // if i don't put an await here, the console will throw a warning
+        const { id } = await props.params;
+        const match = await getMatch(id);
 
         return {
             title: match.name,
@@ -31,5 +35,5 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 
 
 export default async function Page() {
-    return <JoinMatch  />
+    return <JoinMatch />
 }
