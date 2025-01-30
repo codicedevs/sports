@@ -1,7 +1,8 @@
+import { API_URL } from "@/config";
 import { Match } from "@/types";
 
 async function getMatch(id: string): Promise<Match> {
-    const res = await fetch(`https://codice.dev:3000/matches/${id}`, {
+    const res = await fetch(`${API_URL}/matches/${id}`, {
         method: 'GET',
         cache: 'no-cache',
         headers: {

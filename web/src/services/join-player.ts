@@ -1,6 +1,8 @@
+import { API_URL } from "@/config";
+
 async function joinPlayerToMatch(matchId: string, userId: string): Promise<any> {    
-    const res = await fetch(`https://codice.dev:3000/matches/${matchId}/users/${userId}`, {
-        method: 'POST',
+    const res = await fetch(`${API_URL}/matches/${matchId}/users/${userId}/add`, {
+        method: 'PATCH',
         cache: 'no-cache',
         headers: {
             'Content-Type': 'application/json',
@@ -9,7 +11,8 @@ async function joinPlayerToMatch(matchId: string, userId: string): Promise<any> 
     })    
 
     if (!res.ok) {        
-        throw new Error(await res.json())
+        const e = await res.json();
+        throw new Error(e.message || JSON.stringify(e));
     }
     return await res.json()
 }

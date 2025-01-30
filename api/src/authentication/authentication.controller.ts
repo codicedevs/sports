@@ -57,20 +57,20 @@ export class AuthController {
   @Public()
   @Post("google")
   async googleLogin(@Body() userInfo: SsoAuthInfoDto) {
-    // console.log('📥 [googleLogin] Iniciando autenticación con Google SSO');
-    // console.log('👉 Datos recibidos:', userInfo);
+    console.log('📥 [googleLogin] Iniciando autenticación con Google SSO');
+    console.log('👉 Datos recibidos:', userInfo);
 
     try {
       const result = await this.googleAuthService.signInSSO(userInfo);
-    //   console.log('✅ [googleLogin] Autenticación exitosa:', result);
+      console.log('✅ [googleLogin] Autenticación exitosa:', result);
       return result;
     } catch (error) {
-    //   console.error('❌ [googleLogin] Error durante la autenticación:', error);
+      console.error('❌ [googleLogin] Error durante la autenticación:', error);
 
-    //   // Desglose del error
-    //   console.error('📝 Mensaje de error:', error.message || 'No hay mensaje');
-    //   console.error('🛠️ Stack:', error.stack || 'No hay stack trace');
-    //   console.error('🔑 Claves del error:', Object.keys(error));
+      // Desglose del error
+      console.error('📝 Mensaje de error:', error.message || 'No hay mensaje');
+      console.error('🛠️ Stack:', error.stack || 'No hay stack trace');
+      console.error('🔑 Claves del error:', Object.keys(error));
 
       throw {
         message: error.message || 'Error desconocido durante la autenticación',

@@ -1,5 +1,6 @@
 'use client'
 
+import { jwtDecode } from "jwt-decode";
 import { signInWithPopup } from "firebase/auth"
 import { useEffect, useState } from "react"
 import { auth, googleProvider } from "../../lib/sso"
@@ -43,10 +44,10 @@ function JoinMatch() {
             }
 
             const user = await googleSignIn(data)
-            console.log(user._doc._id);
-            joinPlayer(user._doc._id)
+            const { sub } = jwtDecode(user.accessToken)
+            joinPlayer(sub!)
         } catch (error) {
-            console.log("Error de autenticación:", JSON.stringify(error));
+            console.log("Error de autenticación:", error);
         }
     }
     async function joinPlayer(userId: string) {
@@ -55,8 +56,12 @@ function JoinMatch() {
             fetchMatch()
             setHasJoined(true)
             toast.success('Te has unido al partido 💛!')
-        } catch (error) {
-            console.error("Error al unirse al partido:", error);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                toast.error(error.message)
+            } else {
+                toast.error('Error al unirse al partido')
+            }
         }
     }
 
