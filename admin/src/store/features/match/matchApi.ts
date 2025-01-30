@@ -41,7 +41,7 @@ export const matchApi = createApi({
   reducerPath: "matchApi",
   baseQuery: axiosBaseQuery<ApiResponse<any>>(matchService),
   endpoints: (builder) => ({
-    getMatches: builder.query<any, any>({
+    getMatches: builder.query<any, void>({
       query: () => ({
         url: "",
         method: "find",

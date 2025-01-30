@@ -14,8 +14,8 @@ export class CrudService extends HttpBase {
     return localStorage.getItem("jwt");
   }
 
-  saveAccessToken(accessToken: string | null): any {
-    return 1;
+  saveAccessToken(accessToken: string): any {
+    localStorage.setItem("jwt", accessToken);
   }
 
   refreshAccessToken(): any {

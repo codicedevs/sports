@@ -11,6 +11,7 @@ import {
 import dataList from "../assets/users.json";
 import { useState } from "react";
 import UserList from "./userLists";
+import { useGetMatchesQuery } from "../store/features/match/matchApi";
 
 type SearchProps = GetProps<typeof Input.Search>;
 
@@ -69,6 +70,9 @@ const optionsFilter = dataList.map((user) => ({
 const TestList = () => {
   const [bordered, setBordered] = useState(true);
   const [filter, setFilter] = useState<string>("");
+  const { data, isLoading, error } = useGetMatchesQuery();
+
+  console.log(data, isLoading, error);
 
   return (
     <div>
