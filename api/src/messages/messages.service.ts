@@ -1,11 +1,10 @@
 import { BadRequestException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { CreateMessageDto } from './dto/create-message.dto';
-import { UpdateMessageDto } from './dto/update-message.dto';
+import { CreateMessageDto, UpdateMessageDto } from './message.dto';
 import { HydratedDocument, Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { Chatroom } from 'chatroom/entities/chatroom.entity';
+import { Chatroom } from 'chatroom/chatroom.entity';
 import { User } from 'user/user.entity';
-import { Message } from './entities/message.entity';
+import { Message } from './message.entity';
 import { Filter, FilterResponse } from 'types/types';
 import { ChatroomModelType } from 'chatroom/chatroom.enum';
 

@@ -2,10 +2,10 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { Document, Types } from "mongoose";
 import { Role } from "authorization/role.enum";
 import { Match } from "match/match.entity";
-import { Zone } from "zones/entities/zone.entity";
-import { Sport } from "sports/entities/sport.entity";
-import { SportMode } from "sport_modes/entities/sport_mode.entity";
-import { Group } from "groups/entities/group.entity";
+import { Zone } from "zones/zone.entity";
+import { Sport } from "sports/sport.entity";
+import { SportMode } from "sport_modes/sport_mode.entity";
+import { Group } from "groups/group.entity";
 
 // Subschema: Interval
 @Schema({ _id: false })

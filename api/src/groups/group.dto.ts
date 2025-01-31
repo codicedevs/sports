@@ -1,3 +1,4 @@
+import { PartialType } from "@nestjs/swagger";
 import { IsArray, IsOptional } from "class-validator";
 import { ObjectId, Types } from "mongoose";
 import { User } from "user/user.entity";
@@ -11,3 +12,6 @@ export class CreateGroupDto {
     @IsArray()
     invitedUsers?: string[];
 }
+
+export class UpdateGroupDto extends PartialType(CreateGroupDto) {}
+

@@ -1,4 +1,5 @@
-import { Chatroom } from "chatroom/entities/chatroom.entity"
+import { PartialType } from "@nestjs/swagger"
+import { Chatroom } from "chatroom/chatroom.entity"
 import { Types } from "mongoose"
 import { User } from "user/user.entity"
 
@@ -11,3 +12,5 @@ export class SendMessageDto {
     senderId: string
     message: string
 }
+
+export class UpdateMessageDto extends PartialType(CreateMessageDto) {}

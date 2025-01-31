@@ -14,9 +14,9 @@ import { PetitionService } from "petition/petition.service";
 import { PetitionModelType, PetitionStatus } from "petition/petition.enum";
 import { Filter, FilterResponse } from "types/types";
 import * as moment from "moment-timezone"; // Para manejar zonas horarias
-import { Zone } from "zones/entities/zone.entity";
+import { Zone } from "zones/zone.entity";
 import { SportModesService } from "sport_modes/sport_modes.service";
-import { SportMode } from "sport_modes/entities/sport_mode.entity";
+import { SportMode } from "sport_modes/sport_mode.entity";
 import { PushNotificationService } from "services/pushNotificationservice";
 import { LocationsService } from "locations/locations.service";
 import { ChatroomService } from "chatroom/chatroom.service";

@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { ChatroomModelType } from "chatroom/chatroom.enum";
 import { FilterPlugin } from "filter/filter.plugin";
-import { Message } from "messages/entities/message.entity";
+import { Message } from "messages/message.entity";
 import mongoose, { Types, Document } from "mongoose";
 
 @Schema({ _id: false })

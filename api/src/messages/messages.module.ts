@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { MessagesService } from './messages.service';
 import { MessagesController } from './messages.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Chatroom, ChatroomSchema } from 'chatroom/entities/chatroom.entity';
+import { Chatroom, ChatroomSchema } from 'chatroom/chatroom.entity';
 import { User, UserSchema } from 'user/user.entity';
-import { Message, MessageSchema } from './entities/message.entity';
+import { Message, MessageSchema } from './message.entity';
 
 @Module({
   imports: [
