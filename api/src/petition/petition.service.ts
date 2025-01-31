@@ -13,7 +13,7 @@ import { HydratedDocument, Model, Types } from "mongoose";
 import { PetitionModelType, PetitionStatus } from "./petition.enum";
 import { FindManyFilter } from "filter/filter.dto";
 import { PushNotificationService } from "services/pushNotificationservice";
-import { Group } from "groups/entities/group.entity";
+import { Group } from "groups/group.entity";
 type ModelHandlers = {
   [key in PetitionModelType]: {
     model: Model<any>;

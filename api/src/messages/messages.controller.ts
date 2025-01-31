@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, BadRequestException } from '@nestjs/common';
 import { MessagesService } from './messages.service';
-import { CreateMessageDto } from './dto/create-message.dto';
-import { UpdateMessageDto } from './dto/update-message.dto';
+import { CreateMessageDto, UpdateMessageDto } from './message.dto';
 import { Filter } from 'types/types';
 import { ValidateObjectIdPipe } from 'pipes/validate-object-id.pipe';
 import { Types } from 'mongoose';

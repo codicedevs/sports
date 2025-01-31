@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { SportsService } from './sports.service';
 import { SportsController } from './sports.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Sport, SportSchema } from './entities/sport.entity';
+import { Sport, SportSchema } from './sport.entity';
 
 @Module({
   imports: [

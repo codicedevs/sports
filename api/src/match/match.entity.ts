@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { FilterPlugin } from "filter/filter.plugin";
 import { Location } from "locations/location.entity";
 import mongoose, { Document, Types } from "mongoose";
-import { SportMode } from "sport_modes/entities/sport_mode.entity";
+import { SportMode } from "sport_modes/sport_mode.entity";
 import { User } from "user/user.entity";
 
 // Sub-subschema: Player

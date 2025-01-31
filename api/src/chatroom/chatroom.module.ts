@@ -2,11 +2,11 @@ import { Module } from '@nestjs/common';
 import { ChatroomService } from './chatroom.service';
 import { ChatroomController } from './chatroom.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Chatroom, ChatroomSchema } from './entities/chatroom.entity';
+import { Chatroom, ChatroomSchema } from './chatroom.entity';
 import { Match, MatchSchema } from 'match/match.entity';
 import { User, UserSchema } from 'user/user.entity';
-import { Group, GroupSchema } from 'groups/entities/group.entity';
-import { Message, MessageSchema } from 'messages/entities/message.entity';
+import { Group, GroupSchema } from 'groups/group.entity';
+import { Message, MessageSchema } from 'messages/message.entity';
 import { MessagesModule } from 'messages/messages.module';
 
 @Module({
