@@ -15,8 +15,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
         return res.data
     }
 
-const {data:match} = useFetch({fn:fetchMatchInfo,key:[QUERY_KEYS.MATCH]}) 
-
+const {data:match} = useFetch(fetchMatchInfo, [QUERY_KEYS.MATCH]) 
     useEffect(() => {
         fetchMatchInfo()
     },[])
