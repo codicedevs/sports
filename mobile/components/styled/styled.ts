@@ -45,7 +45,7 @@ export const SplashContainer = styled(Animated.View)`
 `;
 
 export const LoadingText = styled(Text)`
-  color: white;
+  color: black;
   margin-top: 10px;
 `;
 
