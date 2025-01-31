@@ -19,7 +19,7 @@ export class SportModesService {
     return sportsModes;
   }
 
-  async findForSports(sportIds: Types.ObjectId[]): Promise<SportMode[]> {
+  async findForSports(sportIds: string[]| Types.ObjectId[]): Promise<SportMode[]> {
     const filter = sportIds ? { sport: { $in: sportIds } } : {};
     return this.sportModeModel.find(filter).exec();
   }

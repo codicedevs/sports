@@ -5,22 +5,39 @@ import { AppScreenProps, AppScreens } from "../navigation/screens";
 import Header from "../components/header";
 import StatisticCard from "../components/statisticCard";
 import SquareCard, { SquareCardProps } from "../components/squareCard";
+import Location from "../types/location.type";
+import { UserPreferences } from "../types/preferences.type";
+import { StepAvailability, StepSport, StepZones } from "../components/userPreferencesSteps";
 import SectionPhoto from "../components/SectionPhoto";
 import MatchCard from "../components/cards/matchCard";
 import ModalAnimation from "../components/cards/animatedCard";
 import Index from "../components/matche";
 import { useSession } from "../context/authProvider";
+import MatchModalHandler from "../components/modal/matchModalHandler";
 import authService from "../service/auth.service";
-import LottieView from "lottie-react-native";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const [userInfo, setUserInfo] = useState<UserPreferences>({
+    sport: '',
+    sportMode: '',
+    availability: [],
+    preferredZones: [],
+  });
+  const [counterSteps, setCounterSteps] = useState(0)
+  const [openMatchModal, setOpenMatchModal] = useState(false)
+
+  // Estados para manejar los modales y pasos
   const [openStep, setOpenStep] = useState(false);
   const [newModalVisible, setNewModalVisible] = useState(false);
 
-  const { setCurrentUser } = useSession();
+  const { setCurrentUser, currentUser, showModal } = useSession();
+
+  const goToMatchDetail = (id: string) => {
+    navigation.navigate(AppScreens.MATCH_DETAIL, { id });
+  };
 
   const checkUser = async () => {
     try {
@@ -35,7 +52,37 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     checkUser();
   }, []);
 
-  const handleStep = () => {
+  const updateUserInfo = (info: Partial<UserPreferences>) => {
+    setUserInfo((prev) => ({ ...prev, ...info }));
+  };
+
+  const handleNext = (data: any) => {
+    setUserInfo((prev) => ({ ...prev, ...data }));
+    if (counterSteps < steps.length - 1) {
+      setCounterSteps((prev) => prev + 1);
+    } else {
+      handleModalClose();
+    }
+  };
+
+  const steps = [
+    <StepSport userInfo={userInfo} setUserInfo={setUserInfo} onNext={handleNext} />,
+    <StepAvailability userInfo={userInfo} setUserInfo={setUserInfo} onNext={handleNext} />,
+    <StepZones userInfo={userInfo} setUserInfo={setUserInfo} onNext={handleNext} />,
+  ];
+
+  const handleModalClose = () => {
+    console.log("Información final del usuario:", userInfo);
+    setModalVisible(false);
+    setCounterSteps(0);
+    setUserInfo({
+      sport: '',
+      sportMode: '',
+      availability: [],
+      preferredZones: [],
+    });
+  };
+  function handleStep() {
     setOpenStep(true);
   };
 
@@ -86,7 +133,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
           <Text style={{ color: "white" }}>Ir a Trial1 Screen</Text>
         </Button>
         <Button onPress={handleStep} mt={10} bg="blue600">
-          <Text style={{ color: "white" }}>Crear Partido</Text>
+          <Text style={{ color: "white" }}>Crear Partidooo</Text>
         </Button>
         <Button
           onPress={() => setNewModalVisible(true)}
@@ -104,13 +151,8 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               {/* Animación Lottie */}
-              <LottieView
-                source={require("../assets/lottie animation/prueba.json")} // Ruta de tu archivo .json
-                autoPlay
-                loop
-                style={{ width: 200, height: 200 }}
-              />
-             
+
+
               <Button
                 onPress={() => setNewModalVisible(false)}
                 mt={10}
@@ -124,6 +166,14 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
         <ModalAnimation open={openStep} onFinish={() => setOpenStep(false)}>
           <Index />
         </ModalAnimation>
+        <Button onPress={() => {
+          !currentUser ?
+            showModal() :
+            setOpenMatchModal(!openMatchModal)
+        }}>
+          <Text>Abrir modal del partido</Text>
+        </Button>
+        <MatchModalHandler goToMatchDetail={goToMatchDetail} open={openMatchModal} setOpen={setOpenMatchModal} />
       </ScrollView>
     </View>
   );
