@@ -150,9 +150,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
         >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              {/* Animación Lottie */}
-
-
+             
               <Button
                 onPress={() => setNewModalVisible(false)}
                 mt={10}
