@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Types } from 'mongoose';
+import mongoose, { Document, Types } from 'mongoose';
 import { IsString, IsMongoId } from 'class-validator';
 import { Sport } from 'sports/entities/sport.entity';
 
@@ -9,7 +9,7 @@ export class SportMode extends Document {
   @IsString()
   name: string;
 
-  @Prop({ required: true, type: Types.ObjectId, ref: 'Sport' }) // Relación con Sport
+  @Prop({ required: true, type: mongoose.Schema.Types.ObjectId , ref: 'Sport' }) // Relación con Sport
   @IsMongoId()
   sport: Types.ObjectId | Sport;
 }

@@ -1,16 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, BadRequestException } from '@nestjs/common';
 import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dto/create-message.dto';
 import { UpdateMessageDto } from './dto/update-message.dto';
 import { Filter } from 'types/types';
+import { ValidateObjectIdPipe } from 'pipes/validate-object-id.pipe';
+import { Types } from 'mongoose';
 
 
 @Controller('messages')
 export class MessagesController {
-  constructor(private readonly messagesService: MessagesService) {}
+  constructor(private readonly messagesService: MessagesService) { }
 
   @Post()
   create(@Body() createMessageDto: CreateMessageDto) {
+    if (!Types.ObjectId.isValid(createMessageDto.chatroomId)) {
+      throw new BadRequestException(`ID de chatroom inválido`);
+    }
+    if (!Types.ObjectId.isValid(createMessageDto.senderId)) {
+      throw new BadRequestException(`ID de sender inválido`);
+    }
     return this.messagesService.create(createMessageDto);
   }
 
@@ -20,12 +28,12 @@ export class MessagesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', new ValidateObjectIdPipe()) id: string) {
     return this.messagesService.findById(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMessageDto: UpdateMessageDto) {
+  update(@Param('id', new ValidateObjectIdPipe()) id: string, @Body() updateMessageDto: UpdateMessageDto) {
     return this.messagesService.update(id, updateMessageDto);
   }
 

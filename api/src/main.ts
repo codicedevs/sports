@@ -15,7 +15,10 @@ const { key, cert, protocol } = getProtocolConfig();
 
 async function bootstrap() {
   process.env.TZ = "America/Argentina/Buenos_Aires";
-  const app = await NestFactory.create(AppModule, undefined);
+  const app = await NestFactory.create(
+      AppModule,
+    //   protocol == "https" ? { httpsOptions: { key, cert } } : undefined
+  );
 
   app.useGlobalPipes(
     new ValidationPipe({
