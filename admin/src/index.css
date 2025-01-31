@@ -54,6 +54,17 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+.homePageBackground {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  background-image: url("../src/assets/cesped.webp");
+  background-size: cover;
+  background-position: center;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;

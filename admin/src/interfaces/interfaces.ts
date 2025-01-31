@@ -4,4 +4,6 @@ export default interface User {
   lastName: string;
   phone: string;
   mail: string;
+  avatarUrl: string;
+  address: string;
 }

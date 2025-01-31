@@ -4,12 +4,11 @@ import store from "./store";
 import HomePage from "./pages/home";
 import LoginPage from "./pages/login";
 import { authLoader } from "./pages/loaders/authLoader";
-import Dashboard from "./pages/dashboard";
 import { ConfigProvider } from "antd";
 import DashboardHome from "./views/dashboardHome";
-import Settings from "./views/settings";
-import Users from "./views/users";
 import Matches from "./views/matches";
+import Dashboard from "./pages/dashboard";
+import TestUserProfile from "./views/testProfile";
 
 const router = createBrowserRouter([
   {
@@ -27,7 +26,7 @@ const router = createBrowserRouter([
     children: [
       { path: "", element: <DashboardHome /> },
       { path: "partidos", element: <Matches /> },
-      { path: "profile", element: <Users /> },
+      { path: "profile", element: <TestUserProfile /> },
     ],
   },
 ]);
