@@ -1,0 +1,28 @@
+name: Deploy to Server
+
+on:
+  push:
+    branches:
+      - development
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.CODICE_SSH_HOST }}
+          username: ${{ secrets.CODICE_SSH_USER }}
+          key: ${{ secrets.CODICE_SSH_KEY }}
+          script: |
+            cd ~/sports
+            git pull
+            cd api
+            yarn install
+            docker-compose up --build -d
