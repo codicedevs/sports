@@ -22,7 +22,7 @@ export function LoadingProvider(props: React.PropsWithChildren) {
         <LoadingContext.Provider
             value={{ isLoading, setIsLoading }}
         >
-            <SpinnerScreen />
+            <SpinnerScreen isLoading={isLoading} />
             {props.children}
         </LoadingContext.Provider>
     )

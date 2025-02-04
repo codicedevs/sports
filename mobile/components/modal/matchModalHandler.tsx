@@ -63,9 +63,9 @@ const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: R
   };
 
   // Get info
-  const { data: sports } = useFetch({ fn: sportService.getAll, key: [QUERY_KEYS.SPORTS] });
-  const { data: sportModes, isFetching } = useFetch({ fn: fetchSportModesById, key: [QUERY_KEYS.SPORT_MODES, selectedSport] });
-  const { data: locations } = useFetch({ fn: locationService.getAll, key: [QUERY_KEYS.LOCATIONS] })
+  const { data: sports } = useFetch(sportService.getAll, [QUERY_KEYS.SPORTS]);
+  const { data: sportModes, isFetching } = useFetch(fetchSportModesById, [QUERY_KEYS.SPORT_MODES, selectedSport]);
+  const { data: locations } = useFetch(locationService.getAll, [QUERY_KEYS.LOCATIONS])
 
   useEffect(() => {
     if (match) return

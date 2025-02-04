@@ -100,6 +100,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
         }}
         showsVerticalScrollIndicator={false}
       >
+        <Button onPress={() => goToMatchDetail("67003e15c94369186bbdfb32")}>HOL</Button>
         <StatisticCard style={{ flex: 1 }} />
         <ScrollView
           horizontal
@@ -125,12 +126,12 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
         <MatchCard />
         <MatchCard />
         <MatchCard />
-        <Button
-          onPress={() => navigation.navigate(AppScreens.TRIAL1_SCREEN)}
-          mt={10}
-          bg="blue600"
-        >
-          <Text style={{ color: "white" }}>Ir a Trial1 Screen</Text>
+        <Button onPress={() => {
+          !currentUser ?
+            showModal() :
+            setOpenMatchModal(!openMatchModal)
+        }}>
+          <Text>Abrir modal del partido</Text>
         </Button>
         <Button onPress={handleStep} mt={10} bg="blue600">
           <Text style={{ color: "white" }}>Crear Partidooo</Text>
@@ -150,9 +151,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
         >
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              {/* Animación Lottie */}
-
-
+             
               <Button
                 onPress={() => setNewModalVisible(false)}
                 mt={10}
@@ -166,13 +165,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
         <ModalAnimation open={openStep} onFinish={() => setOpenStep(false)}>
           <Index />
         </ModalAnimation>
-        <Button onPress={() => {
-          !currentUser ?
-            showModal() :
-            setOpenMatchModal(!openMatchModal)
-        }}>
-          <Text>Abrir modal del partido</Text>
-        </Button>
+      
         <MatchModalHandler goToMatchDetail={goToMatchDetail} open={openMatchModal} setOpen={setOpenMatchModal} />
       </ScrollView>
     </View>

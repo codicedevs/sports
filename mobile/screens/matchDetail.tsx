@@ -18,7 +18,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
         return res.data
     }
 
-    const { data: match, isFetching } = useFetch({ fn: fetchMatchInfo, key: [QUERY_KEYS.MATCH] })
+    const { data: match, isFetching } = useFetch(fetchMatchInfo, [QUERY_KEYS.MATCH])
     return (
         <View>
             <Text>{match?.name}</Text>

@@ -30,9 +30,11 @@ const RestrictiveModal = () => {
             const res = await authService.login("orefici.diego+1@gmail.com", "12345678")
             console.log(res)
             setCurrentUser(res.user)
-            hideModal()
+            if(res){
+                hideModal()
+            }
         } catch(e){
-
+            console.log(e)
         }
     }
 
