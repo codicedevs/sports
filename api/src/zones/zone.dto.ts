@@ -1,5 +1,6 @@
 import { IsString, IsNotEmpty, IsArray, ValidateNested, IsNumber } from 'class-validator';
 import { Type } from 'class-transformer';
+import { PartialType } from '@nestjs/swagger';
 
 class CoordinateDto {
   // @IsNumber({}, { each: true })
@@ -34,3 +35,5 @@ export class CreateZoneDto {
   @Type(() => LocationDto)
   location: LocationDto; // Objeto para representar la ubicación (GeoJSON)
 }
+
+export class UpdateZoneDto extends PartialType(CreateZoneDto) {}

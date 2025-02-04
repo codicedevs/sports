@@ -6,6 +6,7 @@ import SplashScreen from '../screens/splash'
 import { AuthStackScreen, Principal } from './stacks'
 import { useFonts } from 'expo-font'
 import RestrictiveModal from '../components/modal/restrictiveModal'
+import { navigationRef } from '../utils/navigation'
 
 const AppNavigator = () => {
     const { currentUser } = useSession()
@@ -19,7 +20,7 @@ const AppNavigator = () => {
     }
 
     return (
-        <NavigationContainer>
+        <NavigationContainer ref={navigationRef}>
             <VersionModal />
             <RestrictiveModal />
             <SplashScreen />

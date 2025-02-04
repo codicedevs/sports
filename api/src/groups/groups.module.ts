@@ -6,7 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { PetitionModule } from 'petition/petition.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'user/user.entity';
-import { Group, GroupSchema } from './entities/group.entity';
+import { Group, GroupSchema } from './group.entity';
 import { ChatroomModule } from 'chatroom/chatroom.module';
 
 @Module({

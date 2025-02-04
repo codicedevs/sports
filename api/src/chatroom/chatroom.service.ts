@@ -1,15 +1,14 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateChatroomDto } from './dto/create-chatroom.dto';
-import { UpdateChatroomDto } from './dto/update-chatroom.dto';
+import { CreateChatroomDto, UpdateChatroomDto } from './chatroom.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Chatroom } from './entities/chatroom.entity';
+import { Chatroom } from './chatroom.entity';
 import { HydratedDocument, Model, Types } from 'mongoose';
 import { ChatroomModelType } from './chatroom.enum';
 import { Match } from 'match/match.entity';
 import { User } from 'user/user.entity';
-import { Group } from 'groups/entities/group.entity';
+import { Group } from 'groups/group.entity';
 import { Filter } from 'types/types';
-import { Message } from 'messages/entities/message.entity';
+import { Message } from 'messages/message.entity';
 
 type ModelHandlers = {
   [key in ChatroomModelType]: {

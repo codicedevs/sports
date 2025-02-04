@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ZonesService } from './zones.service';
-import { CreateZoneDto } from './dto/create-zone.dto';
-import { UpdateZoneDto } from './dto/update-zone.dto';
+import { CreateZoneDto, UpdateZoneDto } from './zone.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { QueryValidationPipe } from 'pipes/query-validation.pipe';
 import { FindManyFilter } from 'filter/filter.dto';
@@ -11,7 +10,7 @@ import { User } from 'user/user.entity';
 @ApiTags('zones')
 @Controller('zones')
 export class ZonesController {
-  constructor(private readonly zonesService: ZonesService) {}
+  constructor(private readonly zonesService: ZonesService) { }
 
   @Post()
   create(@Body() createZoneDto: CreateZoneDto) {

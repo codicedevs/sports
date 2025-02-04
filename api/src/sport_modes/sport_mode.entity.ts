@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document, Types } from 'mongoose';
 import { IsString, IsMongoId } from 'class-validator';
-import { Sport } from 'sports/entities/sport.entity';
+import { Sport } from 'sports/sport.entity';
 
 @Schema()
 export class SportMode extends Document {

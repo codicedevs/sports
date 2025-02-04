@@ -11,6 +11,9 @@ import locationService from '../../service/location.service';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
 import matchService from '../../service/match.service';
 import { useSession } from '../../context/authProvider';
+import { AppScreens } from '../../navigation/screens';
+import { navigate } from '../../utils/navigation';
+import Match from '../../types/match.type';
 
 const mockHours = [
   "10:00",
@@ -19,22 +22,20 @@ const mockHours = [
   "11:30"
 ]
 
-const MatchModalHandler = ({ goToMatchDetail, open, setOpen }: { goToMatchDetail: (id: string) => void; open: boolean; setOpen: React.Dispatch<React.SetStateAction<boolean>> }) => {
+const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: React.Dispatch<React.SetStateAction<boolean>>; match?: Match }) => {
   // States for selects
   const [selectedSport, setSelectedSport] = useState('');
-  const [selectedSportMode, setSelectedSportMode] = useState('');
+  const [selectedSportMode, setSelectedSportMode] = useState(match?.sportMode ?? '');
   const [selectValue3, setSelectValue3] = useState(null);
-  const [selectedLocation, setSelectedLocation] = useState('')
+  const [selectedLocation, setSelectedLocation] = useState(match?.location ? match.location._id : '')
   const [date, setDate] = useState(new Date())
   const [time, setTime] = useState(new Date())
   const [showTimePicker, setShowTimePicker] = useState(false)
   const [showCalendar, setShowCalendar] = useState(false)
-
   const { currentUser } = useSession()
-
   const fetchSportModesById = async () => {
     if (selectedSport) {
-      setSelectedSportMode('')
+      if (!match) setSelectedSportMode('')
       const res = await sportmodeService.getModesBySportId(selectedSport)
       console.log('POR ID')
       return res
@@ -46,18 +47,18 @@ const MatchModalHandler = ({ goToMatchDetail, open, setOpen }: { goToMatchDetail
   }
 
   const onChangeDate = (event, selectedDate) => {
-    setShowCalendar(false); // Siempre cerramos el picker
+    setShowCalendar(false);
 
     if (event.type === "set" && selectedDate) {
-      setDate(selectedDate); // Solo actualizamos si el usuario seleccionó una fecha
+      setDate(selectedDate); 
     }
   };
 
   const onChangeTime = (event, selectedTime) => {
-    setShowTimePicker(false); // Cierra el picker
+    setShowTimePicker(false); 
 
     if (event.type === "set" && selectedTime) {
-      setTime(selectedTime); // Actualiza la hora si se selecciona
+      setTime(selectedTime); 
     }
   };
 
@@ -67,12 +68,17 @@ const MatchModalHandler = ({ goToMatchDetail, open, setOpen }: { goToMatchDetail
   const { data: locations } = useFetch(locationService.getAll, [QUERY_KEYS.LOCATIONS])
 
   useEffect(() => {
+    if (match) return
     if (sports) {
       setSelectedSport(sports.data[0]._id)
     }
   }, [sports])
 
   useEffect(() => {
+    if (match) {
+      setSelectedSportMode(match.sportMode)
+      return
+    }
     if (selectedSport && sportModes) {
       setSelectedSportMode(sportModes.data[0]._id)
     }
@@ -81,16 +87,33 @@ const MatchModalHandler = ({ goToMatchDetail, open, setOpen }: { goToMatchDetail
   const createMatch = async () => {
     try {
       const res = await matchService.create({
-        name: "BORRAR-3",
+        name: "BORRAR-5-con location",
         date: date,
-        // location: selectedLocation,
+        location: selectedLocation,
         playersLimit: 10,
         userId: "6720ef183a78ebc10564e97b",
         sportMode: selectedSportMode
-        //estoy trayendo mal el current user, tengo q guardar bien la informacion del usuario.
       })
-      goToMatchDetail(res.data._id)
+      navigate(AppScreens.MATCH_DETAIL, { id: res.data._id });
     } catch (e) {
+
+    }
+  }
+
+  const editMatch = async () => {
+    if (!match) return
+    try{
+      const res = await matchService.update(match._id, {
+        name: "BORRAR-5-con location",
+        date: date,
+        location: selectedLocation,
+        playersLimit: 10,
+        userId: "6720ef183a78ebc10564e97b",
+        sportMode: selectedSportMode
+      })
+    } catch (e) {
+
+    } finally{
 
     }
   }
@@ -100,53 +123,56 @@ const MatchModalHandler = ({ goToMatchDetail, open, setOpen }: { goToMatchDetail
     <Overlay visible={open} onBackdropPress={() => setOpen(false)} p="lg" rounded="lg">
       <Div>
         <Text fontSize="xl" mb="md" textAlign="center">
-          {'Crear partido'}
+          {match ? 'Editar partido' : 'Crear partido'}
         </Text>
-
-        {/* Select 1 */}
-        <Div mb="lg">
-          <Text mb="sm">Select Option 1</Text>
-          <SelectDropdown
-            data={sports.data.map((item) => item.name)}
-            onSelect={(selectedItem, index) => {
-              setSelectedSport(sports.data[index]._id);
-            }}
-            defaultValueByIndex={0}
-            defaultButtonText="Choose an option"
-            buttonTextAfterSelection={(selectedItem, index) => selectedItem}
-            rowTextForSelection={(item, index) => item}
-            buttonStyle={styles.dropdownButtonStyle}
-            buttonTextStyle={styles.dropdownButtonTxtStyle}
-            dropdownStyle={styles.dropdownMenuStyle}
-            rowTextStyle={styles.dropdownItemTxtStyle}
-            renderDropdownIcon={isOpened => (
-              <Text style={styles.dropdownButtonArrowStyle}>
-                {isOpened ? '▲' : '▼'}
-              </Text>
-            )}
-            renderItem={(item, index, isSelected) => {
-              return (
-                <Div style={{ ...styles.dropdownItemStyle, ...(isSelected && { backgroundColor: '#D2D9DF' }) }}>
-
-                  <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
-                </Div>
-              );
-            }}
-            renderButton={(selectedItem, isOpened) => {
-              return (
-                <Div style={styles.dropdownButtonStyle}>
-                  <Text style={styles.dropdownButtonTxtStyle}>
-                    {selectedItem ? selectedItem : 'Choose an option'}
-                  </Text>
+        {
+          !match &&
+          <>
+            {/* Select 1 */}
+            <Div mb="lg">
+              <Text mb="sm">Select Option 1</Text>
+              <SelectDropdown
+                data={sports.data.map((item) => item.name)}
+                onSelect={(selectedItem, index) => {
+                  setSelectedSport(sports.data[index]._id);
+                }}
+                defaultValueByIndex={0}
+                defaultButtonText="Choose an option"
+                buttonTextAfterSelection={(selectedItem, index) => selectedItem}
+                rowTextForSelection={(item, index) => item}
+                buttonStyle={styles.dropdownButtonStyle}
+                buttonTextStyle={styles.dropdownButtonTxtStyle}
+                dropdownStyle={styles.dropdownMenuStyle}
+                rowTextStyle={styles.dropdownItemTxtStyle}
+                renderDropdownIcon={isOpened => (
                   <Text style={styles.dropdownButtonArrowStyle}>
                     {isOpened ? '▲' : '▼'}
                   </Text>
-                </Div>
-              );
-            }}
-          />
-        </Div>
+                )}
+                renderItem={(item, index, isSelected) => {
+                  return (
+                    <Div style={{ ...styles.dropdownItemStyle, ...(isSelected && { backgroundColor: '#D2D9DF' }) }}>
 
+                      <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
+                    </Div>
+                  );
+                }}
+                renderButton={(selectedItem, isOpened) => {
+                  return (
+                    <Div style={styles.dropdownButtonStyle}>
+                      <Text style={styles.dropdownButtonTxtStyle}>
+                        {selectedItem ? selectedItem : 'Choose an option'}
+                      </Text>
+                      <Text style={styles.dropdownButtonArrowStyle}>
+                        {isOpened ? '▲' : '▼'}
+                      </Text>
+                    </Div>
+                  );
+                }}
+              />
+            </Div>
+          </>
+        }
         {/* Select 2 */}
         {
           isFetching ?
@@ -159,7 +185,7 @@ const MatchModalHandler = ({ goToMatchDetail, open, setOpen }: { goToMatchDetail
                 onSelect={(selectedItem, index) => {
                   setSelectedSportMode(sportModes.data[index]._id);
                 }}
-                defaultValueByIndex={0}
+                defaultValueByIndex={match ? sportModes.data.findIndex(modes => modes._id === selectedSportMode) : 0}
                 defaultButtonText="Choose an option"
                 buttonTextAfterSelection={(selectedItem, index) => selectedItem}
                 rowTextForSelection={(item, index) => item}
@@ -249,6 +275,7 @@ const MatchModalHandler = ({ goToMatchDetail, open, setOpen }: { goToMatchDetail
             onSelect={(selectedItem, index) => {
               setSelectedLocation(locations.data[index]._id);
             }}
+            defaultValueByIndex={match ? locations.data.findIndex(location => location._id === selectedLocation) : null}
             defaultButtonText="Choose an option"
             buttonTextAfterSelection={(selectedItem, index) => selectedItem}
             rowTextForSelection={(item, index) => item}
@@ -344,7 +371,7 @@ const MatchModalHandler = ({ goToMatchDetail, open, setOpen }: { goToMatchDetail
           <Button bg="red600" color="white" onPress={() => setOpen(false)} rounded="lg">
             Cancel
           </Button>
-          <Button bg="blue600" color="white" onPress={createMatch} rounded="lg">
+          <Button bg="blue600" color="white" onPress={match ? editMatch : createMatch} rounded="lg">
             Save
           </Button>
         </Div>
