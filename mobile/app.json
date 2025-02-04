@@ -27,7 +27,9 @@
             "./assets/fonts/RobotoCondensed-Thin.ttf",
             "./assets/fonts/RobotoCondensed-ThinItalic.ttf",
             "./assets/fonts/NotoSans-Italic-VariableFont_wdth,wght.ttf",
-            "./assets/fonts/NotoSans-VariableFont_wdth,wght.ttf"
+            "./assets/fonts/NotoSans-VariableFont_wdth,wght.ttf",
+            "./assets/fonts/NotoSans_ExtraCondensed-BoldItalic.ttf",
+            "./assets/fonts/NotoSans-BoldItalic.ttf"
           ]
         }
       ]
