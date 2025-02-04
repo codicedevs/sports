@@ -41,8 +41,7 @@ export class CreateMatchDto {
   @IsArray()
   invitedUsers?: string[];
 
-  @IsOptional()
-  sportMode?: Types.ObjectId|SportMode;
+  sportMode: Types.ObjectId|SportMode;
 
   @IsOptional()
   open?: boolean;
