@@ -14,15 +14,19 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      - name: Set up SSH Key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.CODICE_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.CODICE_SSH_HOST }} >> ~/.ssh/known_hosts
+      
       - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.CODICE_SSH_HOST }}
-          username: ${{ secrets.CODICE_SSH_USER }}
-          key: ${{ secrets.CODICE_SSH_KEY }}
-          script: |
-            cd ~/sports
-            git pull
-            cd api
-            yarn install
-            docker-compose up --build -d
+        run: |
+          ssh -i ~/.ssh/id_rsa ${{ secrets.CODICE_SSH_USER }}@${{ secrets.CODICE_SSH_HOST }} << 'EOF'
+          cd ~/sports
+          git pull
+          cd api
+          yarn install
+          docker-compose up --build -d
+          EOF
