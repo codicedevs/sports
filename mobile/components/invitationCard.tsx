@@ -56,13 +56,17 @@ const MatchInvitation: React.FC<MatchInvitationProps> = ({
         </Text>
 
         <Div>
-          <Text color="white" fontSize={customTheme.fontSize.medium}>
+          <Text
+            color="white"
+            fontSize={customTheme.fontSize.medium}
+            ml={customTheme.fontSize.medium}
+          >
             {time}
           </Text>
         </Div>
       </Div>
 
-      <Div flexDir="row" style={{ gap: 20, marginTop: 20 }}>
+      <Div flexDir="row" mt={customTheme.fontSize.medium} style={{ gap: 20}}>
         <Button flex={1} bg="black" borderColor="white" borderWidth={1}>
           <Text
             color="white"

@@ -53,57 +53,6 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
           </Div>
         </Div>
       </Div> */}
-
-      <StatisticCard style={{ flex: 1 }} />
-      <ScrollView
-        horizontal
-        contentContainerStyle={{
-          gap: 10,
-          marginTop: 10,
-        }}
-        showsVerticalScrollIndicator={false}
-      >
-        {cardData.map((data, index) => (
-          <SquareCard
-            key={index}
-            title={data.title}
-            score={data.score}
-            hour={data.hour}
-            location={data.location}
-            backgroundimage={data.backgroundimage}
-          />
-        ))}
-      </ScrollView>
-      <SectionPhoto backGroundImage={require("../assets/photoNew.png")} />
-      <MatchCard />
-      <MatchCard />
-      <MatchCard />
-      <MatchCard />
-      <Button
-        onPress={() => {
-          !currentUser ? showModal() : setOpenMatchModal(!openMatchModal);
-        }}
-      >
-        <Text>Abrir modal del partido</Text>
-      </Button>
-      <Modal
-        transparent
-        visible={newModalVisible}
-        animationType="slide"
-        onRequestClose={() => setNewModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Button
-              onPress={() => setNewModalVisible(false)}
-              mt={10}
-              bg="red600"
-            >
-              <Text style={{ color: "white" }}>Cerrar Modal</Text>
-            </Button>
-          </View>
-        </View>
-      </Modal>
     </Div>
   );
 };
