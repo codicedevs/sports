@@ -46,50 +46,50 @@ export type CustomThemeType = ThemeType & {
 
 // Extiende la interfaz `DefaultTheme` usando el tipo `CustomThemeType`
 declare module "styled-components/native" {
-    export interface DefaultTheme extends CustomThemeType { }
+  export interface DefaultTheme extends CustomThemeType {}
 }
 
 export const customTheme: CustomThemeType = {
-    colors: {
-        primary: "#0070f3",
-        secondary: "#1c1c1c",
-        accent: "#e91e63",
-        background: "#FEFFFA",
-        secondaryBackground:"#151515E5",
-        text: "#333333",
-        cardBorder: "lightgray",
+  colors: {
+    primary: "#0070f3",
+    secondary: "#1c1c1c",
+    accent: "#e91e63",
+    background: "#FEFFFA",
+    secondaryBackground:"#151515E5",
+    text: "#333333",
+    cardBorder: "lightgray",
+  },
+  fontFamily: {
+    normal: "Poppins-Regular",
+    bold: "Poppins-Bold",
+  },
+  fontSize: {
+    small: moderateScale(12),
+    medium: moderateScale(16),
+    large: moderateScale(20),
+    title: moderateScale(24),
+    xl: moderateScale(32),
+  },
+  borderRadius: {
+    none: 0,
+    circle: 99999,
+    medium: scale(5),
+    small: scale(8),
+    big: scale(16),
+  },
+  spacing: {
+    none: 0,
+    xs: scale(5),
+    small: scale(8),
+    medium: scale(16),
+    large: scale(24),
+    xl: scale(32),
+  },
+  shadowColor: "black",
+  name: "myTheme",
+  components: {
+    Text: {
+      fontFamily: "Poppins-Regular",
     },
-    fontFamily: {
-        normal: "Poppins-Regular",
-        bold: "Poppins-Bold"
-    },
-    fontSize: {
-        small: moderateScale(12),
-        medium: moderateScale(16),
-        large: moderateScale(20),
-        title: moderateScale(24),
-        xl: moderateScale(32),
-    },
-    borderRadius: {
-        none: 0,
-        circle: 99999,
-        medium: scale(5),
-        small: scale(8),
-        big: scale(16),
-    },
-    spacing: {
-        none: 0,
-        xs: scale(5),
-        small: scale(8),
-        medium: scale(16),
-        large: scale(24),
-        xl: scale(32),
-    },
-    shadowColor: "black",
-    name: "myTheme",
-    components: {
-        Text: {
-            fontFamily: "Poppins-Regular"
-        }
-    }
+  },
 };
