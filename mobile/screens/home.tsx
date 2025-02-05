@@ -1,10 +1,17 @@
 import React from "react";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
-import { Div, Text } from "react-native-magnus";
+import { Button, Div, Text } from "react-native-magnus";
 import { scale } from "react-native-size-matters";
 import MatchInvitation from "../components/invitationCard";
-import { Image } from "react-native";
+import { Image, Modal, ScrollView, View } from "react-native";
 import { customTheme } from "../utils/theme";
+import ModalAnimation from "../components/cards/animatedCard";
+import MatchCard from "../components/cards/matchCard";
+import Index from "../components/matche";
+import MatchModalHandler from "../components/modal/matchModalHandler";
+import SectionPhoto from "../components/SectionPhoto";
+import SquareCard from "../components/squareCard";
+import StatisticCard from "../components/statisticCard";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
@@ -46,6 +53,57 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
           </Div>
         </Div>
       </Div> */}
+
+      <StatisticCard style={{ flex: 1 }} />
+      <ScrollView
+        horizontal
+        contentContainerStyle={{
+          gap: 10,
+          marginTop: 10,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        {cardData.map((data, index) => (
+          <SquareCard
+            key={index}
+            title={data.title}
+            score={data.score}
+            hour={data.hour}
+            location={data.location}
+            backgroundimage={data.backgroundimage}
+          />
+        ))}
+      </ScrollView>
+      <SectionPhoto backGroundImage={require("../assets/photoNew.png")} />
+      <MatchCard />
+      <MatchCard />
+      <MatchCard />
+      <MatchCard />
+      <Button
+        onPress={() => {
+          !currentUser ? showModal() : setOpenMatchModal(!openMatchModal);
+        }}
+      >
+        <Text>Abrir modal del partido</Text>
+      </Button>
+      <Modal
+        transparent
+        visible={newModalVisible}
+        animationType="slide"
+        onRequestClose={() => setNewModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Button
+              onPress={() => setNewModalVisible(false)}
+              mt={10}
+              bg="red600"
+            >
+              <Text style={{ color: "white" }}>Cerrar Modal</Text>
+            </Button>
+          </View>
+        </View>
+      </Modal>
     </Div>
   );
 };
