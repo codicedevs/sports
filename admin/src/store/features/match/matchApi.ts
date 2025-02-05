@@ -3,6 +3,10 @@ import { BaseQueryFn, createApi } from "@reduxjs/toolkit/query/react";
 import { AxiosError, AxiosResponse } from "axios";
 import { matchService } from "../../../services/match";
 
+interface MatchFilter {
+  _id: string;
+}
+
 interface LoginResponse {
   user: { id: string; name: string };
   access_token: string;
@@ -21,10 +25,15 @@ interface ApiResponse<T> {
 const axiosBaseQuery =
   <T>(
     service: any
-  ): BaseQueryFn<{ url: string; method: string; data?: any }, T, unknown> =>
-  async ({ method, data }) => {
+  ): BaseQueryFn<
+    { url: string; method: string; data?: any; params?: Record<any, any> },
+    T,
+    unknown
+  > =>
+  async ({ method, data, params }) => {
     try {
-      const result: AxiosResponse<T> = await service[method](data);
+      const result: AxiosResponse<T> = await service[method](data, params);
+
       return { data: result.data };
     } catch (error) {
       const axiosError = error as AxiosError;
@@ -41,10 +50,11 @@ export const matchApi = createApi({
   reducerPath: "matchApi",
   baseQuery: axiosBaseQuery<ApiResponse<any>>(matchService),
   endpoints: (builder) => ({
-    getMatches: builder.query<any, void>({
-      query: () => ({
+    getMatches: builder.query<any, any>({
+      query: (filter: any = {}) => ({
         url: "",
         method: "find",
+        params: filter,
       }),
     }),
   }),

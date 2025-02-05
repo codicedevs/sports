@@ -6,8 +6,8 @@ export class CrudService extends HttpBase {
     super(`${API_URL}/${baseURL}`);
   }
 
-  async find(): Promise<any> {
-    return this.get("");
+  async find(data: any, params: any): Promise<any> {
+    return this.get("", { params });
   }
 
   getAccessToken(): any {
