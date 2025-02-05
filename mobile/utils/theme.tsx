@@ -10,6 +10,7 @@ export type CustomThemeType = ThemeType & {
         secondary: string;
         accent: string;
         background: string;
+        secondaryBackground:string,
         text: string;
         cardBorder: string;
     };
@@ -53,7 +54,8 @@ export const customTheme: CustomThemeType = {
         primary: "#0070f3",
         secondary: "#1c1c1c",
         accent: "#e91e63",
-        background: "#f0f0f0",
+        background: "#FEFFFA",
+        secondaryBackground:"#151515E5",
         text: "#333333",
         cardBorder: "lightgray",
     },
