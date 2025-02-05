@@ -45,6 +45,11 @@ export default function App() {
     'RobotoCondensed-SemiBoldItalic': require('./assets/fonts/RobotoCondensed-SemiBoldItalic.ttf'),
     'RobotoCondensed-Thin': require('./assets/fonts/RobotoCondensed-Thin.ttf'),
     'RobotoCondensed-ThinItalic': require('./assets/fonts/RobotoCondensed-ThinItalic.ttf'),
+    //noto sans fuente
+    'NotoSans-Italic': require('./assets/fonts/NotoSans-Italic-VariableFont_wdth,wght.ttf'),
+    'NotoSans-Variable' : require('./assets/fonts/NotoSans-VariableFont_wdth,wght.ttf'),
+    'NotoSans-ExtraCondensed-BoldItalic': require ('./assets/fonts/NotoSans_ExtraCondensed-BoldItalic.ttf'),
+    'NotoSans-BoldItalic': require ('./assets/fonts/NotoSans-BoldItalic.ttf')
   });
 
   if (!fontsLoaded) {
