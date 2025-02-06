@@ -23,6 +23,8 @@ export type CustomThemeType = ThemeType & {
     large: number;
     title: number;
     xl: number;
+    xxl: number;
+    xxxl: number
   };
   borderRadius: {
     none: number;
@@ -67,6 +69,8 @@ export const customTheme: CustomThemeType = {
     large: moderateScale(20),
     title: moderateScale(24),
     xl: moderateScale(32),
+    xxl: moderateScale(40),
+    xxxl: moderateScale(50),
   },
   borderRadius: {
     none: 0,

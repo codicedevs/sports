@@ -8,28 +8,14 @@
             "./assets/fonts/Poppins-Bold.ttf",
             "./assets/fonts/Poppins-Regular.ttf",
             "./assets/fonts/coolvetica.otf",
-            "./assets/fonts/RobotoCondensed-Black.ttf",
-            "./assets/fonts/RobotoCondensed-BlackItalic.ttf",
-            "./assets/fonts/RobotoCondensed-Bold.ttf",
-            "./assets/fonts/RobotoCondensed-BoldItalic.ttf",
-            "./assets/fonts/RobotoCondensed-ExtraBold.ttf",
-            "./assets/fonts/RobotoCondensed-ExtraBoldItalic.ttf",
-            "./assets/fonts/RobotoCondensed-ExtraLight.ttf",
-            "./assets/fonts/RobotoCondensed-ExtraLightItalic.ttf",
-            "./assets/fonts/RobotoCondensed-Italic.ttf",
-            "./assets/fonts/RobotoCondensed-Light.ttf",
-            "./assets/fonts/RobotoCondensed-LightItalic.ttf",
-            "./assets/fonts/RobotoCondensed-Medium.ttf",
-            "./assets/fonts/RobotoCondensed-MediumItalic.ttf",
-            "./assets/fonts/RobotoCondensed-Regular.ttf",
-            "./assets/fonts/RobotoCondensed-SemiBold.ttf",
-            "./assets/fonts/RobotoCondensed-SemiBoldItalic.ttf",
-            "./assets/fonts/RobotoCondensed-Thin.ttf",
-            "./assets/fonts/RobotoCondensed-ThinItalic.ttf",
+           
             "./assets/fonts/NotoSans-Italic-VariableFont_wdth,wght.ttf",
             "./assets/fonts/NotoSans-VariableFont_wdth,wght.ttf",
             "./assets/fonts/NotoSans_ExtraCondensed-BoldItalic.ttf",
-            "./assets/fonts/NotoSans-BoldItalic.ttf"
+            "./assets/fonts/NotoSans-BoldItalic.ttf",
+            "./assets/fonts/NotoSans_Condensed-Blac.ttf",
+            "./assets/fonts/NotoSans_Condensed-BlackItalic.ttf",
+            "./assets/fonts/NotoSans_Condensed-ExtraBoldItalic.ttf"
           ]
         }
       ]
