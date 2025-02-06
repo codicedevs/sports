@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
 import { Button, Div, Text } from "react-native-magnus";
 import { scale } from "react-native-size-matters";
@@ -16,6 +16,7 @@ import StatisticCard from "../components/statisticCard";
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
+  const [open,setOpen] = useState(true)
   return (
     <Div>
       <Div style={{ padding: 10, marginTop: 30 }}>
@@ -26,6 +27,8 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
           time="19:00hs"
         />
       </Div>
+
+    <MatchModalHandler open={open} setOpen={setOpen} />
       {/* <Div
         style={{
           padding: 10,
