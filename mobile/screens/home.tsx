@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
 import { Button, Div, Text } from "react-native-magnus";
 import { scale } from "react-native-size-matters";
@@ -16,16 +16,19 @@ import StatisticCard from "../components/statisticCard";
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
+  const [open, setOpen] = useState(false)
   return (
     <Div>
-      <Div style={{ padding: 10, marginTop: 30 }}>
+      {/* <Div style={{ padding: 10, marginTop: 30 }}>
         <MatchInvitation
           title="Ramiro te ha invitado a un partido"
           matchType="Futbol 5"
           date="Vi 25/01"
           time="19:00hs"
         />
-      </Div>
+      </Div> */}
+      <Button onPress={() => setOpen(true)}>Abrir</Button>
+      <MatchModalHandler open={open} setOpen={setOpen} />
       {/* <Div
         style={{
           padding: 10,
