@@ -60,7 +60,7 @@ export const customTheme: CustomThemeType = {
     cardBorder: "lightgray",
   },
   fontFamily: {
-    normal: "Poppins-Regular",
+    normal: "NotoSans-BoldItalic",
     bold: "Poppins-Bold",
   },
   fontSize: {
@@ -89,7 +89,7 @@ export const customTheme: CustomThemeType = {
   name: "myTheme",
   components: {
     Text: {
-      fontFamily: "Poppins-Regular",
+      fontFamily: "NotoSans-BoldItalic",
     },
   },
 };
