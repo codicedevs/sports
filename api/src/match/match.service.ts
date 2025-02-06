@@ -207,7 +207,7 @@ export class MatchService {
   }
 
   async findAll(filter: Filter): Promise<FilterResponse<Match>> {
-    const results = await this.matchModel.find(filter).limit(0)
+    const results = await this.matchModel.find(filter).exec()
     return {
       results,
       totalCount: await this.matchModel.countDocuments(filter)
