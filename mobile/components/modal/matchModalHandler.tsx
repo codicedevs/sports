@@ -5,7 +5,7 @@ import sportService from '../../service/sport.service';
 import useFetch from '../../hooks/useGet';
 import { QUERY_KEYS } from '../../types/query.types';
 import sportmodeService from '../../service/sportmode.service';
-import { Keyboard, ScrollView, StyleSheet, TouchableWithoutFeedback } from 'react-native';
+import { Keyboard, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import locationService from '../../service/location.service';
 import RNDateTimePicker from '@react-native-community/datetimepicker';
@@ -17,7 +17,7 @@ import Match from '../../types/match.type';
 import { customTheme } from '../../utils/theme';
 import { scale, verticalScale } from 'react-native-size-matters';
 import { MotiText, MotiView } from 'moti';
-import { interpolateColor } from 'react-native-reanimated';
+import Animated, { interpolateColor, useDerivedValue, useSharedValue, withTiming } from 'react-native-reanimated';
 
 const mockHours = [
   "10:00",
@@ -71,9 +71,9 @@ const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: R
   // };
 
   // Get info
-  const { data: sports } = useFetch(sportService.getAll, [QUERY_KEYS.SPORTS]);
-  const { data: sportModes, isFetching } = useFetch(sportmodeService.getAll, [QUERY_KEYS.SPORT_MODES]);
-  const { data: locations } = useFetch(locationService.getAll, [QUERY_KEYS.LOCATIONS])
+  // const { data: sports } = useFetch(sportService.getAll, [QUERY_KEYS.SPORTS]);
+  // const { data: sportModes, isFetching } = useFetch(sportmodeService.getAll, [QUERY_KEYS.SPORT_MODES]);
+  // const { data: locations } = useFetch(locationService.getAll, [QUERY_KEYS.LOCATIONS])
 
   // useEffect(() => {
   //   if (match) return
@@ -128,8 +128,10 @@ const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: R
 
   const mockSport = [{ name: 'Futbol', _id: '123' }, { name: 'Basquet', _id: '321' }, { name: "padel", id: '434' }]
   const mockSportMode = [{ name: '5', _id: '123' }, { name: '7', _id: '321' }, { name: "11", id: '434' }]
+ 
 
-  if (!sports || !sportModes) return null;
+
+  // if (!sports || !sportModes) return null;
   return (
     <Modal isVisible={open} onBackButtonPress={() => setOpen(false)}>
       <Div p={customTheme.spacing.medium}>
@@ -183,7 +185,7 @@ const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: R
                                 width: scale(112),
                                 height: verticalScale(112),
                                 borderWidth: 1,
-                                borderRadius: 'lg',
+                                borderRadius: 8,
                                 justifyContent: 'center',
                                 marginLeft: index === 0 ? 16 : 0,
                                 marginRight: index === mockSport.length - 1 ? 16 : 0,
@@ -197,13 +199,14 @@ const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: R
                               }}
                               transition={{
                                 type: 'timing',
-                                duration: 300, // Duración de la animación
+                                duration: 100, // Duración de la animación
                               }}
                             >
                               <MotiText
                                 style={{
                                   textAlign: 'center',
                                   fontSize: customTheme.fontSize.medium,
+                                  fontFamily: "NotoSans-BoldItalic"
                                 }}
                                 animate={{
                                   color: interpolateColor(
@@ -214,7 +217,7 @@ const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: R
                                 }}
                                 transition={{
                                   type: 'timing',
-                                  duration: 300, // Duración de la animación
+                                  duration: 100, // Duración de la animación
                                 }}
                               >
                                 {sport.name}
@@ -227,7 +230,7 @@ const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: R
                   </Div>
 
                   <Div px={customTheme.spacing.medium}>
-                    <Div w={'100%'} h={1} borderBottomWidth={1} />
+                    <View style={{ width: '100%', borderBottomWidth: 1, borderStyle: "dotted" }} />
                   </Div>
 
                   <Div py={customTheme.spacing.medium} style={{ gap: 16 }}>
@@ -235,8 +238,8 @@ const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: R
                     <ScrollView showsHorizontalScrollIndicator={false} horizontal contentContainerStyle={{ gap: 16 }}>
                       {
                         mockSportMode.map((sport, index) => (
-                          <TouchableWithoutFeedback onPress={() => setSelectedSportMode(sport._id)}>
-                            <MotiView
+                          <TouchableWithoutFeedback key={sport._id} onPress={() => setSelectedSportMode(sport._id)}>
+                            {/* <MotiView
                               style={{
                                 width: scale(88),
                                 height: scale(88),
@@ -259,6 +262,7 @@ const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: R
                                   textAlign: 'center',
                                   lineHeight: verticalScale(88),
                                   fontSize: customTheme.fontSize.xl,
+                                  fontFamily: "NotoSans-BoldItalic"
                                 }}
                                 animate={{
                                   color: interpolateColor(
@@ -274,19 +278,18 @@ const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: R
                               >
                                 {sport.name}
                               </MotiText>
-                            </MotiView>
-                            {/* <Div
-                            w={scale(88)}
-                            h={scale(88)}
-                            borderWidth={1}
-                            rounded={56}
-                            justifyContent='center'
-                            ml={index === 0 ? 16 : 0}
-                            mr={index === mockSportMode.length - 1 ? 16 : 0}
-                            bg={selectedSportMode === sport._id? "black" : "white"}
-                          >
-                            <Text color={selectedSportMode === sport._id? "white" : "black"} textAlign='center' lineHeight={verticalScale(88)} fontSize={customTheme.fontSize.xl}>{sport.name}</Text>
-                          </Div> */}
+                            </MotiView> */}
+                            <View style={{
+                              width:scale(88),
+                              height:scale(88),
+                              borderWidth:1,
+                              borderRadius:56,
+                              justifyContent:'center',
+                              backgroundColor:selectedSportMode === sport._id? "black" : "white"
+                            }}>
+                              <Text color='red'>hola</Text>
+                            </View>
+                           
                           </TouchableWithoutFeedback>
                         ))
                       }
@@ -296,264 +299,9 @@ const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: R
               }
             </Div>
           </MotiView>
-          {/* </TouchableWithoutFeedback> */}
-          {/* <Div borderWidth={1} h={verticalScale(342)} p={customTheme.spacing.small} rounded={"lg"} alignItems='center'>
-            <Text fontSize={customTheme.fontSize.small}>Deporte</Text>
-          </Div> */}
-          {
-            //PREVIO INPUT
-            // !match &&
-            // <>
-            //   {/* Select 1 */}
-            //   <Div mb="lg">
-            //     <Text mb="sm">Select Option 1</Text>
-            //     <SelectDropdown
-            //       data={sports.data.map((item) => item.name)}
-            //       onSelect={(selectedItem, index) => {
-            //         setSelectedSport(sports.data[index]._id);
-            //       }}
-            //       defaultValueByIndex={0}
-            //       defaultButtonText="Choose an option"
-            //       buttonTextAfterSelection={(selectedItem, index) => selectedItem}
-            //       rowTextForSelection={(item, index) => item}
-            //       buttonStyle={styles.dropdownButtonStyle}
-            //       buttonTextStyle={styles.dropdownButtonTxtStyle}
-            //       dropdownStyle={styles.dropdownMenuStyle}
-            //       rowTextStyle={styles.dropdownItemTxtStyle}
-            //       renderDropdownIcon={isOpened => (
-            //         <Text style={styles.dropdownButtonArrowStyle}>
-            //           {isOpened ? '▲' : '▼'}
-            //         </Text>
-            //       )}
-            //       renderItem={(item, index, isSelected) => {
-            //         return (
-            //           <Div style={{ ...styles.dropdownItemStyle, ...(isSelected && { backgroundColor: '#D2D9DF' }) }}>
-
-            //             <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
-            //           </Div>
-            //         );
-            //       }}
-            //       renderButton={(selectedItem, isOpened) => {
-            //         return (
-            //           <Div style={styles.dropdownButtonStyle}>
-            //             <Text style={styles.dropdownButtonTxtStyle}>
-            //               {selectedItem ? selectedItem : 'Choose an option'}
-            //             </Text>
-            //             <Text style={styles.dropdownButtonArrowStyle}>
-            //               {isOpened ? '▲' : '▼'}
-            //             </Text>
-            //           </Div>
-            //         );
-            //       }}
-            //     />
-            //   </Div>
-            // </>
-          }
-          {/* Select 2 */}
-          {
-            // isFetching ?
-            //   <Text>Cargando</Text>
-            //   :
-            //   <Div mb="lg">
-            //     <Text mb="sm">Select Option 2</Text>
-            //     <SelectDropdown
-            //       data={sportModes.data.map((item) => item.name)}
-            //       onSelect={(selectedItem, index) => {
-            //         setSelectedSportMode(sportModes.data[index]._id);
-            //       }}
-            //       defaultValueByIndex={match ? sportModes.data.findIndex(modes => modes._id === selectedSportMode) : 0}
-            //       defaultButtonText="Choose an option"
-            //       buttonTextAfterSelection={(selectedItem, index) => selectedItem}
-            //       rowTextForSelection={(item, index) => item}
-            //       buttonStyle={styles.dropdownButtonStyle}
-            //       buttonTextStyle={styles.dropdownButtonTxtStyle}
-            //       dropdownStyle={styles.dropdownMenuStyle}
-            //       rowTextStyle={styles.dropdownItemTxtStyle}
-            //       renderDropdownIcon={isOpened => (
-            //         <Text style={styles.dropdownButtonArrowStyle}>
-            //           {isOpened ? '▲' : '▼'}
-            //         </Text>
-            //       )}
-            //       renderItem={(item, index, isSelected) => {
-            //         return (
-            //           <Div style={{ ...styles.dropdownItemStyle, ...(isSelected && { backgroundColor: '#D2D9DF' }) }}>
-
-            //             <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
-            //           </Div>
-            //         );
-            //       }}
-            //       renderButton={(selectedItem, isOpened) => {
-            //         return (
-            //           <Div style={styles.dropdownButtonStyle}>
-            //             <Text style={styles.dropdownButtonTxtStyle}>
-            //               {selectedItem ? selectedItem : 'Choose an option'}
-            //             </Text>
-            //             <Text style={styles.dropdownButtonArrowStyle}>
-            //               {isOpened ? '▲' : '▼'}
-            //             </Text>
-            //           </Div>
-            //         );
-            //       }}
-            //     />
-            //   </Div>
-          }
-
-
-          {/* Select 3 */}
-          {/* <Div mb="lg">
-            <Text mb="sm">Select Option 3</Text>
-            <SelectDropdown
-              data={['Privado', 'Publico']}
-              onSelect={(selectedItem, index) => {
-                setSelectValue3(selectedItem === 'Privado' ? 'private' : 'public');
-              }}
-              defaultValueByIndex={0}
-              defaultButtonText="Choose an option"
-              buttonTextAfterSelection={(selectedItem, index) => selectedItem}
-              rowTextForSelection={(item, index) => item}
-              buttonStyle={styles.dropdownButtonStyle}
-              buttonTextStyle={styles.dropdownButtonTxtStyle}
-              dropdownStyle={styles.dropdownMenuStyle}
-              rowTextStyle={styles.dropdownItemTxtStyle}
-              renderDropdownIcon={isOpened => (
-                <Text style={styles.dropdownButtonArrowStyle}>
-                  {isOpened ? '▲' : '▼'}
-                </Text>
-              )}
-              renderItem={(item, index, isSelected) => {
-                return (
-                  <Div style={{ ...styles.dropdownItemStyle, ...(isSelected && { backgroundColor: '#D2D9DF' }) }}>
-
-                    <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
-                  </Div>
-                );
-              }}
-              renderButton={(selectedItem, isOpened) => {
-                return (
-                  <Div style={styles.dropdownButtonStyle}>
-                    <Text style={styles.dropdownButtonTxtStyle}>
-                      {selectedItem ? selectedItem : 'Choose an option'}
-                    </Text>
-                    <Text style={styles.dropdownButtonArrowStyle}>
-                      {isOpened ? '▲' : '▼'}
-                    </Text>
-                  </Div>
-                );
-              }}
-            />
-          </Div> */}
-
-          {/* Inputs */}
-          {/* <Div mb="lg">
-            <Text mb="sm">Select Location</Text>
-            <SelectDropdown
-              data={locations.data.map((item) => item.name)}
-              onSelect={(selectedItem, index) => {
-                setSelectedLocation(locations.data[index]._id);
-              }}
-              defaultValueByIndex={match ? locations.data.findIndex(location => location._id === selectedLocation) : null}
-              defaultButtonText="Choose an option"
-              buttonTextAfterSelection={(selectedItem, index) => selectedItem}
-              rowTextForSelection={(item, index) => item}
-              buttonStyle={styles.dropdownButtonStyle}
-              buttonTextStyle={styles.dropdownButtonTxtStyle}
-              dropdownStyle={styles.dropdownMenuStyle}
-              rowTextStyle={styles.dropdownItemTxtStyle}
-              renderDropdownIcon={isOpened => (
-                <Text style={styles.dropdownButtonArrowStyle}>
-                  {isOpened ? '▲' : '▼'}
-                </Text>
-              )}
-              renderItem={(item, index, isSelected) => {
-                return (
-                  <Div style={{ ...styles.dropdownItemStyle, ...(isSelected && { backgroundColor: '#D2D9DF' }) }}>
-
-                    <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
-                  </Div>
-                );
-              }}
-              renderButton={(selectedItem, isOpened) => {
-                return (
-                  <Div style={styles.dropdownButtonStyle}>
-                    <Text style={styles.dropdownButtonTxtStyle}>
-                      {selectedItem ? selectedItem : 'Choose an option'}
-                    </Text>
-                    <Text style={styles.dropdownButtonArrowStyle}>
-                      {isOpened ? '▲' : '▼'}
-                    </Text>
-                  </Div>
-                );
-              }}
-            />
-          </Div> */}
-
-          {/* <Div mb="lg">
-            <Text mb="sm">Fecha</Text>
-            <Button onPress={() => setShowCalendar(true)}>Seleccionar Fecha</Button>
-            {showCalendar &&
-              <DateTimePicker
-                value={date}
-                mode="date" // Puedes cambiar a "time" o "datetime"
-                display="default" // "default", "spinner", "calendar", "clock"
-                onTouchCancel={() => setShowCalendar(false)}
-                onChange={onChangeDate}
-              />
-            }
-          </Div>
-
-          <Div mb="lg">
-            <Text mb="sm">Select hour</Text>
-            <SelectDropdown
-              data={mockHours}
-              onSelect={(selectedItem, index) => {
-                setTime(mockHours[index]);
-              }}
-              defaultButtonText="Choose an option"
-              buttonTextAfterSelection={(selectedItem, index) => selectedItem}
-              rowTextForSelection={(item, index) => item}
-              buttonStyle={styles.dropdownButtonStyle}
-              buttonTextStyle={styles.dropdownButtonTxtStyle}
-              dropdownStyle={styles.dropdownMenuStyle}
-              rowTextStyle={styles.dropdownItemTxtStyle}
-              renderDropdownIcon={isOpened => (
-                <Text style={styles.dropdownButtonArrowStyle}>
-                  {isOpened ? '▲' : '▼'}
-                </Text>
-              )}
-              renderItem={(item, index, isSelected) => {
-                return (
-                  <Div style={{ ...styles.dropdownItemStyle, ...(isSelected && { backgroundColor: '#D2D9DF' }) }}>
-
-                    <Text style={styles.dropdownItemTxtStyle}>{item}</Text>
-                  </Div>
-                );
-              }}
-              renderButton={(selectedItem, isOpened) => {
-                return (
-                  <Div style={styles.dropdownButtonStyle}>
-                    <Text style={styles.dropdownButtonTxtStyle}>
-                      {selectedItem ? selectedItem : 'Choose an option'}
-                    </Text>
-                    <Text style={styles.dropdownButtonArrowStyle}>
-                      {isOpened ? '▲' : '▼'}
-                    </Text>
-                  </Div>
-                );
-              }}
-            />
-          </Div>
-         
-          <Div row justifyContent="space-between" mt="lg">
-            <Button bg="red600" color="white" onPress={() => setOpen(false)} rounded="lg">
-              Cancel
-            </Button>
-            <Button bg="blue600" color="white" onPress={match ? editMatch : createMatch} rounded="lg">
-              Save
-            </Button>
-          </Div> */}
+        
         </ScrollView>
       </Div>
-      {/* </Overlay> */}
     </Modal>
   );
 };
