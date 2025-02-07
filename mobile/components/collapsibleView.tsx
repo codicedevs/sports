@@ -3,10 +3,11 @@ import { TouchableWithoutFeedback, View, Text } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from "react-native-reanimated";
 import { customTheme } from "../utils/theme";
 import { Div } from "react-native-magnus";
+import { verticalScale } from "react-native-size-matters";
 
-export const Accordion = ({ id, title, children, openId, setOpenId }) => {
-    const isOpen = openId === id; // Verifica si este acordeón está abierto
-    const height = useSharedValue(50); // ⬅ Comienza en colapsado
+export const Accordion = ({ id, title, children, openId, setOpenId, size }) => {
+    const isOpen = openId === id;
+    const height = useSharedValue(verticalScale(50));
 
     const animatedStyle = useAnimatedStyle(() => ({
         height: height.value,
@@ -14,7 +15,7 @@ export const Accordion = ({ id, title, children, openId, setOpenId }) => {
 
     useEffect(() => {
         runOnJS(setTimeout)(() => { // ⬅ Hace que la animación se ejecute correctamente
-            height.value = withTiming(isOpen ? 342 : 50, { duration: 300 });
+            height.value = withTiming(isOpen ? verticalScale(size) : verticalScale(50), { duration: 300 });
         }, 10);
     }, [isOpen]);
 
@@ -38,13 +39,12 @@ export const Accordion = ({ id, title, children, openId, setOpenId }) => {
             {
                 !isOpen &&
                 <TouchableWithoutFeedback onPress={toggleAccordion}>
-                <Div justifyContent='center' h={50} px={customTheme.spacing.medium}>
-                    <Text>{title}</Text>
-                </Div>
-            </TouchableWithoutFeedback>
+                    <Div justifyContent='center' h={50} px={customTheme.spacing.medium}>
+                        <Text>{title}</Text>
+                    </Div>
+                </TouchableWithoutFeedback>
             }
-
-            <Div py={customTheme.spacing.medium}>
+            <Div>
                 {children}
             </Div>
         </Animated.View>
