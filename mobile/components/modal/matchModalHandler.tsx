@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Div, Overlay, Text, Input, Modal } from "react-native-magnus";
-import { Keyboard, ScrollView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native';
+import { Keyboard, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import matchService from '../../service/match.service';
 import { useSession } from '../../context/authProvider';
 import { AppScreens } from '../../navigation/screens';
@@ -8,14 +8,6 @@ import { navigate } from '../../utils/navigation';
 import Match from '../../types/match.type';
 import { customTheme } from '../../utils/theme';
 import { scale, verticalScale } from 'react-native-size-matters';
-import { MotiView } from 'moti';
-
-const mockHours = [
-  "10:00",
-  "10:30",
-  "11:00",
-  "11:30"
-]
 
 const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: React.Dispatch<React.SetStateAction<boolean>>; match?: Match }) => {
   // States for selects
@@ -31,57 +23,19 @@ const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: R
 
   // NUEVO
   const [openSecond, setOpenSecond] = useState(false)
+  const [amount, setAmount] = useState(10)
+  const LowLimit = 10;
+  const HighLimit = LowLimit + 5
 
-  // const fetchSportModesById = async () => {
-  //   if (selectedSport) {
-  //     if (!match) setSelectedSportMode('')
-  //     const res = await sportmodeService.getModesBySportId(selectedSport)
-  //     console.log('POR ID')
-  //     return res
-  //   } else {
-  //     const res = await sportmodeService.getAll()
-  //     console.log("TODO")
-  //     return res
-  //   }
-  // }
+  const IncreaseAmount = () => {
+    if (amount === HighLimit) return
+    setAmount(prev => prev + 1)
+  }
 
-  // const onChangeDate = (event, selectedDate) => {
-  //   setShowCalendar(false);
-
-  //   if (event.type === "set" && selectedDate) {
-  //     setDate(selectedDate);
-  //   }
-  // };
-
-  // const onChangeTime = (event, selectedTime) => {
-  //   setShowTimePicker(false);
-
-  //   if (event.type === "set" && selectedTime) {
-  //     setTime(selectedTime);
-  //   }
-  // };
-
-  // Get info
-  // const { data: sports } = useFetch(sportService.getAll, [QUERY_KEYS.SPORTS]);
-  // const { data: sportModes, isFetching } = useFetch(sportmodeService.getAll, [QUERY_KEYS.SPORT_MODES]);
-  // const { data: locations } = useFetch(locationService.getAll, [QUERY_KEYS.LOCATIONS])
-
-  // useEffect(() => {
-  //   if (match) return
-  //   if (sports) {
-  //     setSelectedSport(sports.data[0]._id)
-  //   }
-  // }, [sports])
-
-  // useEffect(() => {
-  //   if (match) {
-  //     setSelectedSportMode(match.sportMode)
-  //     return
-  //   }
-  //   if (selectedSport && sportModes) {
-  //     setSelectedSportMode(sportModes.data[0]._id)
-  //   }
-  // }, [sportModes])
+  const DecreaseAmount = () => {
+    if (amount === LowLimit) return
+    setAmount(prev => prev - 1)
+  }
 
   const createMatch = async () => {
     try {
@@ -126,50 +80,18 @@ const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: R
   return (
     <Modal isVisible={open} onBackButtonPress={() => setOpen(false)}>
       <Div p={customTheme.spacing.medium}>
-        <ScrollView keyboardShouldPersistTaps="handled" nestedScrollEnabled={true}>
-          <MotiView
-            from={{ height: verticalScale(50), borderWidth: 1 }}
-            animate={{ height: openSecond ? verticalScale(123) : verticalScale(35), borderWidth: 1 }}
-            transition={{ type: "spring", damping: 15 }}
-            style={{
-              borderColor: "#000",
-              borderRadius: 10,
-              alignItems: "center",
-              justifyContent: "center"
-            }}
-          >
-            <Div
-              flex={1}
-              w={"100%"}
-            >
-              {/* TITULO */}
-              {!openSecond &&
-                <TouchableWithoutFeedback onPress={() => setOpenSecond(true)}>
-                  <Div py={customTheme.spacing.small} h={verticalScale(35)} w={"100%"}>
-                    <Text>Cupos</Text>
-                  </Div>
-                </TouchableWithoutFeedback>
-              }
-              {
-                openSecond &&
-                <Div
-                  p={customTheme.spacing.medium}
-                  style={{ gap: 16 }}
-                  flex={1}
-                >
-                  <Text fontSize={customTheme.fontSize.medium} px={customTheme.spacing.medium}>Cupo</Text>
-                  <Div style={{gap:8}} flexDir='row' bg='red' flex={1} alignItems='center' >
-                    <Div w={scale(119)} h={verticalScale(56)} justifyContent='center' bg='green'><Text textAlign='center' fontSize={customTheme.fontSize.xl}>-</Text></Div>
-                    <Div w={scale(56)} h={verticalScale(56)} justifyContent='center'><Text fontSize={customTheme.fontSize.xl} textAlign='center'>10</Text></Div>
-                    <Div w={scale(119)} h={verticalScale(56)} justifyContent='center' bg='green'><Text textAlign='center' fontSize={customTheme.fontSize.xl}>+</Text></Div>
-
-                  </Div>
-                </Div>
-              }
-            </Div>
-          </MotiView>
-
-        </ScrollView>
+        <Div borderWidth={1} rounded={'xl'} h={verticalScale(123)} p={customTheme.spacing.medium} style={{ gap: 8 }}>
+          <Text fontSize={customTheme.fontSize.medium}>Cupo</Text>
+          <Div flexDir='row' flex={1} justifyContent='center' alignItems='center' w={'100%'} >
+            <TouchableOpacity onPress={DecreaseAmount}>
+              <Div w={scale(119)} h={verticalScale(56)} justifyContent='center' bg={amount === LowLimit ? '#DDDED9' : '#151515'}><Text color={amount === LowLimit ? '#9A9B98' : 'white'} textAlign='center' fontSize={customTheme.fontSize.xl}>-</Text></Div>
+            </TouchableOpacity>
+            <Div w={scale(56)} h={verticalScale(56)} justifyContent='center'><Text fontSize={customTheme.fontSize.xl} textAlign='center'>{amount}</Text></Div>
+            <TouchableOpacity onPress={IncreaseAmount}>
+              <Div w={scale(119)} h={verticalScale(56)} justifyContent='center' bg={amount === HighLimit ? '#DDDED9' : '#151515'}><Text color={amount === HighLimit ? '#9A9B98' : 'white'} textAlign='center' fontSize={customTheme.fontSize.xl}>+</Text></Div>
+            </TouchableOpacity>
+          </Div>
+        </Div>
       </Div>
     </Modal>
   );
