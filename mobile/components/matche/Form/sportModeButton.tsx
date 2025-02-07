@@ -21,7 +21,7 @@ const SportModeButton = ({ mode, index, onPress, animationValue, length }: Sport
     backgroundColor: animationValue.value
       ? withTiming('black', { duration: 80 })
       : withTiming('white', { duration: 80 }),
-    opacity: withTiming(animationValue.value ? 1 : 0.5, { duration: 80 }),
+    opacity: withTiming(animationValue.value ? 1 : 0.8, { duration: 80 }),
   }));
 
   const textAnimatedStyle = useAnimatedStyle(() => ({
