@@ -23,9 +23,17 @@ function transformData(data) {
             transformedItem.profile.preferredSportModes = item.profile.preferredSportModes.map(mode => new ObjectId(mode.$oid));
         }
 
-        // Convertir el campo sport a ObjectId si existe
-        if (item.sport && item.sport.$oid) {
-            transformedItem.sport = new ObjectId(item.sport.$oid);
+        if (item.users) {
+            transformedItem.users = item.users.map(user => new ObjectId(user.$oid));
+        }
+
+        // Convertir campos `location`, `userId` y `sportMode` a ObjectId
+        if (item.location?.$oid) {
+            transformedItem.location = new ObjectId(item.location.$oid);
+        }
+
+        if (item.userId?.$oid) {
+            transformedItem.userId = new ObjectId(item.userId.$oid);
         }
 
         // Convertir _id a ObjectId si es necesario
@@ -71,7 +79,7 @@ async function seedDatabase() {
         await locations.deleteMany({});
         await matches.deleteMany({});
         console.log('Cleared existing data');
-       
+
         const resultSports = await sports.insertMany(dataSports);
 
         console.log(`${resultSports.insertedCount} sports inserted`);

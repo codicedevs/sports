@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
 import { Button, Div, Text } from "react-native-magnus";
 import { scale } from "react-native-size-matters";
@@ -6,14 +6,14 @@ import MatchInvitation from "../components/invitationCard";
 import { Image, Modal, ScrollView, View } from "react-native";
 import { customTheme } from "../utils/theme";
 import TournamentCard from "../components/tournamentCard";
-import { customTheme } from "../utils/theme";
-import { scale } from "react-native-size-matters";
+
 
 import { ImageBackground } from "react-native";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
+  const [open, setOpen] = useState(false)
   return (
     <Div> /{/*carta superior de invitacion =)*/}
       <Div style={{ padding: customTheme.spacing.small, marginTop: scale(26) }}>
