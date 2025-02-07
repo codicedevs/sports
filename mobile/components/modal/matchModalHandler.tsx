@@ -1,13 +1,17 @@
 import React, { useState } from 'react';
 import { ScrollView, TouchableWithoutFeedback, View } from 'react-native';
 import { Div, Modal, Text } from "react-native-magnus";
-import { scale, verticalScale } from 'react-native-size-matters';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import SportButton from '../matche/Form/sportButton';
 import SportModeButton from '../matche/Form/sportModeButton';
 import { customTheme } from '../../utils/theme';
 
-const MatchModalHandler = ({ open, setOpen }) => {
+interface ModalProps {
+  open: boolean,
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+const MatchModalHandler = ({ open, setOpen }: ModalProps) => {
   // Estados de selección
   const [selectedSport, setSelectedSport] = useState('');
   const [selectedSportMode, setSelectedSportMode] = useState('');
@@ -57,9 +61,9 @@ const MatchModalHandler = ({ open, setOpen }) => {
   return (
     <Modal isVisible={open} onBackButtonPress={() => setOpen(false)}>
       <Div p={customTheme.spacing.medium}>
-        <ScrollView keyboardShouldPersistTaps="handled" nestedScrollEnabled={true}>
-          <Div w={"100%"} >
-            <TouchableWithoutFeedback onPress={toggleHeight}>
+        {
+          <ScrollView keyboardShouldPersistTaps="handled" nestedScrollEnabled={true}>
+            <Div w={"100%"} >
               <Div>
                 <Animated.View
                   style={[
@@ -68,86 +72,63 @@ const MatchModalHandler = ({ open, setOpen }) => {
                       borderWidth: 1,
                       borderColor: 'black',
                       height: "100%",
-                      paddingVertical: customTheme.spacing.small
+                      paddingVertical: customTheme.spacing.small,
+                      borderRadius: customTheme.borderRadius.medium
                     },
                     animatedStyle,
                   ]}
                 >
-                  <Div pb={customTheme.spacing.medium} style={{ gap: 8 }}>
-                    <Text fontSize={16} px={customTheme.spacing.medium}>¿Qué deporte juegan?</Text>
-                    <ScrollView showsHorizontalScrollIndicator={false} horizontal contentContainerStyle={{ gap: 16}}>
-                      {mockSport.map((sport, index) => (
-                        <SportButton
-                          key={sport._id}
-                          sport={sport}
-                          index={index}
-                          onPress={handleSelectSport}
-                          animationValue={sportAnimations[index]}
-                        />
-                      ))}
-                    </ScrollView>
-                  </Div>
+                  {
+                    !expanded ?
+                      <TouchableWithoutFeedback onPress={toggleHeight}>
+                        <Div justifyContent='center' h={"100%"} px={customTheme.spacing.medium}>
+                          <Text fontSize={customTheme.fontSize.medium}  fontFamily='NotoSans-Variable'>Deportes</Text>
+                        </Div>
+                      </TouchableWithoutFeedback>
+                      :
+                      <>
+                        <Div pb={customTheme.spacing.medium} style={{ gap: 8 }}>
+                          <Text fontSize={16} px={customTheme.spacing.medium}>¿Qué deporte juegan?</Text>
+                          <ScrollView showsHorizontalScrollIndicator={false} horizontal contentContainerStyle={{ gap: 16 }}>
+                            {mockSport.map((sport, index) => (
+                              <SportButton
+                                key={sport._id}
+                                sport={sport}
+                                index={index}
+                                onPress={handleSelectSport}
+                                animationValue={sportAnimations[index]}
+                                length={mockSport.length}
+                              />
+                            ))}
+                          </ScrollView>
+                        </Div>
 
-                  <Div px={16}>
-                    <View style={{ width: '100%', borderBottomWidth: 1, borderStyle: "dotted" }} />
-                  </Div>
+                        <Div px={16}>
+                          <View style={{ width: '100%', borderBottomWidth: 1, borderStyle: "dotted" }} />
+                        </Div>
 
-                  <Div pt={customTheme.spacing.medium} style={{ gap: 8 }}>
-                    <Text fontSize={16} px={16}>¿Qué modalidad?</Text>
-                    <ScrollView showsHorizontalScrollIndicator={false} horizontal contentContainerStyle={{ gap: 16 }}>
-                      {mockSportMode.map((mode, index) => (
-                        <SportModeButton
-                          key={mode._id}
-                          mode={mode}
-                          index={index}
-                          onPress={handleSelectMode}
-                          animationValue={modeAnimations[index]}
-                        />
-                      ))}
-                    </ScrollView>
-                  </Div>
+                        <Div pt={customTheme.spacing.medium} style={{ gap: 8 }}>
+                          <Text fontSize={16} px={16}>¿Qué modalidad?</Text>
+                          <ScrollView showsHorizontalScrollIndicator={false} horizontal contentContainerStyle={{ gap: 16 }}>
+                            {mockSportMode.map((mode, index) => (
+                              <SportModeButton
+                                key={mode._id}
+                                mode={mode}
+                                index={index}
+                                onPress={handleSelectMode}
+                                animationValue={modeAnimations[index]}
+                                length={mockSportMode.length}
+                              />
+                            ))}
+                          </ScrollView>
+                        </Div>
+                      </>
+                  }
                 </Animated.View>
               </Div>
-            </TouchableWithoutFeedback>
-            {/*               
-              <Div py={16} style={{ gap: 16 }}>
-                <Text fontSize={16} px={16}>¿Qué deporte juegan?</Text>
-                <ScrollView showsHorizontalScrollIndicator={false} horizontal contentContainerStyle={{ gap: 16 }}>
-                  {mockSport.map((sport, index) => (
-                    <SportButton
-                      key={sport._id}
-                      sport={sport}
-                      index={index}
-                      onPress={handleSelectSport}
-                      animationValue={sportAnimations[index]}
-                    />
-                  ))}
-                </ScrollView>
-              </Div>
-
-              <Div px={16}>
-                <View style={{ width: '100%', borderBottomWidth: 1, borderStyle: "dotted" }} />
-              </Div>
-
-              
-              <Div py={16} style={{ gap: 16 }}>
-                <Text fontSize={16} px={16}>¿Qué modalidad?</Text>
-                <ScrollView showsHorizontalScrollIndicator={false} horizontal contentContainerStyle={{ gap: 16 }}>
-                  {mockSportMode.map((mode, index) => (
-                    <SportModeButton
-                      key={mode._id}
-                      mode={mode}
-                      index={index}
-                      onPress={handleSelectMode}
-                      animationValue={modeAnimations[index]}
-                    />
-                  ))}
-                </ScrollView>
-              </Div> */}
-
-          </Div>
-
-        </ScrollView>
+            </Div>
+          </ScrollView>
+        }
       </Div>
     </Modal>
   );
