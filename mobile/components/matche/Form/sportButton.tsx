@@ -2,11 +2,21 @@ import React from 'react';
 import { TouchableWithoutFeedback } from 'react-native';
 import { Div } from "react-native-magnus";
 import { scale, verticalScale } from 'react-native-size-matters';
-import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import Animated, { SharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { customTheme } from '../../../utils/theme';
 
-const SportButton = ({ sport, index, onPress, animationValue }) => {
-  // Estilos animados
+interface SportButtonProps {
+  sport: {
+    name: string,
+    _id: string
+  },
+  index: number,
+  onPress: (modeId: string, index: number) => void,
+  animationValue: SharedValue<number>,
+  length: number
+}
+
+const SportButton = ({ sport, index, onPress, animationValue, length }: SportButtonProps) => {
   const animatedStyle = useAnimatedStyle(() => ({
     backgroundColor: animationValue.value
       ? withTiming('black', { duration: 80 })
@@ -16,8 +26,8 @@ const SportButton = ({ sport, index, onPress, animationValue }) => {
 
   const textAnimatedStyle = useAnimatedStyle(() => ({
     color: animationValue.value
-      ? withTiming('white', { duration: 80 }) // Texto blanco si está seleccionado
-      : withTiming('black', { duration: 80 }), // Texto negro si no está seleccionado
+      ? withTiming('white', { duration: 80 })
+      : withTiming('black', { duration: 80 }),
   }));
 
   return (
@@ -33,7 +43,7 @@ const SportButton = ({ sport, index, onPress, animationValue }) => {
               justifyContent: 'center',
               alignItems: 'center',
               marginLeft: index === 0 ? customTheme.spacing.medium : 0,
-                                // marginRight: index === mockSport.length - 1 ? 16 : 0,
+              marginRight: index === length - 1 ? 16 : 0,
             },
             animatedStyle
           ]}

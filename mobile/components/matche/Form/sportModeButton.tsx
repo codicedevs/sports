@@ -2,11 +2,21 @@ import React from 'react';
 import { TouchableWithoutFeedback } from 'react-native';
 import { View } from 'react-native';
 import { scale } from 'react-native-size-matters';
-import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import Animated, { SharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { customTheme } from '../../../utils/theme';
 
-const SportModeButton = ({ mode, index, onPress, animationValue }) => {
-  // Estilos animados
+interface SportModeButtonProps {
+  mode: {
+    name: string,
+    _id: string
+  },
+  index: number,
+  onPress: (modeId: string, index: number) => void,
+  animationValue: SharedValue<number>,
+  length: number
+}
+
+const SportModeButton = ({ mode, index, onPress, animationValue, length }: SportModeButtonProps) => {
   const animatedStyle = useAnimatedStyle(() => ({
     backgroundColor: animationValue.value
       ? withTiming('black', { duration: 80 })
@@ -16,8 +26,8 @@ const SportModeButton = ({ mode, index, onPress, animationValue }) => {
 
   const textAnimatedStyle = useAnimatedStyle(() => ({
     color: animationValue.value
-      ? withTiming('white', { duration: 80 }) // Texto blanco si está seleccionado
-      : withTiming('black', { duration: 80 }), // Texto negro si no está seleccionado
+      ? withTiming('white', { duration: 80 })
+      : withTiming('black', { duration: 80 }),
   }));
 
   return (
@@ -33,13 +43,14 @@ const SportModeButton = ({ mode, index, onPress, animationValue }) => {
               justifyContent: 'center',
               alignItems: 'center',
               marginLeft: index === 0 ? customTheme.spacing.medium : 0,
+              marginRight: index === length - 1 ? 16 : 0,
             },
             animatedStyle
           ]}
         >
           <Animated.Text
             style={[
-              { fontSize: 16, fontFamily: "NotoSans-BoldItalic" },
+              { fontSize: customTheme.fontSize.xl, fontFamily: "NotoSans-BoldItalic" },
               textAnimatedStyle
             ]}
           >
