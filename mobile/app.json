@@ -5,10 +5,17 @@
         "expo-font",
         {
           "fonts": [
+            "./assets/fonts/Poppins-Bold.ttf",
+            "./assets/fonts/Poppins-Regular.ttf",
+            "./assets/fonts/coolvetica.otf",
+           
             "./assets/fonts/NotoSans-Italic-VariableFont_wdth,wght.ttf",
             "./assets/fonts/NotoSans-VariableFont_wdth,wght.ttf",
             "./assets/fonts/NotoSans_ExtraCondensed-BoldItalic.ttf",
-            "./assets/fonts/NotoSans-BoldItalic.ttf"
+            "./assets/fonts/NotoSans-BoldItalic.ttf",
+            "./assets/fonts/NotoSans_Condensed-Blac.ttf",
+            "./assets/fonts/NotoSans_Condensed-BlackItalic.ttf",
+            "./assets/fonts/NotoSans_Condensed-ExtraBoldItalic.ttf"
           ]
         }
       ]

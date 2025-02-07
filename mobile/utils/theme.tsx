@@ -5,43 +5,44 @@ import { DefaultTheme as SCDefaultTheme } from "styled-components/native";
 
 // Define el tipo de tu tema personalizado
 export type CustomThemeType = ThemeType & {
-    colors: {
-        primary: string;
-        secondary: string;
-        accent: string;
-        background: string;
-        secondaryBackground:string,
-        text: string;
-        cardBorder: string;
-    };
-    fontFamily: {
-        normal: string;
-        bold: string
-    };
-    fontSize: {
-        small: number;
-        medium: number;
-        large: number;
-        title: number;
-        xl: number;
-    };
-    borderRadius: {
-        none: number;
-        circle: number;
-        medium: number;
-        small: number;
-        big: number;
-    };
-    spacing: {
-        none: number;
-        xs: number;
-        small: number;
-        medium: number;
-        large: number;
-        xl: number;
-    };
-    shadowColor: string;
-    name: string;
+  colors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    background: string;
+    text: string;
+    cardBorder: string;
+  };
+  fontFamily: {
+    normal: string;
+    bold: string;
+  };
+  fontSize: {
+    small: number;
+    medium: number;
+    large: number;
+    title: number;
+    xl: number;
+    xxl: number;
+    xxxl: number
+  };
+  borderRadius: {
+    none: number;
+    circle: number;
+    medium: number;
+    small: number;
+    big: number;
+  };
+  spacing: {
+    none: number;
+    xs: number;
+    small: number;
+    medium: number;
+    large: number;
+    xl: number;
+  };
+  shadowColor: string;
+  name: string;
 };
 
 // Extiende la interfaz `DefaultTheme` usando el tipo `CustomThemeType`
@@ -69,6 +70,8 @@ export const customTheme: CustomThemeType = {
     large: moderateScale(20),
     title: moderateScale(24),
     xl: moderateScale(32),
+    xxl: moderateScale(40),
+    xxxl: moderateScale(50),
   },
   borderRadius: {
     none: 0,

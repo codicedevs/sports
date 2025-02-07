@@ -19,11 +19,22 @@ const queryClient = new QueryClient()
 
 export default function App() {
   const [fontsLoaded] = useFonts({
+    'AcuminProCondensed': require('./assets/fonts/Acumin_Pro_Condensed.otf'),
+    'Coolvetica': require('./assets/fonts/coolvetica.otf'),
+
+    // Poppins Fonts
+    'Poppins-Regular': require('./assets/fonts/Poppins-Regular.ttf'),
+    'Poppins-Bold': require('./assets/fonts/Poppins-Bold.ttf'),
+
+    
     //noto sans fuente
     'NotoSans-Italic': require('./assets/fonts/NotoSans-Italic-VariableFont_wdth,wght.ttf'),
     'NotoSans-Variable' : require('./assets/fonts/NotoSans-VariableFont_wdth,wght.ttf'),
     'NotoSans-ExtraCondensed-BoldItalic': require ('./assets/fonts/NotoSans_ExtraCondensed-BoldItalic.ttf'),
-    'NotoSans-BoldItalic': require ('./assets/fonts/NotoSans-BoldItalic.ttf')
+    'NotoSans-BoldItalic': require ('./assets/fonts/NotoSans-BoldItalic.ttf'),
+    'NotoSans_Condensed-Black': require('./assets/fonts/NotoSans_Condensed-Black.ttf'),
+    'NotoSans_Condensed-BlackItalic': require('./assets/fonts/NotoSans_Condensed-BlackItalic.ttf'),
+    'NotoSans_Condensed-ExtraBoldItalic' : require('./assets/fonts/NotoSans_Condensed-ExtraBoldItalic.ttf')
   });
 
   if (!fontsLoaded) {

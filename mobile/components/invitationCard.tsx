@@ -35,7 +35,7 @@ const MatchInvitation: React.FC<MatchInvitationProps> = ({
 
       <Div flexDir="row" alignItems="center">
         <Div flexDir="row" alignItems="center">
-          <Image source={require("../assets/IconPelota.png")} />
+          <Image source={require("../assets/IconPelota.png")} style={{ width: 18, height: 18, resizeMode: "contain" }}/>
           <Text
             color="white"
             fontSize={customTheme.fontSize.medium}
@@ -46,7 +46,7 @@ const MatchInvitation: React.FC<MatchInvitationProps> = ({
           </Text>
         </Div>
 
-        <Image source={require("../assets/iconTime.png")} />
+        <Image source={require("../assets/iconTime.png")}  style={{ width: 18, height: 18, resizeMode: "contain" }} />
         <Text
           color="white"
           ml={customTheme.spacing.small}
