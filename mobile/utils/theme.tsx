@@ -75,8 +75,8 @@ export const customTheme: CustomThemeType = {
   borderRadius: {
     none: 0,
     circle: 99999,
-    medium: scale(5),
-    small: scale(8),
+    medium: scale(8),
+    small: scale(5),
     big: scale(16),
   },
   spacing: {
