@@ -32,13 +32,25 @@ function transformData(data) {
             transformedItem.location = new ObjectId(item.location.$oid);
         }
 
+        if (item.sportMode?.$oid) {
+            transformedItem.sportMode = new ObjectId(item.sportMode.$oid);
+        }
+
         if (item.userId?.$oid) {
             transformedItem.userId = new ObjectId(item.userId.$oid);
         }
 
+        if (item.sport?.$oid) {
+            transformedItem.sport = new ObjectId(item.sport.$oid);
+        }
         // Convertir _id a ObjectId si es necesario
         if (item._id && item._id.$oid) {
             transformedItem._id = new ObjectId(item._id.$oid);
+        }
+
+        // Covertir date a Date
+        if (item.date && item.date.$date) {
+            transformedItem.date = new Date(item.date.$date);
         }
 
         return transformedItem;
