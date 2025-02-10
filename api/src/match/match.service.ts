@@ -44,20 +44,20 @@ export class MatchService {
       throw new NotFoundException("Usuario no encontrado");
     }
     // Verificar si la location existe
-    
+
     let locationExist = null
-    if(location){
+    if (location) {
       locationExist = await this.locationModel.findById(location).exec();
       if (!locationExist) {
         throw new NotFoundException("Ubicación no encontrada");
       }
     }
-    
+
     let date = null
-    if(matchData.date){
+    if (matchData.date) {
       date = moment.tz(matchData.date, 'America/Argentina/Buenos_Aires').toDate();
     }
-    
+
     // Crear el partido e incluir al creador en la lista de users
     const match = new this.matchModel({
       ...matchData,
@@ -79,7 +79,7 @@ export class MatchService {
 
     // Agregar el partido al array de matches de la location
 
-    if(locationExist){
+    if (locationExist) {
       locationExist.matches.push(savedMatch.id);
       await locationExist.save();
     }
@@ -186,10 +186,12 @@ export class MatchService {
     const savedMatch = await match.save();
 
     //Creo un chatroom
-        await this.chatroomService.create({reference: {
-          type: ChatroomModelType.match,
-          id: savedMatch._id as Types.ObjectId
-        }})
+    await this.chatroomService.create({
+      reference: {
+        type: ChatroomModelType.match,
+        id: savedMatch._id as Types.ObjectId
+      }
+    })
 
     // Eliminar el matchId del array de partidos del usuario
     const matchIndex = user.matches.findIndex(
@@ -206,13 +208,171 @@ export class MatchService {
     return match;
   }
 
+  fromFieldToModel(field: string) {
+    if (field === "userId") return "users";
+    if (field === "location") return "locations";
+    if (field === "sportMode") return "sportModes";
+    return field + 's'
+  }
   async findAll(filter: Filter): Promise<FilterResponse<Match>> {
-    const results = await this.matchModel.find(filter).exec()
+    if (filter.populate && !Array.isArray(filter.populate)) {
+      filter.populate = [filter.populate];
+    }
+
+    const matchStage: any = {};
+
+    // Si hay filtros en userId o location, creamos condiciones para el $lookup
+    if (filter.where) {
+      for (const key in filter.where) {
+        if (key === "playersLimit" && typeof filter.where[key] === "string") {
+          filter.where[key] = Number(filter.where[key]);
+        }
+        if (key === "open" && typeof filter.where[key] === "string") {
+          filter.where[key] = filter.where[key] === "true";
+        }
+        if (typeof filter.where[key] === "object" && filter.where[key] !== null) {
+          for (const subKey in filter.where[key]) {
+            const fieldPath = `${key}.${subKey}`; // Notación de punto
+            // Convierte valores numéricos si es necesario
+
+            if (filter.where[key][subKey]?.LIKE) {
+              matchStage[fieldPath] = { $regex: filter.where[key][subKey].LIKE, $options: "i" };
+            } else {
+              matchStage[fieldPath] = filter.where[key][subKey];
+            }
+          }
+        } else {
+          matchStage[key] = filter.where[key];
+        }
+      }
+    }
+
+
+    const pipeline: any[] = [];
+
+    // Agregar lookups dinámicos basados en filter.populate
+    if (filter.populate) {
+      for (const field of filter.populate) {
+        pipeline.push(
+          {
+            $lookup: {
+              from: this.fromFieldToModel(field), // Se asume que la colección es el plural del campo
+              localField: field,
+              foreignField: "_id",
+              as: field,
+            },
+          },
+          {
+            $unwind: { path: "$" + field, preserveNullAndEmptyArrays: true },
+          }
+        );
+      }
+    }
+    if (filter.where && "userId" in filter.where && (!filter.populate || (filter.populate && !filter.populate.includes("userId")))) {
+      pipeline.push({
+        $lookup: {
+          from: "users", // Se asume que la colección es el plural del campo
+          localField: "userId",
+          foreignField: "_id",
+          as: "userId",
+        },
+      },
+        {
+          $unwind: { path: "$userId", preserveNullAndEmptyArrays: true },
+        }
+      );
+    }
+    if (filter.where && "location" in filter.where && (!filter.populate || (filter.populate && !filter.populate.includes("location")))) {
+      pipeline.push({
+        $lookup: {
+          from: "locations", // Se asume que la colección es el plural del campo
+          localField: "location",
+          foreignField: "_id",
+          as: "location",
+        },
+      },
+        {
+          $unwind: { path: "$location", preserveNullAndEmptyArrays: true },
+        }
+      );
+    }
+    pipeline.push({ $match: matchStage })
+    const skip = (filter.page && filter.limit) ? ((filter.page - 1) * filter.limit) : 0
+    // Aplicar paginación
+    if (skip) pipeline.push({ $skip: skip });
+    if (filter.limit) pipeline.push({ $limit: +filter.limit });
+
+    const results = await this.matchModel.aggregate(pipeline);
+
+    //Contar la cantidad total de coincidencias
+    const totalCountPipeline = [{ $match: matchStage }, { $count: "totalCount" }];
+    const countResults = await this.matchModel.aggregate(totalCountPipeline);
+    const totalCount = countResults.length > 0 ? countResults[0].totalCount : 0;
+
     return {
       results,
-      totalCount: await this.matchModel.countDocuments(filter)
-    }
+      totalCount
+    };
   }
+
+
+
+  async findAllwithouaggreagetipns(filter: Filter): Promise<FilterResponse<Match>> {
+
+    let query = this.matchModel.find(filter.where || {});
+
+    // Función para transformar propiedades con LIKE en expresiones regulares
+    const transformLikeFilters = (filterObj: Record<string, any>) => {
+      for (const key in filterObj) {
+        if (typeof filterObj[key] === "object" && filterObj[key] !== null) {
+          if ("LIKE" in filterObj[key] && typeof filterObj[key].LIKE === "string") {
+            filterObj[key] = new RegExp(filterObj[key].LIKE, "i"); // Convierte a RegExp
+          }
+        }
+      }
+    };
+
+    // Verificar si hay un filtro con userId
+    if (filter.where && filter.where["userId"]) {
+      transformLikeFilters(filter.where["userId"]); // Aplica transformación
+
+      query = query.populate({
+        path: "userId",
+        match: filter.where["userId"],
+      });
+
+      delete filter.where["userId"];
+    }
+
+    // Verificar si hay un filtro con location
+    if (filter.where && filter.where["location"]) {
+      transformLikeFilters(filter.where["location"]); // Aplica transformación
+
+      query = query.populate({
+        path: "location",
+        match: filter.where["location"],
+      });
+
+      delete filter.where["location"];
+    }
+
+    // Ejecutamos la consulta con el filtro modificado
+    const results = await query.exec();
+
+    // Filtrar los resultados para no incluir aquellos donde userId o location sea null
+    const filteredResults = results.filter(
+      (result) => result.userId !== null && result.location !== null
+    );
+
+    // Calculamos el totalCount de la consulta sin modificar el filtro
+    const totalCount = await this.matchModel.countDocuments(filter.where || {});
+
+    return {
+      results: filteredResults,
+      totalCount,
+    };
+  }
+
 
   async findOne(id: Types.ObjectId): Promise<Match> {
     const match = await this.matchModel
@@ -563,7 +723,7 @@ export class MatchService {
   }
 
   async getUsersForMatchRecommendations(match: MatchDto): Promise<User[]> {
-    if(!match.location || !match.date || !match.sportMode){
+    if (!match.location || !match.date || !match.sportMode) {
       return []
     }
     const day = this.getDay(match.dayOfWeek)
@@ -657,7 +817,7 @@ export class MatchService {
       team1: [],
       team2: [],
     };
-    if(!match.formations) match.formations = newFormations
+    if (!match.formations) match.formations = newFormations
 
     let userAlreadyIn = false;
 
@@ -702,7 +862,7 @@ export class MatchService {
       team1: [],
       team2: [],
     };
-    if(!match.formations) match.formations = newFormations
+    if (!match.formations) match.formations = newFormations
     const processTeam = (players: Player[], targetTeam: Player[]) => {
       for (const player of players) {
         if (player.userId.toString() !== userId.toString()) {
