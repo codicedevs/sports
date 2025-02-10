@@ -5,6 +5,7 @@ import { ScrollView, View } from 'react-native'
 import SportButton from '../Form/sportButton'
 import SportModeButton from '../Form/sportModeButton'
 import { useSharedValue, withTiming } from 'react-native-reanimated'
+import { scale, verticalScale } from 'react-native-size-matters'
 
 const SportInput = () => {
     const [selectedSport, setSelectedSport] = useState('');
@@ -15,7 +16,6 @@ const SportInput = () => {
     const sportAnimations = mockSport.map(() => useSharedValue(0));
     const modeAnimations = mockSportMode.map(() => useSharedValue(0));
 
-    // Función para manejar selección de deporte con fade
     const handleSelectSport = (sportId: string, index: number) => {
         setSelectedSport(sportId);
 
@@ -24,7 +24,6 @@ const SportInput = () => {
         });
     };
 
-    // Función para manejar selección de modalidad con fade
     const handleSelectMode = (modeId: string, index: number) => {
         setSelectedSportMode(modeId);
 
@@ -34,10 +33,10 @@ const SportInput = () => {
     };
 
     return (
-        <Div>
-            <Div pb={customTheme.spacing.medium} style={{ gap: 8 }}>
+        <Div py={customTheme.spacing.medium}>
+            <Div pb={customTheme.spacing.medium} style={{ gap: verticalScale(8) }}>
                 <Text fontSize={16} px={customTheme.spacing.medium}>¿Qué deporte juegan?</Text>
-                <ScrollView showsHorizontalScrollIndicator={false} horizontal contentContainerStyle={{ gap: 16 }}>
+                <ScrollView showsHorizontalScrollIndicator={false} horizontal contentContainerStyle={{ gap: scale(16) }}>
                     {mockSport.map((sport, index) => (
                         <SportButton
                             key={sport._id}
@@ -50,14 +49,12 @@ const SportInput = () => {
                     ))}
                 </ScrollView>
             </Div>
-
-            <Div px={16}>
+            <Div px={customTheme.spacing.medium}>
                 <View style={{ width: '100%', borderBottomWidth: 1, borderStyle: "dotted" }} />
             </Div>
-
-            <Div pt={customTheme.spacing.medium} style={{ gap: 8 }}>
-                <Text fontSize={16} px={16}>¿Qué modalidad?</Text>
-                <ScrollView showsHorizontalScrollIndicator={false} horizontal contentContainerStyle={{ gap: 16 }}>
+            <Div pt={customTheme.spacing.medium} style={{ gap: verticalScale(8) }}>
+                <Text fontSize={customTheme.fontSize.medium} px={customTheme.spacing.medium}>¿Qué modalidad?</Text>
+                <ScrollView showsHorizontalScrollIndicator={false} horizontal contentContainerStyle={{ gap: scale(16) }}>
                     {mockSportMode.map((mode, index) => (
                         <SportModeButton
                             key={mode._id}

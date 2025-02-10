@@ -14,8 +14,6 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
 
-
-
   return (
     <Div>
       {/* <Div style={{ padding: 10, marginTop: 30 }}>
