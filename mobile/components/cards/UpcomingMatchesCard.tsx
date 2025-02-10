@@ -30,7 +30,7 @@ const UpcomingMatchCard: React.FC<UpcomingMatchProps> = ({ fecha, cupo, titulo }
             </Div>
 
             <Text
-                fontSize={20}
+                fontSize={customTheme.fontSize.large}
                 fontFamily="NotoSans-BoldItalic"
             >
                 {titulo}    
