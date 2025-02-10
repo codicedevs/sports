@@ -1,12 +1,23 @@
 import { useEffect } from "react";
-import { TouchableWithoutFeedback, View, Text } from "react-native";
+import { TouchableWithoutFeedback, View } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from "react-native-reanimated";
 import { customTheme } from "../utils/theme";
-import { Div } from "react-native-magnus";
+import { Div, Text } from "react-native-magnus";
+import { verticalScale } from "react-native-size-matters";
 
-export const Accordion = ({ id, title, children, openId, setOpenId }) => {
-    const isOpen = openId === id; // Verifica si este acordeón está abierto
-    const height = useSharedValue(50); // ⬅ Comienza en colapsado
+interface CollapsibleViewProps {
+  id:string,
+  title: string,
+  children: React.JSX.Element,
+  openId:string | null,
+  setOpenId: React.Dispatch<React.SetStateAction<string | null>>,
+  size:number,
+  rightText:string
+}
+
+export const Accordion = ({ id, title, children, openId, setOpenId, size, rightText }: CollapsibleViewProps) => {
+    const isOpen = openId === id;
+    const height = useSharedValue(verticalScale(50));
 
     const animatedStyle = useAnimatedStyle(() => ({
         height: height.value,
@@ -14,7 +25,7 @@ export const Accordion = ({ id, title, children, openId, setOpenId }) => {
 
     useEffect(() => {
         runOnJS(setTimeout)(() => { // ⬅ Hace que la animación se ejecute correctamente
-            height.value = withTiming(isOpen ? 342 : 50, { duration: 300 });
+            height.value = withTiming(isOpen ? verticalScale(size) : verticalScale(50), { duration: 300 });
         }, 10);
     }, [isOpen]);
 
@@ -38,13 +49,13 @@ export const Accordion = ({ id, title, children, openId, setOpenId }) => {
             {
                 !isOpen &&
                 <TouchableWithoutFeedback onPress={toggleAccordion}>
-                <Div justifyContent='center' h={50} px={customTheme.spacing.medium}>
-                    <Text>{title}</Text>
-                </Div>
-            </TouchableWithoutFeedback>
+                    <Div justifyContent='space-between' flexDir="row" h={verticalScale(50)}>
+                        <Text ml={customTheme.spacing.medium} fontFamily='NotoSans-Variable' >{title}</Text>
+                        <Text mr={customTheme.spacing.medium} fontFamily='NotoSans_Condensed-Black'>{rightText}</Text>
+                    </Div>
+                </TouchableWithoutFeedback>
             }
-
-            <Div py={customTheme.spacing.medium}>
+            <Div>
                 {children}
             </Div>
         </Animated.View>

@@ -13,7 +13,7 @@ import { ImageBackground } from "react-native";
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
-  const [open, setOpen] = useState(false)
+  const [open,setOpen] = useState(true)
   return (
     <Div> /{/*carta superior de invitacion =)*/}
       <Div style={{ padding: customTheme.spacing.small, marginTop: scale(26) }}>
