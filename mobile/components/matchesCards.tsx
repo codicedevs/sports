@@ -22,7 +22,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
   maxPlayers,
 }) => {
   return (
-    <Div alignItems="center" p={customTheme.spacing.small} mt={scale(15)}>
+    <Div alignItems="center" mt={scale(15)}>
       {/* Cont Gral */}
       <Div
         borderWidth={scale(1)}
@@ -39,10 +39,17 @@ const MatchCard: React.FC<MatchCardProps> = ({
           rounded={customTheme.borderRadius.medium}
         >
           <Div justifyContent="space-evenly" alignItems="center">
-            <Text fontFamily="Notosans-Regular" fontSize={customTheme.fontSize.medium}>
+            <Text
+              fontFamily="Notosans-Regular"
+              fontSize={customTheme.fontSize.medium}
+            >
               {day}
             </Text>
-            <Text textAlign="center" fontFamily="NotoSans-ExtraBoldItalic" fontSize={customTheme.fontSize.Fourxl}>
+            <Text
+              textAlign="center"
+              fontFamily="NotoSans-ExtraBoldItalic"
+              fontSize={customTheme.fontSize.Fourxl}
+            >
               {date}
             </Text>
             <Div flexDir="row" alignItems="center">
@@ -55,29 +62,36 @@ const MatchCard: React.FC<MatchCardProps> = ({
                   tintColor: "black",
                 }}
               />
-              <Text fontFamily="Notosans-Regular" fontSize={customTheme.fontSize.medium} ml={customTheme.spacing.small}>
+              <Text
+                fontFamily="Notosans-Regular"
+                fontSize={customTheme.fontSize.medium}
+                ml={customTheme.spacing.small}
+              >
                 {time}
               </Text>
             </Div>
           </Div>
         </Div>
 
-        {/* Contenedor bco */}
+        {/* Contenedor blanco */}
         <View
           style={{
             flex: 3,
-            alignItems: "center",
             borderStyle: "dashed",
             borderLeftWidth: scale(1.2),
+            justifyContent:"space-between",
+            padding: scale(10),
           }}
         >
-          <Div >
-            <Text fontSize={customTheme.fontSize.title} p={customTheme.spacing.small} >
-              {location}
-            </Text>
+          <Div>
+            <Text fontSize={customTheme.fontSize.title}>{location}</Text>
           </Div>
-          <Div h="52%" w="100%" justifyContent="flex-end" p={customTheme.spacing.medium}>
-            <Div flexDir="row" alignItems="center" justifyContent="space-between">
+          <Div w="100%" justifyContent="flex-end">
+            <Div
+              flexDir="row"
+              alignItems="center"
+              justifyContent="space-between"
+            >
               <Div flexDir="row">
                 <Image
                   source={require("../assets/IconPelota.png")}
@@ -88,7 +102,12 @@ const MatchCard: React.FC<MatchCardProps> = ({
                     tintColor: "black",
                   }}
                 />
-                <Text fontFamily="Notosans-Regular" fontSize={customTheme.fontSize.medium} ml={scale(3)} mr={customTheme.spacing.medium}>
+                <Text
+                  fontFamily="Notosans-Regular"
+                  fontSize={customTheme.fontSize.medium}
+                  ml={scale(3)}
+                  mr={customTheme.spacing.medium}
+                >
                   {players}
                 </Text>
                 <Image
@@ -100,7 +119,11 @@ const MatchCard: React.FC<MatchCardProps> = ({
                     tintColor: "black",
                   }}
                 />
-                <Text fontFamily="Notosans-Regular" fontSize={customTheme.fontSize.medium} ml={scale(3)}>
+                <Text
+                  fontFamily="Notosans-Regular"
+                  fontSize={customTheme.fontSize.medium}
+                  ml={scale(3)}
+                >
                   {players}/{maxPlayers}
                 </Text>
               </Div>

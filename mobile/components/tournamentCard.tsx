@@ -12,7 +12,7 @@ interface TournamentCardProps {
 
 const TournamentCard: React.FC<TournamentCardProps> = ({ title, date, imageSource }) => {
   return (
-    <Div p={customTheme.spacing.small} mt={customTheme.spacing.medium} w="100%">
+    <Div mt={customTheme.spacing.medium} w="100%">
       <ImageBackground
         source={imageSource}
         resizeMode="cover"

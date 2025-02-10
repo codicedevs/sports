@@ -13,10 +13,10 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
 }) => {
   const [open, setOpen] = useState(false);
   return (
-    <Div>
+    <Div p={customTheme.spacing.small}>
       {" "}
       /{/*carta superior de invitacion =)*/}
-      <Div style={{ padding: customTheme.spacing.small, marginTop: scale(26) }}>
+      <Div style={{  marginTop: scale(26) }}>
         <MatchInvitation
           title="Ramiro te ha invitado a un partido"
           matchType="Futbol 5"
