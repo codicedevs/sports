@@ -6,6 +6,7 @@ import { Zone } from "zones/zone.entity";
 import { Sport } from "sports/sport.entity";
 import { SportMode } from "sport_modes/sport_mode.entity";
 import { Group } from "groups/group.entity";
+import { FilterPlugin } from "filter/filter.plugin";
 
 // Subschema: Interval
 @Schema({ _id: false })
@@ -112,3 +113,4 @@ export class User extends Document {
 
 
 export const UserSchema = SchemaFactory.createForClass(User);
+UserSchema.plugin(FilterPlugin);

@@ -11,6 +11,8 @@ import * as bcrypt from "bcryptjs";
 import { FindManyFilter } from "filter/filter.dto";
 import { Petition } from "petition/petition.entity";
 import { Match } from "match/match.entity";
+import { Filter, FilterResponse } from "types/types";
+
 
 @Injectable()
 export class UserService {
@@ -23,9 +25,12 @@ export class UserService {
     /**
      * @returns
      */
-    async findAll(options?: FindManyFilter<User>): Promise<User[]> {
-        const users = await this.userModel.find(options).exec();
-        return users; // Returns all users found
+    async findAll(filter: Filter): Promise<FilterResponse<User>> {
+        const results = await this.userModel.find(filter).exec();
+        return {
+            results,
+            totalCount: await this.userModel.countDocuments(filter.where),
+        };
     }
 
     /**
@@ -140,7 +145,7 @@ export class UserService {
             const hashedPassword = await bcrypt.hash(updateUserDto.password, 8);
             updateUserDto.password = hashedPassword;
         }
-    
+
         // Si el DTO contiene un perfil, agregarlo o actualizarlo
         if (updateUserDto.profile) {
             updateUserDto.profile = {
@@ -148,7 +153,7 @@ export class UserService {
                 ...updateUserDto.profile, // Actualizar con los nuevos valores
             };
         }
-    
+
         return this.userModel
             .findByIdAndUpdate(id, updateUserDto, { new: true })
             .exec();
