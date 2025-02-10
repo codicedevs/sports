@@ -18,10 +18,10 @@ const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: R
   return (
     <Modal isVisible={open} onBackButtonPress={() => setOpen(false)}>
       <Div flex={1} style={{ gap: verticalScale(16) }} p={customTheme.spacing.medium}>
-        <Accordion id={"Deportes"} openId={openId} setOpenId={setOpenId} title={'Deportes'} size={342} >
+        <Accordion id={"Deportes"} openId={openId} setOpenId={setOpenId} title={'Deportes'} rightText='Futbol 5' size={342} >
           <SportInput />
         </Accordion>
-        <Accordion id={"PlayerInput"} openId={openId} setOpenId={setOpenId} title={'Cupos'} size={123} >
+        <Accordion id={"PlayerInput"} openId={openId} setOpenId={setOpenId} title={'Cupos'} rightText='Agrega participantes' size={123} >
           <PlayersCounterInput />
         </Accordion>
       </Div>

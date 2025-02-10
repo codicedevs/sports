@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import { TouchableWithoutFeedback, View, Text } from "react-native";
+import { TouchableWithoutFeedback, View } from "react-native";
 import Animated, { useSharedValue, useAnimatedStyle, withTiming, runOnJS } from "react-native-reanimated";
 import { customTheme } from "../utils/theme";
-import { Div } from "react-native-magnus";
+import { Div, Text } from "react-native-magnus";
 import { verticalScale } from "react-native-size-matters";
 
 interface CollapsibleViewProps {
@@ -11,10 +11,11 @@ interface CollapsibleViewProps {
   children: React.JSX.Element,
   openId:string | null,
   setOpenId: React.Dispatch<React.SetStateAction<string | null>>,
-  size:number
+  size:number,
+  rightText:string
 }
 
-export const Accordion = ({ id, title, children, openId, setOpenId, size }: CollapsibleViewProps) => {
+export const Accordion = ({ id, title, children, openId, setOpenId, size, rightText }: CollapsibleViewProps) => {
     const isOpen = openId === id;
     const height = useSharedValue(verticalScale(50));
 
@@ -48,8 +49,9 @@ export const Accordion = ({ id, title, children, openId, setOpenId, size }: Coll
             {
                 !isOpen &&
                 <TouchableWithoutFeedback onPress={toggleAccordion}>
-                    <Div justifyContent='center' h={verticalScale(50)} px={customTheme.spacing.medium}>
-                        <Text>{title}</Text>
+                    <Div justifyContent='space-between' flexDir="row" h={verticalScale(50)}>
+                        <Text ml={customTheme.spacing.medium} fontFamily='NotoSans-Variable' >{title}</Text>
+                        <Text mr={customTheme.spacing.medium} fontFamily='NotoSans_Condensed-Black'>{rightText}</Text>
                     </Div>
                 </TouchableWithoutFeedback>
             }
