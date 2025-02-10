@@ -31,6 +31,7 @@ export default function App() {
    "NotoSans_SemiCondensed-ExtraBold" : require("./assets/fonts/NotoSans_SemiCondensed-ExtraBold.ttf"),
    "NotoSans-Black" : require("./assets/fonts/NotoSans-Black.ttf"),
    "NotoSans-ExtraBold" : require("./assets/fonts/NotoSans-ExtraBold.ttf"),
+   "NotoSans-ExtraBoldItalic" : require ("./assets/fonts/NotoSans-ExtraBoldItalic.ttf")
   });
 
   if (!fontsLoaded) {

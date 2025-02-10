@@ -17,7 +17,8 @@
             "./assets/fonts/NotoSans-Regular.ttf",
             "./assets/fonts/NotoSans_SemiCondensed-ExtraBold.ttf",
             "./assets/fonts/NotoSans-Black.ttf",
-            "./assets/fonts/NotoSans-ExtraBold.ttf"
+            "./assets/fonts/NotoSans-ExtraBold.ttf",
+            "./assets/fonts/NotoSans-ExtraBoldItalic.ttf"
           ]
         }
       ]
