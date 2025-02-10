@@ -9,6 +9,7 @@ import SportInput from '../matche/Inputs/sport';
 import MatchPrivacyToggleInput from '../matche/Inputs/matchPrivacyToggle';
 import { ScrollView } from 'react-native';
 import MatchSchedulerInput from '../matche/Inputs/matchScheduler';
+import SearchLocationInput from '../matche/Inputs/searchLocation';
 
 const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: React.Dispatch<React.SetStateAction<boolean>>; match?: Match }) => {
   const [openId, setOpenId] = useState<null | string>(null);
@@ -30,6 +31,9 @@ const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: R
           <Text fontSize={customTheme.fontSize.medium} color={customTheme.colors.gray} fontFamily='NotoSans-Variable'>Campos no obligatorios para crear</Text>
           <Accordion id={"Horario"} openId={openId} setOpenId={setOpenId} title={'Horario'} rightText='A definir' size={802} >
             <MatchSchedulerInput />
+          </Accordion>
+          <Accordion id={"Busqueda"} openId={openId} setOpenId={setOpenId} title={'¿Donde juegan?'} rightText='A definir' size={171} >
+            <SearchLocationInput />
           </Accordion>
         </Div>
       </ScrollView>
