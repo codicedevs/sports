@@ -26,7 +26,7 @@ const MatchInvitation: React.FC<MatchInvitationProps> = ({
       p={customTheme.spacing.medium}
     >
       <Text
-        color={customTheme.colors.secondary}
+        color={customTheme.colors.primary}
         fontSize={customTheme.fontSize.medium}
         fontFamily="NotoSans-Variable"
       >
@@ -76,7 +76,7 @@ const MatchInvitation: React.FC<MatchInvitationProps> = ({
             Rechazar
           </Text>
         </Button>
-        <Button flex={1} bg={customTheme.colors.secondary}>
+        <Button flex={1} bg={customTheme.colors.primary}>
           <Text
             fontFamily="NotoSans-BoldItalic"
             fontSize={customTheme.fontSize.medium}
