@@ -23,6 +23,8 @@ export type CustomThemeType = ThemeType & {
     large: number;
     title: number;
     xl: number;
+    xxl: number;
+    xxxl: number
   };
   borderRadius: {
     none: number;
@@ -51,14 +53,15 @@ declare module "styled-components/native" {
 export const customTheme: CustomThemeType = {
   colors: {
     primary: "#0070f3",
-    secondary: "#D9FA53",
+    secondary: "#1c1c1c",
     accent: "#e91e63",
-    background: "#f0f0f0",
+    background: "#FEFFFA",
+    secondaryBackground:"#151515E5",
     text: "#333333",
     cardBorder: "lightgray",
   },
   fontFamily: {
-    normal: "Poppins-Regular",
+    normal: "NotoSans-BoldItalic",
     bold: "Poppins-Bold",
   },
   fontSize: {
@@ -67,6 +70,8 @@ export const customTheme: CustomThemeType = {
     large: moderateScale(20),
     title: moderateScale(24),
     xl: moderateScale(32),
+    xxl: moderateScale(40),
+    xxxl: moderateScale(50),
   },
   borderRadius: {
     none: 0,
@@ -87,7 +92,7 @@ export const customTheme: CustomThemeType = {
   name: "myTheme",
   components: {
     Text: {
-      fontFamily: "Poppins-Regular",
+      fontFamily: "NotoSans-BoldItalic",
     },
   },
 };
