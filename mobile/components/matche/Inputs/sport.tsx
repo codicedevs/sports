@@ -49,11 +49,11 @@ const SportInput = () => {
                     ))}
                 </ScrollView>
             </Div>
-            <Div px={16}>
+            <Div px={customTheme.spacing.medium}>
                 <View style={{ width: '100%', borderBottomWidth: 1, borderStyle: "dotted" }} />
             </Div>
             <Div pt={customTheme.spacing.medium} style={{ gap: verticalScale(8) }}>
-                <Text fontSize={16} px={16}>¿Qué modalidad?</Text>
+                <Text fontSize={customTheme.fontSize.medium} px={customTheme.spacing.medium}>¿Qué modalidad?</Text>
                 <ScrollView showsHorizontalScrollIndicator={false} horizontal contentContainerStyle={{ gap: scale(16) }}>
                     {mockSportMode.map((mode, index) => (
                         <SportModeButton
