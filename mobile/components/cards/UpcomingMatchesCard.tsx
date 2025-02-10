@@ -5,8 +5,13 @@ import reloj from "@assets/reloj.png";
 import players from "@assets/players.png";
 import flecha from "@assets/flecha.png";
 
+type UpcomingMatchProps = {
+    fecha: string;
+    cupo: string;
+    titulo: string;
+};
 
-const UpcomingMatchCard = () => {
+const UpcomingMatchCard: React.FC<UpcomingMatchProps> = ({ fecha, cupo, titulo }) => {
     return (
         <Div
             h={verticalScale(160)}
@@ -20,7 +25,7 @@ const UpcomingMatchCard = () => {
             <Div flexDir="row">
                 <Image source={reloj} h={customTheme.spacing.medium} w={scale(15)} mt={scale(2)} mr={customTheme.spacing.xs} resizeMode="contain" />
                 <Text fontSize={customTheme.fontSize.medium} fontFamily="NotoSans-Variable">
-                    Vi 30/12 00:00
+                    {fecha}
                 </Text>
             </Div>
 
@@ -28,14 +33,15 @@ const UpcomingMatchCard = () => {
                 fontSize={20}
                 fontFamily="NotoSans-BoldItalic"
             >
-                SUPER CLUB FUTBOL 5</Text>
+                {titulo}    
+            </Text>
             <Div
                 flexDir="row"
                 justifyContent="space-between"
             >
                 <Div bg="#D9FA53" flexDir="row" >
                     <Image source={players} bg="#D9FA53" resizeMode="contain"  w={customTheme.fontSize.medium}/>
-                    <Text ml={5} fontSize={customTheme.fontSize.medium} >6/10</Text>
+                    <Text ml={5} fontSize={customTheme.fontSize.medium} >{cupo}</Text>
                 </Div>
                 <Image source={flecha}  resizeMode="contain" w={customTheme.fontSize.title} />
             </Div>

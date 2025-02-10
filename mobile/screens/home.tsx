@@ -93,7 +93,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
           <Image source={flecha} h={22} w={22} resizeMode="contain" position="absolute" right={scale(-8)} />
         </Div>
       </Div> */}
-      <UpcomingMatchCard />
+      <UpcomingMatchCard fecha={"Vi 30/12 00:00"} cupo={"6/10"} titulo={"SUPER CLUB FUTBOL 5"} />
     </Div>
   );
 };
