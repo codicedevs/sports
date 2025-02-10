@@ -54,7 +54,7 @@ declare module "styled-components/native" {
 
 export const customTheme: CustomThemeType = {
   colors: {
-    primary: "#0070f3",
+    primary: "#D9FA53",
     secondary: "#1c1c1c",
     accent: "#e91e63",
     background: "#FEFFFA",
