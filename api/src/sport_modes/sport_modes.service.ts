@@ -3,7 +3,7 @@ import { CreateSportModeDto, UpdateSportModeDto } from './sport_mode.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { SportMode } from './sport_mode.entity';
 import { Model, Types } from 'mongoose';
-import { FindManyFilter } from 'filter/filter.dto';
+import { Filter, FilterResponse } from 'types/types';
 
 @Injectable()
 export class SportModesService {
@@ -13,12 +13,15 @@ export class SportModesService {
     return createdSportMode.save()
   }
 
-  async findAll(options?: FindManyFilter<SportMode>): Promise<SportMode[]> {
-    const sportsModes = await this.sportModeModel.find(options).exec();
-    return sportsModes;
+  async findAll(filter: Filter): Promise<FilterResponse<SportMode>> {
+    const results = await this.sportModeModel.find(filter).exec();
+    return {
+      results,
+      totalCount: await this.sportModeModel.countDocuments(filter.where),
+    };
   }
 
-  async findForSports(sportIds: string[]| Types.ObjectId[]): Promise<SportMode[]> {
+  async findForSports(sportIds: string[] | Types.ObjectId[]): Promise<SportMode[]> {
     const filter = sportIds ? { sport: { $in: sportIds } } : {};
     return this.sportModeModel.find(filter).exec();
   }
