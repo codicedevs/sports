@@ -1,17 +1,16 @@
 import React, { useState } from "react";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
 import { Button, Div, Text } from "react-native-magnus";
-import { scale } from "react-native-size-matters";
 import MatchInvitation from "../components/invitationCard";
-import { Image, Modal, ScrollView, View } from "react-native";
+import { scale } from "react-native-size-matters";
 import { customTheme } from "../utils/theme";
 import TournamentCard from "../components/tournamentCard";
 import MatchCard from "../components/matchesCards";
+import UpcomingMatchCard from "../components/cards/UpcomingMatchesCard";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
-  const [open, setOpen] = useState(false);
   return (
     <Div p={customTheme.spacing.small}>
       {" "}
@@ -42,5 +41,4 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     </Div>
   );
 };
-
 export default HomeScreen;
