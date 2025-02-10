@@ -5,7 +5,16 @@ import { customTheme } from "../utils/theme";
 import { Div } from "react-native-magnus";
 import { verticalScale } from "react-native-size-matters";
 
-export const Accordion = ({ id, title, children, openId, setOpenId, size }) => {
+interface CollapsibleViewProps {
+  id:string,
+  title: string,
+  children: React.JSX.Element,
+  openId:string | null,
+  setOpenId: React.Dispatch<React.SetStateAction<string | null>>,
+  size:number
+}
+
+export const Accordion = ({ id, title, children, openId, setOpenId, size }: CollapsibleViewProps) => {
     const isOpen = openId === id;
     const height = useSharedValue(verticalScale(50));
 
@@ -39,7 +48,7 @@ export const Accordion = ({ id, title, children, openId, setOpenId, size }) => {
             {
                 !isOpen &&
                 <TouchableWithoutFeedback onPress={toggleAccordion}>
-                    <Div justifyContent='center' h={50} px={customTheme.spacing.medium}>
+                    <Div justifyContent='center' h={verticalScale(50)} px={customTheme.spacing.medium}>
                         <Text>{title}</Text>
                     </Div>
                 </TouchableWithoutFeedback>

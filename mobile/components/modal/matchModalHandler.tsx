@@ -13,20 +13,16 @@ import { Accordion } from '../collapsibleView';
 import SportInput from '../matche/Inputs/sport';
 
 const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: React.Dispatch<React.SetStateAction<boolean>>; match?: Match }) => {
-  const [openId, setOpenId] = useState(null);
- 
+  const [openId, setOpenId] = useState<null | string>(null);
 
- 
-
-  // if (!sports || !sportModes) return null;
   return (
     <Modal isVisible={open} onBackButtonPress={() => setOpen(false)}>
-      <Div flex={1} style={{gap:verticalScale(16)}} p={customTheme.spacing.medium}>
+      <Div flex={1} style={{ gap: verticalScale(16) }} p={customTheme.spacing.medium}>
         <Accordion id={"Deportes"} openId={openId} setOpenId={setOpenId} title={'Deportes'} size={342} >
           <SportInput />
         </Accordion>
-        <Accordion id={"PlayerInput"} openId={openId} setOpenId={setOpenId} title={'Cupos'} size={123}>
-        <PlayersCounterInput />
+        <Accordion id={"PlayerInput"} openId={openId} setOpenId={setOpenId} title={'Cupos'} size={123} >
+          <PlayersCounterInput />
         </Accordion>
       </Div>
     </Modal>
