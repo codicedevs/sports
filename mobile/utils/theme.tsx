@@ -11,7 +11,9 @@ export type CustomThemeType = ThemeType & {
     accent: string;
     background: string;
     text: string;
-    cardBorder: string;
+    gray: string;
+    grayBackground: string;
+    secondaryBackground: string;
   };
   fontFamily: {
     normal: string;
@@ -47,7 +49,7 @@ export type CustomThemeType = ThemeType & {
 
 // Extiende la interfaz `DefaultTheme` usando el tipo `CustomThemeType`
 declare module "styled-components/native" {
-  export interface DefaultTheme extends CustomThemeType {}
+  export interface DefaultTheme extends CustomThemeType { }
 }
 
 export const customTheme: CustomThemeType = {
@@ -56,9 +58,10 @@ export const customTheme: CustomThemeType = {
     secondary: "#1c1c1c",
     accent: "#e91e63",
     background: "#FEFFFA",
-    secondaryBackground:"#151515E5",
+    secondaryBackground: "#151515",
     text: "#333333",
-    cardBorder: "lightgray",
+    gray: "#797977",
+    grayBackground: "#DDDED9"
   },
   fontFamily: {
     normal: "NotoSans-BoldItalic",
