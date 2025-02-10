@@ -73,7 +73,7 @@ console.log(selectedHour)
                 <View style={{ width: '100%', borderBottomWidth: 1, borderStyle: "dotted" }} />
             </Div>
             <Text>¿A que hora juegan?</Text>
-            <Div mt={customTheme.spacing.medium} style={{ gap: 8 }}>
+            <Div mt={customTheme.spacing.medium} style={{ gap: verticalScale(8) }}>
                 {
                     schedules.map((schedule) => (
                         <TouchableOpacity onPress={() => setSelectedHour(schedule)}>
