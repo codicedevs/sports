@@ -1,103 +1,45 @@
-import React, { useState, useRef } from 'react';
-import { TextInput, Animated, Pressable } from 'react-native';
-import { Div, Icon, Text } from 'react-native-magnus';
-import { scale, verticalScale } from 'react-native-size-matters';
+import React, { useState } from 'react';
+import { ScrollView, TouchableOpacity } from 'react-native';
+import { Div, Text } from 'react-native-magnus';
+import { verticalScale } from 'react-native-size-matters';
 import { customTheme } from '../../../utils/theme';
+import SearchBar from '../Form/searchBar';
 
 const SearchLocationInput = () => {
     const [isEditing, setIsEditing] = useState(false);
-    const translateX = useRef(new Animated.Value(0)).current;
-    const opacity = useRef(new Animated.Value(1)).current;
+    const [filter, setFilter] = useState('')
+    const [selectedLocation, setSelectedLocation] = useState('')
 
-    const handlePress = () => {
-        Animated.parallel([
-            Animated.timing(translateX, {
-                toValue: -60,
-                duration: 200,
-                useNativeDriver: true,
-            }),
-            Animated.timing(opacity, {
-                toValue: 0,
-                duration: 150,
-                useNativeDriver: true,
-            })
-        ]).start(() => {
-            setIsEditing(true);
-        });
-    };
-
-    const handleBlur = () => {
-        setIsEditing(false);
-        Animated.parallel([
-            Animated.timing(translateX, {
-                toValue: 0,
-                duration: 200,
-                useNativeDriver: true,
-            }),
-            Animated.timing(opacity, {
-                toValue: 1,
-                duration: 150,
-                useNativeDriver: true,
-            })
-        ]).start();
-    };
+    const Locations = [
+        { id: '1', name: 'Adiur' },
+        { id: '2', name: 'Juan 23' },
+        { id: '3', name: 'El cruce' },
+        { id: '4', name: 'Loyal' },
+        { id: '5', name: 'EL DIEGO' }
+    ];
 
     return (
-        <Div p={customTheme.spacing.medium}>
+        <Div overflow='scroll' px={customTheme.spacing.medium} pt={customTheme.spacing.medium}>
             <Text mb={customTheme.spacing.medium}>¿Dónde juegan?</Text>
-            <Pressable onPress={handlePress} disabled={isEditing}>
-                <Div
-                    h={verticalScale(48)}
-                    borderWidth={1}
-                    flexDir="row"
-                    alignItems="center"
-                    justifyContent="center"
-                    px={customTheme.spacing.medium}
-                    rounded={8}
-                    overflow="hidden"
-                >
-                    <Animated.View
-                        style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            position: 'absolute',
-                            left: '50%',
-                            transform: [
-                                { translateX: scale(-40) },
-                                { translateX }
-                            ]
-                        }}
-                    >
-                        <Icon
-                            color="black"
-                            fontSize={customTheme.fontSize.medium}
-                            name="search"
-                            fontFamily="Feather"
-                        />
-                        <Animated.Text
-                            style={{
-                                marginLeft: 8,
-                                opacity,
-                                fontSize: customTheme.fontSize.medium
-                            }}
-                        >
-                            Buscar
-                        </Animated.Text>
-                    </Animated.View>
-                    {isEditing && (
-                        <TextInput
-                            autoFocus
-                            style={{
-                                flex: 1,
-                                fontSize: customTheme.fontSize.medium,
-                                marginLeft: customTheme.spacing.xl
-                            }}
-                            placeholder="Buscar ubicación..."
-                            onBlur={handleBlur}
-                        />
-                    )}
+            <SearchBar isEditing={isEditing} setIsEditing={setIsEditing} setFilter={setFilter} />
+            <ScrollView showsVerticalScrollIndicator={false}>
+                <Div mt={customTheme.spacing.medium} style={{ gap: 8 }}>
+                    {
+                        Locations.map((location, index) => (
+                            <TouchableOpacity onPress={(() => setSelectedLocation(location.id))}>
+                                <Div
+                                    h={verticalScale(48)}
+                                    mb={Locations.length - 1 === index ? customTheme.spacing.medium : 0}
+                                    bg={selectedLocation === location.id ? customTheme.colors.secondaryBackground : "white"}
+                                    justifyContent='center'
+                                    borderWidth={1}>
+                                    <Text textAlign='center' color={selectedLocation === location.id ? 'white' : customTheme.colors.secondaryBackground}>{location.name}</Text>
+                                </Div>
+                            </TouchableOpacity>
+                        ))
+                    }
                 </Div>
-            </Pressable>
+            </ScrollView>
         </Div>
     );
 };
