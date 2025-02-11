@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ScrollView, TouchableOpacity } from 'react-native';
 import { Div, Text } from 'react-native-magnus';
 import { verticalScale } from 'react-native-size-matters';
@@ -9,6 +9,7 @@ const SearchLocationInput = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [filter, setFilter] = useState('')
     const [selectedLocation, setSelectedLocation] = useState('')
+    const [filteredLocations, setFilteredLocations] = useState<{ id: string; name: string; }[]>([])
 
     const Locations = [
         { id: '1', name: 'Adiur' },
@@ -18,6 +19,20 @@ const SearchLocationInput = () => {
         { id: '5', name: 'EL DIEGO' }
     ];
 
+    useEffect(() => {
+        if (filter.trim() === '') {
+            setFilteredLocations([]); // Si no hay filtro, lista vacía
+        } else {
+            setFilteredLocations(
+                Locations.filter(loc =>
+                    loc.name.toLowerCase().includes(filter.toLowerCase())
+                )
+            );
+        }
+    }, [filter]);
+
+
+
     return (
         <Div overflow='scroll' px={customTheme.spacing.medium} pt={customTheme.spacing.medium}>
             <Text mb={customTheme.spacing.medium}>¿Dónde juegan?</Text>
@@ -25,7 +40,7 @@ const SearchLocationInput = () => {
             <ScrollView showsVerticalScrollIndicator={false}>
                 <Div mt={customTheme.spacing.medium} style={{ gap: 8 }}>
                     {
-                        Locations.map((location, index) => (
+                        (filteredLocations.length > 0 ? filteredLocations : Locations).map((location, index) => (
                             <TouchableOpacity onPress={(() => setSelectedLocation(location.id))}>
                                 <Div
                                     h={verticalScale(48)}
