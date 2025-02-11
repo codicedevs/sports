@@ -86,9 +86,7 @@ const optionsFilter = dataList.map((user) => ({
 
 const MatchTestList = () => {
   const [bordered, setBordered] = useState(true);
-  const [filter, setFilter] = useState<{}>({
-    populate: "userId",
-  });
+  const [filter, setFilter] = useState<{}>();
   const { data, isLoading, error } = useGetMatchesQuery(filter);
   const handleFilterChange = (filterName: string, value: any) => {
     setFilter((prevFilter) => ({
@@ -208,7 +206,7 @@ const MatchTestList = () => {
           </div>
         </div>
       </div>
-      <Table dataSource={data?.results || []} columns={columns} />;
+      <Table dataSource={data?.results || []} columns={columns} />
     </div>
   );
 };

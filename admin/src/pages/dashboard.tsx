@@ -4,13 +4,15 @@ import {
   DesktopOutlined,
   FileOutlined,
   PieChartOutlined,
+  SettingOutlined,
   TableOutlined,
   TeamOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
-import { Breadcrumb, Layout, Menu, theme } from "antd";
+import { Avatar, Breadcrumb, Button, Layout, Menu, theme } from "antd";
 import { Outlet, useNavigate } from "react-router-dom";
+import HeaderAdmin from "../components/header";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -51,10 +53,14 @@ const Dashboard: React.FC = () => {
     token: { colorBgContainer, borderRadiusLG },
   } = theme.useToken();
 
+  const user = {
+    name: "Nombre del Usuario",
+    avatar: "/path-to-avatar.jpg", // Cambia esto al path real de tu imagen de avatar
+  };
+
   return (
     <Layout>
-      <Header style={{ padding: 0 }} />
-
+      <HeaderAdmin />
       <Layout
         style={{
           display: "flex",
@@ -77,7 +83,7 @@ const Dashboard: React.FC = () => {
           />
         </Sider>
         <Layout>
-          <Content style={{ margin: "0 16px" }}>
+          <Content>
             {/* <Breadcrumb style={{ margin: "16px 0" }}>
               <Breadcrumb.Item>User</Breadcrumb.Item>
               <Breadcrumb.Item>Bill</Breadcrumb.Item>
@@ -95,7 +101,7 @@ const Dashboard: React.FC = () => {
             </div>
           </Content>
           <Footer style={{ textAlign: "center" }}>
-            Ant Design ©{new Date().getFullYear()} Created by Ant UED
+            Codice ©{new Date().getFullYear()}
           </Footer>
         </Layout>
       </Layout>

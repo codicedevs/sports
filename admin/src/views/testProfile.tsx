@@ -7,7 +7,7 @@ import UserList from "../components/userLists";
 const TestUserProfile = () => {
   return (
     <Card
-      style={{ width: 300, marginTop: 50, alignSelf: "center" }}
+      style={{ width: 400, marginTop: 50, alignSelf: "center" }}
       bodyStyle={{
         display: "flex",
         flexDirection: "column",
