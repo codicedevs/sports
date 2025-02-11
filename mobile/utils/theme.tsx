@@ -26,7 +26,8 @@ export type CustomThemeType = ThemeType & {
     title: number;
     xl: number;
     xxl: number;
-    xxxl: number
+    xxxl: number;
+    Fourxl: number;
   };
   borderRadius: {
     none: number;
@@ -65,7 +66,7 @@ export const customTheme: CustomThemeType = {
   },
   fontFamily: {
     normal: "NotoSans-BoldItalic",
-    bold: "Poppins-Bold",
+    bold: "NotoSans_Condensed-Black",
   },
   fontSize: {
     small: moderateScale(12),
@@ -75,6 +76,7 @@ export const customTheme: CustomThemeType = {
     xl: moderateScale(32),
     xxl: moderateScale(40),
     xxxl: moderateScale(50),
+    Fourxl: moderateScale(60)
   },
   borderRadius: {
     none: 0,

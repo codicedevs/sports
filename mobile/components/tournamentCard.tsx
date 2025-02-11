@@ -12,7 +12,7 @@ interface TournamentCardProps {
 
 const TournamentCard: React.FC<TournamentCardProps> = ({ title, date, imageSource }) => {
   return (
-    <Div p={customTheme.spacing.small} mt={customTheme.spacing.medium} w="100%">
+    <Div mt={customTheme.spacing.medium} w="100%">
       <ImageBackground
         source={imageSource}
         resizeMode="cover"
@@ -35,11 +35,11 @@ const TournamentCard: React.FC<TournamentCardProps> = ({ title, date, imageSourc
        
         <Div py={customTheme.spacing.small} px={customTheme.spacing.medium}>
           <Text
-            color={customTheme.colors.secondary}
+            color={customTheme.colors.primary}
             fontSize={customTheme.fontSize.xxl}
             fontFamily="NotoSans-BoldItalic"
             style={{
-              textShadowColor: customTheme.colors.secondary,
+              textShadowColor: customTheme.colors.primary,
               textShadowOffset: { width: 1, height: 1 },
               textShadowRadius: 0.3,
               lineHeight: customTheme.fontSize.xxl * 1.1,
