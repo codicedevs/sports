@@ -32,7 +32,7 @@ const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: R
           <Accordion id={"Horario"} openId={openId} setOpenId={setOpenId} title={'Horario'} rightText='A definir' size={802} >
             <MatchSchedulerInput />
           </Accordion>
-          <Accordion id={"Busqueda"} openId={openId} setOpenId={setOpenId} title={'¿Donde juegan?'} rightText='A definir' size={171} >
+          <Accordion id={"Busqueda"} openId={openId} setOpenId={setOpenId} title={'¿Donde juegan?'} rightText='A definir' size={300} >
             <SearchLocationInput />
           </Accordion>
         </Div>
