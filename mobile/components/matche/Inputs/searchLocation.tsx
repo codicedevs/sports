@@ -31,8 +31,6 @@ const SearchLocationInput = () => {
         }
     }, [filter]);
 
-
-
     return (
         <Div overflow='scroll' px={customTheme.spacing.medium} pt={customTheme.spacing.medium}>
             <Text mb={customTheme.spacing.medium}>¿Dónde juegan?</Text>
