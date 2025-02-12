@@ -222,6 +222,7 @@
     ],
     "matches": [
         {
+            "open": true,
             "_id": {
                 "$oid": "67003e15c94369186bbdfb32"
             },
