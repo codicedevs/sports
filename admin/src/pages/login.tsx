@@ -72,7 +72,7 @@ const LoginPage = () => {
         refreshToken: response.refresh_token,
       };
       dispatch(setCredentials(userData));
-      navigate("/dashboard");
+      navigate("/home");
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
       message.error("Error en el inicio de sesión.");

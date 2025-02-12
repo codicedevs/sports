@@ -8,7 +8,7 @@ import { ConfigProvider } from "antd";
 import DashboardHome from "./views/dashboardHome";
 import Matches from "./views/matches";
 import TestUserProfile from "./views/testProfile";
-import DashboardTest from "./pages/dashboardTest";
+import Dashboard from "./pages/dashboard";
 import { useState } from "react";
 import { lightTheme } from "./utils/theme";
 
@@ -22,8 +22,8 @@ const router = createBrowserRouter([
     element: <LoginPage />,
   },
   {
-    path: "/dashboard",
-    element: <DashboardTest />,
+    path: "/home",
+    element: <Dashboard />,
     loader: authLoader,
     children: [
       { path: "", element: <DashboardHome /> },

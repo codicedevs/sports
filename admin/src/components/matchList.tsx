@@ -11,21 +11,12 @@ import {
 import dataList from "../assets/users.json";
 import { useState } from "react";
 import { useGetMatchesQuery } from "../store/features/match/matchApi";
-import User from "../interfaces/interfaces";
 
 type SearchProps = GetProps<typeof Input.Search>;
 
 const { Search } = Input;
 
-const onSearch: SearchProps["onSearch"] = (value, _e, info) =>
-  console.log(info?.source, value);
-
 const columns = [
-  {
-    title: "Id de Partido",
-    dataIndex: "_id",
-    key: "id",
-  },
   {
     title: "Nombre del partido",
     dataIndex: "name",
@@ -40,6 +31,7 @@ const columns = [
     title: "Ciudad",
     dataIndex: "location",
     key: "location",
+    render: (location: any) => `${location.name}`,
   },
   {
     title: "Reserva hecha por",
@@ -84,10 +76,11 @@ const optionsFilter = dataList.map((user) => ({
   value: user.firstName,
 }));
 
-const MatchTestList = () => {
+const MatchList = () => {
   const [bordered, setBordered] = useState(true);
   const [filter, setFilter] = useState<{}>();
   const { data, isLoading, error } = useGetMatchesQuery(filter);
+
   const handleFilterChange = (filterName: string, value: any) => {
     setFilter((prevFilter) => ({
       ...prevFilter,
@@ -95,9 +88,18 @@ const MatchTestList = () => {
     }));
   };
 
+  const handleSearch = (value: string) => {
+    setFilter((prevFilter) => ({ ...prevFilter, search: value }));
+    console.log("lo que sale", filter);
+  };
   const handleOpenChange = () => {
     setBordered(!bordered);
     handleFilterChange("open", !bordered); // Actualiza el estado del filtro
+  };
+
+  const onSearch: SearchProps["onSearch"] = (value, _e, info) => {
+    useGetMatchesQuery(value);
+    console.log(info?.source, value);
   };
 
   return (
@@ -113,6 +115,7 @@ const MatchTestList = () => {
       >
         <Search
           placeholder="ingrese algun dato de interes"
+          onChange={(e) => handleSearch(e.target.value)}
           enterButton="Buscar"
           size="middle"
           style={{ width: "20%" }}
@@ -211,4 +214,4 @@ const MatchTestList = () => {
   );
 };
 
-export default MatchTestList;
+export default MatchList;
