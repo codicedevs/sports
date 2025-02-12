@@ -41,6 +41,7 @@ const SearchLocationInput = () => {
                         (filteredLocations.length > 0 ? filteredLocations : Locations).map((location, index) => (
                             <TouchableOpacity onPress={(() => setSelectedLocation(location.id))}>
                                 <Div
+                                    key={index}
                                     h={verticalScale(48)}
                                     mb={Locations.length - 1 === index ? customTheme.spacing.medium : 0}
                                     bg={selectedLocation === location.id ? customTheme.colors.secondaryBackground : "white"}
