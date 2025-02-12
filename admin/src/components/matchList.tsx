@@ -89,8 +89,8 @@ const MatchList = () => {
   };
 
   const handleSearch = (value: string) => {
-    setFilter((prevFilter) => ({ ...prevFilter, search: value }));
-    console.log("lo que sale", filter);
+    console.log("lo que sale", value);
+    setFilter((prevFilter) => ({ ...prevFilter, name: value }));
   };
   const handleOpenChange = () => {
     setBordered(!bordered);
@@ -99,7 +99,7 @@ const MatchList = () => {
 
   const onSearch: SearchProps["onSearch"] = (value, _e, info) => {
     useGetMatchesQuery(value);
-    console.log(info?.source, value);
+    console.log(value);
   };
 
   return (

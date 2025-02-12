@@ -1,4 +1,5 @@
 import { API_URL } from "../config";
+import objectToQueryString from "../utils/queryToString";
 import { HttpBase } from "./http";
 
 export class CrudService extends HttpBase {
@@ -6,8 +7,9 @@ export class CrudService extends HttpBase {
     super(`${API_URL}/${baseURL}`);
   }
 
-  async find(data: any, params: any): Promise<any> {
-    return this.get("", { params });
+  async find(data: any, filter: any): Promise<any> {
+    const params = objectToQueryString(filter);
+    return this.get(`?${params}`);
   }
 
   getAccessToken(): any {

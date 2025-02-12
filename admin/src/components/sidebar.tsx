@@ -60,7 +60,8 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
         marginLeft: 10,
         borderRadius: 20,
         overflow: "auto",
-        position: collapsed ? "fixed" : "relative",
+        position: "fixed",
+        width: collapsed ? "80px" : "200px",
       }}
     >
       <div style={{ display: "flex", justifyContent: "center" }}>

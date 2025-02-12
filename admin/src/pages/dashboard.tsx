@@ -18,7 +18,7 @@ const Dashboard: React.FC = () => {
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
 
       <Content
-        style={{ flex: 1, marginLeft: collapsed ? 90 : 10, padding: 15 }}
+        style={{ flex: 1, marginLeft: collapsed ? 90 : 210, padding: 15 }}
       >
         <HeaderAdmin />
         <Outlet />
