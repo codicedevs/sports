@@ -8,9 +8,14 @@ interface SportModeButtonProps {
   mode: {
     name: string;
     _id: string;
+    label: string
   };
   index: number;
-  onPress: (modeId: string, index: number) => void;
+  onPress: (modeId: {
+    name: string;
+    _id: string;
+    label: string
+  }, index: number) => void;
   selected: boolean; // Prop que indica si el botón está seleccionado
   length: number;
 }
@@ -39,7 +44,7 @@ const SportModeButton = ({ mode, index, onPress, selected, length }: SportModeBu
   }));
 
   return (
-    <TouchableWithoutFeedback onPress={() => onPress(mode._id, index)}>
+    <TouchableWithoutFeedback onPress={() => onPress(mode, index)}>
       <View>
         <Animated.View
           style={[
@@ -62,7 +67,7 @@ const SportModeButton = ({ mode, index, onPress, selected, length }: SportModeBu
               textAnimatedStyle,
             ]}
           >
-            {mode.name}
+            {mode.label ? mode.label : "5"}
           </Animated.Text>
         </Animated.View>
       </View>

@@ -11,7 +11,10 @@ interface SportButtonProps {
     _id: string
   },
   index: number,
-  onPress: (sportId: string, index: number) => void,
+  onPress: (sportId: {
+    name: string,
+    _id: string
+  }, index: number) => void,
   selected: boolean, // Indicador de selección
   length: number
 }
@@ -38,7 +41,7 @@ const SportButton = ({ sport, index, onPress, selected, length }: SportButtonPro
   }));
 
   return (
-    <TouchableWithoutFeedback onPress={() => onPress(sport._id, index)}>
+    <TouchableWithoutFeedback onPress={() => onPress(sport, index)}>
       <Div>
         <Animated.View
           style={[
