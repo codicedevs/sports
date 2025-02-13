@@ -1,9 +1,8 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, BadRequestException } from '@nestjs/common';
 import { ChatroomService } from './chatroom.service';
-import { CreateChatroomDto } from './dto/create-chatroom.dto';
-import { UpdateChatroomDto } from './dto/update-chatroom.dto';
+import { CreateChatroomDto, UpdateChatroomDto } from './chatroom.dto';
 import { Filter } from 'types/types';
-import { CreateMessageDto, SendMessageDto } from 'messages/dto/create-message.dto';
+import { CreateMessageDto, SendMessageDto } from 'messages/message.dto';
 import { MessagesService } from 'messages/messages.service';
 import { ChatroomModelType } from './chatroom.enum';
 import { ValidateObjectIdPipe } from 'pipes/validate-object-id.pipe';

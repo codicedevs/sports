@@ -4,21 +4,17 @@ import { useLoading } from "../context/loadingProvider";
 
 type FetchFunction<T> = (context: QueryFunctionContext) => Promise<T>;
 
-interface UseFetchProps<T> {
-    fn: FetchFunction<T>;
-    key: string[];
+interface UseFetchOptions<T> {
     triggerLoader?: boolean;
     options?: any;
     initialData?: T | null;
 }
 
-function useFetch<T>({
-    fn,
-    key,
-    triggerLoader = false,
-    options = {},
-    initialData = null,
-}: UseFetchProps<T>) {
+function useFetch<T>(
+    fn: FetchFunction<T>,
+    key: string[],
+    { triggerLoader = false, options = {}, initialData = null }: UseFetchOptions<T> = {}
+) {
     const { setIsLoading } = useLoading();
 
     const query = useQuery<T>({

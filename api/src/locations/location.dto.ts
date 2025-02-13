@@ -21,20 +21,4 @@ export class LocationDto extends CreateLocationDto {
   matches?: Types.ObjectId[];
 }
 
-export class UpdateLocationDto extends PartialType(CreateLocationDto) {
-  @IsNotEmpty()
-  @IsString()
-  name?: string;
-
-  @IsNotEmpty()
-  @IsString()
-  address?: string;
-
-  @IsNotEmpty()
-  @IsArray()
-  coordinates?: [number, number];
-
-  @IsOptional()
-  @IsArray()
-  matches?: Types.ObjectId[];
-}
+export class UpdateLocationDto extends PartialType(LocationDto) { }

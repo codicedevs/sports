@@ -23,14 +23,34 @@ function transformData(data) {
             transformedItem.profile.preferredSportModes = item.profile.preferredSportModes.map(mode => new ObjectId(mode.$oid));
         }
 
-        // Convertir el campo sport a ObjectId si existe
-        if (item.sport && item.sport.$oid) {
-            transformedItem.sport = new ObjectId(item.sport.$oid);
+        if (item.users) {
+            transformedItem.users = item.users.map(user => new ObjectId(user.$oid));
         }
 
+        // Convertir campos `location`, `userId` y `sportMode` a ObjectId
+        if (item.location?.$oid) {
+            transformedItem.location = new ObjectId(item.location.$oid);
+        }
+
+        if (item.sportMode?.$oid) {
+            transformedItem.sportMode = new ObjectId(item.sportMode.$oid);
+        }
+
+        if (item.userId?.$oid) {
+            transformedItem.userId = new ObjectId(item.userId.$oid);
+        }
+
+        if (item.sport?.$oid) {
+            transformedItem.sport = new ObjectId(item.sport.$oid);
+        }
         // Convertir _id a ObjectId si es necesario
         if (item._id && item._id.$oid) {
             transformedItem._id = new ObjectId(item._id.$oid);
+        }
+
+        // Covertir date a Date
+        if (item.date && item.date.$date) {
+            transformedItem.date = new Date(item.date.$date);
         }
 
         return transformedItem;
@@ -71,7 +91,7 @@ async function seedDatabase() {
         await locations.deleteMany({});
         await matches.deleteMany({});
         console.log('Cleared existing data');
-       
+
         const resultSports = await sports.insertMany(dataSports);
 
         console.log(`${resultSports.insertedCount} sports inserted`);

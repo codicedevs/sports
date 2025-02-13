@@ -1,8 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateSportModeDto } from './dto/create-sport_mode.dto';
-import { UpdateSportModeDto } from './dto/update-sport_mode.dto';
+import { CreateSportModeDto, UpdateSportModeDto } from './sport_mode.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { SportMode } from './entities/sport_mode.entity';
+import { SportMode } from './sport_mode.entity';
 import { Model, Types } from 'mongoose';
 import { FindManyFilter } from 'filter/filter.dto';
 
@@ -19,7 +18,7 @@ export class SportModesService {
     return sportsModes;
   }
 
-  async findForSports(sportIds: Types.ObjectId[]): Promise<SportMode[]> {
+  async findForSports(sportIds: string[]| Types.ObjectId[]): Promise<SportMode[]> {
     const filter = sportIds ? { sport: { $in: sportIds } } : {};
     return this.sportModeModel.find(filter).exec();
   }

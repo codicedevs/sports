@@ -8,7 +8,7 @@ import {
   MinLength,
 } from "class-validator";
 import { Location } from "locations/location.entity";
-import { SportMode } from "sport_modes/entities/sport_mode.entity";
+import { SportMode } from "sport_modes/sport_mode.entity";
 import { Formations } from "./match.entity";
 import { Types } from "mongoose";
 
@@ -41,8 +41,7 @@ export class CreateMatchDto {
   @IsArray()
   invitedUsers?: string[];
 
-  @IsOptional()
-  sportMode?: Types.ObjectId|SportMode;
+  sportMode: Types.ObjectId|SportMode;
 
   @IsOptional()
   open?: boolean;
@@ -56,34 +55,4 @@ export class MatchDto extends CreateMatchDto {
   hour?: number;
 }
 
-export class UpdateMatchDto extends PartialType(CreateMatchDto) {
-  @IsNotEmpty()
-  @IsString()
-  @MinLength(4)
-  name?: string;
-
-  @IsNotEmpty()
-  @IsString()
-  date?: string;
-
-  @IsNotEmpty()
-  @IsString()
-  location?: Types.ObjectId;
-
-  @IsNotEmpty()
-  @IsNumber()
-  playersLimit?: number;
-
-  @IsOptional()
-  @IsArray()
-  users?: Types.ObjectId[];
-
-  @IsOptional()
-  sportMode?: Types.ObjectId|SportMode;
-
-  @IsOptional()
-  open?: boolean;
-
-  @IsOptional()
-  formations?: Formations;
-}
+export class UpdateMatchDto extends PartialType(CreateMatchDto) {}

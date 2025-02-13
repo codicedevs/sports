@@ -1,14 +1,13 @@
 import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateGroupDto } from './dto/create-group.dto';
-import { UpdateGroupDto } from './dto/update-group.dto';
+import { CreateGroupDto, UpdateGroupDto } from './group.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'user/user.entity';
 import { Model, ObjectId, Types } from 'mongoose';
-import { Group } from './entities/group.entity';
+import { Group } from './group.entity';
 import { PetitionService } from 'petition/petition.service';
 import { PetitionModelType, PetitionStatus } from 'petition/petition.enum';
 import { Filter, FilterResponse } from 'types/types';
-import { Chatroom } from 'chatroom/entities/chatroom.entity';
+import { Chatroom } from 'chatroom/chatroom.entity';
 import { ChatroomService } from 'chatroom/chatroom.service';
 import { ChatroomModelType } from 'chatroom/chatroom.enum';
 

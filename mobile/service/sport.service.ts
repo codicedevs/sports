@@ -6,7 +6,7 @@ import { HttpService } from "./http.service";
         super("sports");
     }
 
-    getSports = async () => {
+    getAll = async () => {
        return await this.get("")
     }
 }

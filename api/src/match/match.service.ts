@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { model, Model, Types } from "mongoose";
+import { HydratedDocument, model, Model, Types } from "mongoose";
 import { CreateMatchDto, MatchDto, } from "./match.dto";
 import { UpdateMatchDto } from "./match.dto";
 import { Formations, Match, Player } from "./match.entity";
@@ -14,13 +14,15 @@ import { PetitionService } from "petition/petition.service";
 import { PetitionModelType, PetitionStatus } from "petition/petition.enum";
 import { Filter, FilterResponse } from "types/types";
 import * as moment from "moment-timezone"; // Para manejar zonas horarias
-import { Zone } from "zones/entities/zone.entity";
+import { Zone } from "zones/zone.entity";
 import { SportModesService } from "sport_modes/sport_modes.service";
-import { SportMode } from "sport_modes/entities/sport_mode.entity";
+import { SportMode } from "sport_modes/sport_mode.entity";
 import { PushNotificationService } from "services/pushNotificationservice";
 import { LocationsService } from "locations/locations.service";
 import { ChatroomService } from "chatroom/chatroom.service";
 import { ChatroomModelType } from "chatroom/chatroom.enum";
+import { EventEmitter2 } from "@nestjs/event-emitter";
+import { MatchUpdatedEvent } from "app-events.ts/match.events";
 
 @Injectable()
 export class MatchService {
@@ -32,7 +34,8 @@ export class MatchService {
     private readonly locationsService: LocationsService,
     private readonly sportModesService: SportModesService,
     private readonly pushNotificationService: PushNotificationService,
-    private readonly chatroomService: ChatroomService
+    private readonly chatroomService: ChatroomService,
+    private readonly eventEmitter: EventEmitter2
   ) { }
 
   // Servicio para crear partido, con o sin invitaciones
@@ -75,7 +78,7 @@ export class MatchService {
       hour: date && date.getHours(),
     }
 
-    const savedMatch = await match.save();
+    const savedMatch: HydratedDocument<Match> = await match.save();
 
     // Agregar el partido al array de matches de la location
 
@@ -110,28 +113,9 @@ export class MatchService {
         });
       }
     }
-    if (match.open === true) {
-      const eligibleUsers: User[] = await this.getUsersForMatchRecommendations(matchDto)
-      // Filtrar usuarios con `expoPushToken`
-      const tokens = eligibleUsers
-        .map((user) => user.pushToken)
-        .filter((token) => !!token);
+    this.eventEmitter.emit('match.updated', new MatchUpdatedEvent(savedMatch));
+  
 
-
-      if (tokens.length > 0) {
-        const title = '¡Nuevo partido disponible!';
-        const body = `Un partido está abierto. ¡Únete ahora!`;
-
-        await this.pushNotificationService.sendPushNotification(
-          tokens,
-          title,
-          body,
-          { matchId: match.id }, // Puedes incluir más datos
-        );
-
-      }
-
-    }
 
     return savedMatch;
   }
@@ -207,7 +191,7 @@ export class MatchService {
   }
 
   async findAll(filter: Filter): Promise<FilterResponse<Match>> {
-    const results = await this.matchModel.find(filter).limit(0)
+    const results = await this.matchModel.find(filter).exec()
     return {
       results,
       totalCount: await this.matchModel.countDocuments(filter)
@@ -237,6 +221,8 @@ export class MatchService {
     if (!match) {
       throw new NotFoundException(`Match #${id} not found`);
     }
+
+    this.eventEmitter.emit('match.updated', new MatchUpdatedEvent(match));
 
     return match;
   }
@@ -562,7 +548,7 @@ export class MatchService {
     return matches;
   }
 
-  async getUsersForMatchRecommendations(match: MatchDto): Promise<User[]> {
+  async getUsersForMatchRecommendations(match: HydratedDocument<Match>): Promise<User[]> {
     if(!match.location || !match.date || !match.sportMode){
       return []
     }

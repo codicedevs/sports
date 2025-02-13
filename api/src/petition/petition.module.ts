@@ -6,12 +6,12 @@ import { User, UserSchema } from "user/user.entity";
 import { Match, MatchSchema } from "match/match.entity";
 import { Petition, PetitionSchema } from "./petition.entity";
 import { PushNotificationService } from "services/pushNotificationservice";
-import { Group, GroupSchema } from "groups/entities/group.entity";
+import { Group, GroupSchema } from "groups/group.entity";
 import { MatchService } from "match/match.service";
 import { GroupsService } from "groups/groups.service";
 import { ChatroomService } from "chatroom/chatroom.service";
-import { Chatroom, ChatroomSchema } from "chatroom/entities/chatroom.entity";
-import { Message, MessageSchema } from "messages/entities/message.entity";
+import { Chatroom, ChatroomSchema } from "chatroom/chatroom.entity";
+import { Message, MessageSchema } from "messages/message.entity";
 
 @Module({
   imports: [

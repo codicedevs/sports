@@ -3,9 +3,9 @@ import { Text } from "react-native";
 import { Overlay, Button, Div } from "react-native-magnus";
 import { useSession } from "../../context/authProvider";
 import { customTheme } from "../../utils/theme";
-// import { GoogleSignin, GoogleSigninButton } from "@react-native-google-signin/google-signin";
 import authService from "../../service/auth.service";
-
+import { useMutate } from "../../hooks/useMutate";
+//En useSession agregue un showModal, en los lugares que no debe poder accederse sin usuario se debe preguntar si hay un currentUser y si no hay se hace un showModal() 
 const RestrictiveModal = () => {
     const { isModalVisible, hideModal, setCurrentUser } = useSession();
 
@@ -24,6 +24,21 @@ const RestrictiveModal = () => {
     //     }
     //     console.log("Google Sign-In process ended"); // Log final
     // };
+
+    const login = async () => {
+        try{
+            const res = await authService.login("orefici.diego+1@gmail.com", "12345678")
+            console.log(res)
+            setCurrentUser(res.user)
+            if(res){
+                hideModal()
+            }
+        } catch(e){
+            console.log(e)
+        }
+    }
+
+    const loginQuery = useMutate(login, (res) =>{ setCurrentUser(res.user)}, (err) => {console.error(err)})
 
     if (!isModalVisible) return
     return (
@@ -64,6 +79,15 @@ const RestrictiveModal = () => {
                     onPress={hideModal}
                 >
                     Cerrar
+                </Button>
+                <Button
+                    alignSelf="center"
+                    px="xl"
+                    bg="blue600"
+                    color="white"
+                    onPress={loginQuery}
+                >
+                    Iniciar Sesion
                 </Button>
             </Div>
         </Div>

@@ -1,158 +1,61 @@
-import React, { useState, useEffect } from "react";
-import { Text, View, ScrollView, Modal, StyleSheet } from "react-native";
-import { Button } from "react-native-magnus";
+import React, { useState } from "react";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
-import Header from "../components/header";
-import StatisticCard from "../components/statisticCard";
-import SquareCard, { SquareCardProps } from "../components/squareCard";
-import SectionPhoto from "../components/SectionPhoto";
-import MatchCard from "../components/cards/matchCard";
-import ModalAnimation from "../components/cards/animatedCard";
-import Index from "../components/matche";
-import { useSession } from "../context/authProvider";
-import authService from "../service/auth.service";
-import LottieView from "lottie-react-native";
+import { Button, Div, Text } from "react-native-magnus";
+import MatchInvitation from "../components/invitationCard";
+import { scale } from "react-native-size-matters";
+import { customTheme } from "../utils/theme";
+import TournamentCard from "../components/tournamentCard";
+import MatchCard from "../components/matchesCards";
+import UpcomingMatchCard from "../components/UpcomingMatchesCard";
+import { ScrollView } from "react-native";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
-  const [modalVisible, setModalVisible] = useState(false);
-  const [openStep, setOpenStep] = useState(false);
-  const [newModalVisible, setNewModalVisible] = useState(false);
-
-  const { setCurrentUser } = useSession();
-
-  const checkUser = async () => {
-    try {
-      const res = await authService.whoAmI();
-      setCurrentUser(res);
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  useEffect(() => {
-    checkUser();
-  }, []);
-
-  const handleStep = () => {
-    setOpenStep(true);
-  };
-
-  const cardData: SquareCardProps[] = [
-    // Datos de las tarjetas
-  ];
-
   return (
-    <View style={{ flex: 1, padding: 8 }}>
-      <Header />
-      <ScrollView
-        contentContainerStyle={{
-          padding: 10,
-          gap: 12,
-        }}
-        showsVerticalScrollIndicator={false}
-      >
-        <StatisticCard style={{ flex: 1 }} />
-        <ScrollView
-          horizontal
-          contentContainerStyle={{
-            gap: 10,
-            marginTop: 10,
-          }}
-          showsVerticalScrollIndicator={false}
-        >
-          {cardData.map((data, index) => (
-            <SquareCard
-              key={index}
-              title={data.title}
-              score={data.score}
-              hour={data.hour}
-              location={data.location}
-              backgroundimage={data.backgroundimage}
-            />
-          ))}
-        </ScrollView>
-        <SectionPhoto backGroundImage={require("../assets/photoNew.png")} />
-        <MatchCard />
-        <MatchCard />
-        <MatchCard />
-        <MatchCard />
-        <Button
-          onPress={() => navigation.navigate(AppScreens.TRIAL1_SCREEN)}
-          mt={10}
-          bg="blue600"
-        >
-          <Text style={{ color: "white" }}>Ir a Trial1 Screen</Text>
-        </Button>
-        <Button onPress={handleStep} mt={10} bg="blue600">
-          <Text style={{ color: "white" }}>Crear Partido</Text>
-        </Button>
-        <Button
-          onPress={() => setNewModalVisible(true)}
-          mt={10}
-          bg="green600"
-        >
-          <Text style={{ color: "white" }}>Abrir Nuevo Modal</Text>
-        </Button>
-        <Modal
-          transparent
-          visible={newModalVisible}
-          animationType="slide"
-          onRequestClose={() => setNewModalVisible(false)}
-        >
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              {/* Animación Lottie */}
-              <LottieView
-                source={require("../assets/lottie animation/prueba.json")} // Ruta de tu archivo .json
-                autoPlay
-                loop
-                style={{ width: 200, height: 200 }}
-              />
-             
-              <Button
-                onPress={() => setNewModalVisible(false)}
-                mt={10}
-                bg="red600"
-              >
-                <Text style={{ color: "white" }}>Cerrar Modal</Text>
-              </Button>
-            </View>
-          </View>
-        </Modal>
-        <ModalAnimation open={openStep} onFinish={() => setOpenStep(false)}>
-          <Index />
-        </ModalAnimation>
+    <Div p={customTheme.spacing.small}>
+      <ScrollView showsVerticalScrollIndicator={false}> {/* eliminar este scrool solo lo hice para mostrar todo */}
+      {" "}
+      /{/*carta superior de invitacion =)*/}
+      <Div style={{ marginTop: scale(26) }}>
+        <MatchInvitation
+          title="Ramiro te ha invitado a un partido"
+          matchType="Futbol 5"
+          date="Vi 25/01"
+          time="19:00hs"
+        />
+      </Div>{" "}
+      {/* carta del trneo =$*/}
+      <TournamentCard
+        title="TORNEO VERANO FUTBOL ONCE"
+        date="21/02"
+        imageSource={require("../assets/fotoCardTorneo.png")}
+      />
+      <ScrollView horizontal contentContainerStyle={{marginTop: 15}}>
+        {/* card upcoming */}
+        <UpcomingMatchCard fecha="Vi 30/12 " cupo="1/10" titulo="Super Club" />
+        <UpcomingMatchCard fecha="Mar 31/12 " cupo="3/22" titulo="La villa Club" />
+        <UpcomingMatchCard fecha="Lun 1/01 " cupo="9/10" titulo="Loyal" />
       </ScrollView>
-    </View>
+      <ScrollView showsVerticalScrollIndicator={false}>
+      {/* carta partidos */}
+      <MatchCard
+        day="Miércoles"
+        date="9"
+        time="22:00 hs"
+        location="LA CANCHITA DIRECCIÓN 1222"
+        players={5}
+        maxPlayers={10}
+      />
+        <MatchCard
+        day="jueve"
+        date="12"
+        time="52:00 hs"
+        location="anda a sabe"
+        players={5}
+        maxPlayers={10}
+      /></ScrollView></ScrollView>
+    </Div>
   );
 };
-
-const styles = StyleSheet.create({
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
-  },
-  modalContent: {
-    width: "80%",
-    padding: 20,
-    backgroundColor: "white",
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  modalText: {
-    fontSize: 14,
-    textAlign: "center",
-    marginBottom: 20,
-  },
-});
-
 export default HomeScreen;
