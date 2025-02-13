@@ -7,7 +7,6 @@ type Params = Promise<{ id: string }>;
 
 export async function generateMetadata(props: { params: Params }) {
     try {
-        // if i don't put an await here, the console will throw a warning
         const { id } = await props.params;
         const match = await getMatch(id);
 
@@ -18,7 +17,7 @@ export async function generateMetadata(props: { params: Params }) {
             openGraph: {
                 images: [
                     {
-                        url: 'https://dreamy-souffle-80d9a2.netlify.app//soccer-field.jpg',
+                        url: 'https://dreamy-souffle-80d9a2.netlify.app/soccer-field.jpg',
                         width: 713,
                         height: 1000,
                         alt: match.name
