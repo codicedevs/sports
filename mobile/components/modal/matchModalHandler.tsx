@@ -10,16 +10,19 @@ import MatchPrivacyToggleInput from '../matche/Inputs/matchPrivacyToggle';
 import { ScrollView } from 'react-native';
 import MatchSchedulerInput from '../matche/Inputs/matchScheduler';
 import SearchLocationInput from '../matche/Inputs/searchLocation';
+import { Sport, SportMode } from '../../types/form.type';
 
 const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: React.Dispatch<React.SetStateAction<boolean>>; match?: Match }) => {
   const [openId, setOpenId] = useState<null | string>(null);
+  const [selectedSport, setSelectedSport] = useState<Sport | null>(null);
+  const [selectedSportMode, setSelectedSportMode] = useState<SportMode | null>(null);
 
   return (
     <Modal isVisible={open} onBackButtonPress={() => setOpen(false)}>
       <ScrollView >
         <Div flex={1} style={{ gap: verticalScale(16) }} bg={customTheme.colors.background} p={customTheme.spacing.medium}>
           <Accordion id={"Deportes"} openId={openId} setOpenId={setOpenId} title={'Deporte'} rightText='Futbol 5' size={342} >
-            <SportInput />
+            <SportInput selectedSport={selectedSport} setSelectedSport={setSelectedSport} selectedSportMode={selectedSportMode} setSelectedSportMode={setSelectedSportMode} />
           </Accordion>
           <Accordion id={"PlayerInput"} openId={openId} setOpenId={setOpenId} title={'Cupo'} rightText='Agrega participantes' size={123} >
             <PlayersCounterInput />
