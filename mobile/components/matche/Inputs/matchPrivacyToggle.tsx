@@ -3,11 +3,14 @@ import { Div, Text } from 'react-native-magnus'
 import { customTheme } from '../../../utils/theme'
 import { verticalScale } from 'react-native-size-matters'
 import { TouchableOpacity } from 'react-native'
+import { PrivacyOption } from '../../../types/form.type'
 
-type PrivacyOption = 'public' | 'private';
+interface PrivacyToggleProps {
+    privacyOption: PrivacyOption,
+    setPrivacyOption: React.Dispatch<React.SetStateAction<PrivacyOption>>
+}
 
-const MatchPrivacyToggleInput = () => {
-    const [privacyOption, setPrivacyOption] = useState<PrivacyOption>('private');
+const MatchPrivacyToggleInput = ({ privacyOption, setPrivacyOption }: PrivacyToggleProps) => {
 
     const isPrivate = privacyOption === 'private';
     const isPublic = privacyOption === 'public';
