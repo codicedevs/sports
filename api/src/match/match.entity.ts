@@ -17,7 +17,6 @@ export class Player {
 
 export const PlayerSchema = SchemaFactory.createForClass(Player);
 
-
 // Subschema: Formations
 @Schema({ _id: false })
 export class Formations {
@@ -52,23 +51,28 @@ export class Match extends Document {
   @Prop()
   playersLimit?: number;
 
+  @Prop()
+  playersLeft?: number;
+
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "User", required: true })
   userId: Types.ObjectId; // Reference to the user who owns this partido
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }] })
   users?: Types.ObjectId[]; // Array users reference
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "SportMode", required: true })
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "SportMode",
+    required: true,
+  })
   sportMode: Types.ObjectId | SportMode;
 
   @Prop({ required: true, default: true })
-  open: boolean
+  open: boolean;
 
   @Prop({ type: FormationsSchema, required: false })
-  formations?: Formations
-
+  formations?: Formations;
 }
-
 
 export const MatchSchema = SchemaFactory.createForClass(Match);
 MatchSchema.plugin(FilterPlugin);
