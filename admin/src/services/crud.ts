@@ -8,7 +8,9 @@ export class CrudService extends HttpBase {
   }
 
   async find(data: any, filter: any): Promise<any> {
+    console.log("ddddd", filter);
     const params = objectToQueryString(filter);
+    console.log("asd", params);
     return this.get(`?${params}`);
   }
 

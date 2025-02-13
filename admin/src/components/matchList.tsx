@@ -76,6 +76,12 @@ const optionsFilter = dataList.map((user) => ({
   value: user.firstName,
 }));
 
+const stateOptions = [
+  { label: "Abierto", value: true },
+  { label: "Cerrado", value: false },
+  { label: "Todas", value: "all" },
+];
+
 const likeInputs = ["name", "location", "user"];
 
 const MatchList = () => {
@@ -98,9 +104,10 @@ const MatchList = () => {
       }));
     }
   };
-  const handleOpenChange = () => {
-    setBordered(!bordered);
-    handleSearch("open", !bordered); // Actualiza el estado del filtro
+  const handleOpenChange = (value: string) => {
+    console.log(value);
+
+    handleSearch("open", value); // Actualiza el estado del filtro
   };
 
   return (
@@ -111,106 +118,69 @@ const MatchList = () => {
         id="searchHeader"
         style={{
           display: "flex",
-          justifyContent: "space-between",
+          justifyContent: "flex-end",
           alignItems: "center",
           marginBottom: 20,
           gap: 10,
         }}
       >
-        <Search
-          placeholder="ingrese algun dato de interes"
-          onChange={(e) => handleSearch("name", e.target.value)}
-          enterButton="Buscar"
-          size="middle"
-          name="like-name"
-          style={{ width: "20%" }}
-          // suffix={suffix}
-        />
         <div
           style={{
             display: "flex",
-            gap: 20,
-            justifyContent: "space-between",
+            flexDirection: "column",
             alignItems: "center",
+            gap: "5px",
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "5px",
-            }}
-          >
-            <label htmlFor="switchBordered">Persona</label>
+          <label>Buscar</label>
+          <Search
+            placeholder="ingrese algun dato de interes"
+            onChange={(e) => handleSearch("name", e.target.value)}
+            size="middle"
+            name="like-name"
 
-            <Select
-              placeholder="Elegi una persona"
-              optionFilterProp="label"
-              // onChange={onChange}
-              // onSearch={onSearch}
-              options={optionsFilter}
-            />
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyItems: "space-between",
-              alignItems: "center",
-              gap: "5px",
-            }}
-          >
-            <label htmlFor="switchBordered">Estado</label>
-            <div
-              style={{
-                display: "block",
-                alignItems: "center",
-              }}
-            >
-              <Switch
-                checked={bordered}
-                onChange={() => handleOpenChange()}
-                checkedChildren="Abiertos"
-                unCheckedChildren="Cerrados"
-              />
-            </div>
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "5px",
-            }}
-          >
-            <label htmlFor="switchBordered">Turno</label>
-            <Segmented
-              value={filter}
-              onChange={setFilter}
-              options={[
-                { label: "Opcion 1", value: "Opcion 1" },
-                { label: "Opcion 2", value: "Opcion 2" },
-                { label: "Opcion 3", value: "Opcion 3" },
-              ]}
-            />
-          </div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "5px",
-            }}
-          >
-            <label htmlFor="switchBordered">Filtro Custom</label>
-            <Search
-              placeholder="ingrese algun dato de interes"
-              size="middle"
-              // suffix={suffix}
-              onSearch={handleFilterChange}
-            />
-          </div>
+            // suffix={suffix}
+          />
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "5px",
+          }}
+        >
+          <label htmlFor="switchBordered">Estado</label>
+
+          <Select
+            placeholder="Elegí un estado"
+            optionFilterProp="label"
+            onChange={handleOpenChange}
+            // onSearch={onSearch}
+            options={stateOptions}
+            style={{ width: 150, textAlign: "center" }}
+          />
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "5px",
+          }}
+        >
+          <label htmlFor="switchBordered">Turno</label>
+          <Segmented
+            value={filter}
+            onChange={setFilter}
+            options={[
+              { label: "Opcion 1", value: "Opcion 1" },
+              { label: "Opcion 2", value: "Opcion 2" },
+              { label: "Opcion 3", value: "Opcion 3" },
+            ]}
+          />
         </div>
       </div>
       <Table dataSource={data?.results || []} columns={columns} />

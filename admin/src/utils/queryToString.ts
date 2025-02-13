@@ -5,7 +5,6 @@ export default function objectToQueryString(data: Record<string, any>): string {
   for (const key in data) {
     if (Object.prototype.hasOwnProperty.call(data, key)) {
       const value = data[key];
-
       // Si el valor es un objeto (y no un array ni null)
       if (
         value !== null &&
@@ -15,21 +14,26 @@ export default function objectToQueryString(data: Record<string, any>): string {
         for (const operator in value) {
           if (Object.prototype.hasOwnProperty.call(value, operator)) {
             const opValue = value[operator];
-            if (first) {
-              queryParts.push(`where[${key}][${operator}]=${opValue}`);
-              first = false;
-            } else {
-              queryParts.push(`where[${key}][${operator}]=${opValue}`);
+
+            if (opValue !== "all") {
+              if (first) {
+                queryParts.push(`where[${key}][${operator}]=${opValue}`);
+                first = false;
+              } else {
+                queryParts.push(`where[${key}][${operator}]=${opValue}`);
+              }
             }
           }
         }
       } else {
         // Valor directo
-        if (first) {
-          queryParts.push(`where[${key}]=${value}`);
-          first = false;
-        } else {
-          queryParts.push(`where[${key}]=${value}`);
+        if (value !== "all") {
+          if (first) {
+            queryParts.push(`where[${key}]=${value}`);
+            first = false;
+          } else {
+            queryParts.push(`where[${key}]=${value}`);
+          }
         }
       }
     }
