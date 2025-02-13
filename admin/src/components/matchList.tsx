@@ -76,51 +76,55 @@ const optionsFilter = dataList.map((user) => ({
   value: user.firstName,
 }));
 
+const likeInputs = ["name", "location", "user"];
+
 const MatchList = () => {
   const [bordered, setBordered] = useState(true);
   const [filter, setFilter] = useState<{}>();
   const { data, isLoading, error } = useGetMatchesQuery(filter);
 
-  const handleFilterChange = (filterName: string, value: any) => {
-    setFilter((prevFilter) => ({
-      ...prevFilter,
-      [filterName]: value,
-    }));
-  };
+  const handleFilterChange = (filterName: string, value: any) => {};
 
-  const handleSearch = (value: string) => {
-    console.log("lo que sale", value);
-    setFilter((prevFilter) => ({ ...prevFilter, name: value }));
+  const handleSearch = (filterName: string, value: string | boolean) => {
+    if (likeInputs.includes(filterName)) {
+      setFilter((prevFilter) => ({
+        ...prevFilter,
+        [filterName]: { LIKE: value },
+      }));
+    } else {
+      setFilter((prevFilter) => ({
+        ...prevFilter,
+        [filterName]: value,
+      }));
+    }
   };
   const handleOpenChange = () => {
     setBordered(!bordered);
-    handleFilterChange("open", !bordered); // Actualiza el estado del filtro
-  };
-
-  const onSearch: SearchProps["onSearch"] = (value, _e, info) => {
-    useGetMatchesQuery(value);
-    console.log(value);
+    handleSearch("open", !bordered); // Actualiza el estado del filtro
   };
 
   return (
     <div>
       <h2>Partidos</h2>
+
       <div
+        id="searchHeader"
         style={{
           display: "flex",
           justifyContent: "space-between",
+          alignItems: "center",
           marginBottom: 20,
           gap: 10,
         }}
       >
         <Search
           placeholder="ingrese algun dato de interes"
-          onChange={(e) => handleSearch(e.target.value)}
+          onChange={(e) => handleSearch("name", e.target.value)}
           enterButton="Buscar"
           size="middle"
+          name="like-name"
           style={{ width: "20%" }}
           // suffix={suffix}
-          onSearch={onSearch}
         />
         <div
           style={{
@@ -204,7 +208,7 @@ const MatchList = () => {
               placeholder="ingrese algun dato de interes"
               size="middle"
               // suffix={suffix}
-              onSearch={onSearch}
+              onSearch={handleFilterChange}
             />
           </div>
         </div>
