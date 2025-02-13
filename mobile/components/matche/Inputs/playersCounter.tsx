@@ -1,22 +1,37 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Div, Text } from 'react-native-magnus'
 import { customTheme } from '../../../utils/theme'
 import { scale, verticalScale } from 'react-native-size-matters'
 import { TouchableOpacity } from 'react-native'
 
-const PlayersCounterInput = () => {
+interface CounterInputProps {
+    playerAmount: number,
+    playerLimit:number,
+    setPlayerLimit: React.Dispatch<React.SetStateAction<number>>
+}
+
+const PlayersCounterInput = ({ playerAmount, setPlayerLimit }: CounterInputProps) => {
     const [amount, setAmount] = useState(10)
-    const LowLimit = 10;
+    const LowLimit = playerAmount ? playerAmount * 2 : 10;
     const HighLimit = LowLimit + 5
+//REFACTORIZAR ESTO
+    useEffect(() => {
+        if (playerAmount) {
+            setAmount(playerAmount * 2)
+            setPlayerLimit(playerAmount * 2)
+        }
+    }, [playerAmount])
 
     const IncreaseAmount = () => {
         if (amount === HighLimit) return
         setAmount(prev => prev + 1)
+        setPlayerLimit(prev => prev + 1)
     }
 
     const DecreaseAmount = () => {
         if (amount === LowLimit) return
         setAmount(prev => prev - 1)
+        setPlayerLimit(prev => prev - 1)
     }
 
     return (
