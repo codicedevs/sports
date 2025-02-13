@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { Div, Text } from 'react-native-magnus'
 import { customTheme } from '../../../utils/theme';
@@ -26,33 +26,47 @@ LocaleConfig.locales['es'] = {
 LocaleConfig.defaultLocale = 'es';
 
 const schedules = [
-    { id: 1, time: 'A definir' },
+    { id: 1, time: '00:00' },
     { id: 2, time: '08:00' },
     { id: 3, time: '09:00' },
     { id: 4, time: '10:00' },
     { id: 5, time: '11:00' },
     { id: 6, time: '12:00' },
     { id: 7, time: '13:00' }
-  ];
+];
 
-const MatchSchedulerInput = () => {
-    const [selected, setSelected] = useState('');
-    const [selectedHour, setSelectedHour] = useState<{id:number,time:string} | null>(null)
-console.log(selectedHour)
+const MatchSchedulerInput = ({ setMatchDate }: { setMatchDate: React.Dispatch<React.SetStateAction<Date | null | undefined>> }) => {
+    const [selected, setSelected] = useState<Date | null>(null);
+    const [selectedHour, setSelectedHour] = useState<{ id: number, time: string }>({ id: 1, time: '00:00' })
+
+    const changeTime = (date: Date, timeString: string): Date => {
+        const [hours, minutes] = timeString.split(':').map(Number);
+        const newDate = new Date(date);
+        newDate.setHours(hours, minutes, 0, 0);
+        return newDate;
+    }
+
+    useEffect(() => {
+        if (selected) setMatchDate(changeTime(selected, selectedHour.time))
+
+    }, [selected, selectedHour])
+
     return (
         <Div px={customTheme.spacing.medium}>
             <Div mt={customTheme.spacing.medium}>
-            <Text>¿Que día juegan?</Text>
+                <Text>¿Que día juegan?</Text>
             </Div>
             <Calendar
                 locale={"es"}
                 minDate={new Date()}
                 onDayPress={day => {
-                    setSelected(day.dateString);
+                    setSelected(new Date(day.dateString));
                 }}
-                markedDates={{
-                    [selected]: { selected: true, disableTouchEvent: true, selectedDotColor: 'orange' }
-                }}
+                markedDates={
+                    selected
+                        ? { [selected.toISOString().split('T')[0]]: { selected: true, disableTouchEvent: true, selectedDotColor: 'orange' } }
+                        : {}
+                }
                 theme={{
                     backgroundColor: '#ffffff',
                     calendarBackground: '#ffffff',
@@ -77,9 +91,9 @@ console.log(selectedHour)
                 {
                     schedules.map((schedule) => (
                         <TouchableOpacity onPress={() => setSelectedHour(schedule)}>
-                        <Div h={verticalScale(48)} bg={selectedHour?.id === schedule.id? customTheme.colors.secondaryBackground : 'white'} justifyContent='center' borderWidth={1}>
-                            <Text color={selectedHour?.id === schedule.id? 'white' : customTheme.colors.secondaryBackground} textAlign='center'>{schedule.time}</Text>
-                        </Div>
+                            <Div h={verticalScale(48)} bg={selectedHour?.id === schedule.id ? customTheme.colors.secondaryBackground : 'white'} justifyContent='center' borderWidth={1}>
+                                <Text color={selectedHour?.id === schedule.id ? 'white' : customTheme.colors.secondaryBackground} textAlign='center'>{schedule.time === '00:00' ? 'A definir' : schedule.time}</Text>
+                            </Div>
                         </TouchableOpacity>
                     ))
                 }
