@@ -225,6 +225,9 @@
             "_id": {
                 "$oid": "67003e15c94369186bbdfb32"
             },
+            "sportMode": {
+                "$oid": "6751cb8844b53be83b3554cc"
+            },
             "name": "Partido 1",
             "date": {
                 "$date": "2029-10-05T14:48:00.000Z"
