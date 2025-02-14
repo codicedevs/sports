@@ -16,10 +16,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={noto.className}>
-                <div className="h-[100dvh] bg-[#FEFFFA]">
-                    <div className="grid place-items-center px-4 pt-8">
-                        <span className="text-6xl rotate-180 animate-bounce">⚽</span>
-                    </div>
+                <div className="min-h-[100dvh] pb-14">
                     <div className="max-w-[480px] mx-auto">
                         {children}
                     </div>
