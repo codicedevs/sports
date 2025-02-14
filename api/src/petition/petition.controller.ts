@@ -8,6 +8,7 @@ import {
   Delete,
   Put,
   BadRequestException,
+  Query,
 } from "@nestjs/common";
 import { PetitionService } from "./petition.service";
 import { CreatePetitionDto } from "./petition.dto";
@@ -17,6 +18,7 @@ import { PetitionModelType } from "./petition.enum";
 import { Types } from "mongoose";
 import { ValidateObjectIdPipe } from "pipes/validate-object-id.pipe";
 import { types } from "util";
+import { Filter } from "types/types";
 
 @ApiBearerAuth()
 @ApiTags('petitions')
@@ -67,8 +69,8 @@ export class PetitionController {
   }
 
   @Get()
-  findAll() {
-    return this.petitionService.findAll();
+  findAll(@Query() filter: Filter) {
+    return this.petitionService.findAll(filter);
   }
 
   @Get(":id")

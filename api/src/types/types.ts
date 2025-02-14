@@ -2,7 +2,7 @@ export interface Filter {
     page: number;
     limit: number;
     populate?: string[];
-    where?: object;
+    where?: Record<string, any>;
 }
 
 export interface FilterResponse<T> {

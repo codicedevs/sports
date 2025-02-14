@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, BadRequestException, Query } from '@nestjs/common';
 import { EventService } from './event.service';
 import { CreateEventDto, UpdateEventDto } from './event.dto';
 import { Public } from 'authentication/public';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Types } from 'mongoose';
 import { ValidateObjectIdPipe } from 'pipes/validate-object-id.pipe';
+import { Filter } from 'types/types';
 
 @Public()
 @ApiBearerAuth()
@@ -19,8 +20,8 @@ export class EventController {
     }
 
     @Get()
-    findAll() {
-        return this.eventService.findAll();
+    findAll(@Query() filter: Filter) {
+        return this.eventService.findAll(filter);
     }
 
     @Get(':id')

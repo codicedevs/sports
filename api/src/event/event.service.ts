@@ -3,6 +3,7 @@ import { CreateEventDto, UpdateEventDto } from './event.dto';
 import { Event } from './event.entity';
 import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
+import { Filter, FilterResponse } from 'types/types';
 
 @Injectable()
 export class EventService {
@@ -14,8 +15,12 @@ export class EventService {
         return await this.eventModel.create(createEventDto)
     }
 
-    async findAll(): Promise<Event[]> {
-        return await this.eventModel.find()
+    async findAll(filter: Filter): Promise<FilterResponse<Event>> {
+        const results = await this.eventModel.find(filter).exec()
+        return {
+            results,
+            totalCount: await this.eventModel.countDocuments(filter.where)
+        }
     }
 
     async findOne(id: Types.ObjectId): Promise<Event> {

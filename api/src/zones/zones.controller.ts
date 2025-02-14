@@ -5,6 +5,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { QueryValidationPipe } from 'pipes/query-validation.pipe';
 import { FindManyFilter } from 'filter/filter.dto';
 import { User } from 'user/user.entity';
+import { Filter } from 'types/types';
 
 @ApiBearerAuth()
 @ApiTags('zones')
@@ -18,9 +19,8 @@ export class ZonesController {
   }
 
   @Get()
-  findAll(@Query(QueryValidationPipe)
-  options: FindManyFilter<User>,) {
-    return this.zonesService.findAll(options);
+  findAll(@Query() filter: Filter) {
+    return this.zonesService.findAll(filter);
   }
 
   @Get(':id')
