@@ -4,6 +4,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Sport } from './sport.entity';
 import { Model, Types } from 'mongoose';
 import { FindManyFilter } from 'filter/filter.dto';
+import { Filter, FilterResponse } from 'types/types';
 
 @Injectable()
 export class SportsService {
@@ -13,9 +14,12 @@ export class SportsService {
     return createdSport.save()
   }
 
-  async findAll(options?: FindManyFilter<Sport>): Promise<Sport[]> {
-    const sports = await this.sportModel.find(options).exec();
-    return sports;
+  async findAll(filter: Filter): Promise<FilterResponse<Sport>> {
+    const results = await this.sportModel.find(filter).exec();
+    return {
+      results,
+      totalCount: await this.sportModel.countDocuments(filter.where)
+    }
   }
 
   async findOne(id: Types.ObjectId) {

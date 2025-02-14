@@ -7,7 +7,7 @@ import { ChatroomModelType } from './chatroom.enum';
 import { Match } from 'match/match.entity';
 import { User } from 'user/user.entity';
 import { Group } from 'groups/group.entity';
-import { Filter } from 'types/types';
+import { Filter, FilterResponse } from 'types/types';
 import { Message } from 'messages/message.entity';
 
 type ModelHandlers = {
@@ -132,8 +132,12 @@ export class ChatroomService {
   }
 
 
-  async findAll(filter: Filter) {
-    return this.chatroomModel.find(filter);
+  async findAll(filter: Filter): Promise<FilterResponse<Chatroom>> {
+    const results = await this.chatroomModel.find(filter).exec();
+    return {
+      results,
+      totalCount: await this.chatroomModel.countDocuments(filter.where)
+    }
   }
 
   async findOne(id: string) {

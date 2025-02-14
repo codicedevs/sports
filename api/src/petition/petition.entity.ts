@@ -2,8 +2,9 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { Document, Types } from "mongoose";
 import { PetitionModelType, PetitionStatus } from "./petition.enum";
 import { User } from "user/user.entity";
+import { FilterPlugin } from "filter/filter.plugin";
 @Schema({ _id: false })
-export class Reference{
+export class Reference {
   @Prop({
     type: String,
     enum: PetitionModelType, // Usa el enum aquí
@@ -23,7 +24,7 @@ export class Petition extends Document {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "User", required: true })
   receiver: Types.ObjectId;
 
-  @Prop({ type: referenceSchema})
+  @Prop({ type: referenceSchema })
   reference: Reference;
 
 

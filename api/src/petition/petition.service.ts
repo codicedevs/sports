@@ -14,6 +14,7 @@ import { PetitionModelType, PetitionStatus } from "./petition.enum";
 import { FindManyFilter } from "filter/filter.dto";
 import { PushNotificationService } from "services/pushNotificationservice";
 import { Group } from "groups/group.entity";
+import { Filter, FilterResponse } from "types/types";
 type ModelHandlers = {
   [key in PetitionModelType]: {
     model: Model<any>;
@@ -64,7 +65,7 @@ export class PetitionService {
     const { emitter, receiver, reference } = createPetitionDto;
     const targetId = reference.id
     const modelType = reference.type
-    
+
     // Verificar que el usuario solicitante, destinatario, y partido existan
 
     const emitterExist = await this.userModel.findById(emitter).exec();
@@ -155,7 +156,7 @@ export class PetitionService {
 
   async acceptPetition(petitionId: Types.ObjectId): Promise<Match | Group> {
     // Buscar la petición por su ID
-    
+
     const petition: Petition = await this.petitionModel
       .findById(petitionId)
       .populate("emitter")
@@ -166,7 +167,7 @@ export class PetitionService {
     if (!petition) {
       throw new NotFoundException("Solicitud no encontrada");
     }
-    
+
     const modelType = petition?.reference?.type
     const targetId = petition?.reference?.id
 
@@ -204,11 +205,11 @@ export class PetitionService {
         "No se puede aceptar la solicitud porque el partido ya ha alcanzado el límite de jugadores",
       );
     }
-    
+
 
     // Si el emisor es el creador del partido, agregar al receptor en lugar del emisor
     if ((target.userId as Types.ObjectId).equals(petition.emitter._id as Types.ObjectId)) {
-      if(target.users.includes(petition.receiver._id)){
+      if (target.users.includes(petition.receiver._id)) {
         throw new BadRequestException(`El usuario ya se encuentra en el ${translate[modelType]}`)
       }
       (target.users).push(petition.receiver._id);
@@ -221,7 +222,7 @@ export class PetitionService {
         }
       }
     } else {
-      if(target.users.includes(petition.emitter._id)){
+      if (target.users.includes(petition.emitter._id)) {
         throw new BadRequestException(`El usuario ya se encuentra en el ${translate[modelType]}`)
       }
       // En caso contrario, agregar al emisor al partido
@@ -290,7 +291,7 @@ export class PetitionService {
     const existingPetition = await this.petitionModel
       .findOne({
         emitter: new Types.ObjectId(emitterId),
-        reference:{
+        reference: {
           id: new Types.ObjectId(targetId),
           type: modelType
         }
@@ -300,9 +301,12 @@ export class PetitionService {
     return existingPetition;
   }
 
-  async findAll(options?: FindManyFilter<Petition>): Promise<Petition[]> {
-    const petitions = await this.petitionModel.find(options).exec();
-    return petitions;
+  async findAll(filter: Filter): Promise<FilterResponse<Petition>> {
+    const results = await this.petitionModel.find(filter).exec();
+    return {
+      results,
+      totalCount: await this.petitionModel.countDocuments(filter.where),
+    };
   }
 
   findOne(id: number) {

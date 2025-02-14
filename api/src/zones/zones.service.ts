@@ -4,6 +4,7 @@ import { Zone } from './zone.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { FindManyFilter } from 'filter/filter.dto';
+import { Filter, FilterResponse } from 'types/types';
 
 @Injectable()
 export class ZonesService {
@@ -15,9 +16,12 @@ export class ZonesService {
     return createdZone.save();
   }
 
-  async findAll(options?: FindManyFilter<Zone>): Promise<Zone[]> {
-    const users = await this.zoneModel.find(options).exec();
-    return users; // Returns all users found
+  async findAll(filter: Filter): Promise<FilterResponse<Zone>> {
+    const results = await this.zoneModel.find(filter).exec();
+    return {
+      results,
+      totalCount: await this.zoneModel.countDocuments(filter.where)
+    }
   }
 
   findOne(id: number) {
