@@ -5,7 +5,7 @@ const Match = ({ match }: { match: Match }) => {
     const owner = match.users.find((user: User) => user._id === match.userId)
 
     return (
-        <div className="p-4 text-[#151515]">
+        <div className="text-[#151515] p-4">
             <div className="bg-[#151515] rounded-lg p-4 grid gap-2">
                 <p title={match.name} className="text-[#D9FA53] first-letter:uppercase whitespace-nowrap text-ellipsis overflow-hidden">
                     {owner?.name} te ha invitado a un partido
@@ -30,7 +30,7 @@ const Match = ({ match }: { match: Match }) => {
                     </div>
                 </div>
                 <p title={match.name} className="text-sm text-white whitespace-nowrap text-ellipsis overflow-hidden flex items-center gap-1">
-                    <span className="text-xs">📍</span>{match.location.address}
+                    {match.location.name} - {match.location.address}
                 </p>
             </div>
             <div>
