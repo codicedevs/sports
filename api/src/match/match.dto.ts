@@ -29,6 +29,10 @@ export class CreateMatchDto {
   @IsNumber()
   playersLimit?: number;
 
+  @IsOptional()
+  @IsNumber()
+  playersLeft?: number;
+
   @IsNotEmpty()
   @IsString()
   userId: Types.ObjectId;
@@ -41,7 +45,7 @@ export class CreateMatchDto {
   @IsArray()
   invitedUsers?: string[];
 
-  sportMode: Types.ObjectId|SportMode;
+  sportMode: Types.ObjectId | SportMode;
 
   @IsOptional()
   open?: boolean;

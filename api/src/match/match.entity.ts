@@ -48,10 +48,10 @@ export class Match extends Document {
   })
   location?: Types.ObjectId | Location;
 
-  @Prop()
+  @Prop({ default: 10 })
   playersLimit?: number;
 
-  @Prop()
+  @Prop({ default: 10 })
   playersLeft?: number;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "User", required: true })
