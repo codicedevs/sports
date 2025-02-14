@@ -4,8 +4,8 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { model, Model, Types } from "mongoose";
-import { CreateMatchDto, MatchDto, } from "./match.dto";
+import { HydratedDocument, model, Model, Types } from "mongoose";
+import { CreateMatchDto, MatchDto } from "./match.dto";
 import { UpdateMatchDto } from "./match.dto";
 import { Formations, Match, Player } from "./match.entity";
 import { User } from "user/user.entity";
@@ -14,13 +14,15 @@ import { PetitionService } from "petition/petition.service";
 import { PetitionModelType, PetitionStatus } from "petition/petition.enum";
 import { Filter, FilterResponse } from "types/types";
 import * as moment from "moment-timezone"; // Para manejar zonas horarias
-import { Zone } from "zones/entities/zone.entity";
+import { Zone } from "zones/zone.entity";
 import { SportModesService } from "sport_modes/sport_modes.service";
-import { SportMode } from "sport_modes/entities/sport_mode.entity";
+import { SportMode } from "sport_modes/sport_mode.entity";
 import { PushNotificationService } from "services/pushNotificationservice";
 import { LocationsService } from "locations/locations.service";
 import { ChatroomService } from "chatroom/chatroom.service";
 import { ChatroomModelType } from "chatroom/chatroom.enum";
+import { EventEmitter2 } from "@nestjs/event-emitter";
+import { MatchUpdatedEvent } from "app-events.ts/match.events";
 
 @Injectable()
 export class MatchService {
@@ -32,8 +34,9 @@ export class MatchService {
     private readonly locationsService: LocationsService,
     private readonly sportModesService: SportModesService,
     private readonly pushNotificationService: PushNotificationService,
-    private readonly chatroomService: ChatroomService
-  ) { }
+    private readonly chatroomService: ChatroomService,
+    private readonly eventEmitter: EventEmitter2,
+  ) {}
 
   // Servicio para crear partido, con o sin invitaciones
   async createMatch(createMatchDto: CreateMatchDto): Promise<Match> {
@@ -44,20 +47,22 @@ export class MatchService {
       throw new NotFoundException("Usuario no encontrado");
     }
     // Verificar si la location existe
-    
-    let locationExist = null
-    if(location){
+
+    let locationExist = null;
+    if (location) {
       locationExist = await this.locationModel.findById(location).exec();
       if (!locationExist) {
         throw new NotFoundException("Ubicación no encontrada");
       }
     }
-    
-    let date = null
-    if(matchData.date){
-      date = moment.tz(matchData.date, 'America/Argentina/Buenos_Aires').toDate();
+
+    let date = null;
+    if (matchData.date) {
+      date = moment
+        .tz(matchData.date, "America/Argentina/Buenos_Aires")
+        .toDate();
     }
-    
+
     // Crear el partido e incluir al creador en la lista de users
     const match = new this.matchModel({
       ...matchData,
@@ -66,20 +71,19 @@ export class MatchService {
       location: location,
       dayOfWeek: date && date.getDay(),
       hour: date && date.getHours(),
-
-    })
+    });
     const matchDto: MatchDto = {
       ...createMatchDto,
       location: location,
       dayOfWeek: date && date.getDay(),
       hour: date && date.getHours(),
-    }
+    };
 
-    const savedMatch = await match.save();
+    const savedMatch: HydratedDocument<Match> = await match.save();
 
     // Agregar el partido al array de matches de la location
 
-    if(locationExist){
+    if (locationExist) {
       locationExist.matches.push(savedMatch.id);
       await locationExist.save();
     }
@@ -104,39 +108,21 @@ export class MatchService {
           receiver: new Types.ObjectId(invitedUserId), // Convertir receiver a ObjectId
           reference: {
             id: savedMatch.id,
-            type: PetitionModelType.match
+            type: PetitionModelType.match,
           },
           status: PetitionStatus.Pending,
         });
       }
     }
-    if (match.open === true) {
-      const eligibleUsers: User[] = await this.getUsersForMatchRecommendations(matchDto)
-      // Filtrar usuarios con `expoPushToken`
-      const tokens = eligibleUsers
-        .map((user) => user.pushToken)
-        .filter((token) => !!token);
-
-
-      if (tokens.length > 0) {
-        const title = '¡Nuevo partido disponible!';
-        const body = `Un partido está abierto. ¡Únete ahora!`;
-
-        await this.pushNotificationService.sendPushNotification(
-          tokens,
-          title,
-          body,
-          { matchId: match.id }, // Puedes incluir más datos
-        );
-
-      }
-
-    }
+    this.eventEmitter.emit("match.updated", new MatchUpdatedEvent(savedMatch));
 
     return savedMatch;
   }
 
-  async addUserToMatch(matchId: Types.ObjectId, userId: Types.ObjectId): Promise<Match> {
+  async addUserToMatch(
+    matchId: Types.ObjectId,
+    userId: Types.ObjectId,
+  ): Promise<Match> {
     const match = await this.matchModel.findById(matchId).exec();
     const user = await this.userModel.findById(userId).exec();
 
@@ -149,7 +135,15 @@ export class MatchService {
       throw new BadRequestException("El usuario ya está agregado al match");
     }
 
+    // Verificar si el partido ya ha alcanzado el límite de jugadores
+    if (match.playersLimit && match.users.length >= match.playersLimit) {
+      throw new BadRequestException(
+        "No se puede aceptar la solicitud porque el partido ya ha alcanzado el límite de jugadores",
+      );
+    }
+
     match.users.push(userId);
+    this.eventEmitter.emit("player.added", new MatchUpdatedEvent(match));
 
     return match.save();
   }
@@ -186,10 +180,12 @@ export class MatchService {
     const savedMatch = await match.save();
 
     //Creo un chatroom
-        await this.chatroomService.create({reference: {
-          type: ChatroomModelType.match,
-          id: savedMatch._id as Types.ObjectId
-        }})
+    await this.chatroomService.create({
+      reference: {
+        type: ChatroomModelType.match,
+        id: savedMatch._id as Types.ObjectId,
+      },
+    });
 
     // Eliminar el matchId del array de partidos del usuario
     const matchIndex = user.matches.findIndex(
@@ -202,16 +198,17 @@ export class MatchService {
     }
     // Guardar el usuario actualizado
     await user.save();
+    this.eventEmitter.emit("player.removed", new MatchUpdatedEvent(match));
 
     return match;
   }
 
   async findAll(filter: Filter): Promise<FilterResponse<Match>> {
-    const results = await this.matchModel.find(filter).limit(0)
+    const results = await this.matchModel.find(filter).exec();
     return {
       results,
-      totalCount: await this.matchModel.countDocuments(filter)
-    }
+      totalCount: await this.matchModel.countDocuments(filter),
+    };
   }
 
   async findOne(id: Types.ObjectId): Promise<Match> {
@@ -227,7 +224,10 @@ export class MatchService {
     return match;
   }
 
-  async update(id: Types.ObjectId, updateMatchDto: UpdateMatchDto): Promise<Match> {
+  async update(
+    id: Types.ObjectId,
+    updateMatchDto: UpdateMatchDto,
+  ): Promise<Match> {
     const match = await this.matchModel
       .findByIdAndUpdate(id, updateMatchDto, {
         new: true,
@@ -237,6 +237,9 @@ export class MatchService {
     if (!match) {
       throw new NotFoundException(`Match #${id} not found`);
     }
+    console.log("Match updated", updateMatchDto);
+    console.log(match);
+    this.eventEmitter.emit("match.updated", new MatchUpdatedEvent(match));
 
     return match;
   }
@@ -314,46 +317,46 @@ export class MatchService {
         date: { $gte: now },
         $or: [
           { playersLimit: null }, // Permitir partidos sin límite de jugadores
-          { $expr: { $lt: [{ $size: "$users" }, "$playersLimit"] } } // Comparar solo si playersLimit existe
-        ]
+          { $expr: { $lt: [{ $size: "$users" }, "$playersLimit"] } }, // Comparar solo si playersLimit existe
+        ],
       })
       .populate("location");
   }
-
 
   //Lo dejamos por las dudas, pero a priori no lo vamos a usar, filtra por la disponibilidad horaria del usuario
   async getMatchesForUserDate(userId: string): Promise<Match[]> {
     // Paso 1: Obtener la disponibilidad del usuario
     const user = await this.userModel
       .findById(userId)
-      .select('profile.availability')
+      .select("profile.availability")
       .exec();
 
     if (!user || !user.profile?.availability) {
-      throw new Error('User not found or no availability defined.');
+      throw new Error("User not found or no availability defined.");
     }
 
     // Paso 2: Procesar disponibilidad
-    const availabilityFilters = user.profile.availability.map((availability) => {
-      const { day, intervals } = availability;
+    const availabilityFilters = user.profile.availability.map(
+      (availability) => {
+        const { day, intervals } = availability;
 
-      // Convertir día de la semana a índices
-      const dayIndex = this.getDayIndex(day);
+        // Convertir día de la semana a índices
+        const dayIndex = this.getDayIndex(day);
 
-      return {
-        dayIndex,
-        intervals,
-      };
-    });
+        return {
+          dayIndex,
+          intervals,
+        };
+      },
+    );
 
     // Paso 3: Construir la consulta
-
 
     const matches = await this.matchModel.aggregate([
       {
         $match: {
           $or: availabilityFilters.map(({ dayIndex, intervals }) => ({
-            dayOfWeek: dayIndex,  // Usamos dayOfWeek que ya está en UTC-3
+            dayOfWeek: dayIndex, // Usamos dayOfWeek que ya está en UTC-3
             $or: intervals.map((interval) => ({
               hour: { $gte: interval.startHour, $lt: interval.endHour }, // Usamos hour que ya está en UTC-3
             })),
@@ -370,12 +373,12 @@ export class MatchService {
     // Obtener el usuario con sus zonas preferidas
     const user = await this.userModel
       .findById(userId)
-      .populate('profile.preferredZones')
+      .populate("profile.preferredZones")
       .exec();
 
     if (!user || !user.profile?.preferredZones?.length) {
       throw new NotFoundException(
-        'El usuario no tiene zonas preferidas o no existe.',
+        "El usuario no tiene zonas preferidas o no existe.",
       );
     }
 
@@ -407,9 +410,8 @@ export class MatchService {
             },
           },
         },
-      }
+      },
     ]);
-
 
     return matches;
   }
@@ -419,12 +421,12 @@ export class MatchService {
     // Paso 1: Obtener los modos de deporte preferidos del usuario
     const user = await this.userModel
       .findById(userId)
-      .select('profile.preferredSportModes') // Solo traer el campo necesario
+      .select("profile.preferredSportModes") // Solo traer el campo necesario
       .exec();
 
     if (!user || !user.profile?.preferredSportModes?.length) {
       throw new NotFoundException(
-        'El usuario no tiene modos de deporte preferidos o no existe.',
+        "El usuario no tiene modos de deporte preferidos o no existe.",
       );
     }
 
@@ -440,17 +442,18 @@ export class MatchService {
     return matches;
   }
 
-
   async getMatchesForUserRecommendation(userId: string): Promise<Match[]> {
     // Obtener información del usuario
     const user = await this.userModel
       .findById(userId)
-      .populate('profile.preferredZones profile.preferredSportModes')
-      .select('profile.availability profile.preferredZones profile.preferredSportModes profile.preferredSports')
+      .populate("profile.preferredZones profile.preferredSportModes")
+      .select(
+        "profile.availability profile.preferredZones profile.preferredSportModes profile.preferredSports",
+      )
       .exec();
 
     if (!user) {
-      throw new Error('User not found.');
+      throw new Error("User not found.");
     }
 
     // Validar disponibilidad y zonas preferidas
@@ -458,7 +461,7 @@ export class MatchService {
     const preferredZones = (user.profile?.preferredZones as Zone[]) || [];
 
     if (!availability.length || !preferredZones.length) {
-      throw new Error('User has no availability or preferred zones.');
+      throw new Error("User has no availability or preferred zones.");
     }
 
     // Procesar disponibilidad
@@ -474,11 +477,13 @@ export class MatchService {
       };
     });
 
-    let preferredSportModes: SportMode[] = (user.profile?.preferredSportModes as SportMode[]) || []
+    let preferredSportModes: SportMode[] =
+      (user.profile?.preferredSportModes as SportMode[]) || [];
     if (preferredSportModes.length == 0) {
-      preferredSportModes = (await this.sportModesService.findForSports(user.profile.preferredSports as Types.ObjectId[])) as SportMode[]
+      preferredSportModes = (await this.sportModesService.findForSports(
+        user.profile.preferredSports as Types.ObjectId[],
+      )) as SportMode[];
     }
-
 
     // Crear coordenadas de zonas preferidas
     const zonePolygons = preferredZones.map((zone: Zone) => zone.location);
@@ -487,51 +492,61 @@ export class MatchService {
     const matches = await this.matchModel.aggregate([
       {
         $match: {
-          open: true
-        }
-
+          open: true,
+        },
       },
       // Combinar con Location
       {
         $lookup: {
-          from: 'locations', // Colección de Location
-          localField: 'location', // Campo en Match
-          foreignField: '_id', // Campo en Location
-          as: 'location',
+          from: "locations", // Colección de Location
+          localField: "location", // Campo en Match
+          foreignField: "_id", // Campo en Location
+          as: "location",
         },
       },
-      { $unwind: '$location' }, // Descomponer array de ubicación
+      { $unwind: "$location" }, // Descomponer array de ubicación
       // Filtro por zonas
 
-      ...(zonePolygons.length > 0 ? [{
-        $match: {
-          'location.location': {
-            $geoWithin: {
-              $geometry: {
-                type: 'MultiPolygon',
-                coordinates: zonePolygons.map((polygon) => polygon.coordinates),
+      ...(zonePolygons.length > 0
+        ? [
+            {
+              $match: {
+                "location.location": {
+                  $geoWithin: {
+                    $geometry: {
+                      type: "MultiPolygon",
+                      coordinates: zonePolygons.map(
+                        (polygon) => polygon.coordinates,
+                      ),
+                    },
+                  },
+                },
               },
             },
-          },
-        },
-      }] : []),
+          ]
+        : []),
 
       // Filtro por disponibilidad
-      ...(availabilityFilters.length > 0 ? [{
-        $match: {
-          $or: availabilityFilters.map(({ dayIndex, intervals }) => ({
-            dayOfWeek: dayIndex,  // Usamos dayOfWeek que ya está en UTC-3
-            $or: intervals.map((interval) => ({
-              hour: { $gte: interval.startHour, $lt: interval.endHour }, // Usamos hour que ya está en UTC-3
-            })),
-          })),
-        },
-      },] : []),
-
+      ...(availabilityFilters.length > 0
+        ? [
+            {
+              $match: {
+                $or: availabilityFilters.map(({ dayIndex, intervals }) => ({
+                  dayOfWeek: dayIndex, // Usamos dayOfWeek que ya está en UTC-3
+                  $or: intervals.map((interval) => ({
+                    hour: { $gte: interval.startHour, $lt: interval.endHour }, // Usamos hour que ya está en UTC-3
+                  })),
+                })),
+              },
+            },
+          ]
+        : []),
 
       {
         $match: {
-          sportMode: { $in: preferredSportModes.map((mode: SportMode) => mode._id) }, // Asegúrate de que son ObjectId
+          sportMode: {
+            $in: preferredSportModes.map((mode: SportMode) => mode._id),
+          }, // Asegúrate de que son ObjectId
         },
       },
 
@@ -539,52 +554,52 @@ export class MatchService {
 
       {
         $lookup: {
-          from: 'users', // Colección de Users
-          localField: 'users', // Campo en Match
-          foreignField: '_id', // Campo en Users
-          as: 'users', // Nombre de la propiedad a llenar
+          from: "users", // Colección de Users
+          localField: "users", // Campo en Match
+          foreignField: "_id", // Campo en Users
+          as: "users", // Nombre de la propiedad a llenar
         },
       },
       // Puedes hacer un unwind si lo necesitas para objetos relacionados
-      { $unwind: { path: '$users', preserveNullAndEmptyArrays: true } },
+      { $unwind: { path: "$users", preserveNullAndEmptyArrays: true } },
       {
         $lookup: {
-          from: 'sportmodes', // Colección de SportsModes
-          localField: 'sportMode', // Campo en Match
-          foreignField: '_id', // Campo en SportsModes
-          as: 'sportMode', // Nombre de la propiedad a llenar
+          from: "sportmodes", // Colección de SportsModes
+          localField: "sportMode", // Campo en Match
+          foreignField: "_id", // Campo en SportsModes
+          as: "sportMode", // Nombre de la propiedad a llenar
         },
       },
-
     ]);
-
 
     return matches;
   }
 
-  async getUsersForMatchRecommendations(match: MatchDto): Promise<User[]> {
-    if(!match.location || !match.date || !match.sportMode){
-      return []
+  async getUsersForMatchRecommendations(
+    match: HydratedDocument<Match>,
+  ): Promise<User[]> {
+    if (!match.location || !match.date || !match.sportMode) {
+      return [];
     }
-    const day = this.getDay(match.dayOfWeek)
-    const hour = match.hour
-    const locationId = (match.location) as Types.ObjectId
-    const location = await this.locationsService.findOne(locationId)
-    const sportModeId = new Types.ObjectId(match.sportMode as Types.ObjectId)
-    const sportMode = await this.sportModesService.findById(sportModeId)
-    const sportId = sportMode.sport
+    const day = this.getDay(match.dayOfWeek);
+    const hour = match.hour;
+    const locationId = match.location as Types.ObjectId;
+    const location = await this.locationsService.findOne(locationId);
+    const sportModeId = new Types.ObjectId(match.sportMode as Types.ObjectId);
+    const sportMode = await this.sportModesService.findById(sportModeId);
+    const sportId = sportMode.sport;
     const users = await this.userModel.aggregate([
       {
         $match: {
           $or: [
             // Usuarios con preferredSportModes que incluyen sportModeId
-            { 'profile.preferredSportModes': sportModeId },
+            { "profile.preferredSportModes": sportModeId },
             // Usuarios sin preferredSportModes y con preferredSports que coincidan con sportId
             {
               $and: [
-                { 'profile.preferredSportModes': { $exists: true } },
-                { 'profile.preferredSportModes': { $size: 0 } },
-                { 'profile.preferredSports': sportId },
+                { "profile.preferredSportModes": { $exists: true } },
+                { "profile.preferredSportModes": { $size: 0 } },
+                { "profile.preferredSports": sportId },
               ],
             },
           ],
@@ -595,8 +610,8 @@ export class MatchService {
           from: "zones",
           localField: "profile.preferredZones",
           foreignField: "_id",
-          as: "preferredZones"
-        }
+          as: "preferredZones",
+        },
       },
       {
         $match: {
@@ -604,49 +619,54 @@ export class MatchService {
 
           $or: [
             {
-              'preferredZones.location': {
+              "preferredZones.location": {
                 $geoIntersects: {
                   $geometry: location.location,
-                }
-              }
+                },
+              },
             },
             {
-              'preferredZones': { $size: 0 }
-            }
-          ]
+              preferredZones: { $size: 0 },
+            },
+          ],
         },
       },
       {
         $match: {
           // Validar disponibilidad del usuario
-          $or: [{
-            'profile.availability': {
-              $elemMatch: {
-                day: day,
-                intervals: {
-                  $elemMatch: {
-                    startHour: { $lte: hour }, // Intervalo incluye la hora del Match
-                    endHour: { $gt: hour },
+          $or: [
+            {
+              "profile.availability": {
+                $elemMatch: {
+                  day: day,
+                  intervals: {
+                    $elemMatch: {
+                      startHour: { $lte: hour }, // Intervalo incluye la hora del Match
+                      endHour: { $gt: hour },
+                    },
                   },
                 },
               },
-            }
-          },
-          {
-            $and: [
-              { 'profile.preferredSportModes': { $exists: true } },
-              { 'profile.availability': { $size: 0 } }
-            ]
-          }
-          ]
+            },
+            {
+              $and: [
+                { "profile.preferredSportModes": { $exists: true } },
+                { "profile.availability": { $size: 0 } },
+              ],
+            },
+          ],
         },
       },
-
-    ])
+    ]);
     return users;
   }
 
-  async addUserToFormation(userId: Types.ObjectId, matchId: Types.ObjectId, team: 1 | 2, position: number): Promise<Formations> {
+  async addUserToFormation(
+    userId: Types.ObjectId,
+    matchId: Types.ObjectId,
+    team: 1 | 2,
+    position: number,
+  ): Promise<Formations> {
     const match = await this.matchModel.findById(matchId).exec();
     if (!match) {
       throw new Error("Match not found");
@@ -657,7 +677,7 @@ export class MatchService {
       team1: [],
       team2: [],
     };
-    if(!match.formations) match.formations = newFormations
+    if (!match.formations) match.formations = newFormations;
 
     let userAlreadyIn = false;
 
@@ -667,9 +687,12 @@ export class MatchService {
         if (player.userId.toString() === userId.toString()) {
           userAlreadyIn = true;
           player.position = position; // Actualizar posición
-          team === 1 ? newFormations.team1.push(player) : newFormations.team2.push(player);
+          team === 1
+            ? newFormations.team1.push(player)
+            : newFormations.team2.push(player);
         } else {
-          if (player.position !== position) //Si hay alguien en la misma posición y equipo no lo agregamos
+          if (player.position !== position)
+            //Si hay alguien en la misma posición y equipo no lo agregamos
             targetTeam.push(player); // Conservar jugadores que no se modifican
         }
       }
@@ -682,7 +705,9 @@ export class MatchService {
     // Si no estaba en ninguno de los equipos, agregarlo
     if (!userAlreadyIn) {
       const newPlayer: Player = { position, userId };
-      team === 1 ? newFormations.team1.push(newPlayer) : newFormations.team2.push(newPlayer);
+      team === 1
+        ? newFormations.team1.push(newPlayer)
+        : newFormations.team2.push(newPlayer);
     }
 
     // Actualizar el partido en la base de datos
@@ -692,7 +717,10 @@ export class MatchService {
     return newFormations;
   }
 
-  async removeUserFromFormation(matchId: Types.ObjectId, userId: Types.ObjectId) {
+  async removeUserFromFormation(
+    matchId: Types.ObjectId,
+    userId: Types.ObjectId,
+  ) {
     const match = await this.matchModel.findById(matchId).exec();
     if (!match) {
       throw new Error("Match not found");
@@ -702,14 +730,14 @@ export class MatchService {
       team1: [],
       team2: [],
     };
-    if(!match.formations) match.formations = newFormations
+    if (!match.formations) match.formations = newFormations;
     const processTeam = (players: Player[], targetTeam: Player[]) => {
       for (const player of players) {
         if (player.userId.toString() !== userId.toString()) {
-          targetTeam.push(player)
+          targetTeam.push(player);
         }
       }
-    }
+    };
 
     // Procesar ambos equipos
     processTeam(match.formations.team1, newFormations.team1);
@@ -725,28 +753,27 @@ export class MatchService {
   // Convertir día de la semana a índice (igual que antes)
   private getDayIndex(day: string): number {
     const days = [
-      'Sunday',
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
     ];
     return days.indexOf(day); // MongoDB usa Domingo como 0, Lunes como 1, etc.
   }
 
   private getDay(index: number): string {
     const days = [
-      'Sunday',
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
+      "Sunday",
+      "Monday",
+      "Tuesday",
+      "Wednesday",
+      "Thursday",
+      "Friday",
+      "Saturday",
     ];
-    return days[index]
+    return days[index];
   }
-
-}  
+}

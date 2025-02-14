@@ -20,6 +20,7 @@ import { MessagesModule } from './messages/messages.module';
 import { ChatroomModule } from './chatroom/chatroom.module';
 
 import { GroupsModule } from './groups/groups.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 @Module({
   imports: [
     SentryModule.forRoot(),
@@ -30,6 +31,7 @@ import { GroupsModule } from './groups/groups.module';
       // useNewUrlParser: true,
       // useUnifiedTopology: true,
     }),
+    EventEmitterModule.forRoot(),
     UserModule,
     AuthenticationModule,
     MatchModule,

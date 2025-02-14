@@ -4,10 +4,10 @@ import { Button, Select } from 'react-native-magnus';
 import { UserPreferences } from '../types/preferences.type';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import sportService from '../service/sport.service';
-import sportModesService from '../service/sport-modes.service';
 import { Picker } from '@react-native-picker/picker';
 import zonesService from '../service/zones.service';
 import userService from '../service/user.service';
+import sportmodeService from '../service/sportmode.service';
 
 interface StepSportProps {
   userInfo: UserPreferences;
@@ -31,8 +31,8 @@ export const StepSport: React.FC<StepSportProps> = ({ userInfo, setUserInfo, onN
 
   const bringSports = async () => {
     try {
-      const resMode = await sportModesService.getSportModes();
-      const res = await sportService.getSports();
+      const resMode = await sportmodeService.getAll();
+      const res = await sportService.getAll();
       setSports(res.data);
       console.log(res.data)
       setSportModes(resMode.data);

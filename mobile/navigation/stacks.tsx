@@ -8,6 +8,8 @@ import SettingsScreen from "../screens/settings";
 import Trialscreen from "../screens/trial";
 import Trialscreen2 from "../screens/trial2";
 import { AppScreens } from "./screens";
+import MatchDetail from "../screens/matchDetail";
+import CustomTabBar from "../components/layout/customTabBar";
 
 const SettingsStack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator()
@@ -22,12 +24,20 @@ export function HomeStackScreen() {
             screenOptions={{
                 headerShown: false
             }}>
-            <Drawer.Screen name={AppScreens.HOME_SCREEN} component={(props) => (
+            <HomeStack.Screen name={AppScreens.HOME_SCREEN} component={(props) => (
                 <FadeWrapper>
                     <HomeScreen {...props} />
                 </FadeWrapper>
             )} />
-            <Drawer.Screen name={AppScreens.TRIAL1_SCREEN} component={Trialscreen} />
+              <HomeStack.Screen options={{ tabBarStyle: { display: "none" } }} name={AppScreens.MATCH_DETAIL} component={(props) => (
+                //CUANDO HAGA EL CUSTOM TAB PUEDO HACER Q NO APAREZCA EN ESTA TAB EN ESPECIFICO
+                <FadeWrapper>
+                    <MatchDetail {...props} />
+                </FadeWrapper>
+            )} 
+            />
+            <HomeStack.Screen name={AppScreens.TRIAL1_SCREEN} component={Trialscreen} />
+            
         </HomeStack.Navigator>
     );
 }
@@ -47,9 +57,11 @@ export function SettingsStackScreen() {
 
 export function TabStackScreen() {
     return (
-        <Tab.Navigator screenOptions={{ headerShown: false }}>
+        <Tab.Navigator tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
             <Tab.Screen name="HomeStack" component={HomeStackScreen} />
             <Tab.Screen name="SettingsStack" component={SettingsStackScreen} />
+            <Tab.Screen name="SettingsStack1" component={SettingsStackScreen} />
+            <Tab.Screen name="SettingsStack2" component={SettingsStackScreen} />
         </Tab.Navigator>
     )
 }

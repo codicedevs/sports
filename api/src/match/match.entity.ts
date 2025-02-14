@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { FilterPlugin } from "filter/filter.plugin";
 import { Location } from "locations/location.entity";
 import mongoose, { Document, Types } from "mongoose";
-import { SportMode } from "sport_modes/entities/sport_mode.entity";
+import { SportMode } from "sport_modes/sport_mode.entity";
 import { User } from "user/user.entity";
 
 // Sub-subschema: Player
@@ -16,7 +16,6 @@ export class Player {
 }
 
 export const PlayerSchema = SchemaFactory.createForClass(Player);
-
 
 // Subschema: Formations
 @Schema({ _id: false })
@@ -49,8 +48,11 @@ export class Match extends Document {
   })
   location?: Types.ObjectId | Location;
 
-  @Prop()
+  @Prop({ default: 10 })
   playersLimit?: number;
+
+  @Prop({ default: 10 })
+  playersLeft?: number;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "User", required: true })
   userId: Types.ObjectId; // Reference to the user who owns this partido
@@ -58,17 +60,19 @@ export class Match extends Document {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }] })
   users?: Types.ObjectId[]; // Array users reference
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "SportMode", required: true })
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "SportMode",
+    required: true,
+  })
   sportMode: Types.ObjectId | SportMode;
 
   @Prop({ required: true, default: true })
-  open: boolean
+  open: boolean;
 
   @Prop({ type: FormationsSchema, required: false })
-  formations?: Formations
-
+  formations?: Formations;
 }
-
 
 export const MatchSchema = SchemaFactory.createForClass(Match);
 MatchSchema.plugin(FilterPlugin);

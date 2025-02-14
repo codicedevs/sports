@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ZonesService } from './zones.service';
 import { ZonesController } from './zones.controller';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Zone, ZoneSchema } from './entities/zone.entity';
+import { Zone, ZoneSchema } from './zone.entity';
 
 @Module({
   imports: [
