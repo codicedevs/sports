@@ -106,10 +106,10 @@ function JoinMatch() {
         )
     }
 
-    if (hasJoined) {
+    if (!hasJoined) {
         return (
             <div className="p-4">
-                <p className="first-letter:uppercase whitespace-nowrap text-ellipsis overflow-hidden italic">
+                <p className="first-letter:uppercase whitespace-nowrap text-ellipsis overflow-hidden italic mb-4">
                     Te has unido al partido
                 </p>
                 <button
