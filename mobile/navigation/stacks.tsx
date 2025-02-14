@@ -62,6 +62,8 @@ export function TabStackScreen() {
             <Tab.Screen name="SettingsStack" component={SettingsStackScreen} />
             <Tab.Screen name="SettingsStack1" component={SettingsStackScreen} />
             <Tab.Screen name="SettingsStack2" component={SettingsStackScreen} />
+            <Tab.Screen name="SettingsStack3" component={SettingsStackScreen} />
+
         </Tab.Navigator>
     )
 }

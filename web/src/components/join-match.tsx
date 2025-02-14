@@ -14,16 +14,10 @@ import getMatch from "@/services/get-match"
 import Match from "@/components/match"
 
 function JoinMatch() {
-    const [open, setOpen] = useState(false)
-    const [name, setName] = useState('')
     const [hasJoined, setHasJoined] = useState(false)
     const [match, setMatch] = useState<Match | null>(null)
     const [loading, setLoading] = useState(true)
-    const { id }: { id: string } = useParams()
-
-    function toggle() {
-        setOpen(() => !open)
-    }
+    const params = useParams() as { id: string } | null
 
     async function gmailSSO() {
         try {
@@ -52,7 +46,10 @@ function JoinMatch() {
     }
     async function joinPlayer(userId: string) {
         try {
-            await joinPlayerToMatch(id, userId)
+            if (!params?.id) {
+                throw new Error('ID de partido no encontrado')
+            }
+            await joinPlayerToMatch(params?.id, userId)
             fetchMatch()
             setHasJoined(true)
             toast.success('Te has unido al partido 💛!')
@@ -68,10 +65,13 @@ function JoinMatch() {
     async function fetchMatch() {
         try {
             setLoading(true)
-            const res = await getMatch(id)
+            if (!params?.id) {
+                throw new Error('ID de partido no encontrado')
+            }
+            const res = await getMatch(params?.id)
             setMatch(res)
         } catch (error) {
-            console.error("Error al traer el partido:", error);
+            console.error("Error al traer el partido:", error)
         } finally {
             setLoading(false)
         }
@@ -107,9 +107,9 @@ function JoinMatch() {
         return (
             <button
                 onClick={copyToClipboard}
-                className="bg-[#0a2b1d] text-white p-2 m-4 rounded text-sm flex items-center gap-2 w-fit mx-auto"
+                className="bg-[#151515] text-white py-2 px-4 m-4 text-sm flex items-center justify-center gap-2 w-full italic"
             >
-                Compartir enlace
+                Compartir
                 <Image src={whatsapp} alt="whatsapp" className="w-5 h-5" />
             </button>
         )
@@ -118,30 +118,17 @@ function JoinMatch() {
     return (
         <>
             {match && <Match match={match} />}
-            <div className={`fixed bg-[#0a2b1d] bottom-0 w-full rounded-t-lg duration-300 transition-all ${open ? 'h-1/3' : 'h-14'}`}>
-                <button onClick={toggle} className={`p-4  w-full transition-all ${open ? 'text-right' : 'text-center'}`}>
-                    <p className="font-semibold text-white text-sm">
-                        {open ? '❌' : 'Unirse al partido'}
-                    </p>
-                </button>
-                <form className="px-4 text-white">
-                    <label className="text-xs font-semibold">Nombre</label>
-                    <input
-                        required
-                        className="w-full bg-[#0a2b1d] outline-white border-[#D9D9D950] border rounded-md p-2"
-                        placeholder="Lionel Messi"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                    />
-                </form>
-                {open && name && (
-                    <button
-                        onClick={gmailSSO}
-                        className="bg-[#115e2a] text-white p-2 m-4 rounded text-xs flex ml-auto"
-                    >
-                        CONFIRMAR
+            <div className="fixed bottom-0 max-w-[480px] w-full rounded-t-lg">
+                <div className="bg-[#D9FA53] rounded-t-lg">
+                    <button onClick={gmailSSO} className="p-4 text-xl font-bold flex justify-center items-center italic gap-2 w-full">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                            <path d="M18 7.875H10.125V0H7.875V7.875H0V10.125H7.875V18H10.125V10.125H18V7.875Z" fill="#151515" />
+                        </svg>
+                        <p className="font-bold text-[#0a2b1d] text-xl">
+                            Unirse al partido
+                        </p>
                     </button>
-                )}
+                </div>
             </div>
         </>
     )

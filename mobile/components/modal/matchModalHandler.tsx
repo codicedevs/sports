@@ -1,30 +1,42 @@
-import React, { useEffect, useState } from 'react';
-import { Button, Div, Overlay, Text, Input, Modal } from "react-native-magnus";
-import { Keyboard, ScrollView, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
-import matchService from '../../service/match.service';
-import { useSession } from '../../context/authProvider';
-import { AppScreens } from '../../navigation/screens';
-import { navigate } from '../../utils/navigation';
+import React, { useState } from 'react';
+import { Div, Text, Modal } from "react-native-magnus";
 import Match from '../../types/match.type';
 import { customTheme } from '../../utils/theme';
-import { scale, verticalScale } from 'react-native-size-matters';
+import { verticalScale } from 'react-native-size-matters';
 import PlayersCounterInput from '../matche/Inputs/playersCounter';
 import { Accordion } from '../collapsibleView';
 import SportInput from '../matche/Inputs/sport';
+import MatchPrivacyToggleInput from '../matche/Inputs/matchPrivacyToggle';
+import { ScrollView } from 'react-native';
+import MatchSchedulerInput from '../matche/Inputs/matchScheduler';
+import SearchLocationInput from '../matche/Inputs/searchLocation';
 
 const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: React.Dispatch<React.SetStateAction<boolean>>; match?: Match }) => {
   const [openId, setOpenId] = useState<null | string>(null);
 
   return (
     <Modal isVisible={open} onBackButtonPress={() => setOpen(false)}>
-      <Div flex={1} style={{ gap: verticalScale(16) }} p={customTheme.spacing.medium}>
-        <Accordion id={"Deportes"} openId={openId} setOpenId={setOpenId} title={'Deportes'} rightText='Futbol 5' size={342} >
-          <SportInput />
-        </Accordion>
-        <Accordion id={"PlayerInput"} openId={openId} setOpenId={setOpenId} title={'Cupos'} rightText='Agrega participantes' size={123} >
-          <PlayersCounterInput />
-        </Accordion>
-      </Div>
+      <ScrollView >
+        <Div flex={1} style={{ gap: verticalScale(16) }} bg={customTheme.colors.background} p={customTheme.spacing.medium}>
+          <Accordion id={"Deportes"} openId={openId} setOpenId={setOpenId} title={'Deporte'} rightText='Futbol 5' size={342} >
+            <SportInput />
+          </Accordion>
+          <Accordion id={"PlayerInput"} openId={openId} setOpenId={setOpenId} title={'Cupo'} rightText='Agrega participantes' size={123} >
+            <PlayersCounterInput />
+          </Accordion>
+          <Accordion id={"PrivacyToggle"} openId={openId} setOpenId={setOpenId} title={'Privacidad'} rightText='Privada' size={134} >
+            <MatchPrivacyToggleInput />
+          </Accordion>
+          <Div borderBottomWidth={1} borderBottomColor={customTheme.colors.gray} />
+          <Text fontSize={customTheme.fontSize.medium} color={customTheme.colors.gray} fontFamily='NotoSans-Variable'>Campos no obligatorios para crear</Text>
+          <Accordion id={"Horario"} openId={openId} setOpenId={setOpenId} title={'Horario'} rightText='A definir' size={802} >
+            <MatchSchedulerInput />
+          </Accordion>
+          <Accordion id={"Busqueda"} openId={openId} setOpenId={setOpenId} title={'¿Donde juegan?'} rightText='A definir' size={300} >
+            <SearchLocationInput />
+          </Accordion>
+        </Div>
+      </ScrollView>
     </Modal>
   );
 };

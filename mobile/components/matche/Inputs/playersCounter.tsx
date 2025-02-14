@@ -24,11 +24,11 @@ const PlayersCounterInput = () => {
             <Text fontSize={customTheme.fontSize.medium}>Cupo</Text>
             <Div flexDir='row' flex={1} justifyContent='center' alignItems='center' w={'100%'} >
                 <TouchableOpacity onPress={DecreaseAmount}>
-                    <Div w={scale(119)} h={verticalScale(56)} justifyContent='center' bg={amount === LowLimit ? '#DDDED9' : '#151515'}><Text color={amount === LowLimit ? '#9A9B98' : 'white'} textAlign='center' fontSize={customTheme.fontSize.xl}>-</Text></Div>
+                    <Div w={scale(119)} h={verticalScale(56)} justifyContent='center' bg={amount === LowLimit ? customTheme.colors.grayBackground : customTheme.colors.secondaryBackground}><Text color={amount === LowLimit ? customTheme.colors.gray : 'white'} textAlign='center' fontSize={customTheme.fontSize.xl}>-</Text></Div>
                 </TouchableOpacity>
                 <Div w={scale(56)} h={verticalScale(56)} justifyContent='center'><Text fontSize={customTheme.fontSize.xl} fontFamily='NotoSans_Condensed-BlackItalic' textAlign='center'>{amount}</Text></Div>
                 <TouchableOpacity onPress={IncreaseAmount}>
-                    <Div w={scale(119)} h={verticalScale(56)} justifyContent='center' bg={amount === HighLimit ? '#DDDED9' : '#151515'}><Text color={amount === HighLimit ? '#9A9B98' : 'white'} textAlign='center' fontSize={customTheme.fontSize.xl}>+</Text></Div>
+                    <Div w={scale(119)} h={verticalScale(56)} justifyContent='center' bg={amount === HighLimit ? customTheme.colors.grayBackground : customTheme.colors.secondaryBackground}><Text color={amount === HighLimit ? customTheme.colors.gray : 'white'} textAlign='center' fontSize={customTheme.fontSize.xl}>+</Text></Div>
                 </TouchableOpacity>
             </Div>
         </Div>
