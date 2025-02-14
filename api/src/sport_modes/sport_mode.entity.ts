@@ -16,4 +16,3 @@ export class SportMode extends Document {
 }
 
 export const SportModeSchema = SchemaFactory.createForClass(SportMode);
-SportModeSchema.plugin(FilterPlugin);

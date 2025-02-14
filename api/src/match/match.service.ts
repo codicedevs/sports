@@ -23,6 +23,8 @@ import { ChatroomService } from "chatroom/chatroom.service";
 import { ChatroomModelType } from "chatroom/chatroom.enum";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { MatchUpdatedEvent } from "app-events.ts/match.events";
+import { MatchView } from "./match-view.model";
+
 
 @Injectable()
 export class MatchService {
@@ -30,6 +32,7 @@ export class MatchService {
     @InjectModel(Match.name) private readonly matchModel: Model<Match>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Location.name) private readonly locationModel: Model<Location>,
+    @InjectModel(MatchView.name) private readonly matchViewModel: Model<MatchView>,
     private readonly petitionService: PetitionService,
     private readonly locationsService: LocationsService,
     private readonly sportModesService: SportModesService,
@@ -114,7 +117,7 @@ export class MatchService {
       }
     }
     this.eventEmitter.emit('match.updated', new MatchUpdatedEvent(savedMatch));
-  
+
 
 
     return savedMatch;
@@ -192,93 +195,13 @@ export class MatchService {
     return match;
   }
 
-  private fromFieldToModel(field: string) {
-    const mapping: Record<string, string> = {
-      userId: "users",
-      location: "locations",
-      sportMode: "sportModes"
-    };
-    return mapping[field] || `${field}s`;
-  }
-
-  private processFilterWhere(where: any): any {
-    const matchStage: any = {};
-
-    const processObject = (obj: any, parentKey = "") => {
-      for (const key in obj) {
-        const fieldPath = parentKey ? `${parentKey}.${key}` : key;
-        if (key === "playersLimit" && typeof obj[key] === "string") {
-          obj[key] = Number(obj[key]);
-        }
-  
-        if (key === "open" && typeof obj[key] === "string") {
-          obj[key] = obj[key] === "true";
-        }
-
-        if (obj[key] && typeof obj[key] === "object") {
-          if ("LIKE" in obj[key]) {
-            matchStage[fieldPath] = { $regex: obj[key].LIKE, $options: "i" };
-          } else {
-            processObject(obj[key], fieldPath);
-          }
-        } else {
-          matchStage[fieldPath] = obj[key];
-        }
-      }
-    };
-
-    processObject(where);
-
-    return matchStage;
-  }
-
-  private buildLookupPipeline(populate: string[]): any[] {
-    return populate.flatMap((field) => [
-      {
-        $lookup: {
-          from: this.fromFieldToModel(field),
-          localField: field,
-          foreignField: "_id",
-          as: field
-        }
-      },
-      {
-        $unwind: { path: `$${field}`, preserveNullAndEmptyArrays: true }
-      }
-    ]);
-  }
-
-  async findAll(filter: Filter): Promise<FilterResponse<Match>> {
-    filter.populate = Array.isArray(filter.populate) ? filter.populate : filter.populate ? [filter.populate] : [];
-
-    const matchStage = filter.where ? this.processFilterWhere(filter.where) : {};
-    const pipeline: any[] = this.buildLookupPipeline(filter.populate);
-
-    if (filter.where?.userId && !filter.populate.includes("userId")) {
-      pipeline.push(...this.buildLookupPipeline(["userId"]));
+  async findAll(filter: Filter): Promise<FilterResponse<MatchView>> {
+    const results = await this.matchViewModel.find(filter).exec()
+    return {
+      results,
+      totalCount: await this.matchViewModel.countDocuments(filter.where)
     }
-    if (filter.where?.location && !filter.populate.includes("location")) {
-      pipeline.push(...this.buildLookupPipeline(["location"]));
-    }
-
-    pipeline.push({ $match: matchStage });
-
-    if (filter.page && filter.limit) {
-      pipeline.push({ $skip: (filter.page - 1) * filter.limit });
-    }
-    if (filter.limit) {
-      pipeline.push({ $limit: +filter.limit });
-    }
-
-    const results = await this.matchModel.aggregate(pipeline);
-
-    // Contar total de coincidencias
-    const countResults = await this.matchModel.aggregate([{ $match: matchStage }, { $count: "totalCount" }]);
-    const totalCount = countResults.length > 0 ? countResults[0].totalCount : 0;
-
-    return { results, totalCount };
   }
-
 
   async findOne(id: Types.ObjectId): Promise<Match> {
     const match = await this.matchModel
@@ -631,7 +554,7 @@ export class MatchService {
   }
 
   async getUsersForMatchRecommendations(match: HydratedDocument<Match>): Promise<User[]> {
-    if(!match.location || !match.date || !match.sportMode){
+    if (!match.location || !match.date || !match.sportMode) {
       return []
     }
     const day = this.getDay(match.dayOfWeek)
