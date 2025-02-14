@@ -20,13 +20,9 @@ import { MessagesModule } from './messages/messages.module';
 import { ChatroomModule } from './chatroom/chatroom.module';
 
 import { GroupsModule } from './groups/groups.module';
-<<<<<<< Updated upstream
 import { EventEmitterModule } from '@nestjs/event-emitter';
-=======
-import { MatchViewService } from 'match/match-view.service';
-import { MatchViewModule } from 'match/match-view.module';
 import { FilterPlugin } from 'filter/filter.plugin';
->>>>>>> Stashed changes
+import { MatchViewModule } from 'match/match-view.module';
 @Module({
   imports: [
     SentryModule.forRoot(),

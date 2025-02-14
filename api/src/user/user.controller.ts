@@ -23,6 +23,7 @@ import { Public } from "authentication/public";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { Types } from "mongoose";
 import { ValidateObjectIdPipe } from "pipes/validate-object-id.pipe";
+import { Filter } from "types/types";
 
 // All these endpoints are globally protected by the auth guard that requires a token
 
@@ -38,10 +39,10 @@ export class UserController {
      */
     @Get()
     async getAll(
-        @Query(QueryValidationPipe)
-        options: FindManyFilter<User>,
+        @Query()
+        filter: Filter,
     ) {
-        const users = await this.userService.findAll(options);
+        const users = await this.userService.findAll(filter);
         return users;
     }
 

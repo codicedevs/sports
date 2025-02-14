@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { SportModesService } from './sport_modes.service';
 import { CreateSportModeDto, UpdateSportModeDto } from './sport_mode.dto';
 import { Types } from 'mongoose';
 import { ValidateObjectIdPipe } from 'pipes/validate-object-id.pipe';
+import { Filter } from 'types/types';
 
 @Controller('sport-modes')
 export class SportModesController {
@@ -14,8 +15,8 @@ export class SportModesController {
   }
 
   @Get()
-  findAll() {
-    return this.sportModesService.findAll();
+  findAll(@Query() filter: Filter) {
+    return this.sportModesService.findAll(filter);
   }
 
   @Get(':id')

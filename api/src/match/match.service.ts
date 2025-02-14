@@ -23,6 +23,8 @@ import { ChatroomService } from "chatroom/chatroom.service";
 import { ChatroomModelType } from "chatroom/chatroom.enum";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { MatchUpdatedEvent } from "app-events.ts/match.events";
+import { MatchView } from "./match-view.model";
+
 
 @Injectable()
 export class MatchService {
@@ -30,6 +32,7 @@ export class MatchService {
     @InjectModel(Match.name) private readonly matchModel: Model<Match>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Location.name) private readonly locationModel: Model<Location>,
+    @InjectModel(MatchView.name) private readonly matchViewModel: Model<MatchView>,
     private readonly petitionService: PetitionService,
     private readonly locationsService: LocationsService,
     private readonly sportModesService: SportModesService,
@@ -47,20 +50,20 @@ export class MatchService {
       throw new NotFoundException("Usuario no encontrado");
     }
     // Verificar si la location existe
-    
+
     let locationExist = null
-    if(location){
+    if (location) {
       locationExist = await this.locationModel.findById(location).exec();
       if (!locationExist) {
         throw new NotFoundException("Ubicación no encontrada");
       }
     }
-    
+
     let date = null
-    if(matchData.date){
+    if (matchData.date) {
       date = moment.tz(matchData.date, 'America/Argentina/Buenos_Aires').toDate();
     }
-    
+
     // Crear el partido e incluir al creador en la lista de users
     const match = new this.matchModel({
       ...matchData,
@@ -82,7 +85,7 @@ export class MatchService {
 
     // Agregar el partido al array de matches de la location
 
-    if(locationExist){
+    if (locationExist) {
       locationExist.matches.push(savedMatch.id);
       await locationExist.save();
     }
@@ -114,7 +117,7 @@ export class MatchService {
       }
     }
     this.eventEmitter.emit('match.updated', new MatchUpdatedEvent(savedMatch));
-  
+
 
 
     return savedMatch;
@@ -170,10 +173,12 @@ export class MatchService {
     const savedMatch = await match.save();
 
     //Creo un chatroom
-        await this.chatroomService.create({reference: {
-          type: ChatroomModelType.match,
-          id: savedMatch._id as Types.ObjectId
-        }})
+    await this.chatroomService.create({
+      reference: {
+        type: ChatroomModelType.match,
+        id: savedMatch._id as Types.ObjectId
+      }
+    })
 
     // Eliminar el matchId del array de partidos del usuario
     const matchIndex = user.matches.findIndex(
@@ -190,11 +195,11 @@ export class MatchService {
     return match;
   }
 
-  async findAll(filter: Filter): Promise<FilterResponse<Match>> {
-    const results = await this.matchModel.find(filter).exec()
+  async findAll(filter: Filter): Promise<FilterResponse<MatchView>> {
+    const results = await this.matchViewModel.find(filter).exec()
     return {
       results,
-      totalCount: await this.matchModel.countDocuments(filter)
+      totalCount: await this.matchViewModel.countDocuments(filter.where)
     }
   }
 
@@ -549,7 +554,7 @@ export class MatchService {
   }
 
   async getUsersForMatchRecommendations(match: HydratedDocument<Match>): Promise<User[]> {
-    if(!match.location || !match.date || !match.sportMode){
+    if (!match.location || !match.date || !match.sportMode) {
       return []
     }
     const day = this.getDay(match.dayOfWeek)
@@ -643,7 +648,7 @@ export class MatchService {
       team1: [],
       team2: [],
     };
-    if(!match.formations) match.formations = newFormations
+    if (!match.formations) match.formations = newFormations
 
     let userAlreadyIn = false;
 
@@ -688,7 +693,7 @@ export class MatchService {
       team1: [],
       team2: [],
     };
-    if(!match.formations) match.formations = newFormations
+    if (!match.formations) match.formations = newFormations
     const processTeam = (players: Player[], targetTeam: Player[]) => {
       for (const player of players) {
         if (player.userId.toString() !== userId.toString()) {

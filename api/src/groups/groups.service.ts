@@ -88,10 +88,10 @@ export class GroupsService {
     return group.save()
   }
   async findAll(filter: Filter): Promise<FilterResponse<Group>> {
-    const results = await this.groupModel.find(filter).limit(0)
+    const results = await this.groupModel.find(filter)
     return {
       results,
-      totalCount: await this.groupModel.countDocuments(filter)
+      totalCount: await this.groupModel.countDocuments(filter.where)
     }
   }
 
