@@ -135,6 +135,13 @@ export class MatchService {
       throw new BadRequestException("El usuario ya está agregado al match");
     }
 
+    // Verificar si el partido ya ha alcanzado el límite de jugadores
+    if (match.playersLimit && match.users.length >= match.playersLimit) {
+      throw new BadRequestException(
+        "No se puede aceptar la solicitud porque el partido ya ha alcanzado el límite de jugadores",
+      );
+    }
+
     match.users.push(userId);
     this.eventEmitter.emit("player.added", new MatchUpdatedEvent(match));
 

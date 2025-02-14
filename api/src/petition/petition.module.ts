@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { PetitionController } from "./petition.controller";
 import { PetitionService } from "./petition.service";
 import { MongooseModule } from "@nestjs/mongoose";
@@ -12,6 +12,7 @@ import { GroupsService } from "groups/groups.service";
 import { ChatroomService } from "chatroom/chatroom.service";
 import { Chatroom, ChatroomSchema } from "chatroom/chatroom.entity";
 import { Message, MessageSchema } from "messages/message.entity";
+import { MatchModule } from "match/match.module";
 
 @Module({
   imports: [
@@ -22,10 +23,16 @@ import { Message, MessageSchema } from "messages/message.entity";
       { name: Group.name, schema: GroupSchema },
       { name: Chatroom.name, schema: ChatroomSchema },
       { name: Message.name, schema: MessageSchema },
-    ])
+    ]),
+    forwardRef(() => MatchModule),
   ],
   controllers: [PetitionController],
-  providers: [PetitionService, PushNotificationService, GroupsService, ChatroomService],
-  exports:[PetitionService]
+  providers: [
+    PetitionService,
+    PushNotificationService,
+    GroupsService,
+    ChatroomService,
+  ],
+  exports: [PetitionService],
 })
 export class PetitionModule {}

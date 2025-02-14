@@ -41,7 +41,9 @@ export class MatchController {
       throw new BadRequestException(`ID de location inválido`);
     }
     if (createMatchDto.playersLimit !== createMatchDto.playersLeft) {
-      createMatchDto.playersLeft = createMatchDto.playersLimit;
+      createMatchDto.playersLeft =
+        createMatchDto.playersLimit -
+        (createMatchDto.users ? createMatchDto.users.length : 1);
     }
     const newMatch = await this.matchService.createMatch(createMatchDto);
     return newMatch;
