@@ -19,11 +19,11 @@ const SearchLocationInput = ({ matchDetailsRef }: SearchLocationInputProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [filter, setFilter] = useState('');
   const [filteredLocations, setFilteredLocations] = useState<{ id: string; name: string }[]>([]);
-  
+
   const [selectedLocation, setSelectedLocation] = useState<Place | null>(
     matchDetailsRef.current.location
   );
-  
+
   const { data: Locations } = useFetch(locationService.getAll, [QUERY_KEYS.LOCATIONS]);
 
   useEffect(() => {
@@ -46,30 +46,28 @@ const SearchLocationInput = ({ matchDetailsRef }: SearchLocationInputProps) => {
   };
 
   return (
-    <Div px={customTheme.spacing.medium} pt={customTheme.spacing.medium}>
+    <Div flex={1} px={customTheme.spacing.medium} pt={customTheme.spacing.medium}>
       <Text mb={customTheme.spacing.medium}>¿Dónde juegan?</Text>
       <SearchBar isEditing={isEditing} setIsEditing={setIsEditing} setFilter={setFilter} />
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <Div mt={customTheme.spacing.medium} style={{ gap: 8 }}>
-          { (filteredLocations.length > 0 ? filteredLocations : Locations.data).map((loc: Place, index: number) => (
-            <TouchableOpacity key={index} onPress={() => handleSelectLocation(loc)}>
-              <Div
-                h={verticalScale(48)}
-                mb={Locations.data.length - 1 === index ? customTheme.spacing.medium : 0}
-                bg={selectedLocation?._id === loc._id ? customTheme.colors.secondaryBackground : "white"}
-                justifyContent="center"
-                borderWidth={1}
+      <ScrollView nestedScrollEnabled contentContainerStyle={{ paddingVertical: customTheme.spacing.medium, flexGrow: 1 }} showsVerticalScrollIndicator={false}>
+        {(filteredLocations.length > 0 ? filteredLocations : Locations.data).map((loc: Place, index: number) => (
+          <TouchableOpacity key={index} onPress={() => handleSelectLocation(loc)}>
+            <Div
+              h={verticalScale(48)}
+              mb={index !== (Locations.data.length - 1) ? customTheme.spacing.small : 0}
+              bg={selectedLocation?._id === loc._id ? customTheme.colors.secondaryBackground : "white"}
+              justifyContent="center"
+              borderWidth={1}
+            >
+              <Text
+                textAlign="center"
+                color={selectedLocation?._id === loc._id ? 'white' : customTheme.colors.secondaryBackground}
               >
-                <Text
-                  textAlign="center"
-                  color={selectedLocation?._id === loc._id ? 'white' : customTheme.colors.secondaryBackground}
-                >
-                  {loc.name}
-                </Text>
-              </Div>
-            </TouchableOpacity>
-          )) }
-        </Div>
+                {loc.name}
+              </Text>
+            </Div>
+          </TouchableOpacity>
+        ))}
       </ScrollView>
     </Div>
   );
