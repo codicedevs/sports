@@ -4,12 +4,13 @@ import { CreateLocationDto } from "./location.dto";
 import { UpdateLocationDto } from "./location.dto";
 import { Location } from "./location.entity";
 import { Model, Types } from "mongoose";
+import { Filter, FilterResponse } from "types/types";
 
 @Injectable()
 export class LocationsService {
   constructor(
     @InjectModel(Location.name) private locationModel: Model<Location>,
-  ) {}
+  ) { }
 
   async create(createLocationDto: CreateLocationDto): Promise<Location> {
     const { name, address, coordinates } = createLocationDto;
@@ -43,8 +44,12 @@ export class LocationsService {
       .exec();
   }
 
-  async findAll(): Promise<Location[]> {
-    return this.locationModel.find().exec();
+  async findAll(filter: Filter): Promise<FilterResponse<Location>> {
+    const results = await this.locationModel.find(filter).exec();
+    return {
+      results,
+      totalCount: await this.locationModel.countDocuments(filter.where)
+    }
   }
 
   async findOne(id: Types.ObjectId): Promise<Location> {

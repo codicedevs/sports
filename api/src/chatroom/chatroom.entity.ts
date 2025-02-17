@@ -25,4 +25,3 @@ export class Chatroom extends Document {
     messages: Types.ObjectId[]
 }
 export const ChatroomSchema = SchemaFactory.createForClass(Chatroom)
-ChatroomSchema.plugin(FilterPlugin);

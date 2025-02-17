@@ -16,4 +16,3 @@ export class Message extends Document {
     message: string;
 }
 export const MessageSchema = SchemaFactory.createForClass(Message);
-MessageSchema.plugin(FilterPlugin);

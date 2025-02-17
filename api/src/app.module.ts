@@ -20,16 +20,25 @@ import { MessagesModule } from './messages/messages.module';
 import { ChatroomModule } from './chatroom/chatroom.module';
 
 import { GroupsModule } from './groups/groups.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { FilterPlugin } from 'filter/filter.plugin';
+import { MatchViewModule } from 'match/match-view.module';
 @Module({
   imports: [
     SentryModule.forRoot(),
     MongooseModule.forRoot(`mongodb://${serverSetting.DB_HOST}:${serverSetting.DB_PORT}/${serverSetting.DB_DATABASE}`, {
       user: serverSetting.DB_USERNAME,
       pass: serverSetting.DB_PASSWORD,
-      authSource: "admin", // Specifies the authentication database
+      authSource: "admin",
+      connectionFactory: (connection) => {
+        // Apply the FilterPlugin globally
+        connection.plugin(FilterPlugin);
+        return connection;
+      }, // Specifies the authentication database
       // useNewUrlParser: true,
       // useUnifiedTopology: true,
     }),
+    EventEmitterModule.forRoot(),
     UserModule,
     AuthenticationModule,
     MatchModule,
@@ -41,16 +50,17 @@ import { GroupsModule } from './groups/groups.module';
     SportModesModule,
     MessagesModule,
     ChatroomModule,
-    GroupsModule
+    GroupsModule,
+    MatchViewModule
   ],
   controllers: [AppController],
   providers: [
     AppService,
     {
-        provide: APP_FILTER,
-        useClass: SentryGlobalFilter
+      provide: APP_FILTER,
+      useClass: SentryGlobalFilter
     }
   ],
 })
 
-export class AppModule {}
+export class AppModule { }

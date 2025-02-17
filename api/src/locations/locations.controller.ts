@@ -14,6 +14,7 @@ import { CreateLocationDto } from "./location.dto";
 import { UpdateLocationDto } from "./location.dto";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { Types } from "mongoose";
+import { Filter } from "types/types";
 
 @ApiBearerAuth()
 @ApiTags('locations')
@@ -27,8 +28,8 @@ export class LocationsController {
   }
   
   @Get()
-  findAll() {
-    return this.locationsService.findAll();
+  findAll(@Query() filter: Filter) {
+    return this.locationsService.findAll(filter);
   }
 
   @Get(":id")

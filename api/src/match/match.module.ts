@@ -11,6 +11,9 @@ import { JwtService } from "@nestjs/jwt";
 import { SportModesModule } from "sport_modes/sport_modes.module";
 import { PushNotificationService } from "services/pushNotificationservice";
 import { ChatroomModule } from "chatroom/chatroom.module";
+import { MatchListener } from "app-listeners/match.listener";
+import { MatchViewModule } from "./match-view.module";
+import { MatchView, MatchViewSchema } from "./match-view.model";
 
 @Module({
     imports: [
@@ -18,14 +21,15 @@ import { ChatroomModule } from "chatroom/chatroom.module";
             { name: Match.name, schema: MatchSchema },
             { name: User.name, schema: UserSchema },
             { name: Location.name, schema: LocationSchema },
+            { name: MatchView.name, schema: MatchViewSchema }
         ]),
         PetitionModule,
         LocationsModule,
         SportModesModule,
-        ChatroomModule,
+        ChatroomModule
     ],
     controllers: [MatchController],
-    providers: [MatchService, JwtService, PushNotificationService],
+    providers: [MatchService, JwtService, PushNotificationService, MatchListener],
     exports: [MatchService],
 })
 export class MatchModule { }

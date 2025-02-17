@@ -1,6 +1,12 @@
 import "./globals.css";
 import "../../lib/sso";
 import { ToastContainer } from 'react-toastify';
+import { Noto_Sans } from 'next/font/google'
+
+const noto = Noto_Sans({
+    subsets: ['latin'],
+    variable: '--font-noto'
+})
 
 export default function RootLayout({
     children,
@@ -9,14 +15,13 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-            <body>
-                <div className="h-[100dvh] bg-[#115e2a]">
-                    <div className="grid place-items-center px-4 pt-8">
-                        <span className="text-6xl rotate-180 animate-bounce">⚽</span>
+            <body className={noto.className}>
+                <div className="min-h-[100dvh] pb-14">
+                    <div className="max-w-[480px] mx-auto">
+                        {children}
                     </div>
-                    {children}
                 </div>
-                <ToastContainer 
+                <ToastContainer
                     position="bottom-center"
                     autoClose={2000}
                 />

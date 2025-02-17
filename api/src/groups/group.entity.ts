@@ -19,4 +19,3 @@ export class Group extends Document {
 }
 
 export const GroupSchema = SchemaFactory.createForClass(Group);
-GroupSchema.plugin(FilterPlugin);

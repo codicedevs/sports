@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-import { model, Model, Types } from "mongoose";
+import { HydratedDocument, model, Model, Types } from "mongoose";
 import { CreateMatchDto, MatchDto, } from "./match.dto";
 import { UpdateMatchDto } from "./match.dto";
 import { Formations, Match, Player } from "./match.entity";
@@ -21,6 +21,10 @@ import { PushNotificationService } from "services/pushNotificationservice";
 import { LocationsService } from "locations/locations.service";
 import { ChatroomService } from "chatroom/chatroom.service";
 import { ChatroomModelType } from "chatroom/chatroom.enum";
+import { EventEmitter2 } from "@nestjs/event-emitter";
+import { MatchUpdatedEvent } from "app-events.ts/match.events";
+import { MatchView } from "./match-view.model";
+
 
 @Injectable()
 export class MatchService {
@@ -28,11 +32,13 @@ export class MatchService {
     @InjectModel(Match.name) private readonly matchModel: Model<Match>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Location.name) private readonly locationModel: Model<Location>,
+    @InjectModel(MatchView.name) private readonly matchViewModel: Model<MatchView>,
     private readonly petitionService: PetitionService,
     private readonly locationsService: LocationsService,
     private readonly sportModesService: SportModesService,
     private readonly pushNotificationService: PushNotificationService,
-    private readonly chatroomService: ChatroomService
+    private readonly chatroomService: ChatroomService,
+    private readonly eventEmitter: EventEmitter2
   ) { }
 
   // Servicio para crear partido, con o sin invitaciones
@@ -44,20 +50,20 @@ export class MatchService {
       throw new NotFoundException("Usuario no encontrado");
     }
     // Verificar si la location existe
-    
+
     let locationExist = null
-    if(location){
+    if (location) {
       locationExist = await this.locationModel.findById(location).exec();
       if (!locationExist) {
         throw new NotFoundException("Ubicación no encontrada");
       }
     }
-    
+
     let date = null
-    if(matchData.date){
+    if (matchData.date) {
       date = moment.tz(matchData.date, 'America/Argentina/Buenos_Aires').toDate();
     }
-    
+
     // Crear el partido e incluir al creador en la lista de users
     const match = new this.matchModel({
       ...matchData,
@@ -75,11 +81,11 @@ export class MatchService {
       hour: date && date.getHours(),
     }
 
-    const savedMatch = await match.save();
+    const savedMatch: HydratedDocument<Match> = await match.save();
 
     // Agregar el partido al array de matches de la location
 
-    if(locationExist){
+    if (locationExist) {
       locationExist.matches.push(savedMatch.id);
       await locationExist.save();
     }
@@ -110,28 +116,9 @@ export class MatchService {
         });
       }
     }
-    if (match.open === true) {
-      const eligibleUsers: User[] = await this.getUsersForMatchRecommendations(matchDto)
-      // Filtrar usuarios con `expoPushToken`
-      const tokens = eligibleUsers
-        .map((user) => user.pushToken)
-        .filter((token) => !!token);
+    this.eventEmitter.emit('match.updated', new MatchUpdatedEvent(savedMatch));
 
 
-      if (tokens.length > 0) {
-        const title = '¡Nuevo partido disponible!';
-        const body = `Un partido está abierto. ¡Únete ahora!`;
-
-        await this.pushNotificationService.sendPushNotification(
-          tokens,
-          title,
-          body,
-          { matchId: match.id }, // Puedes incluir más datos
-        );
-
-      }
-
-    }
 
     return savedMatch;
   }
@@ -186,10 +173,12 @@ export class MatchService {
     const savedMatch = await match.save();
 
     //Creo un chatroom
-        await this.chatroomService.create({reference: {
-          type: ChatroomModelType.match,
-          id: savedMatch._id as Types.ObjectId
-        }})
+    await this.chatroomService.create({
+      reference: {
+        type: ChatroomModelType.match,
+        id: savedMatch._id as Types.ObjectId
+      }
+    })
 
     // Eliminar el matchId del array de partidos del usuario
     const matchIndex = user.matches.findIndex(
@@ -206,11 +195,11 @@ export class MatchService {
     return match;
   }
 
-  async findAll(filter: Filter): Promise<FilterResponse<Match>> {
-    const results = await this.matchModel.find(filter).exec()
+  async findAll(filter: Filter): Promise<FilterResponse<MatchView>> {
+    const results = await this.matchViewModel.find(filter).exec()
     return {
       results,
-      totalCount: await this.matchModel.countDocuments(filter)
+      totalCount: await this.matchViewModel.countDocuments(filter.where)
     }
   }
 
@@ -237,6 +226,8 @@ export class MatchService {
     if (!match) {
       throw new NotFoundException(`Match #${id} not found`);
     }
+
+    this.eventEmitter.emit('match.updated', new MatchUpdatedEvent(match));
 
     return match;
   }
@@ -562,8 +553,8 @@ export class MatchService {
     return matches;
   }
 
-  async getUsersForMatchRecommendations(match: MatchDto): Promise<User[]> {
-    if(!match.location || !match.date || !match.sportMode){
+  async getUsersForMatchRecommendations(match: HydratedDocument<Match>): Promise<User[]> {
+    if (!match.location || !match.date || !match.sportMode) {
       return []
     }
     const day = this.getDay(match.dayOfWeek)
@@ -657,7 +648,7 @@ export class MatchService {
       team1: [],
       team2: [],
     };
-    if(!match.formations) match.formations = newFormations
+    if (!match.formations) match.formations = newFormations
 
     let userAlreadyIn = false;
 
@@ -702,7 +693,7 @@ export class MatchService {
       team1: [],
       team2: [],
     };
-    if(!match.formations) match.formations = newFormations
+    if (!match.formations) match.formations = newFormations
     const processTeam = (players: Player[], targetTeam: Player[]) => {
       for (const player of players) {
         if (player.userId.toString() !== userId.toString()) {

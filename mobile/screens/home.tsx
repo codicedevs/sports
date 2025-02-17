@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
-import { Button, Div, Text } from "react-native-magnus";
+import { Button, Div } from "react-native-magnus";
 import MatchModalHandler from "../components/modal/matchModalHandler";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
