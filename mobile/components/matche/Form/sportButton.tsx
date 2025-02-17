@@ -15,14 +15,13 @@ interface SportButtonProps {
     name: string,
     _id: string
   }, index: number) => void,
-  selected: boolean, // Indicador de selección
+  selected: boolean,
   length: number
 }
 
 const SportButton = ({ sport, index, onPress, selected, length }: SportButtonProps) => {
   const animationValue = useSharedValue(0);
 
-  // Actualiza la animación cuando cambia la prop `selected`
   useEffect(() => {
     animationValue.value = withTiming(selected ? 1 : 0, { duration: 80 });
   }, [selected]);

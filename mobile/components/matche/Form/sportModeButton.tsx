@@ -13,20 +13,17 @@ interface SportModeButtonProps {
   };
   index: number;
   onPress: (modeId: SportMode, index: number) => void;
-  selected: boolean; // Prop que indica si el botón está seleccionado
+  selected: boolean; 
   length: number;
 }
 
 const SportModeButton = ({ mode, index, onPress, selected, length }: SportModeButtonProps) => {
-  // Inicializamos la animación localmente
   const animationValue = useSharedValue(0);
 
-  // Actualizamos la animación cuando cambia la prop 'selected'
   useEffect(() => {
     animationValue.value = withTiming(selected ? 1 : 0, { duration: 80 });
   }, [selected, animationValue]);
 
-  // Aplicamos la misma lógica de animación que en SportButton
   const animatedStyle = useAnimatedStyle(() => ({
     backgroundColor: animationValue.value
       ? withTiming('black', { duration: 80 })

@@ -11,7 +11,7 @@ interface PlayersCounterInputProps {
 }
 
 const PlayersCounterInput = ({ matchDetailsRef }: PlayersCounterInputProps) => {
-  const defaultBase = matchDetailsRef.current.selectedSportMode?.label ? matchDetailsRef.current.selectedSportMode.label : 5; // Puedes modificar este valor según convenga
+  const defaultBase = matchDetailsRef.current.selectedSportMode?.label ? matchDetailsRef.current.selectedSportMode.label : 5;
   const lowLimit = defaultBase * 2;
   const highLimit = lowLimit + 5;
 
