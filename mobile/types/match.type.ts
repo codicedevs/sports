@@ -29,9 +29,11 @@ export default Match;
 
 export interface CreateMatchDto {
   name: string;
-  date: string;
-  location: string;
+  date?: Date;
+  location?: string;
   playersLimit: number;
   userId: string;
   invitedUsers?: string[] | undefined;
+  sportMode: string;
+  open?:boolean
 }

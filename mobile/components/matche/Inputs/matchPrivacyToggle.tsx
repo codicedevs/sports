@@ -7,18 +7,22 @@ import { PrivacyOption } from '../../../types/form.type';
 
 interface PrivacyToggleProps {
   matchDetailsRef: React.MutableRefObject<{
-    privacyOption: PrivacyOption;
+    privacyOption: boolean;
   }>;
 }
 
 const MatchPrivacyToggleInput = ({ matchDetailsRef }: PrivacyToggleProps) => {
   const [privacyOption, setPrivacyOption] = useState<PrivacyOption>(
-    matchDetailsRef.current.privacyOption
+    matchDetailsRef.current.privacyOption? "public" : "private" 
   );
 
   const handleToggle = (option: PrivacyOption) => {
     setPrivacyOption(option);
-    matchDetailsRef.current.privacyOption = option;
+    if(option === "private"){
+      matchDetailsRef.current.privacyOption = false;
+    } else {
+      matchDetailsRef.current.privacyOption = true;
+    }
   };
 
   const isPrivate = privacyOption === 'private';

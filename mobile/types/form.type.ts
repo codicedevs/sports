@@ -6,7 +6,8 @@ export interface Sport {
 export interface SportMode {
     name: string;
     _id: string;
-    label: string
+    label: string;
+    sport:string
 }
 
 export type PrivacyOption = 'public' | 'private';
@@ -28,7 +29,7 @@ export interface MatchDetails {
     selectedSport: Sport | null;
     selectedSportMode: SportMode | null;
     playerLimit: number;
-    privacyOption: PrivacyOption;
-    matchDate: Date | null;
+    privacyOption: boolean;
+    matchDate: Date | undefined;
     location: Place | null;
 }
