@@ -1,4 +1,5 @@
 import { API_URL } from "../config";
+import objectToQueryString from "../utils/queryToString";
 import { HttpBase } from "./http";
 
 export class CrudService extends HttpBase {
@@ -6,12 +7,19 @@ export class CrudService extends HttpBase {
     super(`${API_URL}/${baseURL}`);
   }
 
+  async find(data: any, filter: any): Promise<any> {
+    console.log("ddddd", filter);
+    const params = objectToQueryString(filter);
+    console.log("asd", params);
+    return this.get(`?${params}`);
+  }
+
   getAccessToken(): any {
     return localStorage.getItem("jwt");
   }
 
-  saveAccessToken(accessToken: string | null): any {
-    return 1;
+  saveAccessToken(accessToken: string): any {
+    localStorage.setItem("jwt", accessToken);
   }
 
   refreshAccessToken(): any {

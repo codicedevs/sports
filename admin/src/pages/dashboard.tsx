@@ -1,26 +1,31 @@
-import { Outlet } from "react-router-dom";
-import Header from "../components/header";
+import React, { useState } from "react";
+import { Outlet, useNavigate } from "react-router-dom";
+import HeaderAdmin from "../components/header";
 import Sidebar from "../components/sidebar";
+import { Content } from "antd/es/layout/layout";
 
-function Dashboard() {
+const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
+  const [collapsed, setCollapsed] = useState(false);
+
+  const user = {
+    name: "Nombre del Usuario",
+    avatar: "/path-to-avatar.jpg", // Cambia esto al path real de tu imagen de avatar
+  };
+
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        height: "100vh",
-        width: "100vw",
-      }}
-    >
-      <Header />
-      <div style={{ flex: 1, display: "flex" }}>
-        <Sidebar />
-        <div style={{ flex: 1, padding: "20px" }}>
-          <Outlet />
-        </div>
-      </div>
+    <div style={{ display: "flex", flexDirection: "row", minHeight: "100vh" }}>
+      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
+
+      <Content
+        style={{ flex: 1, marginLeft: collapsed ? 90 : 210, padding: 15 }}
+      >
+        <HeaderAdmin />
+        <Outlet />
+      </Content>
+      {/* </div> */}
     </div>
   );
-}
+};
 
 export default Dashboard;
