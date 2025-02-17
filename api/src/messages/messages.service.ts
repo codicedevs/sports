@@ -50,7 +50,7 @@ export class MessagesService {
   async findAll(filter: Filter): Promise<FilterResponse<HydratedDocument<Message>>> {
     // Construye la consulta con paginación
     const results = await this.messageModel.find(filter).exec()
-    const totalCount = await this.messageModel.countDocuments(filter.where || {});
+    const totalCount = await this.messageModel.countDocuments(filter).exec()
 
 
     // Retorna los resultados con metadatos de paginación

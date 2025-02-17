@@ -48,7 +48,7 @@ export class LocationsService {
     const results = await this.locationModel.find(filter).exec();
     return {
       results,
-      totalCount: await this.locationModel.countDocuments(filter.where)
+      totalCount: await this.locationModel.countDocuments(filter).exec()
     }
   }
 

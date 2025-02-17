@@ -305,7 +305,7 @@ export class PetitionService {
     const results = await this.petitionModel.find(filter).exec();
     return {
       results,
-      totalCount: await this.petitionModel.countDocuments(filter.where),
+      totalCount: await this.petitionModel.countDocuments(filter).exec()
     };
   }
 
