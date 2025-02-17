@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
+import { ScrollView, View } from 'react-native';
 import { Div, Text } from 'react-native-magnus';
 import { customTheme } from '../../../utils/theme';
-import { ScrollView, View } from 'react-native';
+import { scale, verticalScale } from 'react-native-size-matters';
 import SportButton from '../Form/sportButton';
 import SportModeButton from '../Form/sportModeButton';
 import useFetch from '../../../hooks/useGet';
+import sportService from '../../../service/sport.service';
 import sportmodeService from '../../../service/sportmode.service';
 import { QUERY_KEYS } from '../../../types/query.types';
-import { scale, verticalScale } from 'react-native-size-matters';
-import sportService from '../../../service/sport.service';
-import { Sport, SportMode } from '../../../types/form.type';
-import { MatchDetails } from '../../../types/match.types'; // Asegúrate de tener definido este tipo
+import { MatchDetails, Sport, SportMode } from '../../../types/form.type';
 import { MotiView } from 'moti';
 import { Skeleton } from 'moti/skeleton';
 
@@ -26,21 +25,23 @@ const SportInput = ({ matchDetailsRef }: SportInputProps) => {
     matchDetailsRef.current.selectedSportMode
   );
 
-  const fetchSportModesById = async () => {
-    if (selectedSport?.name) {
-      const res = await sportmodeService.getModesBySportId(selectedSport._id);
-      return res;
-    } else {
-      const res = await sportmodeService.getAll();
-      return res;
-    }
-  };
-
   const { data: sports } = useFetch(sportService.getAll, [QUERY_KEYS.SPORTS]);
-  const { data: sportModes } = useFetch(
-    fetchSportModesById,
-    [QUERY_KEYS.SPORT_MODES, selectedSport?.name]
-  );
+  const { data: allSportModes } = useFetch(sportmodeService.getAll, [QUERY_KEYS.SPORT_MODES]);
+
+  useEffect(() => {
+    if (selectedSport && allSportModes) {
+      const filteredModes = allSportModes.data.filter(
+        (mode: SportMode) => mode.sport === selectedSport._id
+      );
+      if (filteredModes.length > 0) {
+        setSelectedSportMode(filteredModes[0]);
+        matchDetailsRef.current.selectedSportMode = filteredModes[0];
+      } else {
+        setSelectedSportMode(null);
+        matchDetailsRef.current.selectedSportMode = null;
+      }
+    }
+  }, [selectedSport, allSportModes]);
 
   const handleSelectSport = (sport: Sport, index: number) => {
     setSelectedSport(sport);
@@ -60,19 +61,18 @@ const SportInput = ({ matchDetailsRef }: SportInputProps) => {
     }
   }, [sports]);
 
-  useEffect(() => {
-    if (!selectedSportMode && sportModes) {
-      const defaultMode = sportModes.data[0];
-      setSelectedSportMode(defaultMode);
-      matchDetailsRef.current.selectedSportMode = defaultMode;
-    }
-  }, [sportModes]);
+  if (!sports || !allSportModes)
+    return (
+      <MotiView>
+        <Skeleton colorMode="light" height={'100%'} width={'100%'} />
+      </MotiView>
+    );
 
-  if (!sports || !sportModes) return (
-    <MotiView>
-      <Skeleton colorMode='light' height={'100%'} width={"100%"} />
-    </MotiView>
-  )
+  const sportModesForSelectedSport = allSportModes
+    ? allSportModes.data.filter(
+      (mode: SportMode) => mode.sport === selectedSport?._id
+    )
+    : [];
 
   return (
     <Div py={customTheme.spacing.medium}>
@@ -109,14 +109,14 @@ const SportInput = ({ matchDetailsRef }: SportInputProps) => {
           horizontal
           contentContainerStyle={{ gap: scale(16) }}
         >
-          {sportModes.data.map((mode, index) => (
+          {sportModesForSelectedSport.map((mode, index) => (
             <SportModeButton
               key={mode._id}
               mode={mode}
               index={index}
               onPress={handleSelectMode}
               selected={selectedSportMode?._id === mode._id}
-              length={sportModes.data.length}
+              length={sportModesForSelectedSport.length}
             />
           ))}
         </ScrollView>

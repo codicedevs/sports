@@ -3,6 +3,7 @@ import { TouchableWithoutFeedback, View } from 'react-native';
 import { scale } from 'react-native-size-matters';
 import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { customTheme } from '../../../utils/theme';
+import { SportMode } from '../../../types/form.type';
 
 interface SportModeButtonProps {
   mode: {
@@ -11,11 +12,7 @@ interface SportModeButtonProps {
     label: string
   };
   index: number;
-  onPress: (modeId: {
-    name: string;
-    _id: string;
-    label: string
-  }, index: number) => void;
+  onPress: (modeId: SportMode, index: number) => void;
   selected: boolean; // Prop que indica si el botón está seleccionado
   length: number;
 }
