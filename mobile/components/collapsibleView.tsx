@@ -55,7 +55,7 @@ export const Accordion = ({ id, title, children, openId, setOpenId, size, rightT
                     </Div>
                 </TouchableWithoutFeedback>
             }
-            <Div>
+            <Div h={"100%"}>
                 {children}
             </Div>
         </Animated.View>

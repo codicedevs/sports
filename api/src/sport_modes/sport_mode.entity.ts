@@ -13,6 +13,10 @@ export class SportMode extends Document {
   @Prop({ required: true, type: mongoose.Schema.Types.ObjectId , ref: 'Sport' }) // Relación con Sport
   @IsMongoId()
   sport: Types.ObjectId | Sport;
+
+  @Prop({ required: true })
+  @IsString()
+  label: string;
 }
 
 export const SportModeSchema = SchemaFactory.createForClass(SportMode);

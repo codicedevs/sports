@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { TouchableWithoutFeedback } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { Div } from "react-native-magnus";
 import { scale, verticalScale } from 'react-native-size-matters';
-import Animated, { SharedValue, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { customTheme } from '../../../utils/theme';
 
 interface SportButtonProps {
@@ -11,12 +11,21 @@ interface SportButtonProps {
     _id: string
   },
   index: number,
-  onPress: (modeId: string, index: number) => void,
-  animationValue: SharedValue<number>,
+  onPress: (sportId: {
+    name: string,
+    _id: string
+  }, index: number) => void,
+  selected: boolean,
   length: number
 }
 
-const SportButton = ({ sport, index, onPress, animationValue, length }: SportButtonProps) => {
+const SportButton = ({ sport, index, onPress, selected, length }: SportButtonProps) => {
+  const animationValue = useSharedValue(0);
+
+  useEffect(() => {
+    animationValue.value = withTiming(selected ? 1 : 0, { duration: 80 });
+  }, [selected]);
+
   const animatedStyle = useAnimatedStyle(() => ({
     backgroundColor: animationValue.value
       ? withTiming('black', { duration: 80 })
@@ -31,7 +40,7 @@ const SportButton = ({ sport, index, onPress, animationValue, length }: SportBut
   }));
 
   return (
-    <TouchableWithoutFeedback onPress={() => onPress(sport._id, index)}>
+    <TouchableWithoutFeedback onPress={() => onPress(sport, index)}>
       <Div>
         <Animated.View
           style={[

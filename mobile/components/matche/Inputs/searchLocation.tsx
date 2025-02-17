@@ -4,57 +4,73 @@ import { Div, Text } from 'react-native-magnus';
 import { verticalScale } from 'react-native-size-matters';
 import { customTheme } from '../../../utils/theme';
 import SearchBar from '../Form/searchBar';
+import useFetch from '../../../hooks/useGet';
+import locationService from '../../../service/location.service';
+import { QUERY_KEYS } from '../../../types/query.types';
+import { Place } from '../../../types/form.type';
 
-const SearchLocationInput = () => {
-    const [isEditing, setIsEditing] = useState(false);
-    const [filter, setFilter] = useState('')
-    const [selectedLocation, setSelectedLocation] = useState('')
-    const [filteredLocations, setFilteredLocations] = useState<{ id: string; name: string; }[]>([])
+interface SearchLocationInputProps {
+  matchDetailsRef: React.MutableRefObject<{
+    location: Place | null;
+  }>;
+}
 
-    const Locations = [
-        { id: '1', name: 'Adiur' },
-        { id: '2', name: 'Juan 23' },
-        { id: '3', name: 'El cruce' },
-        { id: '4', name: 'Loyal' },
-        { id: '5', name: 'EL DIEGO' }
-    ];
+const SearchLocationInput = ({ matchDetailsRef }: SearchLocationInputProps) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [filter, setFilter] = useState('');
+  const [filteredLocations, setFilteredLocations] = useState<{ id: string; name: string }[]>([]);
 
-    useEffect(() => {
-        if (filter.trim() === '') {
-            setFilteredLocations([]); // Si no hay filtro, lista vacía
-        } else {
-            setFilteredLocations(
-                Locations.filter(loc =>
-                    loc.name.toLowerCase().includes(filter.toLowerCase())
-                )
-            );
-        }
-    }, [filter]);
+  const [selectedLocation, setSelectedLocation] = useState<Place | null>(
+    matchDetailsRef.current.location
+  );
 
-    return (
-        <Div overflow='scroll' px={customTheme.spacing.medium} pt={customTheme.spacing.medium}>
-            <Text mb={customTheme.spacing.medium}>¿Dónde juegan?</Text>
-            <SearchBar isEditing={isEditing} setIsEditing={setIsEditing} setFilter={setFilter} />
-            <ScrollView showsVerticalScrollIndicator={false}>
-                <Div mt={customTheme.spacing.medium} style={{ gap: 8 }}>
-                    {
-                        (filteredLocations.length > 0 ? filteredLocations : Locations).map((location, index) => (
-                            <TouchableOpacity onPress={(() => setSelectedLocation(location.id))}>
-                                <Div
-                                    h={verticalScale(48)}
-                                    mb={Locations.length - 1 === index ? customTheme.spacing.medium : 0}
-                                    bg={selectedLocation === location.id ? customTheme.colors.secondaryBackground : "white"}
-                                    justifyContent='center'
-                                    borderWidth={1}>
-                                    <Text textAlign='center' color={selectedLocation === location.id ? 'white' : customTheme.colors.secondaryBackground}>{location.name}</Text>
-                                </Div>
-                            </TouchableOpacity>
-                        ))
-                    }
-                </Div>
-            </ScrollView>
-        </Div>
-    );
+  const { data: Locations } = useFetch(locationService.getAll, [QUERY_KEYS.LOCATIONS]);
+
+  useEffect(() => {
+    if (filter.trim() === '') {
+      setFilteredLocations([]);
+    } else if (Locations) {
+      setFilteredLocations(
+        Locations.data.filter((loc: Place) =>
+          loc.name.toLowerCase().includes(filter.toLowerCase())
+        )
+      );
+    }
+  }, [filter, Locations]);
+
+  if (!Locations) return null;
+
+  const handleSelectLocation = (location: Place) => {
+    setSelectedLocation(location);
+    matchDetailsRef.current.location = location;
+  };
+
+  return (
+    <Div flex={1} px={customTheme.spacing.medium} pt={customTheme.spacing.medium}>
+      <Text mb={customTheme.spacing.medium}>¿Dónde juegan?</Text>
+      <SearchBar isEditing={isEditing} setIsEditing={setIsEditing} setFilter={setFilter} />
+      <ScrollView nestedScrollEnabled contentContainerStyle={{ paddingVertical: customTheme.spacing.medium, flexGrow: 1 }} showsVerticalScrollIndicator={false}>
+        {(filteredLocations.length > 0 ? filteredLocations : Locations.data).map((loc: Place, index: number) => (
+          <TouchableOpacity key={index} onPress={() => handleSelectLocation(loc)}>
+            <Div
+              h={verticalScale(48)}
+              mb={index !== (Locations.data.length - 1) ? customTheme.spacing.small : 0}
+              bg={selectedLocation?._id === loc._id ? customTheme.colors.secondaryBackground : "white"}
+              justifyContent="center"
+              borderWidth={1}
+            >
+              <Text
+                textAlign="center"
+                color={selectedLocation?._id === loc._id ? 'white' : customTheme.colors.secondaryBackground}
+              >
+                {loc.name}
+              </Text>
+            </Div>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+    </Div>
+  );
 };
 
 export default SearchLocationInput;

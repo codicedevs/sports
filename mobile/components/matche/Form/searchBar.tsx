@@ -18,7 +18,7 @@ const SearchBar = ({ isEditing, setIsEditing, setFilter }: SearchBarProps) => {
     if (isEditing) {
       Animated.parallel([
         Animated.timing(translateX, {
-          toValue: -60,
+          toValue: scale(-80),
           duration: 200,
           useNativeDriver: true,
         }),
@@ -66,10 +66,9 @@ const SearchBar = ({ isEditing, setIsEditing, setFilter }: SearchBarProps) => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            position: 'absolute',
-            left: '50%',
+             position: 'absolute',
+            alignSelf:"center",
             transform: [
-              { translateX: scale(-40) },
               { translateX }
             ]
           }}
