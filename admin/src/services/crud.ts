@@ -1,16 +1,15 @@
 import { API_URL } from "../config";
+import { Filter, Match } from "../interfaces/interfaces";
 import objectToQueryString from "../utils/queryToString";
 import { HttpBase } from "./http";
 
-export class CrudService extends HttpBase {
+export class CrudService<T> extends HttpBase {
   constructor(baseURL: string) {
     super(`${API_URL}/${baseURL}`);
   }
 
-  async find(data: any, filter: any): Promise<any> {
-    console.log("ddddd", filter);
+  async find(data: any, filter: Filter<T>): Promise<Match> {
     const params = objectToQueryString(filter);
-    console.log("asd", params);
     return this.get(`?${params}`);
   }
 

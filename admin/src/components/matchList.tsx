@@ -1,7 +1,8 @@
 import { Button, Input, Segmented, Select, Space, Table } from "antd";
 import { useState } from "react";
 import { useGetMatchesQuery } from "../store/features/match/matchApi";
-import { CheckCircleOutlined } from "@ant-design/icons";
+import { CheckCircleTwoTone, CloseCircleTwoTone } from "@ant-design/icons";
+import { Location, Match, User } from "../interfaces/interfaces";
 const { Search } = Input;
 const columns = [
   {
@@ -36,19 +37,30 @@ const columns = [
     title: "Cancha",
     dataIndex: "location",
     key: "location",
-    render: (location: any) => (location ? `${location.name}` : "Sin definir"),
+    render: (location: Location) =>
+      location ? `${location.name}` : "Sin definir",
   },
   {
     title: "Reserva hecha por",
     dataIndex: "user",
     key: "userId",
-    render: (user: any) => `${user?.name}`,
+    render: (user: User) => `${user?.name}`,
   },
   {
     title: "Abierto",
     dataIndex: "open",
     key: "open",
-    render: (open: boolean) => (open ? <CheckCircleOutlined /> : "Cerrado"),
+    render: (open: boolean) => {
+      return (
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          {open ? (
+            <CheckCircleTwoTone twoToneColor="#52c41a" />
+          ) : (
+            <CloseCircleTwoTone twoToneColor="#c4521a" />
+          )}
+        </div>
+      );
+    },
   },
   // {
   //   title: "Jugadores",
@@ -60,7 +72,7 @@ const columns = [
     key: "action",
     width: "25%",
     align: "right" as const,
-    render: (record: any) => (
+    render: (record: Match) => (
       <Space
         size="middle"
         style={{
@@ -69,7 +81,7 @@ const columns = [
           justifyContent: "right",
         }}
       >
-        {/* <a>Escribir a {record.userId}</a> */}
+        <a>Escribir a {record.user.name}</a>
         <Button>Editar</Button>
         <Button>Borrar</Button>
       </Space>
@@ -102,7 +114,7 @@ const MatchList = () => {
   const handleOpenChange = (value: string) => {
     console.log(value);
 
-    handleSearch("open", value); // Actualiza el estado del filtro
+    handleSearch("open", value);
   };
 
   return (
@@ -133,8 +145,6 @@ const MatchList = () => {
             onChange={(e) => handleSearch("name", e.target.value)}
             size="middle"
             name="like-name"
-
-            // suffix={suffix}
           />
         </div>
 
@@ -169,11 +179,10 @@ const MatchList = () => {
           <label htmlFor="switchBordered">Turno</label>
           <Segmented
             value={filter}
-            onChange={setFilter}
             options={[
-              { label: "Opcion 1", value: "Opcion 1" },
-              { label: "Opcion 2", value: "Opcion 2" },
-              { label: "Opcion 3", value: "Opcion 3" },
+              { label: "Mañana", value: "Opcion 1" },
+              { label: "Tarde", value: "Opcion 2" },
+              { label: "Noche", value: "Opcion 3" },
             ]}
           />
         </div>

@@ -2,7 +2,6 @@
 import { BaseQueryFn, createApi } from "@reduxjs/toolkit/query/react";
 import { AxiosError, AxiosResponse } from "axios";
 import { matchService } from "../../../services/match";
-import objectToQueryString from "../../../utils/queryToString";
 
 interface MatchFilter {
   _id: string;
