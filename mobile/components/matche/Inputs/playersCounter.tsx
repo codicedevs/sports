@@ -15,7 +15,6 @@ const PlayersCounterInput = ({ matchDetailsRef }: PlayersCounterInputProps) => {
   const defaultBase = matchDetailsRef.current.selectedSportMode?.label || 5;
   const lowLimit = defaultBase * 2;
   const highLimit = lowLimit + 5;
-  const initialData = useRef(0)
   const initialAmount =
     matchDetailsRef.current.playerLimit > 0 ? matchDetailsRef.current.playerLimit : lowLimit;
   const [amount, setAmount] = useState<number>(initialAmount);
