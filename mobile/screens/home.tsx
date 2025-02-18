@@ -27,7 +27,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
 
     <Div>
     <Button onPress={() => setOpen(true)}>Abrir</Button>
-    <MatchModalHandler open={open} setOpen={setOpen} />
+    <MatchModalHandler open={open} setOpen={setOpen} match={'67af556cb453684f313e9a4b'} />
     </Div>
   );
 };
