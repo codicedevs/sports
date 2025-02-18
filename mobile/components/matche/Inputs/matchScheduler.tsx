@@ -47,10 +47,9 @@ const MatchSchedulerInput = ({ matchDetailsRef }: MatchSchedulerInputProps) => {
     id: 1,
     time: '00:00'
   });
-
   const temporal = () => {
     if (!matchDetailsRef.current.matchDate) return;
-
+    if(typeof matchDetailsRef.current.matchDate === "object") return
     const dateString = matchDetailsRef.current.matchDate.split('T')[0];
 
     const originalDate = new Date(matchDetailsRef.current.matchDate);
@@ -72,8 +71,6 @@ const MatchSchedulerInput = ({ matchDetailsRef }: MatchSchedulerInputProps) => {
   useEffect(() => {
     temporal()
   }, [matchDetailsRef.current.matchDate])
-
-  console.log(matchDetailsRef.current.matchDate)
 
   const changeTime = (date: Date, timeString: string): Date => {
     const [hours, minutes] = timeString.split(':').map(Number);
