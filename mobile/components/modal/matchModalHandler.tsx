@@ -14,7 +14,7 @@ import { MatchDetails, Place, PrivacyOption, Sport, SportMode } from '../../type
 import matchService from '../../service/match.service';
 import { useMutate } from '../../hooks/useMutate';
 
-const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: React.Dispatch<React.SetStateAction<boolean>>; match?: Match }) => {
+const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: React.Dispatch<React.SetStateAction<boolean>>; match?: string }) => {
   const matchDetailsRef = useRef<MatchDetails>({
     selectedSport: null,
     selectedSportMode: null,
@@ -23,6 +23,28 @@ const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: R
     matchDate: undefined,
     location: null,
   });
+
+  const fetchMatch = async () => {
+    if (!match) return
+    try {
+      const res = await matchService.getById(match)
+      console.log(res.data)
+      matchDetailsRef.current.selectedSport = res.data.sportMode.sport
+      matchDetailsRef.current.selectedSportMode = res.data.sportMode;
+      matchDetailsRef.current.playerLimit = res.data.playersLimit;
+      matchDetailsRef.current.privacyOption = res.data.open;
+      matchDetailsRef.current.matchDate = res.data.date
+      matchDetailsRef.current.location = res.data.location
+    } catch (e) {
+
+    }
+  }
+
+  useEffect(() => {
+    if (match) {
+      fetchMatch()
+    }
+  }, [])
 
   const [openId, setOpenId] = useState<null | string>(null);
 
