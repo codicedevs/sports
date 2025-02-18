@@ -38,6 +38,17 @@ const SearchLocationInput = ({ matchDetailsRef }: SearchLocationInputProps) => {
     }
   }, [filter, Locations]);
 
+  useEffect(() => {
+    if (Locations && matchDetailsRef.current.location) {
+      const foundLocation = Locations.data.results.find(
+        (loc: Place) => loc._id === matchDetailsRef.current.location?._id
+      );
+      if (foundLocation) {
+        setSelectedLocation(foundLocation);
+      }
+    }
+  }, [Locations, matchDetailsRef.current.location])
+
   if (!Locations) return null;
 
   const handleSelectLocation = (location: Place) => {
