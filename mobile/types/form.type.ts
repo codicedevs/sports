@@ -30,6 +30,6 @@ export interface MatchDetails {
     selectedSportMode: SportMode | null;
     playerLimit: number;
     privacyOption: boolean;
-    matchDate: Date | undefined;
+    matchDate: string | undefined;
     location: Place | null;
 }
