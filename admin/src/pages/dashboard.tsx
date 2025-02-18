@@ -20,7 +20,7 @@ const Dashboard: React.FC = () => {
       <Content
         style={{ flex: 1, marginLeft: collapsed ? 90 : 210, padding: 15 }}
       >
-        <HeaderAdmin />
+        <HeaderAdmin collapsed={collapsed} setCollapsed={setCollapsed} />
         <Outlet />
       </Content>
       {/* </div> */}

@@ -54,11 +54,13 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
     <Sider
       collapsible
       collapsed={collapsed}
-      onCollapse={(value) => setCollapsed(value)}
+      // onCollapse={(value) => setCollapsed(value)}
+      trigger={null}
       style={{
         minHeight: "100vh",
         marginLeft: 10,
         borderRadius: 20,
+        padding: "0 10px",
         overflow: "auto",
         position: "fixed",
         width: collapsed ? "80px" : "200px",

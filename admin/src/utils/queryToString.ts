@@ -1,4 +1,6 @@
-export default function objectToQueryString(data: Record<string, any>): string {
+import { Filter } from "../interfaces/interfaces";
+
+export default function objectToQueryString<T>(data: Filter<T>): string {
   let queryParts = [];
   let first = true;
 

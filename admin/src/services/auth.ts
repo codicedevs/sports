@@ -1,6 +1,7 @@
+import { User } from "../interfaces/interfaces";
 import { CrudService } from "./crud";
 
-class AuthService extends CrudService {
+class AuthService extends CrudService<User> {
   constructor() {
     super("auth");
   }

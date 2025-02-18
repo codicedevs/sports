@@ -1,21 +1,9 @@
-import {
-  Button,
-  GetProps,
-  Input,
-  Segmented,
-  Select,
-  Space,
-  Switch,
-  Table,
-} from "antd";
-import dataList from "../assets/users.json";
+import { Button, Input, Segmented, Select, Space, Table } from "antd";
 import { useState } from "react";
 import { useGetMatchesQuery } from "../store/features/match/matchApi";
-
-type SearchProps = GetProps<typeof Input.Search>;
-
+import { CheckCircleTwoTone, CloseCircleTwoTone } from "@ant-design/icons";
+import { Location, Match, User } from "../interfaces/interfaces";
 const { Search } = Input;
-
 const columns = [
   {
     title: "Nombre del partido",
@@ -26,24 +14,53 @@ const columns = [
     title: "Fecha",
     dataIndex: "date",
     key: "date",
+    render: (date: Date) => {
+      const dateObj = new Date(date);
+      const day = ("0" + dateObj.getDate()).slice(-2);
+      const month = ("0" + (dateObj.getMonth() + 1)).slice(-2);
+      const year = dateObj.getFullYear();
+      return `${day}/${month}/${year}`;
+    },
   },
   {
-    title: "Ciudad",
+    title: "Hora",
+    dataIndex: "date",
+    key: "time",
+    render: (date: Date) => {
+      const dateObj = new Date(date);
+      const hours = ("0" + dateObj.getHours()).slice(-2);
+      const minutes = ("0" + dateObj.getMinutes()).slice(-2);
+      return `${hours}:${minutes}`;
+    },
+  },
+  {
+    title: "Cancha",
     dataIndex: "location",
     key: "location",
-    render: (location: any) => `${location.name}`,
+    render: (location: Location) =>
+      location ? `${location.name}` : "Sin definir",
   },
   {
     title: "Reserva hecha por",
-    dataIndex: "userId",
+    dataIndex: "user",
     key: "userId",
-    render: (user: any) => `${user.name}`,
+    render: (user: User) => `${user?.name}`,
   },
   {
-    title: "Estado",
+    title: "Abierto",
     dataIndex: "open",
     key: "open",
-    render: (open: boolean) => (open ? <h3>Abierto</h3> : "Cerrado"),
+    render: (open: boolean) => {
+      return (
+        <div style={{ display: "flex", justifyContent: "center" }}>
+          {open ? (
+            <CheckCircleTwoTone twoToneColor="#52c41a" />
+          ) : (
+            <CloseCircleTwoTone twoToneColor="#c4521a" />
+          )}
+        </div>
+      );
+    },
   },
   // {
   //   title: "Jugadores",
@@ -54,7 +71,8 @@ const columns = [
     title: "Acción",
     key: "action",
     width: "25%",
-    render: (record: any) => (
+    align: "right" as const,
+    render: (record: Match) => (
       <Space
         size="middle"
         style={{
@@ -63,34 +81,23 @@ const columns = [
           justifyContent: "right",
         }}
       >
-        {/* <a>Escribir a {record.userId}</a> */}
+        <a>Escribir a {record.user.name}</a>
         <Button>Editar</Button>
         <Button>Borrar</Button>
       </Space>
     ),
   },
 ];
-
-const optionsFilter = dataList.map((user) => ({
-  label: user.firstName,
-  value: user.firstName,
-}));
-
 const stateOptions = [
   { label: "Abierto", value: true },
   { label: "Cerrado", value: false },
   { label: "Todas", value: "all" },
 ];
-
 const likeInputs = ["name", "location", "user"];
 
 const MatchList = () => {
-  const [bordered, setBordered] = useState(true);
   const [filter, setFilter] = useState<{}>();
-  const { data, isLoading, error } = useGetMatchesQuery(filter);
-
-  const handleFilterChange = (filterName: string, value: any) => {};
-
+  const { data } = useGetMatchesQuery(filter);
   const handleSearch = (filterName: string, value: string | boolean) => {
     if (likeInputs.includes(filterName)) {
       setFilter((prevFilter) => ({
@@ -107,7 +114,7 @@ const MatchList = () => {
   const handleOpenChange = (value: string) => {
     console.log(value);
 
-    handleSearch("open", value); // Actualiza el estado del filtro
+    handleSearch("open", value);
   };
 
   return (
@@ -138,8 +145,6 @@ const MatchList = () => {
             onChange={(e) => handleSearch("name", e.target.value)}
             size="middle"
             name="like-name"
-
-            // suffix={suffix}
           />
         </div>
 
@@ -157,7 +162,7 @@ const MatchList = () => {
             placeholder="Elegí un estado"
             optionFilterProp="label"
             onChange={handleOpenChange}
-            // onSearch={onSearch}
+            defaultValue={"all"}
             options={stateOptions}
             style={{ width: 150, textAlign: "center" }}
           />
@@ -174,11 +179,10 @@ const MatchList = () => {
           <label htmlFor="switchBordered">Turno</label>
           <Segmented
             value={filter}
-            onChange={setFilter}
             options={[
-              { label: "Opcion 1", value: "Opcion 1" },
-              { label: "Opcion 2", value: "Opcion 2" },
-              { label: "Opcion 3", value: "Opcion 3" },
+              { label: "Mañana", value: "Opcion 1" },
+              { label: "Tarde", value: "Opcion 2" },
+              { label: "Noche", value: "Opcion 3" },
             ]}
           />
         </div>

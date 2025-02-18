@@ -1,8 +1,7 @@
 import React from "react";
 import { Avatar, Card, List } from "antd";
 import { MailOutlined, PhoneOutlined, HomeOutlined } from "@ant-design/icons";
-import User from "../interfaces/interfaces";
-import UserList from "../components/userList";
+import { User } from "../interfaces/interfaces";
 
 const TestUserProfile = () => {
   return (
