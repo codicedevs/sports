@@ -15,8 +15,14 @@ export const lightTheme: ThemeConfig = {
     Menu: {
       subMenuItemBg: lightColors.cleary,
       itemBg: lightColors.primary,
-      itemSelectedBg: lightColors.pressed,
+      itemSelectedBg: lightColors.secondary,
+      itemSelectedColor: lightColors.primary,
       colorText: "#ffffff",
+      subMenuItemSelectedColor: lightColors.secondary,
+    },
+    Table: {
+      headerBg: lightColors.primary,
+      headerColor: "#ffffff",
     },
   },
 };
