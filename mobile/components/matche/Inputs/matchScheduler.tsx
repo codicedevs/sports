@@ -48,6 +48,33 @@ const MatchSchedulerInput = ({ matchDetailsRef }: MatchSchedulerInputProps) => {
     time: '00:00'
   });
 
+  const temporal = () => {
+    if (!matchDetailsRef.current.matchDate) return;
+
+    const dateString = matchDetailsRef.current.matchDate.split('T')[0];
+
+    const originalDate = new Date(matchDetailsRef.current.matchDate);
+
+    originalDate.setHours(originalDate.getHours() - 3);
+
+    const adjustedHours = originalDate.getUTCHours().toString().padStart(2, '0');
+    const adjustedMinutes = originalDate.getUTCMinutes().toString().padStart(2, '0');
+    const adjustedTime = `${adjustedHours}:${adjustedMinutes}`;
+
+    const matchingSchedule = schedules.find(schedule => schedule.time === adjustedTime);
+    if (matchingSchedule) {
+      setSelectedHour(matchingSchedule);
+    }
+
+    setSelected(new Date(dateString));
+  };
+
+  useEffect(() => {
+    temporal()
+  }, [matchDetailsRef.current.matchDate])
+
+  console.log(matchDetailsRef.current.matchDate)
+
   const changeTime = (date: Date, timeString: string): Date => {
     const [hours, minutes] = timeString.split(':').map(Number);
     const newDate = new Date(date);
@@ -60,7 +87,7 @@ const MatchSchedulerInput = ({ matchDetailsRef }: MatchSchedulerInputProps) => {
       const newDate = changeTime(selected, selectedHour.time);
       matchDetailsRef.current.matchDate = newDate;
     }
-  }, [selected, selectedHour, matchDetailsRef]);
+  }, [selected, selectedHour]);
 
   return (
     <Div px={customTheme.spacing.medium}>
