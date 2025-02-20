@@ -20,6 +20,7 @@ export interface User {
   _id: string;
   name: string;
   email: string;
+  phone: string;
   password: string;
   friends: string[]; // Asumimos que son referencias por _id
   roles: string[];
