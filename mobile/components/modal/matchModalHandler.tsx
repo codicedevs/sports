@@ -40,20 +40,24 @@ const MatchModalHandler = ({
 
   const [openId, setOpenId] = useState<null | string>(null);
 
-  const createMatch = () => {
+  const createMatch = async () => {
     try {
-      const res = matchService.create({
+      const res = await matchService.create({
         name: "Prueba3",
         date: matchDetailsRef.current.matchDate,
         location: matchDetailsRef.current.location?._id,
         playersLimit: matchDetailsRef.current.playerLimit,
-        userId: "6720ef0e3a78ebc10564e979",
+        userId: "66fc580c32617aadfac71feb",
         sportMode: matchDetailsRef.current.selectedSportMode?._id,
         open: matchDetailsRef.current.privacyOption,
       });
 
-      return res;
-    } catch (e) {}
+      console.log("Partido creado:", res);
+
+      closeModal();
+    } catch (e) {
+      console.error("Error al crear el partido:", e);
+    }
   };
 
   const closeModal = () => {
