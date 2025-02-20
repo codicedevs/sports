@@ -26,7 +26,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                 !isFetching &&
                 <>
                     <Button onPress={() => setOpen(true)}>Editar partido</Button>
-                    <MatchModalHandler open={open} setOpen={setOpen} match={match} />
+                    <MatchModalHandler open={false} setOpen={setOpen} match={match} />
                 </>
             }
         </View>
