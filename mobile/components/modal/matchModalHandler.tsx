@@ -62,7 +62,7 @@ const MatchModalHandler = ({
       if (onMatchCreated) {
         onMatchCreated(createdMatchId);
       }
-
+      console.log(res)
       closeModal();
     } catch (e) {
       console.error("Error al crear el partido:", e);

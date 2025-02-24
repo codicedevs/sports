@@ -25,7 +25,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
     <Div p={customTheme.spacing.medium}>
       <Text>Partido id: {id}</Text>
       <Div flexDir="row" alignItems="center">
-        <Div justifyContent="flex-start">
+        <Div justifyContent="flex-start" p={customTheme.spacing.small}>
           <Image
             source={require("../assets/iconflecha2.png")}
             style={{ width: 20, height: 20, resizeMode: "contain" }}
@@ -40,16 +40,19 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
           </Text>
         </Div>
       </Div>
-      <Div flexDir="row" justifyContent="space-between">
+      <Div flexDir="row" justifyContent="space-between" alignItems="center" p={customTheme.spacing.small}>
         <Div>
-          <Text>FUTBOL 5</Text>
+          <Text fontSize={customTheme.fontSize.large} 
+        fontFamily="NotoSans-BoldItalic">FUTBOL 5</Text>
         </Div>
-        <Div flexDir="row">
+        <Div flexDir="row" justifyContent="center" bg={customTheme.colors.primary}>
           <Image
             source={require("../assets/iconUser.png")}
-            style={{ width: 20, height: 20, resizeMode: "contain" }}
+            w={customTheme.fontSize.medium}resizeMode="contain"
+            mr={customTheme.spacing.small}
           />
-          <Text>5/10</Text>
+          <Text fontSize={customTheme.fontSize.medium} 
+          fontFamily="NotoSans-BoldItalic">5/10</Text>
         </Div>
       </Div>
     </Div>
