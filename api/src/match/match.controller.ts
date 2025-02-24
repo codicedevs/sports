@@ -28,7 +28,7 @@ import { Public } from "authentication/public";
 @Controller("matches")
 export class MatchController {
     constructor(private readonly matchService: MatchService) { }
-
+    @Public()
     @Post()
     async createMatch(@Body() createMatchDto: CreateMatchDto) {
         if (!Types.ObjectId.isValid(createMatchDto.userId)) {

@@ -1,53 +1,59 @@
 import React, { FC, ReactNode, useState } from "react";
+import { ModalContext } from "./modalProvider";
+import MatchModalHandler from "../components/modal/matchModalHandler";
 
 export const AuthContext = React.createContext<{
-    currentUser: any;
-    setCurrentUser: (user: any) => void;
-    isModalVisible: boolean;
-    showModal: () => void;
-    hideModal: () => void;
+  currentUser: any;
+  setCurrentUser: (user: any) => void;
+  isModalVisible: boolean;
+  showModal: () => void;
+  hideModal: () => void;
 }>({
-    currentUser: 'null',
-    setCurrentUser: () => { },
-    isModalVisible: false,
-    showModal: () => { },
-    hideModal: () => { },
-})
+  currentUser: "null",
+  setCurrentUser: () => {},
+  isModalVisible: false,
+  showModal: () => {},
+  hideModal: () => {},
+});
 
 interface AppProviderProps {
-    children: ReactNode;
+  children: ReactNode;
 }
 
 export function useSession() {
-    const value = React.useContext(AuthContext);
-    if (process.env.NODE_ENV !== 'production') {
-        if (!value) {
-            throw new Error('useSession must be wrapped in a <SessionProvider />');
-        }
+  const value = React.useContext(AuthContext);
+  if (process.env.NODE_ENV !== "production") {
+    if (!value) {
+      throw new Error("useSession must be wrapped in a <SessionProvider />");
     }
-    return value;
+  }
+  return value;
 }
 
 const AppProvider: FC<AppProviderProps> = ({ children }) => {
-    const [currentUser, setCurrentUser] = useState<any>(null);
-    const [isModalVisible, setIsModalVisible] = useState(false);
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [open, setOpen] = useState(false);
 
-    const showModal = () => setIsModalVisible(true);
-    const hideModal = () => setIsModalVisible(false);
+  const showModal = () => setIsModalVisible(true);
+  const hideModal = () => setIsModalVisible(false);
 
-    return (
-        <AuthContext.Provider
-            value={{
-                currentUser,
-                setCurrentUser,
-                isModalVisible,
-                showModal,
-                hideModal,
-            }}
-        >
-            {children}
-        </AuthContext.Provider>
-    )
-}
+  return (
+    <AuthContext.Provider
+      value={{
+        currentUser,
+        setCurrentUser,
+        isModalVisible,
+        showModal,
+        hideModal,
+      }}
+    >
+      <ModalContext.Provider value={{ open, setOpen }}>
+        {children}
+      </ModalContext.Provider>
+      <MatchModalHandler open={open} setOpen={setOpen} />
+    </AuthContext.Provider>
+  );
+};
 
 export default AppProvider;
