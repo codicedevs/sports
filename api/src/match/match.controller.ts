@@ -40,7 +40,7 @@ export class MatchController {
         const newMatch = await this.matchService.createMatch(createMatchDto);
         return newMatch;
     }
-
+    @Public()
     @Get()
     async findAll(@Query() filter: Filter) {
         return await this.matchService.findAll(filter);

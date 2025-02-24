@@ -1,22 +1,23 @@
 
 import Petition from "../types/petition.type";
 import { UserPreferences } from "../types/preferences.type";
-import { User } from "../types/user.type";
-import { HttpService } from "./http.service";
+import { IUser, User } from "../types/user.type";
+import { CRUDService } from "./CRUD";
+// import { HttpService } from "./http.service";
 
-class UserService extends HttpService {
+class UserService extends CRUDService<IUser> {
   constructor() {
     super("users");
   }
 
-  getAll = async () => {
-    const res = await this.get(`/`);
-    return res.data;
-  };
+  // getAll = async () => {
+  //   const res = await this.get(`/`);
+  //   return res.data;
+  // };
 
-  getUserById = async (id: string) => {
-    return this.get(`/${id}`);
-  };
+  // getUserById = async (id: string) => {
+  //   return this.get(`/${id}`);
+  // };
 
   getUserFriends = (id: string) => {
     return this.get(`${id}/friends`);

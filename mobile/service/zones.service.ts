@@ -1,7 +1,8 @@
+import { CRUDService } from "./CRUD";
 import { HttpService } from "./http.service";
 
 
- class ZonesService extends HttpService {
+ class ZonesService extends CRUDService<Zone> {
     constructor() {
         super("zones");
     }
