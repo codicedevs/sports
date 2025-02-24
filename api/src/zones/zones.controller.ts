@@ -6,7 +6,8 @@ import { QueryValidationPipe } from 'pipes/query-validation.pipe';
 import { FindManyFilter } from 'filter/filter.dto';
 import { User } from 'user/user.entity';
 import { Filter } from 'types/types';
-
+import { Public } from 'authentication/public';
+@Public()
 @ApiBearerAuth()
 @ApiTags('zones')
 @Controller('zones')

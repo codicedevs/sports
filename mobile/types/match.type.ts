@@ -34,6 +34,6 @@ export interface CreateMatchDto {
   playersLimit: number;
   userId: string;
   invitedUsers?: string[] | undefined;
-  sportMode: string;
+  sportMode: string | undefined;
   open?:boolean
 }
