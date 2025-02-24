@@ -30,7 +30,7 @@ const SportInput = ({ matchDetailsRef }: SportInputProps) => {
 
   useEffect(() => {
     if (selectedSport && allSportModes) {
-      console.log("bbbb",allSportModes)
+      
       const filteredModes = allSportModes.data.results.filter(
         (mode: SportMode) => mode.sport === selectedSport._id
       );

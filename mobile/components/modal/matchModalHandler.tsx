@@ -20,10 +20,16 @@ import {
 import matchService from "../../service/match.service";
 import { useMutate } from "../../hooks/useMutate";
 
+interface MatchModalHandlerProps {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  onMatchCreated?: (matchId: string) => void;
+}
+
 const MatchModalHandler = ({
   open,
   setOpen,
-  match,
+  onMatchCreated,
 }: {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -51,8 +57,11 @@ const MatchModalHandler = ({
         sportMode: matchDetailsRef.current.selectedSportMode?._id,
         open: matchDetailsRef.current.privacyOption,
       });
-
-      console.log("Partido creado:", res);
+      
+      const createdMatchId = res.data._id;
+      if (onMatchCreated) {
+        onMatchCreated(createdMatchId);
+      }
 
       closeModal();
     } catch (e) {
