@@ -20,7 +20,7 @@ export class ZonesService {
     const results = await this.zoneModel.find(filter).exec();
     return {
       results,
-      totalCount: await this.zoneModel.countDocuments(filter.where)
+      totalCount: await this.zoneModel.countDocuments(filter).exec()
     }
   }
 

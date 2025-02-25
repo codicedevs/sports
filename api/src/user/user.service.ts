@@ -29,7 +29,7 @@ export class UserService {
         const results = await this.userModel.find(filter).exec();
         return {
             results,
-            totalCount: await this.userModel.countDocuments(filter.where),
+            totalCount: await this.userModel.countDocuments(filter).exec()
         };
     }
 

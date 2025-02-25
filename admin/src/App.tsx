@@ -4,12 +4,13 @@ import store from "./store";
 import HomePage from "./pages/home";
 import LoginPage from "./pages/login";
 import { authLoader } from "./pages/loaders/authLoader";
-import Dashboard from "./pages/dashboard";
 import { ConfigProvider } from "antd";
 import DashboardHome from "./views/dashboardHome";
-import Settings from "./views/settings";
-import Users from "./views/users";
 import Matches from "./views/matches";
+import TestUserProfile from "./views/testProfile";
+import Dashboard from "./pages/dashboard";
+import { useState } from "react";
+import { lightTheme } from "./utils/theme";
 
 const router = createBrowserRouter([
   {
@@ -21,31 +22,20 @@ const router = createBrowserRouter([
     element: <LoginPage />,
   },
   {
-    path: "/protected",
+    path: "/home",
     element: <Dashboard />,
     loader: authLoader,
     children: [
       { path: "", element: <DashboardHome /> },
       { path: "partidos", element: <Matches /> },
-      { path: "profile", element: <Users /> },
+      { path: "profile", element: <TestUserProfile /> },
     ],
   },
 ]);
 
 const App = () => (
   <Provider store={store}>
-    <ConfigProvider
-      theme={{
-        token: {
-          // Seed Token
-          colorPrimary: "#56116b",
-          borderRadius: 2,
-
-          // Alias Token
-          colorBgContainer: "#f6ffed",
-        },
-      }}
-    >
+    <ConfigProvider theme={lightTheme}>
       <RouterProvider router={router} />
     </ConfigProvider>
   </Provider>

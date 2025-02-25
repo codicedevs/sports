@@ -4,6 +4,7 @@ import { CreateSportDto, UpdateSportDto } from './sport.dto';
 import { ValidateObjectIdPipe } from 'pipes/validate-object-id.pipe';
 import { Types } from 'mongoose';
 import { Filter } from 'types/types';
+import { Public } from 'authentication/public';
 
 @Controller('sports')
 export class SportsController {
@@ -13,7 +14,7 @@ export class SportsController {
   create(@Body() createSportDto: CreateSportDto) {
     return this.sportsService.create(createSportDto);
   }
-
+@Public()
   @Get()
   findAll(@Query() filter: Filter) {
     return this.sportsService.findAll(filter);

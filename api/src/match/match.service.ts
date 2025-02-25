@@ -199,7 +199,7 @@ export class MatchService {
     const results = await this.matchViewModel.find(filter).exec()
     return {
       results,
-      totalCount: await this.matchViewModel.countDocuments(filter.where)
+      totalCount: await this.matchViewModel.countDocuments(filter).exec()
     }
   }
 

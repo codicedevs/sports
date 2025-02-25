@@ -4,6 +4,7 @@ import { CreateSportModeDto, UpdateSportModeDto } from './sport_mode.dto';
 import { Types } from 'mongoose';
 import { ValidateObjectIdPipe } from 'pipes/validate-object-id.pipe';
 import { Filter } from 'types/types';
+import { Public } from 'authentication/public';
 
 @Controller('sport-modes')
 export class SportModesController {
@@ -13,7 +14,7 @@ export class SportModesController {
   create(@Body() createSportModeDto: CreateSportModeDto) {
     return this.sportModesService.create(createSportModeDto);
   }
-
+@Public()
   @Get()
   findAll(@Query() filter: Filter) {
     return this.sportModesService.findAll(filter);

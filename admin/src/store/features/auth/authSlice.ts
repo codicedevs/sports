@@ -8,7 +8,7 @@ interface AuthState {
 
 const initialState: AuthState = {
   user: null,
-  token: null,
+  token: localStorage.getItem("jwt") || null,
 };
 
 const authSlice = createSlice({

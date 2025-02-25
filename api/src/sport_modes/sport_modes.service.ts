@@ -17,7 +17,7 @@ export class SportModesService {
     const results = await this.sportModeModel.find(filter).exec();
     return {
       results,
-      totalCount: await this.sportModeModel.countDocuments(filter.where),
+      totalCount: await this.sportModeModel.countDocuments(filter).exec()
     };
   }
 
