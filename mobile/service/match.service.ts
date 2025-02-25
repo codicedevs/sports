@@ -7,11 +7,20 @@ class MatchService extends HttpService {
     super("matches");
   }
 
-  getAll = async () => {
-    const res = await this.get(`/`);
-    return res.data;
+  getAll = async (filter?) => {
+    // if (!!filter) {
+      if (Object.keys(filter).length !== 0) {
+      console.log(filter)
+      const res = await this.get('/', {
+        params: filter
+      });
+      return res;
+    } else {
+      console.log('TODOS')
+      const res = await this.get('/');
+      return res;
+    }
   };
-
 
   update = async (id: string, matchInfo: CreateMatchDto) => {
     const res = await this.put(`/${id}`, matchInfo)
