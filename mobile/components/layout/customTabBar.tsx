@@ -52,7 +52,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
             alignSelf="center"
           >
             {React.cloneElement(iconMap[route.name] || <Icon name="circle" fontSize={24} />, {
-              color: isFocused ? customTheme.colors.primary : "white",
+              fill: isFocused ? customTheme.colors.primary : "white",
             })}
           </Button>
         );
