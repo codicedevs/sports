@@ -38,8 +38,6 @@ const SelectZoneInput = ({ matchDetailsRef }: SportInputProps) => {
     };
 
     if (!zonas) return null
-   
-
     return (
         <Div p={customTheme.spacing.medium}>
             <Text my={customTheme.spacing.medium}>Elegir zona</Text>
