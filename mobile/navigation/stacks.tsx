@@ -10,6 +10,7 @@ import Trialscreen2 from "../screens/trial2";
 import { AppScreens } from "./screens";
 import MatchDetail from "../screens/matchDetail";
 import CustomTabBar from "../components/layout/customTabBar";
+import MatchesScreen from "../screens/matches";
 
 const SettingsStack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator()
@@ -61,7 +62,7 @@ export function TabStackScreen() {
             <Tab.Screen name="HomeStack" component={HomeStackScreen} />
             <Tab.Screen name="SettingsStack" component={SettingsStackScreen} />
             <Tab.Screen name="SettingsStack1" component={SettingsStackScreen} />
-            <Tab.Screen name="SettingsStack2" component={SettingsStackScreen} />
+            <Tab.Screen name={AppScreens.MATCH_SCREEN} component={MatchesScreen} />
             <Tab.Screen name="SettingsStack3" component={SettingsStackScreen} />
 
         </Tab.Navigator>

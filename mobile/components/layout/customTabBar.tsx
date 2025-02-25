@@ -13,7 +13,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
     HomeStack: <Icon fontFamily="Octicons" name="home" fontSize={customTheme.fontSize.xl} color="#aaa" />,
     SettingsStack: <Icon fontFamily="Feather" name="bell" fontSize={customTheme.fontSize.xl} color="#aaa" />,
     SettingsStack1: <Icon fontFamily="Feather" name="plus" fontSize={customTheme.fontSize.xl} color="#aaa" />,
-    SettingsStack2: <Icon fontFamily="MaterialCommunityIcons" name="soccer-field" fontSize={customTheme.fontSize.xl} color="#aaa"   style={{ transform: [{ rotate: "90deg" }] }} />,
+    [AppScreens.MATCH_SCREEN]: <Icon fontFamily="MaterialCommunityIcons" name="soccer-field" fontSize={customTheme.fontSize.xl} color="#aaa"   style={{ transform: [{ rotate: "90deg" }] }} />,
     SettingsStack3: <Icon fontFamily="Feather" name="user" fontSize={customTheme.fontSize.xl} color="#aaa" />,
   };
 
