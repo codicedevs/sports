@@ -40,14 +40,14 @@ const MatchesScreen = () => {
         };
       
         if (filters.sportModes && filters.sportModes.length > 0) {
-          mongoFilter.where["sportMode.name"] = {
-            $in: filters.sportModes.map((mode) => mode.name),
+          mongoFilter.where["sportMode._id"] = {
+            $in: filters.sportModes.map((mode) => mode._id),
           };
         }
       
         if (filters.zones && filters.zones.length > 0) {
-          mongoFilter.where["location.name"] = {
-            $in: filters.zones.map((zone) => zone.name),
+          mongoFilter.where["location._id"] = {
+            $in: filters.zones.map((zone) => zone._id),
           };
         }
       
@@ -61,8 +61,6 @@ const MatchesScreen = () => {
       
         return mongoFilter;
       }
-      
-
 
     const fetchMatches = async () => {
         const mongoFilter = buildMongoFilter(filter);
