@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { Div } from "react-native-magnus";
-import { scale, verticalScale } from "react-native-size-matters";
 
-// Componente para representar un jugador
 const FPlayer = ({ size, style }) => {
   return (
     <Div
@@ -17,8 +15,6 @@ const FPlayer = ({ size, style }) => {
 };
 
 const TeamField = ({ playersCount }) => {
-  // Calculamos los jugadores sin arquero por equipo (suponiendo que playersCount es par)
-  // Ejemplo: en un equipo de 10, el arquero se posiciona fijo y los otros 4 se distribuyen en dos filas (2-2).
   const nonGoalkeeperPlayers = playersCount / 2 - 1;
   const [layout, setLayout] = useState(null);
 
@@ -29,21 +25,32 @@ const TeamField = ({ playersCount }) => {
 
   let players = [];
   if (layout) {
-    // Dividimos en 2 filas
+    // Número de jugadores por fila (suponemos que es par)
     const playersPerRow = nonGoalkeeperPlayers / 2;
-    // Calculamos el espaciado horizontal para cada fila
-    const horizontalSpacing = layout.width / (playersPerRow + 1);
-    // El tamaño del círculo se define proporcionalmente (ajusta el factor según lo necesites)
-    const circleSize = horizontalSpacing * 0.8;
-    // Definimos posiciones verticales para cada fila (puedes modificar estos porcentajes)
+    
+    const factor = 0.8; // Factor para definir el tamaño relativo del círculo respecto al spacing
+    let circleSize, spacing;
+    if (playersPerRow > 1) {
+      circleSize = (factor * layout.width) / ((playersPerRow - 1) + factor);
+      spacing = (layout.width - circleSize) / (playersPerRow - 1);
+    } else {
+      // En caso de tener un solo jugador en la fila, lo centramos
+      circleSize = layout.width * 0.5;
+      spacing = 0;
+    }
+    
     const rowYPositions = [
       layout.height * 0.35 - circleSize / 2,
       layout.height * 0.65 - circleSize / 2,
     ];
 
+    // Recorremos cada fila y cada jugador dentro de la fila
     for (let row = 0; row < 2; row++) {
       for (let i = 0; i < playersPerRow; i++) {
-        const left = horizontalSpacing * (i + 1) - circleSize / 2;
+        // El centro horizontal del jugador i será:
+        const centerX = circleSize / 2 + i * spacing;
+        // Para posicionar el elemento, restamos la mitad del circleSize
+        const left = centerX - circleSize / 2;
         players.push(
           <FPlayer
             key={`${row}-${i}`}
@@ -67,15 +74,15 @@ const TeamField = ({ playersCount }) => {
 };
 
 const Field = () => {
-  // Ejemplo: total de jugadores por equipo (puede ser 10, 14, 18, 22, etc.)
-  const totalPlayers = 16;
+  // Puedes cambiar este valor a 18, 22, etc.
+  const totalPlayers = 22;
 
   return (
     <Div p={20} bg="red" h="100%">
       <Div id="first-half" borderWidth={1} flex={1}>
-        {/* Arquero en posición fija (por ejemplo, en la parte superior) */}
+        {/* Arquero en posición fija, por ejemplo, en la parte superior */}
         <Div h="15%" alignItems="center" justifyContent="center">
-          <FPlayer size={scale(50)} />
+          <FPlayer size={50} />
         </Div>
         {/* Jugadores de campo distribuidos en dos filas */}
         <TeamField playersCount={totalPlayers} />
