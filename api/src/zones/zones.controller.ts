@@ -7,6 +7,8 @@ import { FindManyFilter } from 'filter/filter.dto';
 import { User } from 'user/user.entity';
 import { Filter } from 'types/types';
 import { Public } from 'authentication/public';
+import { Types } from 'mongoose';
+import { ValidateObjectIdPipe } from 'pipes/validate-object-id.pipe';
 @Public()
 @ApiBearerAuth()
 @ApiTags('zones')
@@ -25,8 +27,8 @@ export class ZonesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.zonesService.findOne(+id);
+  findOne(@Param("id", new ValidateObjectIdPipe()) id: string) {
+    return this.zonesService.findOne(new Types.ObjectId(id));
   }
 
   @Patch(':id')
