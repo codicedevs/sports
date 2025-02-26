@@ -3,6 +3,7 @@ import { AppScreenProps, AppScreens } from "../navigation/screens";
 import { Button, Div } from "react-native-magnus";
 import MatchModalHandler from "../components/modal/matchModalHandler";
 import { ModalContext } from "../context/modalProvider";
+import Field from "../components/field";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
@@ -16,15 +17,8 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   };
 
   return (
-    <Div>
-      <Button block onPress={() => setOpen(true)}>
-        Abrir
-      </Button>
-      <MatchModalHandler
-        open={open}
-        setOpen={setOpen}
-        onMatchCreated={handleMatchCreated}
-      />
+    <Div flex={1}>
+      <Field />
     </Div>
   );
 };
