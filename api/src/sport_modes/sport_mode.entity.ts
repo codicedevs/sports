@@ -14,9 +14,9 @@ export class SportMode extends Document {
   @IsMongoId()
   sport: Types.ObjectId | Sport;
 
-  @Prop({ required: true })
+  @Prop({ required: false })
   @IsString()
-  label: string;
+  label?: string;
 }
 
 export const SportModeSchema = SchemaFactory.createForClass(SportMode);
