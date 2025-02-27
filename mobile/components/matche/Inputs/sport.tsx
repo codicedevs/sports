@@ -83,6 +83,14 @@ const SportInput = ({ matchDetailsRef }: SportInputProps) => {
     matchDetailsRef.current.selectedSportMode = mode;
   };
 
+  useEffect(() => {
+    if (!selectedSport && sports) {
+      const defaultSport = sports.data.results[0];
+      setSelectedSport(defaultSport);
+      matchDetailsRef.current.selectedSport = defaultSport;
+    }
+  }, [sports]);
+
   if (!sports || !allSportModes)
     return (
       <MotiView>

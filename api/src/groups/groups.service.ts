@@ -91,7 +91,7 @@ export class GroupsService {
     const results = await this.groupModel.find(filter)
     return {
       results,
-      totalCount: await this.groupModel.countDocuments(filter.where)
+      totalCount: await this.groupModel.countDocuments(filter).exec()
     }
   }
 

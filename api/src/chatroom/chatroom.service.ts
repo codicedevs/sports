@@ -136,7 +136,7 @@ export class ChatroomService {
     const results = await this.chatroomModel.find(filter).exec();
     return {
       results,
-      totalCount: await this.chatroomModel.countDocuments(filter.where)
+      totalCount: await this.chatroomModel.countDocuments(filter).exec()
     }
   }
 

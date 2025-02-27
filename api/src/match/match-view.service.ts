@@ -49,7 +49,7 @@ export class MatchViewService implements OnModuleInit {
           },
           {
             $lookup: {
-              from: 'sportModes',
+              from: 'sportmodes',
               localField: 'sportMode',
               foreignField: '_id',
               as: 'sportMode',

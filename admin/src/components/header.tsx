@@ -1,57 +1,46 @@
-import { SettingOutlined, UserOutlined } from "@ant-design/icons";
-import { Avatar, Dropdown, Menu } from "antd";
+import { MenuOutlined, SearchOutlined, UserOutlined } from "@ant-design/icons";
+import { Avatar, Button, Input } from "antd";
+import { Header } from "antd/es/layout/layout";
+import { lightColors } from "../utils/colors";
+import { Breadcrumbs } from "./breadcrumbs";
+import { SetStateType } from "../interfaces/types";
 
-export default function Header() {
-  const menu = (
-    <Menu>
-      <Menu.Item key="0">
-        <a href="protected/profile">Perfil</a>
-      </Menu.Item>
-      <Menu.Item key="1">
-        <a href="protected/settings">Configuración</a>
-      </Menu.Item>
-      <Menu.Divider />
-      <Menu.Item key="2">Cerrar Sesión</Menu.Item>
-    </Menu>
-  );
-
+interface HeaderProps {
+  collapsed: boolean;
+  setCollapsed: SetStateType<boolean>;
+}
+const HeaderAdmin = ({ collapsed, setCollapsed }: HeaderProps) => {
   return (
-    <div
+    <Header
       style={{
         display: "flex",
         justifyContent: "space-between",
         alignItems: "center",
-        width: "100%",
-        height: "50px",
-        background: "#f0f2f5",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
-        padding: "10 0px",
+        borderBottom: "1px solid gray",
+        marginBottom: "10px",
       }}
     >
-      <h2 style={{ paddingLeft: "20px" }}>Sports Admin</h2>
-      <div
-        style={{
-          padding: "20px",
-          display: "flex",
-          alignItems: "center",
-          gap: "10px",
-        }}
-      >
-        <Dropdown overlay={menu} trigger={["click"]}>
-          <div>
-            <a
-              className="ant-dropdown-link"
-              onClick={(e) => e.preventDefault()}
-            >
-              <SettingOutlined />
-            </a>
-          </div>
-        </Dropdown>
+      <div style={{ display: "flex", gap: 15 }}>
+        <Button
+          type="text"
+          icon={<MenuOutlined />}
+          onClick={() => setCollapsed(!collapsed)}
+        />
+        <Breadcrumbs />
+      </div>
+      <div style={{ display: "flex", gap: 15 }}>
         <Avatar
-          style={{ backgroundColor: "#1720a8" }}
+          style={{ backgroundColor: lightColors.primary, width: "30px" }}
           icon={<UserOutlined />}
         />
+        <Input
+          placeholder="Buscar..."
+          suffix={<SearchOutlined style={{ color: "rgba(0,0,0,.45)" }} />}
+          style={{ width: 200 }}
+        />
       </div>
-    </div>
+    </Header>
   );
-}
+};
+
+export default HeaderAdmin;

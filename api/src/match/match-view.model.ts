@@ -2,7 +2,7 @@ import mongoose, { Document, Types } from 'mongoose';
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Location } from 'locations/location.entity';
 import { User } from 'user/user.entity';
-import { SportMode } from 'sport_modes/sport_mode.entity';
+import { SportMode, SportModeSchema } from 'sport_modes/sport_mode.entity';
 import { Formations, FormationsSchema } from './match.entity';
 
 @Schema({ collection: 'matchView', versionKey: false })
@@ -26,8 +26,8 @@ export class MatchView extends Document {
   @Prop({ type: Location })
   location?: Location;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "SportMode", required: true })
-  sportMode: Types.ObjectId | SportMode;
+  @Prop({ type: SportModeSchema, required: true })
+  sportMode: SportMode;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "User", required: true })
   userId: Types.ObjectId;

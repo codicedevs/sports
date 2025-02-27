@@ -1,6 +1,6 @@
 export interface Filter {
-    page: number;
-    limit: number;
+    page?: number;
+    limit?: number;
     populate?: string[];
     where?: Record<string, any>;
 }

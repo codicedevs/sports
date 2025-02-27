@@ -18,7 +18,7 @@ export class SportsService {
     const results = await this.sportModel.find(filter).exec();
     return {
       results,
-      totalCount: await this.sportModel.countDocuments(filter.where)
+      totalCount: await this.sportModel.countDocuments(filter).exec()
     }
   }
 

@@ -1,9 +1,9 @@
-import React from "react";
+import MatchList from "../components/matchList";
 
 const Matches = () => {
   return (
     <div>
-      <h1>Menu Partidos</h1>
+      <MatchList />
     </div>
   );
 };

@@ -19,7 +19,7 @@ export class EventService {
         const results = await this.eventModel.find(filter).exec()
         return {
             results,
-            totalCount: await this.eventModel.countDocuments(filter.where)
+            totalCount: await this.eventModel.countDocuments(filter).exec()
         }
     }
 

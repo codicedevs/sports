@@ -1,56 +1,93 @@
-import { Link } from "react-router-dom";
+import {
+  PieChartOutlined,
+  TableOutlined,
+  UserOutlined,
+} from "@ant-design/icons";
+import { Menu, MenuProps, Typography } from "antd";
+import Sider from "antd/es/layout/Sider";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import logo from "../assets/logo.png";
+import logoColap from "../assets/Pelota logo.png";
+import { lightColors } from "../utils/colors";
+import { SetStateType } from "../interfaces/types";
 
-export default function Sidebar() {
+type MenuItem = Required<MenuProps>["items"][number];
+
+function getItem(
+  label: React.ReactNode,
+  key: React.Key,
+  icon?: React.ReactNode,
+  children?: MenuItem[] | null,
+  onClick?: () => void,
+  danger: boolean = false
+): MenuItem {
+  return {
+    key,
+    icon,
+    children,
+    label,
+    onClick,
+    danger,
+  } as MenuItem;
+}
+
+interface SidebarProps {
+  collapsed: boolean;
+  setCollapsed: SetStateType<boolean>;
+}
+
+const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
+  const navigate = useNavigate();
+  const items: MenuItem[] = [
+    getItem("Dashboard", "1", <PieChartOutlined />, null, () => navigate("")),
+    getItem("Partidos", "2", <TableOutlined />, null, () =>
+      navigate("partidos")
+    ),
+    getItem("Jugadores", "sub2", <UserOutlined />, [
+      getItem("Tom", "3", null, null, () => navigate("profile")),
+      getItem("Bill", "4", null, null, () => navigate("profile")),
+      getItem("Alex", "5", null, null, () => navigate("profile")),
+    ]),
+  ];
   return (
-    <div
+    <Sider
+      collapsible
+      collapsed={collapsed}
+      // onCollapse={(value) => setCollapsed(value)}
+      trigger={null}
       style={{
-        width: "200px",
-        height: "100%", // Toma toda la altura del contenedor padre
-        background: "#001529",
-        color: "white",
+        minHeight: "100vh",
+        marginLeft: 10,
+        borderRadius: 20,
+        padding: "0 10px",
+        overflow: "auto",
+        position: "fixed",
+        width: collapsed ? "80px" : "200px",
       }}
     >
-      <ul style={{ listStyleType: "none", padding: "20px 0" }}>
-        <li>
-          <Link
-            to=""
-            style={{
-              color: "white",
-              textDecoration: "none",
-              display: "block",
-              padding: "10px 20px",
-            }}
-          >
-            Dashboard General
-          </Link>
-        </li>
-        <li>
-          <Link
-            to="partidos"
-            style={{
-              color: "white",
-              textDecoration: "none",
-              display: "block",
-              padding: "10px 20px",
-            }}
-          >
-            Partidos
-          </Link>
-        </li>
-        <li>
-          <Link
-            to="profile"
-            style={{
-              color: "white",
-              textDecoration: "none",
-              display: "block",
-              padding: "10px 20px",
-            }}
-          >
-            Usuarios
-          </Link>
-        </li>
-      </ul>
-    </div>
+      <div style={{ display: "flex", justifyContent: "center" }}>
+        {collapsed ? (
+          <img
+            src={logoColap}
+            alt="logo"
+            style={{ width: "50px", margin: "10px" }}
+          />
+        ) : (
+          <div>
+            <img
+              src={logo}
+              alt="logo"
+              style={{ width: "150px", marginRight: "10px" }}
+            />
+            <h2 style={{ color: lightColors.pressed }}>Loyal Futbol 5</h2>
+          </div>
+        )}
+      </div>
+
+      <Menu defaultSelectedKeys={["1"]} mode="inline" items={items} />
+    </Sider>
   );
-}
+};
+
+export default Sidebar;
