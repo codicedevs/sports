@@ -15,13 +15,11 @@ const FPlayer = ({ size, style }) => (
   />
 );
 
-const TeamField = ({ playersCount }) => {
+const TeamField = ({ playersCount, mirror = false }) => {
   const fieldPlayers = playersCount - 1;
   const maxPerRow = playersCount === 5 ? 2 : 4;
   const numRows = Math.ceil(fieldPlayers / maxPerRow);
-
   const [layout, setLayout] = useState(null);
-
   const handleLayout = (event) => {
     const { width, height } = event.nativeEvent.layout;
     setLayout({ width, height });
@@ -38,10 +36,12 @@ const TeamField = ({ playersCount }) => {
     const rowHeight = layout.height / numRows;
 
     for (let row = 0; row < numRows; row++) {
-      const playersInRow = row < numRows - 1 ? maxPerRow : fieldPlayers - row * maxPerRow;
+      const effectiveRow = mirror ? (numRows - 1 - row) : row;
+      const playersInRow =
+        row < numRows - 1 ? maxPerRow : fieldPlayers - row * maxPerRow;
       const rowWidth = playersInRow * circleSize + (playersInRow - 1) * spacing;
       const leftOffset = (layout.width - rowWidth) / 2;
-      const top = row * rowHeight + (rowHeight - circleSize) / 2;
+      const top = effectiveRow * rowHeight + (rowHeight - circleSize) / 2;
 
       for (let i = 0; i < playersInRow; i++) {
         const left = leftOffset + i * (circleSize + spacing);
@@ -64,19 +64,23 @@ const TeamField = ({ playersCount }) => {
 };
 
 const Field = () => {
+
   const totalPlayers = 10;
   const teamPlayers = totalPlayers / 2;
 
   return (
     <Div p={20} bg="red" h="100%">
       <Div id="first-half" borderWidth={1} flex={1}>
-        {/* Posición fija del arquero */}
         <Div h="15%" alignItems="center" justifyContent="center">
           <FPlayer size={scale(50)} />
         </Div>
-        <TeamField playersCount={teamPlayers} />
+        <TeamField playersCount={teamPlayers} mirror={false} />
       </Div>
       <Div id="second-half" borderWidth={1} flex={1}>
+        <TeamField playersCount={teamPlayers} mirror={true} />
+        <Div h="15%" alignItems="center" justifyContent="center">
+          <FPlayer size={scale(50)} />
+        </Div>
       </Div>
     </Div>
   );
