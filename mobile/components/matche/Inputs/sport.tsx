@@ -29,9 +29,9 @@ const SportInput = ({ matchDetailsRef }: SportInputProps) => {
   const { data: allSportModes } = useFetch(sportmodeService.getAll, [QUERY_KEYS.SPORT_MODES]);
 
   useEffect(() => {
-    if (selectedSport && allSportModes) {
-      
-      const filteredModes = allSportModes.results.filter(
+
+    if (selectedSport && allSportModes?.data) {
+      const filteredModes = allSportModes.data.results.filter(
         (mode: SportMode) => mode.sport === selectedSport._id
       );
       if (filteredModes.length > 0) {

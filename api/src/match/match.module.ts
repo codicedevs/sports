@@ -14,6 +14,7 @@ import { ChatroomModule } from "chatroom/chatroom.module";
 import { MatchListener } from "app-listeners/match.listener";
 import { MatchViewModule } from "./match-view.module";
 import { MatchView, MatchViewSchema } from "./match-view.model";
+import { ZonesModule } from "zones/zones.module";
 
 @Module({
     imports: [
@@ -26,7 +27,8 @@ import { MatchView, MatchViewSchema } from "./match-view.model";
         PetitionModule,
         LocationsModule,
         SportModesModule,
-        ChatroomModule
+        ChatroomModule,
+        ZonesModule
     ],
     controllers: [MatchController],
     providers: [MatchService, JwtService, PushNotificationService, MatchListener],
