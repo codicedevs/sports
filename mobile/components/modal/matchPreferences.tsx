@@ -27,7 +27,7 @@ const MatchPreferencesModal = ({ open, setOpen }: { open: boolean; setOpen: Reac
 
     const createPreference = async () => {
         try {
-            const res = await userService.put('6720ef183a78ebc10564e97b', {
+            const res = await userService.put('6720ef213a78ebc10564e97d', {
                 profile: {
                     preferredSports: matchDetailsRef.current.preferredSports,
                     preferredSportModes: matchDetailsRef.current.preferredSportModes,
