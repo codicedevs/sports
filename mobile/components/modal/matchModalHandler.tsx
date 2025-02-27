@@ -53,26 +53,33 @@ const MatchModalHandler = ({
         date: matchDetailsRef.current.matchDate,
         location: matchDetailsRef.current.location?._id,
         playersLimit: matchDetailsRef.current.playerLimit,
-        userId: "66fc580c32617aadfac71feb",
+        userId: "6720ef0e3a78ebc10564e979",
         sportMode: matchDetailsRef.current.selectedSportMode?._id,
         open: matchDetailsRef.current.privacyOption,
       });
-      
+
       const createdMatchId = res.data._id;
       if (onMatchCreated) {
         onMatchCreated(createdMatchId);
       }
-      console.log(res)
       closeModal();
     } catch (e) {
       console.error("Error al crear el partido:", e);
-    }
+    }    
   };
+
+  // async function create() {
+  //   const res = await matchService.create({
+  //     userId: "66fc580c32617aadfac71feb",
+  //     sportMode: "6751cb8844b53be83b3554cc",
+  //     open: false
+  //   })
+  // };
 
   const closeModal = () => {
     setOpenId(null);
     setOpen(false);
-  };
+  };  
 
   return (
     <Modal isVisible={open} onBackButtonPress={closeModal}>

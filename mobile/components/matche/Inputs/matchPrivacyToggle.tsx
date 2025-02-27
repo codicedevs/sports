@@ -27,7 +27,7 @@ const MatchPrivacyToggleInput = ({ matchDetailsRef }: PrivacyToggleProps) => {
 
   const isPrivate = privacyOption === 'private';
   const isPublic = privacyOption === 'public';
-
+    
   return (
     <Div p={customTheme.spacing.medium} style={{ gap: 8 }}>
       <Div h={verticalScale(40)} flexDir="row">

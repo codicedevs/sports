@@ -1,32 +1,12 @@
 
-import { CreateMatchDto } from "../types/match.type";
-import { HttpService } from "./http.service";
+import Match, { CreateMatchDto } from "../types/match.type";
+import { CRUDService } from "./CRUD";
 
-class MatchService extends HttpService {
+class MatchService extends CRUDService<Match> {
   constructor() {
     super("matches");
   }
-
-  getAll = async () => {
-    const res = await this.get(`/`);
-    return res.data;
-  };
-
-
-  update = async (id: string, matchInfo: CreateMatchDto) => {
-    const res = await this.put(`/${id}`, matchInfo)
-    return res.data
-  }
-
-  getById = async (id: string) => {
-    return await this.get(`/${id}`)
-  }
-
-  create = async (match: CreateMatchDto) => {
-    const res = await this.post(`/`, match);
-    return res;
-  };
-
+  
   acceptCreatematch = async (matchId: string) => {
     return this.put(`/accept/${matchId}`);
   };
