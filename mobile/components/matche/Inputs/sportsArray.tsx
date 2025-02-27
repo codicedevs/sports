@@ -18,7 +18,6 @@ interface SportInputProps {
 }
 
 const SportArrayInput = ({ matchDetailsRef }: SportInputProps) => {
-    // Se usan arrays para manejar múltiples selecciones.
     const [selectedSports, setSelectedSports] = useState<Sport[]>(
         matchDetailsRef.current.preferredSports
             ? (matchDetailsRef.current.preferredSports as Sport[])
@@ -33,18 +32,14 @@ const SportArrayInput = ({ matchDetailsRef }: SportInputProps) => {
     const { data: sports } = useFetch(sportService.getAll, [QUERY_KEYS.SPORTS]);
     const { data: allSportModes } = useFetch(sportmodeService.getAll, [QUERY_KEYS.SPORT_MODES]);
 
-    // Si no hay deportes seleccionados, podrías elegir alguno por defecto,
-    // pero en selección múltiple generalmente el usuario decide qué seleccionar.
     useEffect(() => {
         if (!selectedSports.length && sports) {
-            // Opcional: seleccionar el primer deporte por defecto
             const defaultSport = sports.data.results[0];
             setSelectedSports([defaultSport]);
             matchDetailsRef.current.preferredSports = [defaultSport];
         }
     }, [sports]);
 
-    // Función para alternar la selección de un deporte
     const handleSelectSport = (sport: Sport, index: number) => {
         const isSelected = selectedSports.some(s => s._id === sport._id);
         let newSelectedSports: Sport[];
@@ -70,10 +65,8 @@ const SportArrayInput = ({ matchDetailsRef }: SportInputProps) => {
     };
 
     const handleSelectAllModes = () => {
-        // Si no hay modos disponibles, no hacemos nada.
         if (sportModesForSelectedSports.length === 0) return;
 
-        // Verificamos si todas las modalidades están seleccionadas
         const allSelected = sportModesForSelectedSports.every(
             (mode: SportMode) => selectedSportModes.some((m) => m._id === mode._id)
         );
@@ -81,13 +74,11 @@ const SportArrayInput = ({ matchDetailsRef }: SportInputProps) => {
         let newSelectedModes: SportMode[];
 
         if (allSelected) {
-            // Si ya están todas seleccionadas, las deseleccionamos:
             newSelectedModes = selectedSportModes.filter(
                 (mode: SportMode) =>
                     !sportModesForSelectedSports.some((m: SportMode) => m._id === mode._id)
             );
         } else {
-            // Si no están todas, agregamos aquellas que no estén ya seleccionadas.
             newSelectedModes = [...selectedSportModes];
             sportModesForSelectedSports.forEach((mode: SportMode) => {
                 if (!newSelectedModes.some((m) => m._id === mode._id)) {
