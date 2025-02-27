@@ -5,7 +5,6 @@ class LocationService extends CRUDService<Location> {
   constructor() {
     super("locations");
   }
-
 };
 
 export default new LocationService();

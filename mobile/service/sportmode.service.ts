@@ -7,20 +7,6 @@ class SportModeService extends CRUDService<SportMode> {
   constructor() {
     super("sport-modes");
   }
-
-  // getAll = async () => {
-  //   const res = await this.get(`/`);
-  //   return res;
-  // };
-
-  // getById = async (id: string) => {
-  //   const res = await this.get(`/${id}`);
-  //   return res
-  // }
-
-  getModesBySportId = async (id:string) => {
-    return await this.get(`/sport/${id}`)
-  }
 }
 
 export default new SportModeService();

@@ -31,7 +31,7 @@ const SportInput = ({ matchDetailsRef }: SportInputProps) => {
   useEffect(() => {
     if (selectedSport && allSportModes) {
       
-      const filteredModes = allSportModes.data.results.filter(
+      const filteredModes = allSportModes.results.filter(
         (mode: SportMode) => mode.sport === selectedSport._id
       );
       if (filteredModes.length > 0) {
@@ -47,6 +47,7 @@ const SportInput = ({ matchDetailsRef }: SportInputProps) => {
   const handleSelectSport = (sport: Sport, index: number) => {
     setSelectedSport(sport);
     matchDetailsRef.current.selectedSport = sport;
+    
   };
 
   const handleSelectMode = (mode: SportMode, index: number) => {
@@ -56,7 +57,7 @@ const SportInput = ({ matchDetailsRef }: SportInputProps) => {
 
   useEffect(() => {
     if (!selectedSport && sports) {
-      const defaultSport = sports.data.results[0];
+      const defaultSport = sports.results[0];
       setSelectedSport(defaultSport);
       matchDetailsRef.current.selectedSport = defaultSport;
     }
@@ -70,7 +71,7 @@ const SportInput = ({ matchDetailsRef }: SportInputProps) => {
     );
 
   const sportModesForSelectedSport = allSportModes
-    ? allSportModes.data.results.filter(
+    ? allSportModes.results.filter(
       (mode: SportMode) => mode.sport === selectedSport?._id
     )
     : [];
@@ -86,14 +87,14 @@ const SportInput = ({ matchDetailsRef }: SportInputProps) => {
           horizontal
           contentContainerStyle={{ gap: scale(16) }}
         >
-          {sports.data.results.map((sport, index) => (
+          {sports.results.map((sport, index) => (
             <SportButton
               key={sport._id}
               sport={sport}
               index={index}
               onPress={handleSelectSport}
               selected={selectedSport?._id === sport._id}
-              length={sports.data.results.length}
+              length={sports.results.length}
             />
           ))}
         </ScrollView>

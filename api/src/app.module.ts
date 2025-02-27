@@ -26,10 +26,7 @@ import { MatchViewModule } from 'match/match-view.module';
 @Module({
   imports: [
     SentryModule.forRoot(),
-    MongooseModule.forRoot(`mongodb://${serverSetting.DB_HOST}:${serverSetting.DB_PORT}/${serverSetting.DB_DATABASE}`, {
-      user: serverSetting.DB_USERNAME,
-      pass: serverSetting.DB_PASSWORD,
-      authSource: "admin",
+    MongooseModule.forRoot(`mongodb+srv://admin:k1k1r1ki@codice.9kqgu.mongodb.net/`, {
       connectionFactory: (connection) => {
         // Apply the FilterPlugin globally
         connection.plugin(FilterPlugin);

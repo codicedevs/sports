@@ -3,6 +3,8 @@ import { AppScreenProps, AppScreens } from "../navigation/screens";
 import { Button, Div } from "react-native-magnus";
 import MatchModalHandler from "../components/modal/matchModalHandler";
 import { ModalContext } from "../context/modalProvider";
+import locationService from "../service/location.service";
+import matchService from "../service/match.service";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
