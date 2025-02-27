@@ -5,7 +5,7 @@ import {
 } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { HydratedDocument, Model, Types } from "mongoose";
-import { User } from "./user.entity";
+import { Profile, User } from "./user.entity";
 import { CreateUserDto, UpdateUserDto } from "./user.dto";
 import * as bcrypt from "bcryptjs";
 import { FindManyFilter } from "filter/filter.dto";
@@ -138,26 +138,32 @@ export class UserService {
      * @returns
      */
     async update(id: Types.ObjectId, updateUserDto: UpdateUserDto): Promise<User> {
-        const user = await this.findByIdOrFail(id); // chequea si user existe
-
-        // If the DTO contains a new password, hash it before updating
-        if (updateUserDto.password) {
-            const hashedPassword = await bcrypt.hash(updateUserDto.password, 8);
-            updateUserDto.password = hashedPassword;
+        // 1) Buscar el usuario
+        const user : User = await this.userModel.findById(id).exec();
+        if (!user) {
+          throw new NotFoundException(`User with id ${id} not found`);
         }
-
-        // Si el DTO contiene un perfil, agregarlo o actualizarlo
-        if (updateUserDto.profile) {
-            updateUserDto.profile = {
-                ...(user.profile || {}), // Si no existe, inicializarlo como un objeto vacío
-                ...updateUserDto.profile, // Actualizar con los nuevos valores
-            };
+    
+        // 2) Separar campos que requieren lógica especial
+        const { password, profile, ...restFields } = updateUserDto;
+    
+        // 3) Si hay password, hashearla antes de asignar
+        if (password) {
+          user.password = await bcrypt.hash(password, 8);
         }
-
-        return this.userModel
-            .findByIdAndUpdate(id, updateUserDto, { new: true })
-            .exec();
-    }
+    
+        // 4) Fusionar profile (si lo hay) con el subdocumento existente
+        if (profile) {
+          const currentProfile = user.profile ?( user.profile as HydratedDocument<Profile>).toObject() : {};
+          user.profile = { ...currentProfile, ...profile };
+        }
+    
+        // 5) Hacer "merge" genérico del resto de campos en el usuario
+        Object.assign(user, restFields);
+    
+        // 6) Guardar el documento
+        return user.save();
+      }
 
     async updatePushToken(
         userId: string,
