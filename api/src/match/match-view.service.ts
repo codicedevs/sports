@@ -8,7 +8,7 @@ export class MatchViewService implements OnModuleInit {
   constructor(
     @InjectConnection() private readonly connection: Connection,
     @InjectModel(MatchView.name) private readonly matchViewModel: Model<MatchView>
-  ) {}
+  ) { }
 
   async createMatchView() {
     try {
@@ -57,6 +57,17 @@ export class MatchViewService implements OnModuleInit {
           },
           {
             $unwind: { path: '$sportMode', preserveNullAndEmptyArrays: true },
+          },
+          {
+            $lookup: {
+              from: 'sports',                 // Colección "sports"
+              localField: 'sportMode.sport', // Campo donde está el _id de Sport
+              foreignField: '_id',           // Se compara con _id de la colección "sports"
+              as: 'sport',                   // Nombre del campo resultante
+            },
+          },
+          {
+            $unwind: { path: '$sport', preserveNullAndEmptyArrays: true },
           },
         ],
       });
