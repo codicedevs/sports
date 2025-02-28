@@ -31,7 +31,6 @@ const SportArrayInput = ({ matchDetailsRef }: SportInputProps) => {
 
     const { data: sports } = useFetch(sportService.getAll, [QUERY_KEYS.SPORTS]);
     const { data: allSportModes } = useFetch(sportmodeService.getAll, [QUERY_KEYS.SPORT_MODES]);
-
     useEffect(() => {
         if (!selectedSports.length && sports) {
             const defaultSport = sports.data.results[0];
@@ -39,6 +38,31 @@ const SportArrayInput = ({ matchDetailsRef }: SportInputProps) => {
             matchDetailsRef.current.preferredSports = [defaultSport];
         }
     }, [sports]);
+
+    useEffect(() => {
+        if (sports && matchDetailsRef.current.preferredSports) {
+          const updatedSports = (matchDetailsRef.current.preferredSports as (string | Sport)[]).map(item =>
+            typeof item === 'string'
+              ? sports.data.results.find((s: Sport) => s._id === item)
+              : item
+          ).filter(Boolean) as Sport[];
+          setSelectedSports(updatedSports);
+          matchDetailsRef.current.preferredSports = updatedSports;
+        }
+      }, [sports]);
+
+      useEffect(() => {
+        if (allSportModes && matchDetailsRef.current.preferredSportModes) {
+          const updatedModes = (matchDetailsRef.current.preferredSportModes as (string | SportMode)[]).map(item =>
+            typeof item === 'string'
+              ? allSportModes.data.results.find((m: SportMode) => m._id === item)
+              : item
+          ).filter(Boolean) as SportMode[];
+          setSelectedSportModes(updatedModes);
+          matchDetailsRef.current.preferredSportModes = updatedModes;
+        }
+      }, [allSportModes]);
+      
 
     const handleSelectSport = (sport: Sport, index: number) => {
         const isSelected = selectedSports.some(s => s._id === sport._id);
