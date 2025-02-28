@@ -74,6 +74,9 @@ const MatchModalHandler = ({
     setOpen(false);
   };
 
+  
+console.log("RENDEEER","Rendering MatchSchedulerInput")
+
   return (
     <Modal isVisible={open} onBackButtonPress={closeModal}>
       <ScrollView>

@@ -1,67 +1,137 @@
-import React, { useEffect, useState } from 'react';
-import { ScrollView, TouchableOpacity } from 'react-native';
-import { Div, Text } from 'react-native-magnus';
-import { verticalScale } from 'react-native-size-matters';
-import { customTheme } from '../../../utils/theme';
-import SearchBar from '../Form/searchBar';
-import useFetch from '../../../hooks/useGet';
-import locationService from '../../../service/location.service';
-import { QUERY_KEYS } from '../../../types/query.types';
-import { Place } from '../../../types/form.type';
+import React, { useEffect, useState } from "react";
+import { ScrollView, TouchableOpacity } from "react-native";
+import { Div, Text } from "react-native-magnus";
+import { scale, verticalScale } from "react-native-size-matters";
+import { customTheme } from "../../../utils/theme";
+import SearchBar from "../Form/searchBar";
+import useFetch from "../../../hooks/useGet";
+import locationService from "../../../service/location.service";
+import { QUERY_KEYS } from "../../../types/query.types";
+import { Place } from "../../../types/form.type";
 
 interface SearchLocationInputProps {
-  matchDetailsRef: React.MutableRefObject<{
+  // Para el modo editable (modal)
+  matchDetailsRef?: React.MutableRefObject<{
     location: Place | null;
   }>;
+
+  // Para modo lectura: pasar la ubicación directamente
+  location?: Place | null;
+
+  // Si es true => sólo lectura, sin búsqueda ni scroll
+  readOnly?: boolean;
 }
 
-const SearchLocationInput = ({ matchDetailsRef }: SearchLocationInputProps) => {
+export default function SearchLocationInput({
+  matchDetailsRef,
+  location,
+  readOnly = false,
+}: SearchLocationInputProps) {
   const [isEditing, setIsEditing] = useState(false);
-  const [filter, setFilter] = useState('');
-  const [filteredLocations, setFilteredLocations] = useState<{ id: string; name: string }[]>([]);
-
+  const [filter, setFilter] = useState("");
+  const [filteredLocations, setFilteredLocations] = useState<Place[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<Place | null>(
-    matchDetailsRef.current.location
+    matchDetailsRef?.current.location ?? null
   );
 
-  const { data: Locations } = useFetch(locationService.getAll, [QUERY_KEYS.LOCATIONS]);
+  const { data: Locations } = useFetch(locationService.getAll, [
+    QUERY_KEYS.LOCATIONS,
+  ]);
 
+  // Si estamos en modo lectura y se pasa "location", la usamos como seleccionada
   useEffect(() => {
-    if (filter.trim() === '') {
+    if (readOnly && location) {
+      setSelectedLocation(location);
+    }
+  }, [readOnly, location]);
+
+  // Filtrar ubicaciones al cambiar el texto de búsqueda
+  useEffect(() => {
+    if (!Locations) return;
+    if (filter.trim() === "") {
       setFilteredLocations([]);
-    } else if (Locations) {
-      setFilteredLocations(
-        Locations.data.results.filter((loc: Place) =>
-          loc.name.toLowerCase().includes(filter.toLowerCase())
-        )
+    } else {
+      const results = Locations.data.results.filter((loc: Place) =>
+        loc.name.toLowerCase().includes(filter.toLowerCase())
       );
+      setFilteredLocations(results);
     }
   }, [filter, Locations]);
 
   if (!Locations) return null;
 
-  const handleSelectLocation = (location: Place) => {
-    setSelectedLocation(location);
-    matchDetailsRef.current.location = location;
-  };
+  function handleSelectLocation(loc: Place) {
+    setSelectedLocation(loc);
+    if (matchDetailsRef) {
+      matchDetailsRef.current.location = loc;
+    }
+  }
 
+  // MODO SOLO LECTURA
+  if (readOnly) {
+    return (
+      <Div p={customTheme.spacing.small}>
+        <Div borderWidth={1} rounded="md" p={customTheme.spacing.small}>
+          <Div  h={scale(25)} flexDir="row" justifyContent="space-between" alignItems="center">
+            <Text fontFamily="NotoSans-Variable">Lugar</Text>
+            <Text fontFamily="NotoSans-BoldItalic">{selectedLocation?.name ?? "A definir"}</Text>
+          </Div>
+        </Div>
+      </Div>
+    );
+  }
+
+  // MODO EDICIÓN
   return (
-    <Div flex={1} px={customTheme.spacing.medium} pt={customTheme.spacing.medium}>
+    <Div
+      flex={1}
+      px={customTheme.spacing.medium}
+      pt={customTheme.spacing.medium}
+    >
       <Text mb={customTheme.spacing.medium}>¿Dónde juegan?</Text>
-      <SearchBar isEditing={isEditing} setIsEditing={setIsEditing} setFilter={setFilter} />
-      <ScrollView nestedScrollEnabled contentContainerStyle={{ paddingVertical: customTheme.spacing.medium, flexGrow: 1 }} showsVerticalScrollIndicator={false}>
-        {(filteredLocations.length > 0 ? filteredLocations : Locations.data.results).map((loc: Place, index: number) => (
-          <TouchableOpacity key={index} onPress={() => handleSelectLocation(loc)}>
+      <SearchBar
+        isEditing={isEditing}
+        setIsEditing={setIsEditing}
+        setFilter={setFilter}
+      />
+      <ScrollView
+        nestedScrollEnabled
+        contentContainerStyle={{
+          paddingVertical: customTheme.spacing.medium,
+          flexGrow: 1,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        {(filteredLocations.length > 0
+          ? filteredLocations
+          : Locations.data.results
+        ).map((loc: Place, index: number) => (
+          <TouchableOpacity
+            key={index}
+            onPress={() => handleSelectLocation(loc)}
+          >
             <Div
               h={verticalScale(48)}
-              mb={index !== (Locations.data.results.length - 1) ? customTheme.spacing.small : 0}
-              bg={selectedLocation?._id === loc._id ? customTheme.colors.secondaryBackground : "white"}
+              mb={
+                index !== Locations.data.results.length - 1
+                  ? customTheme.spacing.small
+                  : 0
+              }
+              bg={
+                selectedLocation?._id === loc._id
+                  ? customTheme.colors.secondaryBackground
+                  : "white"
+              }
               justifyContent="center"
               borderWidth={1}
             >
               <Text
                 textAlign="center"
-                color={selectedLocation?._id === loc._id ? 'white' : customTheme.colors.secondaryBackground}
+                color={
+                  selectedLocation?._id === loc._id
+                    ? "white"
+                    : customTheme.colors.secondaryBackground
+                }
               >
                 {loc.name}
               </Text>
@@ -71,6 +141,4 @@ const SearchLocationInput = ({ matchDetailsRef }: SearchLocationInputProps) => {
       </ScrollView>
     </Div>
   );
-};
-
-export default SearchLocationInput;
+}

@@ -203,16 +203,15 @@ export class MatchService {
     }
   }
 
-  async findOne(id: Types.ObjectId): Promise<Match> {
-    const match = await this.matchModel
+  async findOne(id: Types.ObjectId): Promise<MatchView> {
+    const match = await this.matchViewModel
       .findById(id)
-      .populate("location")
-      .populate("users")
       .exec();
 
     if (!match) {
       throw new NotFoundException(`Partido #${id} not found`);
     }
+    console.log("BBBBBBB",match)
     return match;
   }
 
