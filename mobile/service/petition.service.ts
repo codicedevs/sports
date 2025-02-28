@@ -1,20 +1,21 @@
-import { CreatePetitionDto } from "../types/petition.type";
-import { HttpService } from "./http.service";
+import { CreatePetitionDto, PetitionDto } from "../types/petition.type";
+import { CRUDService } from "./CRUD";
+// import { HttpService } from "./http.service";
 
-class PetitionService extends HttpService {
+class PetitionService extends CRUDService<PetitionDto> {
   constructor() {
     super("petitions");
   }
 
-  getAll = async () => {
-    const res = await this.get(`/`);
-    return res.data;
-  };
+  // getAll = async () => {
+  //   const res = await this.get(`/`);
+  //   return res.data;
+  // };
 
-  create = async (petition: CreatePetitionDto) => {
-    const res = await this.post(`/`, { petition });
-    return res.data;
-  };
+  // create = async (petition: CreatePetitionDto) => {
+  //   const res = await this.post(`/`, { petition });
+  //   return res.data;
+  // };
 
   acceptPetition = async (petitionId: string) => {
     return this.put(`/accept/${petitionId}`);
