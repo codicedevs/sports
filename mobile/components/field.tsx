@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Div } from "react-native-magnus";
 import { scale } from "react-native-size-matters";
+import Match from "../types/match.type";
 
 const MAX_CIRCLE_SIZE = scale(50);
 
@@ -63,13 +64,13 @@ const TeamField = ({ playersCount, mirror = false }) => {
   );
 };
 
-const Field = () => {
-
-  const totalPlayers = 10;
+const Field = ({match} : {match: Match}) => {
+  
+  const totalPlayers = match.playersLimit;
   const teamPlayers = totalPlayers / 2;
 
   return (
-    <Div p={20} bg="red" h="100%">
+    <Div p={20} bg="green" h="100%">
       <Div id="first-half" borderWidth={1} flex={1}>
         <Div h="15%" alignItems="center" justifyContent="center">
           <FPlayer size={scale(50)} />
