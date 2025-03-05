@@ -113,7 +113,12 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
           </Text>
         </TouchableOpacity>
       </Div>
-      <ScrollView style={{ flex: 1 }}>
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{
+          paddingBottom: 120,
+        }}
+      >
         {activeTab === "partido" && (
           <Div flex={1}>
             <Div p={customTheme.spacing.small}>
@@ -175,7 +180,6 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
               <Div
                 mb={customTheme.spacing.small}
                 mt={customTheme.spacing.small}
-                
                 borderTopColor="#bbbbbf"
                 borderTopWidth={scale(1)}
               />
@@ -185,7 +189,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                 <SearchLocationInput readOnly location={location} />
               </Div>
               {/* Bot Invitar / Compartir */}
-              <Div >
+              <Div>
                 <Div
                   p={customTheme.spacing.small}
                   justifyContent="center"
@@ -224,7 +228,6 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                 </Div>
               </Div>
             </Div>
-           
           </Div>
         )}
 
@@ -246,38 +249,43 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
           </Div>
         )}
       </ScrollView>
-       {/* Botones Eliminar / Guardar */}
-       <Div justifyContent="flex-end" flex={3} position="absolute" bottom={0}
-      left={0}
-      right={0}
-      bg="black">
-              <Div bg="black">
-                <Div
-                  mb={customTheme.spacing.small}
-                  w="100%"
-                  borderTopColor="black"
-                  borderTopWidth={scale(1)}
-                />
-                <Div
-                  flexDir="row"
-                  justifyContent="space-between"
-                  p={customTheme.spacing.small}
-                >
-                  <Button
-                    w="48%"
-                    bg="white"
-                    borderWidth={1}
-                    borderColor="black"
-                    block
-                  >
-                    <Text>Eliminar</Text>
-                  </Button>
-                  <Button w="48%" block bg={customTheme.colors.primary}>
-                    <Text color={customTheme.colors.text}>Guardar</Text>
-                  </Button>
-                </Div>
-              </Div>
-            </Div>
+      {/* Botones Eliminar / Guardar */}
+      <Div
+        justifyContent="flex-end"
+        flex={3}
+        position="absolute"
+        bottom={0}
+        left={0}
+        right={0}
+        bg="black"
+      >
+        <Div bg="black">
+          <Div
+            mb={customTheme.spacing.small}
+            w="100%"
+            borderTopColor="black"
+            borderTopWidth={scale(1)}
+          />
+          <Div
+            flexDir="row"
+            justifyContent="space-between"
+            p={customTheme.spacing.small}
+          >
+            <Button
+              w="48%"
+              bg="white"
+              borderWidth={1}
+              borderColor="black"
+              block
+            >
+              <Text>Eliminar</Text>
+            </Button>
+            <Button w="48%" block bg={customTheme.colors.primary}>
+              <Text color={customTheme.colors.text}>Guardar</Text>
+            </Button>
+          </Div>
+        </Div>
+      </Div>
     </Div>
   );
 };
