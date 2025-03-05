@@ -33,7 +33,7 @@ const SportArrayInput = ({ matchDetailsRef }: SportInputProps) => {
     const { data: allSportModes } = useFetch(sportmodeService.getAll, [QUERY_KEYS.SPORT_MODES]);
     useEffect(() => {
         if (!selectedSports.length && sports) {
-            const defaultSport = sports.data.results[0];
+            const defaultSport = sports.results[0];
             setSelectedSports([defaultSport]);
             matchDetailsRef.current.preferredSports = [defaultSport];
         }
@@ -43,7 +43,7 @@ const SportArrayInput = ({ matchDetailsRef }: SportInputProps) => {
         if (sports && matchDetailsRef.current.preferredSports) {
           const updatedSports = (matchDetailsRef.current.preferredSports as (string | Sport)[]).map(item =>
             typeof item === 'string'
-              ? sports.data.results.find((s: Sport) => s._id === item)
+              ? sports.results.find((s: Sport) => s._id === item)
               : item
           ).filter(Boolean) as Sport[];
           setSelectedSports(updatedSports);
@@ -55,7 +55,7 @@ const SportArrayInput = ({ matchDetailsRef }: SportInputProps) => {
         if (allSportModes && matchDetailsRef.current.preferredSportModes) {
           const updatedModes = (matchDetailsRef.current.preferredSportModes as (string | SportMode)[]).map(item =>
             typeof item === 'string'
-              ? allSportModes.data.results.find((m: SportMode) => m._id === item)
+              ? allSportModes.results.find((m: SportMode) => m._id === item)
               : item
           ).filter(Boolean) as SportMode[];
           setSelectedSportModes(updatedModes);
@@ -123,7 +123,7 @@ const SportArrayInput = ({ matchDetailsRef }: SportInputProps) => {
         );
 
     const sportModesForSelectedSports = allSportModes
-        ? allSportModes.data.results.filter((mode: SportMode) =>
+        ? allSportModes.results.filter((mode: SportMode) =>
             selectedSports.some(s => s._id === mode.sport)
         )
         : [];
@@ -139,14 +139,14 @@ const SportArrayInput = ({ matchDetailsRef }: SportInputProps) => {
                     horizontal
                     contentContainerStyle={{ gap: scale(16) }}
                 >
-                    {sports.data.results.map((sport, index) => (
+                    {sports.results.map((sport, index) => (
                         <SportButton
                             key={sport._id}
                             sport={sport}
                             index={index}
                             onPress={handleSelectSport}
                             selected={selectedSports.some(s => s._id === sport._id)}
-                            length={sports.data.results.length}
+                            length={sports.results.length}
                         />
                     ))}
                 </ScrollView>
