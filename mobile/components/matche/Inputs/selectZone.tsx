@@ -15,12 +15,12 @@ interface SportInputProps {
 const SelectZoneInput = ({ matchDetailsRef }: SportInputProps) => {
     const [selectedZone, setSelectedZone] = useState<Zone[]>([])
 
-    const { data: zonas } = useFetch(zonesService.getZones, [QUERY_KEYS.ZONES])
+    const { data: zonas } = useFetch(zonesService.getAll, [QUERY_KEYS.ZONES])
     useEffect(() => {
         if (zonas && matchDetailsRef.current.preferredZones) {
             const updatedZone = (matchDetailsRef.current.preferredZones as (string | Zone)[]).map(item =>
                 typeof item === 'string'
-                    ? zonas.data.results.find((s: Zone) => s._id === item)
+                    ? zonas.results.find((s: Zone) => s._id === item)
                     : item
             ).filter(Boolean) as Zone[];
             setSelectedZone(updatedZone);
@@ -44,10 +44,10 @@ const SelectZoneInput = ({ matchDetailsRef }: SportInputProps) => {
       
       const toggleSelectAll = () => {
         let newSelected: Zone[];
-        if (selectedZone.length === zonas.data.results.length) {
+        if (selectedZone.length === zonas.results.length) {
           newSelected = [];
         } else {
-          newSelected = zonas.data.results;
+          newSelected = zonas.results;
         }
         setSelectedZone(newSelected);
         matchDetailsRef.current.preferredZones = newSelected;
@@ -61,19 +61,19 @@ const SelectZoneInput = ({ matchDetailsRef }: SportInputProps) => {
                 <TouchableOpacity onPress={toggleSelectAll}>
                     <Div
                         h={verticalScale(48)}
-                        bg={selectedZone.length === zonas.data.results.length ? 'black' : 'white'}
+                        bg={selectedZone.length === zonas.results.length ? 'black' : 'white'}
                         justifyContent="center"
                         borderWidth={1}
                     >
                         <Text
-                            color={selectedZone.length === zonas.data.results.length ? 'white' : 'black'}
+                            color={selectedZone.length === zonas.results.length ? 'white' : 'black'}
                             textAlign="center"
                         >
                             Todos
                         </Text>
                     </Div>
                 </TouchableOpacity>
-                {zonas.data.results.map((zona, index) => {
+                {zonas.results.map((zona, index) => {
                     const isSelected = selectedZone.some(z => z._id === zona._id)
                     return (
                         <TouchableOpacity key={index} onPress={() => toggleZoneSelection(zona)}>
