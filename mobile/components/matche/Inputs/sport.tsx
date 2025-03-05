@@ -19,21 +19,50 @@ interface SportInputProps {
 
 const SportInput = ({ matchDetailsRef }: SportInputProps) => {
   const [selectedSport, setSelectedSport] = useState<Sport | null>(
-    matchDetailsRef.current.selectedSport
+    matchDetailsRef.current.selectedSport || null
   );
   const [selectedSportMode, setSelectedSportMode] = useState<SportMode | null>(
-    matchDetailsRef.current.selectedSportMode
+    matchDetailsRef.current.selectedSportMode || null
   );
 
   const { data: sports } = useFetch(sportService.getAll, [QUERY_KEYS.SPORTS]);
   const { data: allSportModes } = useFetch(sportmodeService.getAll, [QUERY_KEYS.SPORT_MODES]);
 
   useEffect(() => {
+    if (sports?.data) {
+      if (matchDetailsRef.current.selectedSport) {
+        const foundSport = sports.data.results.find(
+          (s: Sport) => s._id === matchDetailsRef.current.selectedSport._id
+        );
+        if (foundSport) {
+          setSelectedSport(foundSport);
+        } else {
+          setSelectedSport(sports.data.results[0]);
+          matchDetailsRef.current.selectedSport = sports.data.results[0];
+        }
+      } else {
+        setSelectedSport(sports.data.results[0]);
+        matchDetailsRef.current.selectedSport = sports.data.results[0];
+      }
+    }
+  }, [sports, matchDetailsRef]);
 
+  useEffect(() => {
     if (selectedSport && allSportModes?.data) {
       const filteredModes = allSportModes.data.results.filter(
         (mode: SportMode) => mode.sport === selectedSport._id
       );
+
+      if (matchDetailsRef.current.selectedSportMode) {
+        const foundMode = filteredModes.find(
+          (mode: SportMode) => mode._id === matchDetailsRef.current.selectedSportMode._id
+        );
+        if (foundMode) {
+          setSelectedSportMode(foundMode);
+          return; 
+        }
+      }
+
       if (filteredModes.length > 0) {
         setSelectedSportMode(filteredModes[0]);
         matchDetailsRef.current.selectedSportMode = filteredModes[0];
@@ -42,7 +71,7 @@ const SportInput = ({ matchDetailsRef }: SportInputProps) => {
         matchDetailsRef.current.selectedSportMode = null;
       }
     }
-  }, [selectedSport, allSportModes]);
+  }, [selectedSport, allSportModes, matchDetailsRef]);
 
   const handleSelectSport = (sport: Sport, index: number) => {
     setSelectedSport(sport);
@@ -70,10 +99,10 @@ const SportInput = ({ matchDetailsRef }: SportInputProps) => {
       </MotiView>
     );
 
-  const sportModesForSelectedSport = allSportModes
-    ? allSportModes.results.filter(
-      (mode: SportMode) => mode.sport === selectedSport?._id
-    )
+  const sportModesForSelectedSport = allSportModes?.data
+    ? allSportModes.data.results.filter(
+        (mode: SportMode) => mode.sport === selectedSport?._id
+      )
     : [];
 
   return (

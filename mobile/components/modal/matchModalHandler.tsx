@@ -11,30 +11,12 @@ import { ScrollView, TouchableOpacity } from "react-native";
 import MatchSchedulerInput from "../matche/Inputs/matchScheduler";
 import SearchLocationInput from "../matche/Inputs/searchLocation";
 import {
-  MatchDetails,
-  Place,
-  PrivacyOption,
-  Sport,
-  SportMode,
+  MatchDetails
 } from "../../types/form.type";
 import matchService from "../../service/match.service";
 import { useMutate } from "../../hooks/useMutate";
 
-interface MatchModalHandlerProps {
-  open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  onMatchCreated?: (matchId: string) => void;
-}
-
-const MatchModalHandler = ({
-  open,
-  setOpen,
-  onMatchCreated,
-}: {
-  open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  match?: Match;
-}) => {
+const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: React.Dispatch<React.SetStateAction<boolean>>; match?: string }) => {
   const matchDetailsRef = useRef<MatchDetails>({
     selectedSport: null,
     selectedSportMode: null,
@@ -43,6 +25,27 @@ const MatchModalHandler = ({
     matchDate: undefined,
     location: null,
   });
+
+  const fetchMatch = async () => {
+    if (!match) return
+    try {
+      const res = await matchService.getById(match)
+      matchDetailsRef.current.selectedSport = res.data.sportMode.sport
+      matchDetailsRef.current.selectedSportMode = res.data.sportMode;
+      matchDetailsRef.current.playerLimit = res.data.playersLimit;
+      matchDetailsRef.current.privacyOption = res.data.open;
+      matchDetailsRef.current.matchDate = res.data.date
+      matchDetailsRef.current.location = res.data.location
+    } catch (e) {
+
+    }
+  }
+
+  useEffect(() => {
+    if (match) {
+      fetchMatch()
+    }
+  }, [])
 
   const [openId, setOpenId] = useState<null | string>(null);
 
@@ -68,13 +71,30 @@ const MatchModalHandler = ({
     }    
   };
 
-  // async function create() {
-  //   const res = await matchService.create({
-  //     userId: "66fc580c32617aadfac71feb",
-  //     sportMode: "6751cb8844b53be83b3554cc",
-  //     open: false
-  //   })
-  // };
+  const editMatch = async() => {
+    try {
+      const res =await matchService.update('67af556cb453684f313e9a4b', {
+        name: "Prueba3",
+        date: matchDetailsRef.current.matchDate,
+        location: matchDetailsRef.current.location?._id,
+        playersLimit: matchDetailsRef.current.playerLimit,
+        userId: '6720ef0e3a78ebc10564e979',
+        sportMode: matchDetailsRef.current.selectedSportMode?._id,
+        open: matchDetailsRef.current.privacyOption
+      })
+      console.log(res)
+    } catch (e) {
+console.log(e,'ERROR')
+    }
+  }
+
+  const handleAction = () => {
+    if(!match){
+      createMatch()
+    } else {
+      editMatch()
+    }
+  }
 
   const closeModal = () => {
     setOpenId(null);
@@ -153,19 +173,10 @@ const MatchModalHandler = ({
           </Accordion>
         </Div>
       </ScrollView>
-      <Div
-        justifyContent="center"
-        bg="#151515E5"
-        h={verticalScale(80)}
-        p={customTheme.spacing.medium}
-      >
-        <TouchableOpacity onPress={createMatch}>
-          <Div
-            h={verticalScale(45)}
-            justifyContent="center"
-            bg={customTheme.colors.primary}
-          >
-            <Text textAlign="center">Crear</Text>
+      <Div justifyContent='center' bg='#151515E5' h={verticalScale(80)} p={customTheme.spacing.medium}>
+        <TouchableOpacity onPress={handleAction}>
+          <Div h={verticalScale(45)} justifyContent='center' bg={customTheme.colors.primary}>
+            <Text textAlign='center'>{!match ?"Crear" : "Editar"}</Text>
           </Div>
         </TouchableOpacity>
       </Div>

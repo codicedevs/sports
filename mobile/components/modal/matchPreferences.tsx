@@ -2,23 +2,51 @@ import React, { useRef, useState } from 'react'
 import { ScrollView, TouchableOpacity } from 'react-native';
 import { Div, Modal, Text } from 'react-native-magnus';
 import { Accordion } from '../collapsibleView';
-import { MatchDetails, Profile } from '../../types/form.type';
+import { Profile } from '../../types/form.type';
 import { verticalScale } from 'react-native-size-matters';
-import SportInput from '../matche/Inputs/sport';
 import { customTheme } from '../../utils/theme';
 import DateTimePreferenceInput from '../matche/Inputs/dateTimePreference';
 import userService from '../../service/user.service';
 import SelectZoneInput from '../matche/Inputs/selectZone';
 import SportArrayInput from '../matche/Inputs/sportsArray';
 
+const USERID = "6720ef213a78ebc10564e97d"
+
+const USERPROFILE = {
+    "profile": {
+        "availability": [
+            {
+                "day": "Sunday",
+                "intervals": [
+                    {
+                        "startHour": 8,
+                        "endHour": 9
+                    },
+                    {
+                        "startHour": 9,
+                        "endHour": 10
+                    }
+                ]
+            }
+        ],
+        "preferredZones": ['67b74cbd3fa5740f3fc3947d'],
+        "preferredSports": [
+            "676d900973a26a0de5f38bd7"
+        ],
+        "preferredSportModes": [
+            "676d903173a26a0de5f38bda"
+        ]
+    }
+}
+
 const MatchPreferencesModal = ({ open, setOpen }: { open: boolean; setOpen: React.Dispatch<React.SetStateAction<boolean>> }) => {
     const [openId, setOpenId] = useState<null | string>(null);
     const matchDetailsRef = useRef<Profile>({
-        availability: null,
-        preferredSportModes: null,
-        preferredSports: null,
-        preferredZones: null,
-    });
+        availability: USERPROFILE?.profile.availability  ?? null,
+        preferredSportModes: USERPROFILE?.profile.preferredSportModes ?? null,
+        preferredSports: USERPROFILE?.profile.preferredSports ?? null,
+        preferredZones: USERPROFILE?.profile.preferredZones ?? null,
+      });
 
     const closeModal = () => {
         setOpenId(null)
@@ -27,12 +55,12 @@ const MatchPreferencesModal = ({ open, setOpen }: { open: boolean; setOpen: Reac
 
     const createPreference = async () => {
         try {
-            const res = await userService.put('6720ef213a78ebc10564e97d', {
+            const res = await userService.put(USERID, {
                 profile: {
                     preferredSports: matchDetailsRef.current.preferredSports,
                     preferredSportModes: matchDetailsRef.current.preferredSportModes,
                     availability: matchDetailsRef.current.availability,
-                    preferedZones: matchDetailsRef.current.preferredZones
+                    preferredZones: matchDetailsRef.current.preferredZones
                 }
             })
             console.log(res.data)

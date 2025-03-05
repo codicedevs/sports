@@ -34,6 +34,19 @@ const DateTimePreferenceInput = ({ matchDetailsRef }: SportInputProps) => {
   const [selectedUserDays, setSelectedUserDays] = useState<Record<string, any[]>>({})
 
   useEffect(() => {
+    if (matchDetailsRef.current.availability && matchDetailsRef.current.availability.length > 0) {
+      const preSelectedDays: Record<string, { startHour: string; endHour: string }[]> = {};
+      matchDetailsRef.current.availability.forEach(avail => {
+        preSelectedDays[avail.day] = avail.intervals.map(interval => ({
+          startHour: interval.startHour.toString().padStart(2, '0') + ":00",
+          endHour: interval.endHour.toString().padStart(2, '0') + ":00"
+        }));
+      });
+      setSelectedUserDays(preSelectedDays);
+    }
+  }, []);
+
+  useEffect(() => {
     const availabilities = Object.keys(selectedUserDays).map(dayKey => {
       const day = dayKey as "Sunday" | "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday";
       const intervals = selectedUserDays[dayKey].map((schedule: { startHour: string; endHour: string }) => {
@@ -45,7 +58,6 @@ const DateTimePreferenceInput = ({ matchDetailsRef }: SportInputProps) => {
     });
     matchDetailsRef.current.availability = availabilities;
   }, [selectedUserDays, matchDetailsRef]);
-  
 
   const getDayStyles = (dayId: string) => {
     const key = String(dayId)
@@ -60,7 +72,6 @@ const DateTimePreferenceInput = ({ matchDetailsRef }: SportInputProps) => {
   const toggleSchedule = (schedule: typeof schedules[0]) => {
     setSelectedUserDays(prev => {
       const currentSchedules = prev[currentDay] || []
-
       const exists = currentSchedules.some(
         s => s.startHour === schedule.value.startHour && s.endHour === schedule.value.endHour
       )

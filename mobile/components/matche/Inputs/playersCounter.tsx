@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Div, Text } from 'react-native-magnus';
 import { customTheme } from '../../../utils/theme';
 import { scale, verticalScale } from 'react-native-size-matters';
@@ -6,21 +6,27 @@ import { TouchableOpacity } from 'react-native';
 
 interface PlayersCounterInputProps {
   matchDetailsRef: React.MutableRefObject<{
-    playerLimit: number;
+    playerLimit: number; 
+    selectedSportMode?: { label: number };
   }>;
 }
 
 const PlayersCounterInput = ({ matchDetailsRef }: PlayersCounterInputProps) => {
-  const defaultBase = matchDetailsRef.current.selectedSportMode?.label ? matchDetailsRef.current.selectedSportMode.label : 5;
+  const defaultBase = matchDetailsRef.current.selectedSportMode?.label || 5;
   const lowLimit = defaultBase * 2;
   const highLimit = lowLimit + 5;
-
-  const [amount, setAmount] = useState<number>(lowLimit);
+  const initialAmount =
+    matchDetailsRef.current.playerLimit > 0 ? matchDetailsRef.current.playerLimit : lowLimit;
+  const [amount, setAmount] = useState<number>(initialAmount);
 
   useEffect(() => {
-    setAmount(lowLimit);
-    matchDetailsRef.current.playerLimit = lowLimit;
-  }, [lowLimit, matchDetailsRef]);
+    if (matchDetailsRef.current.playerLimit === lowLimit) {
+      setAmount(lowLimit);
+      matchDetailsRef.current.playerLimit = lowLimit;
+    } else {
+      setAmount(matchDetailsRef.current.playerLimit)
+    }
+  }, [lowLimit]);
 
   const increaseAmount = () => {
     if (amount < highLimit) {
@@ -47,7 +53,11 @@ const PlayersCounterInput = ({ matchDetailsRef }: PlayersCounterInputProps) => {
             w={scale(119)}
             h={verticalScale(56)}
             justifyContent="center"
-            bg={amount === lowLimit ? customTheme.colors.grayBackground : customTheme.colors.secondaryBackground}
+            bg={
+              amount === lowLimit
+                ? customTheme.colors.grayBackground
+                : customTheme.colors.secondaryBackground
+            }
           >
             <Text
               color={amount === lowLimit ? customTheme.colors.gray : 'white'}
@@ -59,7 +69,11 @@ const PlayersCounterInput = ({ matchDetailsRef }: PlayersCounterInputProps) => {
           </Div>
         </TouchableOpacity>
         <Div w={scale(56)} h={verticalScale(56)} justifyContent="center">
-          <Text fontSize={customTheme.fontSize.xl} fontFamily="NotoSans_Condensed-BlackItalic" textAlign="center">
+          <Text
+            fontSize={customTheme.fontSize.xl}
+            fontFamily="NotoSans_Condensed-BlackItalic"
+            textAlign="center"
+          >
             {amount}
           </Text>
         </Div>
@@ -68,7 +82,11 @@ const PlayersCounterInput = ({ matchDetailsRef }: PlayersCounterInputProps) => {
             w={scale(119)}
             h={verticalScale(56)}
             justifyContent="center"
-            bg={amount === highLimit ? customTheme.colors.grayBackground : customTheme.colors.secondaryBackground}
+            bg={
+              amount === highLimit
+                ? customTheme.colors.grayBackground
+                : customTheme.colors.secondaryBackground
+            }
           >
             <Text
               color={amount === highLimit ? customTheme.colors.gray : 'white'}

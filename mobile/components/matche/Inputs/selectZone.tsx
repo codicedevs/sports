@@ -15,27 +15,43 @@ interface SportInputProps {
 const SelectZoneInput = ({ matchDetailsRef }: SportInputProps) => {
     const [selectedZone, setSelectedZone] = useState<Zone[]>([])
 
-    const { data: zonas } = useFetch(zonesService.getZones, [QUERY_KEYS.ZONES])
+    const { data: zonas } = useFetch(zonesService.getAll, [QUERY_KEYS.ZONES])
     useEffect(() => {
-        matchDetailsRef.current.preferredZones = selectedZone;
-    }, [selectedZone, matchDetailsRef]);
+        if (zonas && matchDetailsRef.current.preferredZones) {
+            const updatedZone = (matchDetailsRef.current.preferredZones as (string | Zone)[]).map(item =>
+                typeof item === 'string'
+                    ? zonas.results.find((s: Zone) => s._id === item)
+                    : item
+            ).filter(Boolean) as Zone[];
+            setSelectedZone(updatedZone);
+            console.log(updatedZone)
+            matchDetailsRef.current.preferredZones = updatedZone;
+        }
+    }, [zonas]);
 
     const toggleZoneSelection = (zone: Zone) => {
-        const isSelected = selectedZone.some(z => z._id === zone._id)
-        if (isSelected) {
-            setSelectedZone(selectedZone.filter(z => z._id !== zone._id))
+        setSelectedZone((prevSelected) => {
+          let updated: Zone[];
+          if (prevSelected.some((z) => z._id === zone._id)) {
+            updated = prevSelected.filter((z) => z._id !== zone._id);
+          } else {
+            updated = [...prevSelected, zone];
+          }
+          matchDetailsRef.current.preferredZones = updated;
+          return updated;
+        });
+      };
+      
+      const toggleSelectAll = () => {
+        let newSelected: Zone[];
+        if (selectedZone.length === zonas.results.length) {
+          newSelected = [];
         } else {
-            setSelectedZone([...selectedZone, zone])
+          newSelected = zonas.results;
         }
-    }
-
-    const toggleSelectAll = () => {
-        if (selectedZone.length === zonas.data.results.length) {
-            setSelectedZone([]);
-        } else {
-            setSelectedZone(zonas.data.results);
-        }
-    };
+        setSelectedZone(newSelected);
+        matchDetailsRef.current.preferredZones = newSelected;
+      };
 
     if (!zonas) return null
     return (
@@ -45,19 +61,19 @@ const SelectZoneInput = ({ matchDetailsRef }: SportInputProps) => {
                 <TouchableOpacity onPress={toggleSelectAll}>
                     <Div
                         h={verticalScale(48)}
-                        bg={selectedZone.length === zonas.data.results.length ? 'black' : 'white'}
+                        bg={selectedZone.length === zonas.results.length ? 'black' : 'white'}
                         justifyContent="center"
                         borderWidth={1}
                     >
                         <Text
-                            color={selectedZone.length === zonas.data.results.length ? 'white' : 'black'}
+                            color={selectedZone.length === zonas.results.length ? 'white' : 'black'}
                             textAlign="center"
                         >
                             Todos
                         </Text>
                     </Div>
                 </TouchableOpacity>
-                {zonas.data.results.map((zona, index) => {
+                {zonas.results.map((zona, index) => {
                     const isSelected = selectedZone.some(z => z._id === zona._id)
                     return (
                         <TouchableOpacity key={index} onPress={() => toggleZoneSelection(zona)}>
