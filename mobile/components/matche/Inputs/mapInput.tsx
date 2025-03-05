@@ -35,6 +35,10 @@ export default function MapLocationDisplay({
             latitudeDelta: 0.01,
             longitudeDelta: 0.01,
           }}
+          scrollEnabled={false} // para que quede fijo el mapa ;)
+          zoomEnabled={false}
+          rotateEnabled={false}
+          pitchEnabled={false}
         >
           <Marker coordinate={{ latitude: lat, longitude: lng }} />
         </MapView>

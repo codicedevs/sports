@@ -74,18 +74,36 @@ export default function SearchLocationInput({
 
   // MODO SOLO LECTURA
   if (readOnly) {
+    const hasCoords = !!(
+      selectedLocation && selectedLocation.location?.coordinates
+    );
+
     return (
-      <Div p={customTheme.spacing.small} >
-        <Div  borderWidth={1} rounded="md" p={customTheme.spacing.small} w="100%" h={scale(370)}>
-          <Div >
-            <Div flexDir="row"justifyContent="space-between">
+      <Div p={customTheme.spacing.small}>
+        <Div
+          borderWidth={1}
+          rounded="md"
+          p={customTheme.spacing.small}
+          w="100%"
+        >
+          <Div flexDir="row" alignItems="center" justifyContent="space-between">
             <Text fontFamily="NotoSans-Variable">Lugar</Text>
+
+            {!hasCoords && (
+              <Text fontFamily="NotoSans-BoldItalic">Sin coordenadas</Text>
+            )}
+
             <Text fontFamily="NotoSans-BoldItalic">
               {selectedLocation?.name ?? "A definir"}
-            </Text></Div>
-            <Div w="100%">
-            <MapLocationDisplay place={selectedLocation} mapHeight={392}  /></Div>
+            </Text>
           </Div>
+
+          {/* Si hay coordenadas... */}
+          {hasCoords && (
+            <Div mt={customTheme.spacing.small}>
+              <MapLocationDisplay place={selectedLocation} mapHeight={200} />
+            </Div>
+          )}
         </Div>
       </Div>
     );
