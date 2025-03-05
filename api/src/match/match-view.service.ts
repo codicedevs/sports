@@ -17,12 +17,13 @@ export class MatchViewService implements OnModuleInit {
       const existingView = collections.find(col => col.name === 'matchView');
 
       if (existingView) {
-        console.log('⚠️ La vista `matchView` ya existe. Eliminándola...');
-        await this.connection.db.collection('matchView').drop();
-        console.log('✅ Vista `matchView` eliminada con éxito.');
+        // If it already exists, just skip creation
+        console.log('⚠️ matchView already exists. Skipping creation...');
+        return;
       }
 
-      await this.connection.db.createCollection('matchView', {
+      await this.connection.db.command( {
+        create: "matchView",
         viewOn: 'matches',
         pipeline: [
           {
