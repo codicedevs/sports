@@ -72,7 +72,7 @@ const MatchSchedulerInput = ({ matchDetailsRef }: MatchSchedulerInputProps) => {
     temporal()
   }, [matchDetailsRef.current.matchDate])
 
-  const changeTime = (date: Date, timeString: string): Date => {
+  const changeTime = (date: Date, timeString: string): Date => {    
     const [hours, minutes] = timeString.split(':').map(Number);
     const newDate = new Date(date);
     newDate.setHours(hours, minutes, 0, 0);
@@ -81,7 +81,7 @@ const MatchSchedulerInput = ({ matchDetailsRef }: MatchSchedulerInputProps) => {
 
   useEffect(() => {
     if (selected) {
-      const newDate = changeTime(selected, selectedHour.time);
+      const newDate = changeTime(selected, selectedHour.time);      
       matchDetailsRef.current.matchDate = newDate;
     }
   }, [selected, selectedHour]);
@@ -94,7 +94,7 @@ const MatchSchedulerInput = ({ matchDetailsRef }: MatchSchedulerInputProps) => {
       <Calendar
         locale="es"
         minDate={new Date()}
-        onDayPress={(day) => {
+        onDayPress={(day: string) => {          
           setSelected(new Date(day.dateString));
         }}
         markedDates={

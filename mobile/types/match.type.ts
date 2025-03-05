@@ -12,7 +12,7 @@ import { User } from "./user.type";
 // }
 
  interface Match {
-  _id: string;
+  _id?: string;
   name?: string;
   date?: Date;
   dayOfWeek?: number; // 0 = Domingo, 1 = Lunes, etc.

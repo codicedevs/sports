@@ -56,20 +56,19 @@ const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: R
         date: matchDetailsRef.current.matchDate,
         location: matchDetailsRef.current.location?._id,
         playersLimit: matchDetailsRef.current.playerLimit,
-        userId: "66fc580c32617aadfac71feb",
+        userId: "6720ef0e3a78ebc10564e979",
         sportMode: matchDetailsRef.current.selectedSportMode?._id,
         open: matchDetailsRef.current.privacyOption,
       });
-      
+
       const createdMatchId = res.data._id;
       if (onMatchCreated) {
         onMatchCreated(createdMatchId);
       }
-      console.log(res)
       closeModal();
     } catch (e) {
       console.error("Error al crear el partido:", e);
-    }
+    }    
   };
 
   const editMatch = async() => {
@@ -100,7 +99,7 @@ console.log(e,'ERROR')
   const closeModal = () => {
     setOpenId(null);
     setOpen(false);
-  };
+  };  
 
   return (
     <Modal isVisible={open} onBackButtonPress={closeModal}>

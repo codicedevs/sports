@@ -42,7 +42,7 @@ const PlayersCounterInput = ({ matchDetailsRef }: PlayersCounterInputProps) => {
       setAmount(newAmount);
       matchDetailsRef.current.playerLimit = newAmount;
     }
-  };
+  };  
 
   return (
     <Div rounded="xl" h={verticalScale(123)} p={customTheme.spacing.medium} style={{ gap: 8 }}>
