@@ -31,10 +31,10 @@ const USERPROFILE = {
         ],
         "preferredZones": ['67b74cbd3fa5740f3fc3947d'],
         "preferredSports": [
-            "6751ca653be43773e5051cbd"
+            "676d900973a26a0de5f38bd7"
         ],
         "preferredSportModes": [
-            "6751cb8844b53be83b3554cc"
+            "676d903173a26a0de5f38bda"
         ]
     }
 }
