@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, TouchableOpacity } from "react-native";
+import { ScrollView, StyleSheet, TouchableOpacity } from "react-native";
 import { Div, Text } from "react-native-magnus";
 import { scale, verticalScale } from "react-native-size-matters";
 import { customTheme } from "../../../utils/theme";
@@ -8,6 +8,8 @@ import useFetch from "../../../hooks/useGet";
 import locationService from "../../../service/location.service";
 import { QUERY_KEYS } from "../../../types/query.types";
 import { Place } from "../../../types/form.type";
+import MapView from "react-native-maps";
+import MapLocationDisplay from "./mapInput";
 
 interface SearchLocationInputProps {
   // Para el modo editable (modal)
@@ -38,6 +40,8 @@ export default function SearchLocationInput({
     QUERY_KEYS.LOCATIONS,
   ]);
 
+  console.log("55555", Locations);
+
   // Si estamos en modo lectura y se pasa "location", la usamos como seleccionada
   useEffect(() => {
     if (readOnly && location) {
@@ -54,6 +58,7 @@ export default function SearchLocationInput({
       const results = Locations.data.results.filter((loc: Place) =>
         loc.name.toLowerCase().includes(filter.toLowerCase())
       );
+      console.log("1111111111111", results);
       setFilteredLocations(results);
     }
   }, [filter, Locations]);
@@ -70,11 +75,16 @@ export default function SearchLocationInput({
   // MODO SOLO LECTURA
   if (readOnly) {
     return (
-      <Div p={customTheme.spacing.small}>
-        <Div borderWidth={1} rounded="md" p={customTheme.spacing.small}>
-          <Div  h={scale(25)} flexDir="row" justifyContent="space-between" alignItems="center">
+      <Div p={customTheme.spacing.small} >
+        <Div  borderWidth={1} rounded="md" p={customTheme.spacing.small} w="100%" h={scale(370)}>
+          <Div >
+            <Div flexDir="row"justifyContent="space-between">
             <Text fontFamily="NotoSans-Variable">Lugar</Text>
-            <Text fontFamily="NotoSans-BoldItalic">{selectedLocation?.name ?? "A definir"}</Text>
+            <Text fontFamily="NotoSans-BoldItalic">
+              {selectedLocation?.name ?? "A definir"}
+            </Text></Div>
+            <Div w="100%">
+            <MapLocationDisplay place={selectedLocation} mapHeight={392}  /></Div>
           </Div>
         </Div>
       </Div>
