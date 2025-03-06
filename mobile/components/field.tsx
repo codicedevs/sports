@@ -1,9 +1,10 @@
-import React, { useState } from "react";
-import { Div, Overlay, Text } from "react-native-magnus";
+import React, {  useState } from "react";
+import { Div, Input, Text } from "react-native-magnus";
 import { scale, verticalScale } from "react-native-size-matters";
 import Match from "../types/match.type";
-import { ScrollView, TouchableOpacity } from "react-native";
+import {ScrollView, TouchableOpacity } from "react-native";
 import { customTheme } from "../utils/theme";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const personas = [
   "Santiago Rodríguez", "Valentina Gómez", "Mateo Fernández", "Lucía Pérez",
@@ -15,8 +16,12 @@ const personas = [
 ];
 
 const MAX_CIRCLE_SIZE = scale(50);
-
-const FPlayer = ({ size, style, initials }) => (
+interface FPlayerProps {
+  size: number;
+  style?: any;
+  initials?: string;
+}
+const FPlayer = ({ size, style, initials }: FPlayerProps) => (
   <Div
     w={size}
     h={size}
@@ -31,7 +36,14 @@ const FPlayer = ({ size, style, initials }) => (
   </Div>
 );
 
-const TeamField = ({ playersCount, mirror = false, onPlayerPress, playersAssignments }) => {
+interface TeamFieldProps {
+  playersCount: number;
+  mirror?: boolean;
+  onPlayerPress: (playerId: string) => void;
+  playersAssignments: Record<string, string>;
+}
+
+const TeamField = ({ playersCount, mirror = false, onPlayerPress, playersAssignments }: TeamFieldProps) => {
   const fieldPlayers = playersCount - 1;
   const maxPerRow = playersCount === 5 ? 2 : 4;
   const numRows = Math.ceil(fieldPlayers / maxPerRow);
@@ -84,10 +96,15 @@ const TeamField = ({ playersCount, mirror = false, onPlayerPress, playersAssignm
   );
 };
 
-const Field = ({ match }: { match: Match }) => {
+interface FieldProps {
+  match: Match;
+}
+
+const Field = ({ match }: FieldProps) => {
   const [open, setOpen] = useState(false);
   const [selectedPlayerId, setSelectedPlayerId] = useState(null);
   const [playersAssignments, setPlayersAssignments] = useState({});
+   const [searchQuery, setSearchQuery] = useState("");
 
   const totalPlayers = match.playersLimit;
   const teamPlayers = totalPlayers / 2;
@@ -103,25 +120,60 @@ const Field = ({ match }: { match: Match }) => {
     setSelectedPlayerId(null);
   };
 
+  const filteredPersonas = React.useMemo(() => {
+    return personas.filter((persona) =>
+      persona.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery]);
+
+  const iniciales = (playerId: string) =>{
+    const GK = playersAssignments[playerId];
+    const initials = GK ? GK.split(" ").map(word => word[0]).join("") : null;
+    return initials
+  }
+
   return (
     <>
-      <Overlay visible={open}>
-        <Div h={verticalScale(500)}>
-          <ScrollView>
-            {personas.map((persona) => (
-              <TouchableOpacity key={persona} onPress={() => handlePersonaSelect(persona)}>
-                <Div p={customTheme.spacing.medium}>
-                  <Text>{persona}</Text>
-                </Div>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </Div>
-      </Overlay>
+     {open && (
+  <Div
+    position="absolute"
+    top={0}
+    left={0}
+    right={0}
+    bottom={0}
+    bg="rgba(0, 0, 0, 0.5)"
+    alignItems="center"
+    justifyContent="center"
+    zIndex={1000}
+  >
+    <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <Div bg="white" p={customTheme.spacing.medium} rounded="lg" shadow="md" w={scale(300)}>
+        <Input
+          placeholder="Buscar..."
+          value={searchQuery}
+          onChangeText={(text) => setSearchQuery(text)}
+          mb={customTheme.spacing.medium}
+        />
+        <ScrollView style={{ maxHeight: verticalScale(300) }}>
+          {filteredPersonas.map((persona) => (
+            <TouchableOpacity key={persona} onPress={() => handlePersonaSelect(persona)}>
+              <Div p={customTheme.spacing.medium}>
+                <Text>{persona}</Text>
+              </Div>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+      </Div>
+    </KeyboardAwareScrollView>
+  </Div>
+)}
+
       <Div p={20} bg="green" h="100%">
         <Div id="first-half" borderWidth={1} flex={1}>
           <Div h="15%" alignItems="center" justifyContent="center">
-            <FPlayer size={scale(50)} />
+            <TouchableOpacity id="Top-GK" onPress={() =>handlePlayerPress("Top-GK")}>
+            <FPlayer size={scale(50)} initials={iniciales('Top-GK')} />
+            </TouchableOpacity>
           </Div>
           <TeamField 
             playersCount={teamPlayers} 
@@ -138,7 +190,9 @@ const Field = ({ match }: { match: Match }) => {
             playersAssignments={playersAssignments} 
           />
           <Div h="15%" alignItems="center" justifyContent="center">
-            <FPlayer size={scale(50)} />
+          <TouchableOpacity id="Bottom-GK" onPress={() =>handlePlayerPress("Top-GK")}>
+            <FPlayer size={scale(50)} initials={iniciales('Bottom-GK')} />
+            </TouchableOpacity>
           </Div>
         </Div>
       </Div>
