@@ -33,6 +33,7 @@ export class MatchService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Location.name) private readonly locationModel: Model<Location>,
     @InjectModel(MatchView.name) private readonly matchViewModel: Model<MatchView>,
+    @InjectModel(SportMode.name) private readonly sportModeModel: Model<SportMode>,
     private readonly petitionService: PetitionService,
     private readonly locationsService: LocationsService,
     private readonly sportModesService: SportModesService,
@@ -59,6 +60,12 @@ export class MatchService {
       }
     }
 
+    //Verificar si el sportMode existe
+    const sportMode = await this.sportModeModel.findById(userId).exec();
+    if (!sportMode) {
+      throw new NotFoundException("Sport Mode no encontrado");
+    }
+
     let date = null
     if (matchData.date) {
       date = moment.tz(matchData.date, 'America/Argentina/Buenos_Aires').toDate();
@@ -82,6 +89,14 @@ export class MatchService {
     }
 
     const savedMatch: HydratedDocument<Match> = await match.save();
+
+    //Creo un chatroom
+    await this.chatroomService.create({
+      reference: {
+        type: ChatroomModelType.match,
+        id: savedMatch._id as Types.ObjectId
+      }
+    })
 
     // Agregar el partido al array de matches de la location
 
@@ -172,13 +187,6 @@ export class MatchService {
     // Guardar el partido actualizado
     const savedMatch = await match.save();
 
-    //Creo un chatroom
-    await this.chatroomService.create({
-      reference: {
-        type: ChatroomModelType.match,
-        id: savedMatch._id as Types.ObjectId
-      }
-    })
 
     // Eliminar el matchId del array de partidos del usuario
     const matchIndex = user.matches.findIndex(
