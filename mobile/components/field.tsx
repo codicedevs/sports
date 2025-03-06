@@ -5,6 +5,7 @@ import Match from "../types/match.type";
 import {ScrollView, TouchableOpacity } from "react-native";
 import { customTheme } from "../utils/theme";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 
 const personas = [
   "Santiago Rodríguez", "Valentina Gómez", "Mateo Fernández", "Lucía Pérez",
@@ -74,7 +75,7 @@ const TeamField = ({ playersCount, mirror = false, onPlayerPress, playersAssignm
         const left = leftOffset + i * (circleSize + spacing);
         const playerId = `${mirror ? "bottom" : "top"}-${row}-${i}`;
         const persona = playersAssignments[playerId];
-        const initials = persona ? persona.split(" ").map(word => word[0]).join("") : null;
+        const initials = persona ? persona.split(" ").map(word => word[0]).join("") : "+";
 
         players.push(
           <TouchableOpacity key={playerId} onPress={() => onPlayerPress(playerId)}>
@@ -128,26 +129,30 @@ const Field = ({ match }: FieldProps) => {
 
   const iniciales = (playerId: string) =>{
     const GK = playersAssignments[playerId];
-    const initials = GK ? GK.split(" ").map(word => word[0]).join("") : null;
+    const initials = GK ? GK.split(" ").map(word => word[0]).join("") : "+";
     return initials
   }
 
   return (
     <>
      {open && (
+      <TouchableWithoutFeedback onPress={() => setOpen(false)} style={{height:"100%", backgroundColor:"rgba(0, 0, 0, 0.5)"}}>
   <Div
     position="absolute"
     top={0}
     left={0}
     right={0}
     bottom={0}
-    bg="rgba(0, 0, 0, 0.5)"
+    // bg="rgba(0, 0, 0, 0.5)"
     alignItems="center"
     justifyContent="center"
     zIndex={1000}
   >
     <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Div bg="white" p={customTheme.spacing.medium} rounded="lg" shadow="md" w={scale(300)}>
+      <Div zIndex={2000} h={verticalScale(400)} bg="white" p={customTheme.spacing.medium} rounded="lg" shadow="md" w={scale(300)}>
+      <TouchableOpacity onPress={() => setOpen(false)} style={{paddingVertical:customTheme.spacing.small}}>
+        <Text>Close</Text>
+        </TouchableOpacity>
         <Input
           placeholder="Buscar..."
           value={searchQuery}
@@ -166,6 +171,7 @@ const Field = ({ match }: FieldProps) => {
       </Div>
     </KeyboardAwareScrollView>
   </Div>
+  </TouchableWithoutFeedback>
 )}
 
       <Div p={20} bg="green" h="100%">
