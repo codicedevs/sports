@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { Div, Input, Text } from "react-native-magnus";
 import { scale, verticalScale } from "react-native-size-matters";
 import Match from "../types/match.type";
-import { ScrollView, TouchableOpacity } from "react-native";
+import { ScrollView, TouchableOpacity, TouchableWithoutFeedback } from "react-native";
 import { customTheme } from "../utils/theme";
 import Modal from "react-native-modal";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const personas = [
   "Santiago Rodríguez", "Valentina Gómez", "Mateo Fernández", "Lucía Pérez",
@@ -14,6 +15,23 @@ const personas = [
   "Felipe Navarro", "Agustina Soto", "Bruno Carrasco", "Josefina Paredes",
   "Facundo Ibáñez", "Victoria Duarte"
 ];
+
+const teams = {
+  team1: [
+    { posicion: 1, user: "rodrigo alejandro" },
+    { posicion: 2, user: "Carlos Mendoza" },
+    { posicion: 3, user: "Juan Martínez" },
+    { posicion: 4, user: "Luis Hernández" },
+    { posicion: 5, user: "Diego Álvarez" }
+  ],
+  team2: [
+    { posicion: 1, user: "alejandro rococo" },
+    { posicion: 2, user: "Sergio Rivera" },
+    { posicion: 3, user: "Pablo Torres" },
+    { posicion: 4, user: "Marcos Silva" },
+    { posicion: 5, user: "Roberto González" }
+  ]
+};
 
 const MAX_CIRCLE_SIZE = scale(50);
 interface FPlayerProps {
@@ -56,6 +74,8 @@ const TeamField = ({ playersCount, mirror = false, onPlayerPress, playersAssignm
 
   let players = [];
   if (layout) {
+    let circleNumber = 2;
+
     const availableWidth = layout.width * 0.9;
     const cellWidth = availableWidth / maxPerRow;
     const computedCircleSize = cellWidth * 0.8;
@@ -73,18 +93,26 @@ const TeamField = ({ playersCount, mirror = false, onPlayerPress, playersAssignm
       for (let i = 0; i < playersInRow; i++) {
         const left = leftOffset + i * (circleSize + spacing);
         const playerId = `${mirror ? "bottom" : "top"}-${row}-${i}`;
-        const persona = playersAssignments[playerId];
-        const initials = persona ? persona.split(" ").map(word => word[0]).join("") : "+";
-
+        const assignedPersona = playersAssignments[playerId];
+        const displayLabel = assignedPersona
+          ? assignedPersona.persona.split(" ").map(word => word[0]).join("")
+          : "+";
+        
+        const currentCircleNumber = circleNumber;
+        
         players.push(
-          <TouchableOpacity key={playerId} onPress={() => onPlayerPress(playerId)}>
+          <TouchableOpacity
+            key={playerId}
+            onPress={() => onPlayerPress(playerId, currentCircleNumber)}
+          >
             <FPlayer
               size={circleSize}
               style={{ position: "absolute", left, top }}
-              initials={initials}
+              initials={displayLabel}
             />
           </TouchableOpacity>
         );
+        circleNumber++;
       }
     }
   }
@@ -103,21 +131,28 @@ interface FieldProps {
 const Field = ({ match }: FieldProps) => {
   const [open, setOpen] = useState(false);
   const [selectedPlayerId, setSelectedPlayerId] = useState(null);
+  const [selectedCircleNumber, setSelectedCircleNumber] = useState(null);
   const [playersAssignments, setPlayersAssignments] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
 
   const totalPlayers = match.playersLimit;
   const teamPlayers = totalPlayers / 2;
 
-  const handlePlayerPress = (playerId) => {
+  console.log(playersAssignments)
+  const handlePlayerPress = (playerId, circleNumber) => {
     setSelectedPlayerId(playerId);
+    setSelectedCircleNumber(circleNumber);
     setOpen(true);
   };
 
   const handlePersonaSelect = (persona) => {
-    setPlayersAssignments(prev => ({ ...prev, [selectedPlayerId]: persona }));
+    setPlayersAssignments(prev => ({
+      ...prev,
+      [selectedPlayerId]: { persona, circleNumber: selectedCircleNumber }
+    }));
     setOpen(false);
     setSelectedPlayerId(null);
+    setSelectedCircleNumber(null);
   };
 
   const filteredPersonas = React.useMemo(() => {
@@ -126,68 +161,62 @@ const Field = ({ match }: FieldProps) => {
     );
   }, [searchQuery]);
 
-  const iniciales = (playerId: string) => {
-    const GK = playersAssignments[playerId];
-    const initials = GK ? GK.split(" ").map(word => word[0]).join("") : "+";
-    return initials
-  }
+  const iniciales = (playerId) => {
+    const entry = playersAssignments[playerId];
+    return entry && entry.persona ? entry.persona.split(" ").map(word => word[0]).join("") : "+";
+  };
 
   return (
     <>
-      <Modal
-        isVisible={open}
-        animationIn="fadeIn"
-        animationInTiming={300}
-        animationOut="fadeOut"
-        animationOutTiming={300}
-        backdropOpacity={0.5}
-        onBackdropPress={() => setOpen(false)}
-        onBackButtonPress={() => setOpen(false)}
-        coverScreen={true}
-        style={{ margin: 0 }}
-      >
-
+      {open && (
         <Div
-          zIndex={2000}
-          h={verticalScale(400)}
-          bg="white"
-          p={customTheme.spacing.medium}
-          rounded="lg"
-          shadow="md"
-          w={scale(300)}
-          alignSelf="center"
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          bg="rgba(0, 0, 0, 0.5)"
+          alignItems="center"
+          justifyContent="center"
+          zIndex={1000}
         >
-          <TouchableOpacity
-            onPress={() => setOpen(false)}
-            style={{ paddingVertical: customTheme.spacing.small }}
-          >
-            <Text>Close</Text>
-          </TouchableOpacity>
-          <Input
-            placeholder="Buscar..."
-            value={searchQuery}
-            onChangeText={(text) => setSearchQuery(text)}
-            mb={customTheme.spacing.medium}
-          />
-          <ScrollView style={{ maxHeight: verticalScale(300) }}>
-            {filteredPersonas.map((persona) => (
-              <TouchableOpacity
-                key={persona}
-                onPress={() => handlePersonaSelect(persona)}
-              >
-                <Div p={customTheme.spacing.medium}>
-                  <Text>{persona}</Text>
-                </Div>
+          <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Div
+              zIndex={2000}
+              h={verticalScale(400)}
+              bg="white"
+              p={customTheme.spacing.medium}
+              rounded="lg"
+              shadow="md"
+              w={scale(300)}
+            >
+              <TouchableOpacity onPress={() => setOpen(false)} style={{ paddingVertical: customTheme.spacing.small }}>
+                <Text>Close</Text>
               </TouchableOpacity>
-            ))}
-          </ScrollView>
+              <Input
+                placeholder="Buscar..."
+                value={searchQuery}
+                onChangeText={(text) => setSearchQuery(text)}
+                mb={customTheme.spacing.medium}
+              />
+              <ScrollView style={{ maxHeight: verticalScale(300) }}>
+                {filteredPersonas.map((persona) => (
+                  <TouchableOpacity key={persona} onPress={() => handlePersonaSelect(persona)}>
+                    <Div p={customTheme.spacing.medium}>
+                      <Text>{persona}</Text>
+                    </Div>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </Div>
+          </KeyboardAwareScrollView>
         </Div>
-      </Modal>
+      )}
 
       <Div p={20} bg="green" h="100%">
         <Div id="first-half" borderWidth={1} flex={1}>
           <Div h="15%" alignItems="center" justifyContent="center">
-            <TouchableOpacity id="Top-GK" onPress={() => handlePlayerPress("Top-GK")}>
+            <TouchableOpacity id="Top-GK" onPress={() => handlePlayerPress("Top-GK", 1)}>
               <FPlayer size={scale(50)} initials={iniciales('Top-GK')} />
             </TouchableOpacity>
           </Div>
@@ -206,7 +235,7 @@ const Field = ({ match }: FieldProps) => {
             playersAssignments={playersAssignments}
           />
           <Div h="15%" alignItems="center" justifyContent="center">
-            <TouchableOpacity id="Bottom-GK" onPress={() => handlePlayerPress("Top-GK")}>
+            <TouchableOpacity id="Bottom-GK" onPress={() => handlePlayerPress("Bottom-GK", 1)}>
               <FPlayer size={scale(50)} initials={iniciales('Bottom-GK')} />
             </TouchableOpacity>
           </Div>
