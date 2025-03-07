@@ -51,3 +51,6 @@ export class MatchView extends Document {
 
 export const MatchViewSchema = SchemaFactory.createForClass(MatchView);
 
+// Desactivar la creación automática de la colección para que no se genere "matchView" como colección
+MatchViewSchema.set('autoCreate', false);
+MatchViewSchema.set('autoIndex', false);
