@@ -27,10 +27,10 @@ export default function SearchLocationInput({
   const [selectedLocation, setSelectedLocation] = useState<Place | null>(
     matchDetailsRef?.current.location ?? null
   );
-  // Controla si el usuario eligió un lugar (para ocultar la lista y mostrar el mapa)
+  // si se selecc una loc
   const [userHasSelected, setUserHasSelected] = useState(false);
 
-  // Llamada al servicio para obtener ubicaciones
+  // Llamada  ubicaciones
   const { data: Locations } = useFetch(locationService.getAll, [
     QUERY_KEYS.LOCATIONS,
   ]);
@@ -42,7 +42,7 @@ export default function SearchLocationInput({
     }
   }, [readOnly, location]);
 
-  // Filtrado de ubicaciones
+  // Filtrado de ub
   useEffect(() => {
     if (!Locations) return;
     if (filter.trim() === "") {
@@ -92,7 +92,10 @@ export default function SearchLocationInput({
 
           {hasCoords && (
             <Div mt={customTheme.spacing.small}>
-              <MapLocationDisplay place={selectedLocation} mapHeight={scale(250)} />
+              <MapLocationDisplay
+                place={selectedLocation}
+                mapHeight={scale(250)}
+              />
             </Div>
           )}
         </Div>
@@ -180,7 +183,10 @@ export default function SearchLocationInput({
 
           {hasCoords && (
             <Div mt={customTheme.spacing.small}>
-              <MapLocationDisplay place={selectedLocation} mapHeight={scale(270)} />
+              <MapLocationDisplay
+                place={selectedLocation}
+                mapHeight={scale(270)}
+              />
             </Div>
           )}
         </Div>
