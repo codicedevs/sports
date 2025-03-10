@@ -22,12 +22,16 @@ import { Types } from "mongoose";
 import { create } from "domain";
 import { ValidateObjectIdPipe } from "pipes/validate-object-id.pipe";
 import { Public } from "authentication/public";
+import { ZonesService } from "zones/zones.service";
+import { Zone } from "zones/zone.entity";
 
 @ApiBearerAuth()
 @ApiTags('matches')
 @Controller("matches")
 export class MatchController {
-    constructor(private readonly matchService: MatchService) { }
+    constructor(private readonly matchService: MatchService,
+        private readonly zonesService: ZonesService
+    ) { }
     @Public()
     @Post()
     async createMatch(@Body() createMatchDto: CreateMatchDto) {
@@ -40,9 +44,30 @@ export class MatchController {
         const newMatch = await this.matchService.createMatch(createMatchDto);
         return newMatch;
     }
-
+    @Public()
     @Get()
     async findAll(@Query() filter: Filter) {
+        const zonesIds = filter?.where?.zones?.$in
+        if (zonesIds) {
+            const zones = (await this.zonesService.findAll({ where: { _id: { $in: zonesIds } } })).results
+            const zonePolygons = zones.map((zone: Zone) => zone.location)
+            delete filter.where.zones
+            filter.where = {
+                ...filter.where, ...{
+                    'location.location': {
+                        $geoWithin: {
+                            $geometry: {
+                                type: 'MultiPolygon',
+                                coordinates: zonePolygons.map((polygon) => polygon.coordinates)
+                            }
+                        }
+                    }
+                }
+            }
+
+        } else if (filter?.where?.zones) {
+            throw new BadRequestException("Zones should be an array")
+        }
         return await this.matchService.findAll(filter);
     }
 
@@ -56,19 +81,19 @@ export class MatchController {
         return await this.matchService.getAvailableMatches();
     }
 
-    @Get("/findForDate/:userId")
+    @Get("/findForDate/users/:userId")
     async findForDate(@Param("userId", new ValidateObjectIdPipe("usuario")) userId: string) {
         const matches = await this.matchService.getMatchesForUserDate(userId);
         return matches;
     }
 
-    @Get("/findForZone/:userId")
+    @Get("/findForZone/users/:userId")
     async findForZone(@Param("userId", new ValidateObjectIdPipe("usuario")) userId: string) {
         const matches = await this.matchService.getMatchesInUserZones(userId);
         return matches;
     }
 
-    @Get("/findForSportMode/:userId")
+    @Get("/findForSportMode/users/:userId")
     async findForSportMode(@Param("userId", new ValidateObjectIdPipe("usuario")) userId: string) {
         const matches = await this.matchService.getMatchesByUserSportMode(userId);
         return matches;

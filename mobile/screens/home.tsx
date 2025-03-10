@@ -2,6 +2,7 @@ import React, { useContext } from "react";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
 import { Button, Div } from "react-native-magnus";
 import MatchModalHandler from "../components/modal/matchModalHandler";
+import MatchPreferencesModal from "../components/modal/matchPreferences";
 import { ModalContext } from "../context/modalProvider";
 import Field from "../components/field";
 import { useSession } from "../context/authProvider";
@@ -66,6 +67,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     <Div flex={1}>
       <Field match={match} />
     </Div>
+
   );
 };
 

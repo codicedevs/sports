@@ -14,6 +14,8 @@ import { ChatroomModule } from "chatroom/chatroom.module";
 import { MatchListener } from "app-listeners/match.listener";
 import { MatchViewModule } from "./match-view.module";
 import { MatchView, MatchViewSchema } from "./match-view.model";
+import { ZonesModule } from "zones/zones.module";
+import { SportMode, SportModeSchema } from "sport_modes/sport_mode.entity";
 
 @Module({
     imports: [
@@ -21,12 +23,14 @@ import { MatchView, MatchViewSchema } from "./match-view.model";
             { name: Match.name, schema: MatchSchema },
             { name: User.name, schema: UserSchema },
             { name: Location.name, schema: LocationSchema },
-            { name: MatchView.name, schema: MatchViewSchema }
+            { name: MatchView.name, schema: MatchViewSchema },
+            { name: SportMode.name, schema: SportModeSchema }
         ]),
         PetitionModule,
         LocationsModule,
         SportModesModule,
-        ChatroomModule
+        ChatroomModule,
+        ZonesModule
     ],
     controllers: [MatchController],
     providers: [MatchService, JwtService, PushNotificationService, MatchListener],

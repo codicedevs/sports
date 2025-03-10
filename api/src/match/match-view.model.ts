@@ -4,6 +4,7 @@ import { Location } from 'locations/location.entity';
 import { User } from 'user/user.entity';
 import { SportMode, SportModeSchema } from 'sport_modes/sport_mode.entity';
 import { Formations, FormationsSchema } from './match.entity';
+import { Sport, SportSchema } from 'sports/sport.entity';
 
 @Schema({ collection: 'matchView', versionKey: false })
 export class MatchView extends Document {
@@ -29,6 +30,9 @@ export class MatchView extends Document {
   @Prop({ type: SportModeSchema, required: true })
   sportMode: SportMode;
 
+  @Prop({ type: SportSchema, required: true})
+  sport: Sport;
+
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "User", required: true })
   userId: Types.ObjectId;
 
@@ -47,3 +51,6 @@ export class MatchView extends Document {
 
 export const MatchViewSchema = SchemaFactory.createForClass(MatchView);
 
+// Desactivar la creación automática de la colección para que no se genere "matchView" como colección
+MatchViewSchema.set('autoCreate', false);
+MatchViewSchema.set('autoIndex', false);
