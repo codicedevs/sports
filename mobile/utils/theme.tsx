@@ -14,6 +14,7 @@ export type CustomThemeType = ThemeType & {
     gray: string;
     grayBackground: string;
     secondaryBackground: string;
+   
   };
   fontFamily: {
     normal: string;
@@ -62,7 +63,8 @@ export const customTheme: CustomThemeType = {
     secondaryBackground: "#151515",
     text: "#333333",
     gray: "#797977",
-    grayBackground: "#DDDED9"
+    grayBackground: "#f2f2f0"
+  
   },
   fontFamily: {
     normal: "NotoSans-BoldItalic",

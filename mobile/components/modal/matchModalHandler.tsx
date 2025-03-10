@@ -101,6 +101,9 @@ console.log(e,'ERROR')
     setOpen(false);
   };  
 
+  
+console.log("RENDEEER","Rendering MatchSchedulerInput")
+
   return (
     <Modal isVisible={open} onBackButtonPress={closeModal}>
       <ScrollView>
