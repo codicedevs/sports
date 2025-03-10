@@ -650,6 +650,11 @@ export class MatchService {
     if (!match) {
       throw new Error("Match not found");
     }
+    const user = await this.userModel.findById(userId).exec();
+    if (!user) {
+      throw new Error("User not found");
+    }
+
 
     // Preparar nuevas formaciones
     const newFormations: Formations = {
@@ -661,22 +666,22 @@ export class MatchService {
     let userAlreadyIn = false;
 
     // Helper para procesar los equipos
-    const processTeam = (players: Player[], targetTeam: Player[]) => {
+    const processTeam = (players: Player[], targetTeam: Player[], teamNumber: Number) => {
       for (const player of players) {
         if (player.userId.toString() === userId.toString()) {
           userAlreadyIn = true;
           player.position = position; // Actualizar posición
           team === 1 ? newFormations.team1.push(player) : newFormations.team2.push(player);
         } else {
-          if (player.position !== position) //Si hay alguien en la misma posición y equipo no lo agregamos
+          if ((player.position !== position || teamNumber !== team)) //Si hay alguien en la misma posición y equipo no lo agregamos
             targetTeam.push(player); // Conservar jugadores que no se modifican
         }
       }
     };
 
     // Procesar ambos equipos
-    processTeam(match.formations.team1, newFormations.team1);
-    processTeam(match.formations.team2, newFormations.team2);
+    processTeam(match.formations.team1, newFormations.team1, 1);
+    processTeam(match.formations.team2, newFormations.team2, 2);
 
     // Si no estaba en ninguno de los equipos, agregarlo
     if (!userAlreadyIn) {
