@@ -8,12 +8,14 @@ export const AuthContext = React.createContext<{
   isModalVisible: boolean;
   showModal: () => void;
   hideModal: () => void;
+  protect: (callback: any) => any;
 }>({
   currentUser: "null",
   setCurrentUser: () => {},
   isModalVisible: false,
   showModal: () => {},
   hideModal: () => {},
+  protect: (callback) => () => {},
 });
 
 interface AppProviderProps {
@@ -38,6 +40,18 @@ const AppProvider: FC<AppProviderProps> = ({ children }) => {
   const showModal = () => setIsModalVisible(true);
   const hideModal = () => setIsModalVisible(false);
 
+  function protect(callback: Function) {
+    console.log(currentUser);
+    
+    if(currentUser) {
+      return callback
+    } else {
+      showModal()
+      return () => {}
+    }
+  };
+
+  
   return (
     <AuthContext.Provider
       value={{
@@ -46,6 +60,7 @@ const AppProvider: FC<AppProviderProps> = ({ children }) => {
         isModalVisible,
         showModal,
         hideModal,
+        protect
       }}
     >
       <ModalContext.Provider value={{ open, setOpen }}>

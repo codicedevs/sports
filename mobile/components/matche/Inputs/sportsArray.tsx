@@ -34,7 +34,7 @@ const SportArrayInput = ({ matchDetailsRef }: SportInputProps) => {
 
     useEffect(() => {
         if (!selectedSports.length && sports) {
-            const defaultSport = sports.data.results[0];
+            const defaultSport = sports.results[0];
             setSelectedSports([defaultSport]);
             matchDetailsRef.current.preferredSports = [defaultSport];
         }
@@ -99,7 +99,7 @@ const SportArrayInput = ({ matchDetailsRef }: SportInputProps) => {
         );
 
     const sportModesForSelectedSports = allSportModes
-        ? allSportModes.data.results.filter((mode: SportMode) =>
+        ? allSportModes.results.filter((mode: SportMode) =>
             selectedSports.some(s => s._id === mode.sport)
         )
         : [];
@@ -115,14 +115,14 @@ const SportArrayInput = ({ matchDetailsRef }: SportInputProps) => {
                     horizontal
                     contentContainerStyle={{ gap: scale(16) }}
                 >
-                    {sports.data.results.map((sport, index) => (
+                    {sports.results.map((sport, index) => (
                         <SportButton
                             key={sport._id}
                             sport={sport}
                             index={index}
                             onPress={handleSelectSport}
                             selected={selectedSports.some(s => s._id === sport._id)}
-                            length={sports.data.results.length}
+                            length={sports.results.length}
                         />
                     ))}
                 </ScrollView>

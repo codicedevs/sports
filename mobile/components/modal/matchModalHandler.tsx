@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, Context } from "react";
+import React, { useEffect, useRef, useState, Context, useContext } from "react";
 import { Div, Text, Modal } from "react-native-magnus";
 import Match from "../../types/match.type";
 import { customTheme } from "../../utils/theme";
@@ -19,6 +19,7 @@ import {
 } from "../../types/form.type";
 import matchService from "../../service/match.service";
 import { useMutate } from "../../hooks/useMutate";
+import { AuthContext } from "../../context/authProvider";
 
 interface MatchModalHandlerProps {
   open: boolean;
@@ -45,6 +46,7 @@ const MatchModalHandler = ({
   });
 
   const [openId, setOpenId] = useState<null | string>(null);
+  const context = useContext(AuthContext)
 
   const createMatch = async () => {
     try {
@@ -159,7 +161,7 @@ const MatchModalHandler = ({
         h={verticalScale(80)}
         p={customTheme.spacing.medium}
       >
-        <TouchableOpacity onPress={createMatch}>
+        <TouchableOpacity onPress={() => {context.protect(createMatch)}}>
           <Div
             h={verticalScale(45)}
             justifyContent="center"
