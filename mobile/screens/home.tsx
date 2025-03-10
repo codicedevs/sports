@@ -16,14 +16,15 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   };
 
   return (
-    <Div>
-      <Button block onPress={() => setOpen(true)}>
+    <Div flexDir="row" justifyContent="center">
+      <Button  onPress={() => setOpen(true)}>
         Abrir
       </Button>
       <MatchModalHandler
         open={open}
         setOpen={setOpen}
         onMatchCreated={handleMatchCreated}
+        
       />
     </Div>
   );
