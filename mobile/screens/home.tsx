@@ -57,15 +57,21 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
 }) => {
   const { open, setOpen } = useContext(ModalContext);
 
-  // Función que se llamará cuando se cree el partido en el modal
   const handleMatchCreated = (createdMatchId: string) => {
-    // Navega a la pantalla de detalle y pasa el ID
+   
     navigation.navigate(AppScreens.MATCH_DETAIL, { id: createdMatchId });
   };
 
   return (
-    <Div flex={1}>
-      <Field match={match} />
+    <Div flexDir="row" justifyContent="center">
+      <Button  onPress={() => setOpen(true)}>
+        Abrir
+      </Button>
+      <MatchModalHandler
+        open={open}
+        setOpen={setOpen}
+        onMatchCreated={handleMatchCreated}
+      />
     </Div>
 
   );

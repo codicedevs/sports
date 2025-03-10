@@ -28,10 +28,7 @@ export class MatchView extends Document {
   location?: Location;
 
   @Prop({ type: SportModeSchema, required: true })
-  sportMode: SportMode;
-
-  @Prop({ type: SportSchema, required: true})
-  sport: Sport;
+  sportMode: SportMode;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "User", required: true })
   userId: Types.ObjectId;
