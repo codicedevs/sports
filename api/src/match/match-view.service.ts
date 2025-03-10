@@ -73,10 +73,10 @@ export class MatchViewService implements OnModuleInit {
         ],
       });
 
-      console.log('✅ View `matchView` creada exitosamente');
+      console.log('✅ View matchView creada exitosamente');
     } catch (error: any) {
       if (error.codeName === 'NamespaceExists') {
-        console.log('⚠️ La vista `matchView` ya existe');
+        console.log('⚠ La vista matchView ya existe');
       } else {
         console.error('❌ Error creando la view:', error);
       }
@@ -93,4 +93,5 @@ export class MatchViewService implements OnModuleInit {
   async onModuleInit() {
     await this.createMatchView();
   }
+  
 }

@@ -1,39 +1,34 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Div, Input, Text } from "react-native-magnus";
 import { scale, verticalScale } from "react-native-size-matters";
 import Match from "../types/match.type";
-import { ScrollView, TouchableOpacity, TouchableWithoutFeedback } from "react-native";
+import { ImageBackground, ScrollView, TouchableOpacity } from "react-native";
 import { customTheme } from "../utils/theme";
-import Modal from "react-native-modal";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import matchService from "../service/match.service";
+
+
+// match id 66e482584509915a15968bd7
 
 const personas = [
-  "Santiago Rodríguez", "Valentina Gómez", "Mateo Fernández", "Lucía Pérez",
-  "Sebastián Ramírez", "Camila Torres", "Benjamín Morales", "Martina Jiménez",
-  "Joaquín Herrera", "Sofía Castro", "Tomás Vargas", "Isabella Méndez",
-  "Lucas Rojas", "Emilia Aguirre", "Gabriel Ortega", "Renata Silva",
-  "Felipe Navarro", "Agustina Soto", "Bruno Carrasco", "Josefina Paredes",
-  "Facundo Ibáñez", "Victoria Duarte"
+  { _id: "66e482584509915a15968bd7", name: "Diego" },
+  { _id: "671a838fa244aadecccd9904", name: "diego11" },
+  { _id: "671a84b9ba1c16df2574f220", name: "diego12" },
+  { _id: "671a84bfba1c16df2574f222", name: "diego14" },
+  { _id: "679b940c3dc4af55650b6049", name: "diego orefici" },
+  { _id: "66f7055a26fc7aa2eabb94ef", name: "diego+1" },
+  { _id: "66f7056226fc7aa2eabb94f1", name: "diego+2" },
+  { _id: "66f7057126fc7aa2eabb94f7", name: "diego+5" },
+  { _id: "679ba8a55768ea11f86cdf9e", name: "Administrator Administrador" },
+  { _id: "66f7056726fc7aa2eabb94f3", name: "diego+3" },
+  { _id: "671a8395a244aadecccd9906", name: "diego10" },
+  { _id: "671a839ba244aadecccd9908", name: "diego9" },
+  { _id: "66f7056c26fc7aa2eabb94f5", name: "diego+4" },
+  { _id: "66f7057526fc7aa2eabb94f9", name: "diego+6" }
 ];
 
-const teams = {
-  team1: [
-    { posicion: 1, user: "rodrigo alejandro" },
-    { posicion: 2, user: "Carlos Mendoza" },
-    { posicion: 3, user: "Juan Martínez" },
-    { posicion: 4, user: "Luis Hernández" },
-    { posicion: 5, user: "Diego Álvarez" }
-  ],
-  team2: [
-    { posicion: 1, user: "alejandro rococo" },
-    { posicion: 2, user: "Sergio Rivera" },
-    { posicion: 3, user: "Pablo Torres" },
-    { posicion: 4, user: "Marcos Silva" },
-    { posicion: 5, user: "Roberto González" }
-  ]
-};
-
 const MAX_CIRCLE_SIZE = scale(50);
+
 interface FPlayerProps {
   size: number;
   style?: any;
@@ -44,7 +39,6 @@ const FPlayer = ({ size, style, initials }: FPlayerProps) => (
     w={size}
     h={size}
     rounded="circle"
-    borderWidth={1}
     bg="white"
     alignItems="center"
     justifyContent="center"
@@ -57,11 +51,20 @@ const FPlayer = ({ size, style, initials }: FPlayerProps) => (
 interface TeamFieldProps {
   playersCount: number;
   mirror?: boolean;
-  onPlayerPress: (playerId: string) => void;
-  playersAssignments: Record<string, string>;
+  onPlayerPress: (playerId: string, circleNumber: number) => void;
+  playersAssignments: Record<string, any>;
+  teamData?: { posicion: number, user: string }[];
+  onAutoAssign?: (assignments: Record<string, { persona: any, circleNumber: number }>) => void;
 }
 
-const TeamField = ({ playersCount, mirror = false, onPlayerPress, playersAssignments }: TeamFieldProps) => {
+const TeamField = ({
+  playersCount,
+  mirror = false,
+  onPlayerPress,
+  playersAssignments,
+  teamData,
+  onAutoAssign
+}: TeamFieldProps) => {
   const fieldPlayers = playersCount - 1;
   const maxPerRow = playersCount === 5 ? 2 : 4;
   const numRows = Math.ceil(fieldPlayers / maxPerRow);
@@ -73,9 +76,9 @@ const TeamField = ({ playersCount, mirror = false, onPlayerPress, playersAssignm
   };
 
   let players = [];
-  if (layout) {
-    let circleNumber = 2;
+  let circleNumber = 2;
 
+  if (layout) {
     const availableWidth = layout.width * 0.9;
     const cellWidth = availableWidth / maxPerRow;
     const computedCircleSize = cellWidth * 0.8;
@@ -94,12 +97,10 @@ const TeamField = ({ playersCount, mirror = false, onPlayerPress, playersAssignm
         const left = leftOffset + i * (circleSize + spacing);
         const playerId = `${mirror ? "bottom" : "top"}-${row}-${i}`;
         const assignedPersona = playersAssignments[playerId];
-        const displayLabel = assignedPersona
-          ? assignedPersona.persona.split(" ").map(word => word[0]).join("")
+        const displayLabel = assignedPersona && assignedPersona.persona && assignedPersona.persona.name
+          ? assignedPersona.persona.name.split(" ").map(word => word[0]).join("")
           : "+";
-        
         const currentCircleNumber = circleNumber;
-        
         players.push(
           <TouchableOpacity
             key={playerId}
@@ -117,8 +118,32 @@ const TeamField = ({ playersCount, mirror = false, onPlayerPress, playersAssignm
     }
   }
 
+
+  useEffect(() => {
+    if (layout && teamData && teamData.length > 0 && onAutoAssign) {
+      let assignments = {};
+      let circleNum = 2; 
+      for (let row = 0; row < numRows; row++) {
+        const playersInRow = row < numRows - 1 ? maxPerRow : fieldPlayers - row * maxPerRow;
+        for (let i = 0; i < playersInRow; i++) {
+          const playerId = `${mirror ? "bottom" : "top"}-${row}-${i}`;
+          if (!playersAssignments[playerId]) {
+            const teamPlayer = teamData.find(p => p.position === circleNum);
+            if (teamPlayer && teamPlayer.userId) {
+              assignments[playerId] = { persona: teamPlayer.userId, circleNumber: circleNum };
+            }
+          }
+          circleNum++;
+        }
+      }
+      if (Object.keys(assignments).length > 0) {
+        onAutoAssign(assignments);
+      }
+    }
+  }, [layout, teamData, onAutoAssign, mirror, numRows, fieldPlayers, maxPerRow, playersAssignments]);
+
   return (
-    <Div flex={1} bg="green" onLayout={handleLayout} position="relative">
+    <Div flex={1} onLayout={handleLayout} position="relative">
       {players}
     </Div>
   );
@@ -137,33 +162,68 @@ const Field = ({ match }: FieldProps) => {
 
   const totalPlayers = match.playersLimit;
   const teamPlayers = totalPlayers / 2;
-
   console.log(playersAssignments)
+  useEffect(() => {
+    setPlayersAssignments(prev => ({
+      ...prev,
+      "Top-GK": { circleNumber: 1 },
+      "Bottom-GK": { circleNumber: 1 }
+    }));
+  }, []);
+
   const handlePlayerPress = (playerId, circleNumber) => {
     setSelectedPlayerId(playerId);
     setSelectedCircleNumber(circleNumber);
     setOpen(true);
   };
 
+  const addToFormation = async (player: any) => {
+    const team = (selectedPlayerId.split('-')[0] === "top" ? 1 : 2)
+    console.log(team)
+    await matchService.addPlayerToFormation("676d8fc473a26a0de5f38bd1", player._id, {
+      team: team,
+      position: selectedCircleNumber
+    })
+  }
+
+  const removeFromFormation = async (player: any) => {
+    console.log(player, 'SACANDO')
+    await matchService.removePlayerFromFormation("676d8fc473a26a0de5f38bd1", player._id)
+  }
+
   const handlePersonaSelect = (persona) => {
-    setPlayersAssignments(prev => ({
-      ...prev,
-      [selectedPlayerId]: { persona, circleNumber: selectedCircleNumber }
-    }));
+    setPlayersAssignments(prev => {
+      const newAssignments = { ...prev };
+
+      Object.keys(newAssignments).forEach(key => {
+        if (
+          newAssignments[key].persona &&
+          newAssignments[key].persona._id === persona._id
+        ) {
+          delete newAssignments[key];
+        }
+      });
+
+      addToFormation(persona);
+      newAssignments[selectedPlayerId] = { persona, circleNumber: selectedCircleNumber };
+      return newAssignments;
+    });
     setOpen(false);
     setSelectedPlayerId(null);
     setSelectedCircleNumber(null);
   };
 
   const filteredPersonas = React.useMemo(() => {
-    return personas.filter((persona) =>
-      persona.toLowerCase().includes(searchQuery.toLowerCase())
+    return personas.filter((personaObj) =>
+      personaObj.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [searchQuery]);
 
   const iniciales = (playerId) => {
     const entry = playersAssignments[playerId];
-    return entry && entry.persona ? entry.persona.split(" ").map(word => word[0]).join("") : "+";
+    return entry && entry.persona && entry.persona.name
+      ? entry.persona.name.split(" ").map(word => word[0]).join("")
+      : "+";
   };
 
   return (
@@ -201,9 +261,9 @@ const Field = ({ match }: FieldProps) => {
               />
               <ScrollView style={{ maxHeight: verticalScale(300) }}>
                 {filteredPersonas.map((persona) => (
-                  <TouchableOpacity key={persona} onPress={() => handlePersonaSelect(persona)}>
+                  <TouchableOpacity key={persona._id} onPress={() => handlePersonaSelect(persona)}>
                     <Div p={customTheme.spacing.medium}>
-                      <Text>{persona}</Text>
+                      <Text>{persona.name}</Text>
                     </Div>
                   </TouchableOpacity>
                 ))}
@@ -212,35 +272,48 @@ const Field = ({ match }: FieldProps) => {
           </KeyboardAwareScrollView>
         </Div>
       )}
+      <ImageBackground
+        source={require('../assets/match/canchaF.jpg')}
+        style={{ height: "100%" }}
+      >
+        <Div p={20} h="100%">
+          <Div id="first-half" flex={1}>
+            <Div h="15%" alignItems="center" justifyContent="center">
+              <TouchableOpacity id="Top-GK" onPress={() => handlePlayerPress("Top-GK", 1)}>
+                <FPlayer size={scale(50)} initials={iniciales("Top-GK")} />
+              </TouchableOpacity>
+            </Div>
+            <TeamField
+              playersCount={teamPlayers}
+              mirror={false}
+              onPlayerPress={handlePlayerPress}
+              playersAssignments={playersAssignments}
+              onAutoAssign={(assignments) =>
+                setPlayersAssignments(prev => ({ ...prev, ...assignments }))
+              }
+              teamData={match.formations.team2}
+            />
+          </Div>
 
-      <Div p={20} bg="green" h="100%">
-        <Div id="first-half" borderWidth={1} flex={1}>
-          <Div h="15%" alignItems="center" justifyContent="center">
-            <TouchableOpacity id="Top-GK" onPress={() => handlePlayerPress("Top-GK", 1)}>
-              <FPlayer size={scale(50)} initials={iniciales('Top-GK')} />
-            </TouchableOpacity>
-          </Div>
-          <TeamField
-            playersCount={teamPlayers}
-            mirror={false}
-            onPlayerPress={handlePlayerPress}
-            playersAssignments={playersAssignments}
-          />
-        </Div>
-        <Div id="second-half" borderWidth={1} flex={1}>
-          <TeamField
-            playersCount={teamPlayers}
-            mirror={true}
-            onPlayerPress={handlePlayerPress}
-            playersAssignments={playersAssignments}
-          />
-          <Div h="15%" alignItems="center" justifyContent="center">
-            <TouchableOpacity id="Bottom-GK" onPress={() => handlePlayerPress("Bottom-GK", 1)}>
-              <FPlayer size={scale(50)} initials={iniciales('Bottom-GK')} />
-            </TouchableOpacity>
+          <Div id="second-half" flex={1}>
+            <TeamField
+              playersCount={teamPlayers}
+              mirror={true}
+              onPlayerPress={handlePlayerPress}
+              playersAssignments={playersAssignments}
+              onAutoAssign={(assignments) =>
+                setPlayersAssignments(prev => ({ ...prev, ...assignments }))
+              }
+              teamData={match.formations.team1}
+            />
+            <Div h="15%" alignItems="center" justifyContent="center">
+              <TouchableOpacity id="Bottom-GK" onPress={() => handlePlayerPress("Bottom-GK", 1)}>
+                <FPlayer size={scale(50)} initials={iniciales("Bottom-GK")} />
+              </TouchableOpacity>
+            </Div>
           </Div>
         </Div>
-      </Div>
+      </ImageBackground>
     </>
   );
 };
