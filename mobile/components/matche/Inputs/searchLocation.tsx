@@ -27,15 +27,13 @@ export default function SearchLocationInput({
   const [selectedLocation, setSelectedLocation] = useState<Place | null>(
     matchDetailsRef?.current.location ?? null
   );
-  // si se selecc una loc
+
   const [userHasSelected, setUserHasSelected] = useState(false);
 
-  // Llamada  ubicaciones
   const { data: Locations } = useFetch(locationService.getAll, [
     QUERY_KEYS.LOCATIONS,
   ]);
 
-  // Si en modo lectura y hay "location", la usamos como valor inicial
   useEffect(() => {
     if (readOnly && location) {
       setSelectedLocation(location);
@@ -46,9 +44,9 @@ export default function SearchLocationInput({
   useEffect(() => {
     if (!Locations) return;
     if (filter.trim() === "") {
-      setFilteredLocations(Locations.data.results);
+      setFilteredLocations(Locations.results);
     } else {
-      const results = Locations.data.results.filter((loc: Place) =>
+      const results = Locations.results.filter((loc: Place) =>
         loc.name.toLowerCase().includes(filter.toLowerCase())
       );
       setFilteredLocations(results);
@@ -59,13 +57,12 @@ export default function SearchLocationInput({
 
   function handleSelectLocation(loc: Place) {
     setSelectedLocation(loc);
-    setUserHasSelected(true); // Se seleccionó un lugar de la lista
+    setUserHasSelected(true);
     if (matchDetailsRef) {
       matchDetailsRef.current.location = loc;
     }
   }
 
-  // Verificamos si el lugar tiene coords
   const hasCoords =
     selectedLocation?.location?.coordinates &&
     selectedLocation.location.coordinates.length === 2;
@@ -103,8 +100,6 @@ export default function SearchLocationInput({
     );
   }
 
-  // MODO EDICIÓN
-
   if (!userHasSelected) {
     return (
       <Div
@@ -130,7 +125,7 @@ export default function SearchLocationInput({
         >
           {(filteredLocations.length > 0
             ? filteredLocations
-            : Locations.data.results
+            : Locations.results
           ).map((loc: Place, index: number) => (
             <TouchableOpacity
               key={index}
@@ -139,7 +134,7 @@ export default function SearchLocationInput({
               <Div
                 h={verticalScale(48)}
                 mb={
-                  index !== Locations.data.results.length - 1
+                  index !== Locations.results.length - 1
                     ? customTheme.spacing.small
                     : 0
                 }
