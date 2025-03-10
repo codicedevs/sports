@@ -191,6 +191,6 @@ export default function SearchLocationInput({
           )}
         </Div>
       </Div>
-    );
-  }
+    );
+  }
 }
