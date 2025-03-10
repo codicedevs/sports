@@ -46,12 +46,13 @@ export default function SearchLocationInput({
   useEffect(() => {
     if (!Locations) return;
     if (filter.trim() === "") {
-      setFilteredLocations(Locations.data.results);
+      setFilteredLocations(Locations.results);
     } else {
-      const results = Locations.data.results.filter((loc: Place) =>
+      const results = Locations.results.filter((loc: Place) =>
         loc.name.toLowerCase().includes(filter.toLowerCase())
       );
       setFilteredLocations(results);
+      
     }
   }, [filter, Locations]);
 
@@ -130,7 +131,7 @@ export default function SearchLocationInput({
         >
           {(filteredLocations.length > 0
             ? filteredLocations
-            : Locations.data.results
+            : Locations.results
           ).map((loc: Place, index: number) => (
             <TouchableOpacity
               key={index}
@@ -139,7 +140,7 @@ export default function SearchLocationInput({
               <Div
                 h={verticalScale(48)}
                 mb={
-                  index !== Locations.data.results.length - 1
+                  index !== Locations.results.length - 1
                     ? customTheme.spacing.small
                     : 0
                 }
