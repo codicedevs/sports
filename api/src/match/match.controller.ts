@@ -24,13 +24,17 @@ import { ValidateObjectIdPipe } from "pipes/validate-object-id.pipe";
 import { Public } from "authentication/public";
 import { ZonesService } from "zones/zones.service";
 import { Zone } from "zones/zone.entity";
+import { PetitionService } from "petition/petition.service";
+import { PetitionModelType, PetitionStatus } from "petition/petition.enum";
 
 @ApiBearerAuth()
 @ApiTags('matches')
 @Controller("matches")
 export class MatchController {
-    constructor(private readonly matchService: MatchService,
-        private readonly zonesService: ZonesService
+    constructor(
+        private readonly matchService: MatchService,
+        private readonly zonesService: ZonesService,
+        private readonly petitionService: PetitionService
     ) { }
     @Public()
     @Post()
@@ -110,7 +114,7 @@ export class MatchController {
         const match = await this.matchService.findOne(new Types.ObjectId(id));
         return match;
     }
-
+    @Public()
     @Patch("/:matchId/formation/:userId/add")
     async updateFormation(
         @Param("matchId", new ValidateObjectIdPipe("partido")) matchId: string,
@@ -125,7 +129,7 @@ export class MatchController {
         );
         return updatedMatch;
     }
-
+    @Public()
     @Patch("/:matchId/formation/:userId/remove")
     async deleteUserFromFormation(
         @Param("matchId", new ValidateObjectIdPipe("partido")) matchId: string,
@@ -169,6 +173,39 @@ export class MatchController {
         );
 
         return updatedMatch;
+    }
+
+    @Public()
+    @Get(":matchId/petitions")
+    async getPetitionsByMatch(
+        @Param("matchId", new ValidateObjectIdPipe("match")) matchId: string
+    ) {
+        const petitions = await this.petitionService.findByReference({
+            id: new Types.ObjectId(matchId),
+            type: PetitionModelType.match, 
+        });
+
+        const result = {
+            pending: [] as any[],
+            accepted: [] as any[],
+            declined: [] as any[],
+        };
+
+        petitions.forEach(petition => {
+            switch (petition.status) {
+                case PetitionStatus.Pending:
+                    result.pending.push(petition.receiver);
+                    break;
+                case PetitionStatus.Accepted:
+                    result.accepted.push(petition.receiver);
+                    break;
+                case PetitionStatus.Declined:
+                    result.declined.push(petition.receiver);
+                    break;
+            }
+        });
+
+        return result;
     }
 
     @Put(":id")

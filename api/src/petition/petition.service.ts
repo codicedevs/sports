@@ -58,9 +58,7 @@ export class PetitionService {
       },
     },
   };
-
-
-
+  
   async create(createPetitionDto: CreatePetitionDto): Promise<Petition> {
     const { emitter, receiver, reference } = createPetitionDto;
     const targetId = reference.id
@@ -152,6 +150,16 @@ export class PetitionService {
     }
 
     return newPetition;
+  }
+
+  async findByReference(reference: { id: Types.ObjectId; type: PetitionModelType }): Promise<Petition[]> {
+    return this.petitionModel
+      .find({
+        'reference.id': reference.id,
+        'reference.type': reference.type,
+      })
+      .populate('receiver')
+      .exec();
   }
 
   async acceptPetition(petitionId: Types.ObjectId): Promise<Match | Group> {
