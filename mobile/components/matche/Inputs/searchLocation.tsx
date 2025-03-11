@@ -50,6 +50,7 @@ export default function SearchLocationInput({
         loc.name.toLowerCase().includes(filter.toLowerCase())
       );
       setFilteredLocations(results);
+      
     }
   }, [filter, Locations]);
 
