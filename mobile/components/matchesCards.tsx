@@ -1,17 +1,27 @@
 import React from "react";
-import { View, Image } from "react-native";
+import { View, Image, TouchableOpacity } from "react-native";
 import { Div, Text } from "react-native-magnus";
 import { scale } from "react-native-size-matters";
 import { customTheme } from "../utils/theme";
+import Location from "../types/location.type";
+import { User } from "../types/user.type";
+import { AppScreens, AppScreensParamList } from "../navigation/screens";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 interface MatchCardProps {
-  day: string;
-  date: string;
-  time: string;
-  location: string;
-  players: number;
-  maxPlayers: number;
+  day: number | undefined;
+  date: Date | undefined;
+  time: number | undefined;
+  location: Location | undefined;
+  players: User [] | undefined;
+  maxPlayers: number | undefined;
 }
+
+type HomeScreenNavigationProp = NativeStackNavigationProp<
+  AppScreensParamList,
+  AppScreens.HOME_SCREEN
+>;
 
 const MatchCard: React.FC<MatchCardProps> = ({
   day,
@@ -20,9 +30,15 @@ const MatchCard: React.FC<MatchCardProps> = ({
   location,
   players,
   maxPlayers,
+  
+  
 }) => {
+  const navigation = useNavigation<HomeScreenNavigationProp>();
   return (
-    <Div alignItems="center" mt={scale(15)}>
+    <TouchableOpacity
+    onPress={() => navigation.navigate(AppScreens.MATCH_DETAIL, { id: "" })}
+  >
+    <Div alignItems="center" mt={scale(15)} p={customTheme.spacing.small}>
       {/* Cont Gral */}
       <Div
         borderWidth={scale(1)}
@@ -48,7 +64,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
             <Text
               textAlign="center"
               fontFamily="NotoSans-ExtraBoldItalic"
-              fontSize={customTheme.fontSize.Fourxl}
+              fontSize={customTheme.fontSize.large}
             >
               {date}
             </Text>
@@ -79,12 +95,12 @@ const MatchCard: React.FC<MatchCardProps> = ({
             flex: 3,
             borderStyle: "dashed",
             borderLeftWidth: scale(1.2),
-            justifyContent:"space-between",
+            justifyContent: "space-between",
             padding: scale(10),
           }}
         >
           <Div>
-            <Text fontSize={customTheme.fontSize.title}>{location}</Text>
+            <Text fontSize={customTheme.fontSize.title}>{location?.name}</Text>
           </Div>
           <Div w="100%" justifyContent="flex-end">
             <Div
@@ -108,7 +124,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
                   ml={scale(3)}
                   mr={customTheme.spacing.medium}
                 >
-                  {players}
+                  {players?.length}
                 </Text>
                 <Image
                   source={require("../assets/iconUser.png")}
@@ -124,7 +140,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
                   fontSize={customTheme.fontSize.medium}
                   ml={scale(3)}
                 >
-                  {players}/{maxPlayers}
+                  {players?.length}/{maxPlayers}
                 </Text>
               </Div>
               <Div>
@@ -142,7 +158,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
           </Div>
         </View>
       </Div>
-    </Div>
+    </Div></TouchableOpacity>
   );
 };
 
