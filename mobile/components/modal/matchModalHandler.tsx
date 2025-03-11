@@ -1,22 +1,41 @@
-import React, { useEffect, useRef, useState, Context } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Div, Text, Modal } from "react-native-magnus";
-import Match from "../../types/match.type";
-import { customTheme } from "../../utils/theme";
 import { verticalScale } from "react-native-size-matters";
-import PlayersCounterInput from "../matche/Inputs/playersCounter";
+import { ScrollView, TouchableOpacity } from "react-native";
+import { customTheme } from "../../utils/theme";
 import { Accordion } from "../collapsibleView";
+import PlayersCounterInput from "../matche/Inputs/playersCounter";
 import SportInput from "../matche/Inputs/sport";
 import MatchPrivacyToggleInput from "../matche/Inputs/matchPrivacyToggle";
-import { ScrollView, TouchableOpacity } from "react-native";
 import MatchSchedulerInput from "../matche/Inputs/matchScheduler";
 import SearchLocationInput from "../matche/Inputs/searchLocation";
-import {
-  MatchDetails
-} from "../../types/form.type";
+import { MatchDetails } from "../../types/form.type";
 import matchService from "../../service/match.service";
-import { useMutate } from "../../hooks/useMutate";
 
-const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: React.Dispatch<React.SetStateAction<boolean>>; match?: string }) => {
+/* =======================================
+   1) Declaramos la interfaz de props,
+      incluyendo onMatchCreated
+   ======================================= */
+interface MatchModalHandlerProps {
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  match?: string;
+  onMatchCreated?: (matchId: string) => void; // <-- MARCADO: Agregamos prop opcional
+}
+
+/* =======================================
+   2) Definimos el componente, usando la
+      interfaz en la desestructuración
+   ======================================= */
+export default function MatchModalHandler({
+  open,
+  setOpen,
+  match,
+  onMatchCreated, // <-- MARCADO: desestructuramos
+}: MatchModalHandlerProps) {
+  const [openId, setOpenId] = useState<null | string>(null);
+
+  // Objeto con la info del partido a crear/editar
   const matchDetailsRef = useRef<MatchDetails>({
     selectedSport: null,
     selectedSportMode: null,
@@ -26,30 +45,33 @@ const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: R
     location: null,
   });
 
-  const fetchMatch = async () => {
-    if (!match) return
-    try {
-      const res = await matchService.getById(match)
-      matchDetailsRef.current.selectedSport = res.data.sportMode.sport
-      matchDetailsRef.current.selectedSportMode = res.data.sportMode;
-      matchDetailsRef.current.playerLimit = res.data.playersLimit;
-      matchDetailsRef.current.privacyOption = res.data.open;
-      matchDetailsRef.current.matchDate = res.data.date
-      matchDetailsRef.current.location = res.data.location
-    } catch (e) {
+  useEffect(() => {
+    if (match) {
+      fetchMatch();
+    }
+  }, [match]);
 
+  async function fetchMatch() {
+    if (!match) return;
+    try {
+      const res = await matchService.getById(match);
+      // Ajusta según la forma real de la respuesta
+      matchDetailsRef.current.selectedSport = res.data.sportMode?.sport || null;
+      matchDetailsRef.current.selectedSportMode = res.data.sportMode || null;
+      matchDetailsRef.current.playerLimit = res.data.playersLimit || 0;
+      matchDetailsRef.current.privacyOption = res.data.open || false;
+      matchDetailsRef.current.matchDate = res.data.date;
+      matchDetailsRef.current.location = res.data.location || null;
+    } catch (e) {
+      console.error("Error al fetchMatch:", e);
     }
   }
 
-  useEffect(() => {
-    if (match) {
-      fetchMatch()
-    }
-  }, [])
-
-  const [openId, setOpenId] = useState<null | string>(null);
-
-  const createMatch = async () => {
+  /* =======================================
+     3) Función para crear el partido:
+        si onMatchCreated existe, se llama
+     ======================================= */
+  async function createMatch() {
     try {
       const res = await matchService.create({
         name: "Prueba3",
@@ -62,47 +84,51 @@ const MatchModalHandler = ({ open, setOpen, match }: { open: boolean; setOpen: R
       });
 
       const createdMatchId = res.data._id;
+      // <-- MARCADO: si onMatchCreated está definido, lo llamamos
       if (onMatchCreated) {
         onMatchCreated(createdMatchId);
       }
       closeModal();
     } catch (e) {
       console.error("Error al crear el partido:", e);
-    }    
-  };
+    }
+  }
 
-  const editMatch = async() => {
+  /* =======================================
+     4) Función para editar el partido
+     ======================================= */
+  async function editMatch() {
     try {
-      const res =await matchService.update('67af556cb453684f313e9a4b', {
+      const res = await matchService.update("67af556cb453684f313e9a4b", {
         name: "Prueba3",
         date: matchDetailsRef.current.matchDate,
         location: matchDetailsRef.current.location?._id,
         playersLimit: matchDetailsRef.current.playerLimit,
-        userId: '6720ef0e3a78ebc10564e979',
+        userId: "6720ef0e3a78ebc10564e979",
         sportMode: matchDetailsRef.current.selectedSportMode?._id,
-        open: matchDetailsRef.current.privacyOption
-      })
-      console.log(res)
+        open: matchDetailsRef.current.privacyOption,
+      });
+      console.log("Partido editado:", res);
     } catch (e) {
-console.log(e,'ERROR')
+      console.log("Error al editar el partido:", e);
     }
   }
 
-  const handleAction = () => {
-    if(!match){
-      createMatch()
+  /* =======================================
+     5) Decide crear o editar según 'match'
+     ======================================= */
+  function handleAction() {
+    if (!match) {
+      createMatch();
     } else {
-      editMatch()
+      editMatch();
     }
   }
 
-  const closeModal = () => {
+  function closeModal() {
     setOpenId(null);
     setOpen(false);
-  };  
-
-  
-console.log("RENDEEER","Rendering MatchSchedulerInput")
+  }
 
   return (
     <Modal isVisible={open} onBackButtonPress={closeModal}>
@@ -114,39 +140,36 @@ console.log("RENDEEER","Rendering MatchSchedulerInput")
           p={customTheme.spacing.medium}
         >
           <Accordion
-            id={"Deportes"}
+            id="Deportes"
             openId={openId}
             setOpenId={setOpenId}
-            title={"Deporte"}
+            title="Deporte"
             rightText="Futbol 5"
             size={342}
           >
             <SportInput matchDetailsRef={matchDetailsRef} />
           </Accordion>
           <Accordion
-            id={"PlayerInput"}
+            id="PlayerInput"
             openId={openId}
             setOpenId={setOpenId}
-            title={"Cupo"}
+            title="Cupo"
             rightText="Agrega participantes"
             size={123}
           >
             <PlayersCounterInput matchDetailsRef={matchDetailsRef} />
           </Accordion>
           <Accordion
-            id={"PrivacyToggle"}
+            id="PrivacyToggle"
             openId={openId}
             setOpenId={setOpenId}
-            title={"Privacidad"}
+            title="Privacidad"
             rightText="Privada"
             size={134}
           >
             <MatchPrivacyToggleInput matchDetailsRef={matchDetailsRef} />
           </Accordion>
-          <Div
-            borderBottomWidth={1}
-            borderBottomColor={customTheme.colors.gray}
-          />
+          <Div borderBottomWidth={1} borderBottomColor={customTheme.colors.gray} />
           <Text
             fontSize={customTheme.fontSize.medium}
             color={customTheme.colors.gray}
@@ -155,20 +178,20 @@ console.log("RENDEEER","Rendering MatchSchedulerInput")
             Campos no obligatorios para crear
           </Text>
           <Accordion
-            id={"Horario"}
+            id="Horario"
             openId={openId}
             setOpenId={setOpenId}
-            title={"Horario"}
+            title="Horario"
             rightText="A definir"
             size={802}
           >
             <MatchSchedulerInput matchDetailsRef={matchDetailsRef} />
           </Accordion>
           <Accordion
-            id={"Busqueda"}
+            id="Busqueda"
             openId={openId}
             setOpenId={setOpenId}
-            title={"¿Donde juegan?"}
+            title="¿Donde juegan?"
             rightText="A definir"
             size={300}
           >
@@ -176,15 +199,14 @@ console.log("RENDEEER","Rendering MatchSchedulerInput")
           </Accordion>
         </Div>
       </ScrollView>
-      <Div justifyContent='center' bg='#151515E5' h={verticalScale(80)} p={customTheme.spacing.medium}>
+
+      <Div justifyContent="center" bg="#151515E5" h={verticalScale(80)} p={customTheme.spacing.medium}>
         <TouchableOpacity onPress={handleAction}>
-          <Div h={verticalScale(45)} justifyContent='center' bg={customTheme.colors.primary}>
-            <Text textAlign='center'>{!match ?"Crear" : "Editar"}</Text>
+          <Div h={verticalScale(45)} justifyContent="center" bg={customTheme.colors.primary}>
+            <Text textAlign="center">{!match ? "Crear" : "Editar"}</Text>
           </Div>
         </TouchableOpacity>
       </Div>
     </Modal>
   );
-};
-
-export default MatchModalHandler;
+}

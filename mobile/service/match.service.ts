@@ -7,6 +7,7 @@ class MatchService extends CRUDService<Match> {
     super("matches");
   }
   
+  
   acceptCreatematch = async (matchId: string) => {
     return this.put(`/accept/${matchId}`);
   };
