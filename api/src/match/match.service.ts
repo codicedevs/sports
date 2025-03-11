@@ -44,7 +44,7 @@ export class MatchService {
 
   // Servicio para crear partido, con o sin invitaciones
   async createMatch(createMatchDto: CreateMatchDto): Promise<Match> {
-    const { userId, invitedUsers, location, ...matchData } = createMatchDto;
+    const { userId, invitedUsers, location, sportMode, ...matchData } = createMatchDto;
     // Verificar si el usuario creador existe
     const user = await this.userModel.findById(userId).exec();
     if (!user) {
@@ -61,8 +61,8 @@ export class MatchService {
     }
 
     //Verificar si el sportMode existe
-    const sportMode = await this.sportModeModel.findById(userId).exec();
-    if (!sportMode) {
+    const sportModeExists = await this.sportModeModel.findById(sportMode).exec();
+    if (!sportModeExists) {
       throw new NotFoundException("Sport Mode no encontrado");
     }
 
@@ -74,6 +74,7 @@ export class MatchService {
     // Crear el partido e incluir al creador en la lista de users
     const match = new this.matchModel({
       ...matchData,
+      sportMode: sportModeExists,
       userId: user._id,
       users: [user._id],
       location: location,

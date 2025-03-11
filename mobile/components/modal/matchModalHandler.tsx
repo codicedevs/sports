@@ -64,6 +64,7 @@ export default function MatchModalHandler({
       matchDetailsRef.current.location = res.data.location || null;
     } catch (e) {
       console.error("Error al fetchMatch:", e);
+      console.log(e);
     }
   }
 
@@ -78,8 +79,8 @@ export default function MatchModalHandler({
         date: matchDetailsRef.current.matchDate,
         location: matchDetailsRef.current.location?._id,
         playersLimit: matchDetailsRef.current.playerLimit,
-        userId: "6720ef0e3a78ebc10564e979",
-        sportMode: matchDetailsRef.current.selectedSportMode?._id,
+        userId: "66e482584509915a15968bd7",
+        sportMode: '67c873ffeb647cc591249358',
         open: matchDetailsRef.current.privacyOption,
       });
 
@@ -92,14 +93,12 @@ export default function MatchModalHandler({
     } catch (e) {
       console.error("Error al crear el partido:", e);
     }
-  }
+    console.log('sportmode', matchDetailsRef.current.selectedSportMode);
+  };
 
-  /* =======================================
-     4) Función para editar el partido
-     ======================================= */
-  async function editMatch() {
+  const editMatch = async () => {
     try {
-      const res = await matchService.update("67af556cb453684f313e9a4b", {
+      const res = await matchService.update('67af556cb453684f313e9a4b', {
         name: "Prueba3",
         date: matchDetailsRef.current.matchDate,
         location: matchDetailsRef.current.location?._id,
@@ -110,16 +109,13 @@ export default function MatchModalHandler({
       });
       console.log("Partido editado:", res);
     } catch (e) {
-      console.log("Error al editar el partido:", e);
+      console.log(e, 'ERROR')
     }
   }
 
-  /* =======================================
-     5) Decide crear o editar según 'match'
-     ======================================= */
-  function handleAction() {
+  const handleAction = () => {
     if (!match) {
-      createMatch();
+      createMatch()
     } else {
       editMatch();
     }
@@ -128,7 +124,11 @@ export default function MatchModalHandler({
   function closeModal() {
     setOpenId(null);
     setOpen(false);
-  }
+  };
+
+
+  console.log("RENDEEER", "Rendering MatchSchedulerInput")
+  
 
   return (
     <Modal isVisible={open} onBackButtonPress={closeModal}>
@@ -202,8 +202,8 @@ export default function MatchModalHandler({
 
       <Div justifyContent="center" bg="#151515E5" h={verticalScale(80)} p={customTheme.spacing.medium}>
         <TouchableOpacity onPress={handleAction}>
-          <Div h={verticalScale(45)} justifyContent="center" bg={customTheme.colors.primary}>
-            <Text textAlign="center">{!match ? "Crear" : "Editar"}</Text>
+          <Div h={verticalScale(45)} justifyContent='center' bg={customTheme.colors.primary}>
+            <Text textAlign='center'>{!match ? "Crear" : "Editar"}</Text>
           </Div>
         </TouchableOpacity>
       </Div>

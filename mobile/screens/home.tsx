@@ -3,9 +3,8 @@ import { AppScreenProps, AppScreens } from "../navigation/screens";
 import { Button, Div } from "react-native-magnus";
 import MatchPreferencesModal from "../components/modal/matchPreferences";
 import { ModalContext } from "../context/modalProvider";
-import locationService from "../service/location.service";
-import matchService from "../service/match.service";
-import TriangleContainer from "../components/triangleButtons";
+import MatchModalHandler from "../components/modal/matchModalHandler";
+
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
@@ -19,8 +18,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   return (
     <Div>
     <Button onPress={() => setOpen(true)}>Abrir</Button>
-    <MatchPreferencesModal open={open} setOpen={setOpen} />
-    <TriangleContainer />
+    <MatchModalHandler open={open} setOpen={setOpen} />
     </Div>
 
   );
