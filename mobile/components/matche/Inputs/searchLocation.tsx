@@ -27,15 +27,13 @@ export default function SearchLocationInput({
   const [selectedLocation, setSelectedLocation] = useState<Place | null>(
     matchDetailsRef?.current.location ?? null
   );
-  // si se selecc una loc
+
   const [userHasSelected, setUserHasSelected] = useState(false);
 
-  // Llamada  ubicaciones
   const { data: Locations } = useFetch(locationService.getAll, [
     QUERY_KEYS.LOCATIONS,
   ]);
 
-  // Si en modo lectura y hay "location", la usamos como valor inicial
   useEffect(() => {
     if (readOnly && location) {
       setSelectedLocation(location);
@@ -60,13 +58,12 @@ export default function SearchLocationInput({
 
   function handleSelectLocation(loc: Place) {
     setSelectedLocation(loc);
-    setUserHasSelected(true); // Se seleccionó un lugar de la lista
+    setUserHasSelected(true);
     if (matchDetailsRef) {
       matchDetailsRef.current.location = loc;
     }
   }
 
-  // Verificamos si el lugar tiene coords
   const hasCoords =
     selectedLocation?.location?.coordinates &&
     selectedLocation.location.coordinates.length === 2;
@@ -103,8 +100,6 @@ export default function SearchLocationInput({
       </Div>
     );
   }
-
-  // MODO EDICIÓN
 
   if (!userHasSelected) {
     return (
