@@ -6,6 +6,7 @@ import MatchPreferencesModal from "../components/modal/matchPreferences";
 import { ModalContext } from "../context/modalProvider";
 import locationService from "../service/location.service";
 import matchService from "../service/match.service";
+import TriangleContainer from "../components/triangleButtons";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
@@ -19,16 +20,10 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   };
 
   return (
-    <Div flexDir="row" justifyContent="center">
-      <Button  onPress={() => setOpen(true)}>
-        Abrir
-      </Button>
-      <MatchModalHandler
-        open={open}
-        setOpen={setOpen}
-        onMatchCreated={handleMatchCreated}
-        
-      />
+    <Div>
+    <Button onPress={() => setOpen(true)}>Abrir</Button>
+    <MatchPreferencesModal open={open} setOpen={setOpen} />
+    <TriangleContainer />
     </Div>
 
   );
