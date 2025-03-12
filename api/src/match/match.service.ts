@@ -74,7 +74,7 @@ export class MatchService {
     // Crear el partido e incluir al creador en la lista de users
     const match = new this.matchModel({
       ...matchData,
-      sportMode: sportModeExists,
+      sportMode: sportMode,
       userId: user._id,
       users: [user._id],
       location: location,
@@ -82,12 +82,6 @@ export class MatchService {
       hour: date && date.getHours(),
 
     })
-    const matchDto: MatchDto = {
-      ...createMatchDto,
-      location: location,
-      dayOfWeek: date && date.getDay(),
-      hour: date && date.getHours(),
-    }
 
     const savedMatch: HydratedDocument<Match> = await match.save();
 
