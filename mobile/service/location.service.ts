@@ -1,20 +1,10 @@
-import { HttpService } from "./http.service";
 import Location from "../types/location.type";
+import { CRUDService } from "./CRUD";
 
-class LocationService extends HttpService {
+class LocationService extends CRUDService<Location> {
   constructor() {
     super("locations");
   }
-
-  getAll = async () => {
-    const res = await this.get(`/`);
-    return res;
-  };
-
-  create = async (location: Location) => {
-    const res = await this.post(`/`, { location });
-    return res.data;
-  };
-}
+};
 
 export default new LocationService();

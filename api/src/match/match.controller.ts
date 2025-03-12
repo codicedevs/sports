@@ -22,13 +22,21 @@ import { Types } from "mongoose";
 import { create } from "domain";
 import { ValidateObjectIdPipe } from "pipes/validate-object-id.pipe";
 import { Public } from "authentication/public";
+import { ZonesService } from "zones/zones.service";
+import { Zone } from "zones/zone.entity";
+import { PetitionService } from "petition/petition.service";
+import { PetitionModelType, PetitionStatus } from "petition/petition.enum";
 
 @ApiBearerAuth()
 @ApiTags('matches')
 @Controller("matches")
 export class MatchController {
-    constructor(private readonly matchService: MatchService) { }
-
+    constructor(
+        private readonly matchService: MatchService,
+        private readonly zonesService: ZonesService,
+        private readonly petitionService: PetitionService
+    ) { }
+    @Public()
     @Post()
     async createMatch(@Body() createMatchDto: CreateMatchDto) {
         if (!Types.ObjectId.isValid(createMatchDto.userId)) {
@@ -40,9 +48,30 @@ export class MatchController {
         const newMatch = await this.matchService.createMatch(createMatchDto);
         return newMatch;
     }
-
+    @Public()
     @Get()
     async findAll(@Query() filter: Filter) {
+        const zonesIds = filter?.where?.zones?.$in
+        if (zonesIds) {
+            const zones = (await this.zonesService.findAll({ where: { _id: { $in: zonesIds } } })).results
+            const zonePolygons = zones.map((zone: Zone) => zone.location)
+            delete filter.where.zones
+            filter.where = {
+                ...filter.where, ...{
+                    'location.location': {
+                        $geoWithin: {
+                            $geometry: {
+                                type: 'MultiPolygon',
+                                coordinates: zonePolygons.map((polygon) => polygon.coordinates)
+                            }
+                        }
+                    }
+                }
+            }
+
+        } else if (filter?.where?.zones) {
+            throw new BadRequestException("Zones should be an array")
+        }
         return await this.matchService.findAll(filter);
     }
 
@@ -56,19 +85,19 @@ export class MatchController {
         return await this.matchService.getAvailableMatches();
     }
 
-    @Get("/findForDate/:userId")
+    @Get("/findForDate/users/:userId")
     async findForDate(@Param("userId", new ValidateObjectIdPipe("usuario")) userId: string) {
         const matches = await this.matchService.getMatchesForUserDate(userId);
         return matches;
     }
 
-    @Get("/findForZone/:userId")
+    @Get("/findForZone/users/:userId")
     async findForZone(@Param("userId", new ValidateObjectIdPipe("usuario")) userId: string) {
         const matches = await this.matchService.getMatchesInUserZones(userId);
         return matches;
     }
 
-    @Get("/findForSportMode/:userId")
+    @Get("/findForSportMode/users/:userId")
     async findForSportMode(@Param("userId", new ValidateObjectIdPipe("usuario")) userId: string) {
         const matches = await this.matchService.getMatchesByUserSportMode(userId);
         return matches;
@@ -85,7 +114,7 @@ export class MatchController {
         const match = await this.matchService.findOne(new Types.ObjectId(id));
         return match;
     }
-
+    @Public()
     @Patch("/:matchId/formation/:userId/add")
     async updateFormation(
         @Param("matchId", new ValidateObjectIdPipe("partido")) matchId: string,
@@ -100,7 +129,7 @@ export class MatchController {
         );
         return updatedMatch;
     }
-
+    @Public()
     @Patch("/:matchId/formation/:userId/remove")
     async deleteUserFromFormation(
         @Param("matchId", new ValidateObjectIdPipe("partido")) matchId: string,
@@ -144,6 +173,39 @@ export class MatchController {
         );
 
         return updatedMatch;
+    }
+
+    @Public()
+    @Get(":matchId/petitions")
+    async getPetitionsByMatch(
+        @Param("matchId", new ValidateObjectIdPipe("match")) matchId: string
+    ) {
+        const petitions = await this.petitionService.findByReference({
+            id: new Types.ObjectId(matchId),
+            type: PetitionModelType.match, 
+        });
+
+        const result = {
+            pending: [] as any[],
+            accepted: [] as any[],
+            declined: [] as any[],
+        };
+
+        petitions.forEach(petition => {
+            switch (petition.status) {
+                case PetitionStatus.Pending:
+                    result.pending.push(petition.receiver);
+                    break;
+                case PetitionStatus.Accepted:
+                    result.accepted.push(petition.receiver);
+                    break;
+                case PetitionStatus.Declined:
+                    result.declined.push(petition.receiver);
+                    break;
+            }
+        });
+
+        return result;
     }
 
     @Put(":id")

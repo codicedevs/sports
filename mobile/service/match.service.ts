@@ -1,8 +1,8 @@
 
-import { CreateMatchDto } from "../types/match.type";
-import { HttpService } from "./http.service";
+import Match, { CreateMatchDto } from "../types/match.type";
+import { CRUDService } from "./CRUD";
 
-class MatchService extends HttpService {
+class MatchService extends CRUDService<Match> {
   constructor() {
     super("matches");
   }
@@ -33,8 +33,23 @@ class MatchService extends HttpService {
 
   create = async (match: CreateMatchDto) => {
     const res = await this.post(`/`, match);
-    return res;
+    return res
   };
+
+  addPlayerToFormation = async (
+    matchId: string,
+    userId: string,
+    body: { team: number; position: number }
+  ) => {
+    await this.patch(`/${matchId}/formation/${userId}/add`, body)
+  }
+
+  removePlayerFromFormation = async (
+    matchId: string,
+    userId: string
+  ) => {
+    await this.patch(`/${matchId}/formation/${userId}/add`)
+  }
 
   acceptCreatematch = async (matchId: string) => {
     return this.put(`/accept/${matchId}`);

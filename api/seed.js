@@ -24,7 +24,11 @@ function transformData(data) {
         }
 
         if (item.users) {
-            transformedItem.users = item.users.map(user => new ObjectId(user.$oid));
+            transformedItem.users = item.users.map(user => (user.$oid)? (new ObjectId(user.$oid)): user);
+        }
+
+        if (item.matches) {
+            transformedItem.matches = item.matches.map(match => (match.$oid)? (new ObjectId(match.$oid)): match);
         }
 
         // Convertir campos `location`, `userId` y `sportMode` a ObjectId

@@ -1,21 +1,27 @@
-import { NavigationContainer } from '@react-navigation/native'
-import React from 'react'
-import VersionModal from '../components/modal/versionModal'
-import SplashScreen from '../screens/splash'
-import { AuthStackScreen, Principal } from './stacks'
-import RestrictiveModal from '../components/modal/restrictiveModal'
-import { navigationRef } from '../utils/navigation'
+import { NavigationContainer } from "@react-navigation/native";
+import React, { useState } from "react";
+import VersionModal from "../components/modal/versionModal";
+import SplashScreen from "../screens/splash";
+import { AuthStackScreen, Principal } from "./stacks";
+import RestrictiveModal from "../components/modal/restrictiveModal";
+import { navigationRef } from "../utils/navigation";
+import { ModalContext } from "../context/modalProvider";
+import MatchModalHandler from "../components/modal/matchModalHandler";
 
 const AppNavigator = () => {
+  const [open, setOpen] = useState(false);
+  return (
+    <NavigationContainer ref={navigationRef}>
+      <VersionModal />
 
-    return (
-        <NavigationContainer ref={navigationRef}>
-            <VersionModal />
-            <RestrictiveModal />
-            <SplashScreen />
-            {true ? <Principal /> : <AuthStackScreen />}
-        </NavigationContainer>
-    )
-}
+      <MatchModalHandler open={open} setOpen={setOpen} />
+      <RestrictiveModal />
+      <SplashScreen />
+      <ModalContext.Provider value={{ open, setOpen }}>
+      <Principal />
+      </ModalContext.Provider>
+    </NavigationContainer>
+  );
+};
 
-export default AppNavigator
+export default AppNavigator;

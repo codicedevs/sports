@@ -33,6 +33,7 @@ export class MatchService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Location.name) private readonly locationModel: Model<Location>,
     @InjectModel(MatchView.name) private readonly matchViewModel: Model<MatchView>,
+    @InjectModel(SportMode.name) private readonly sportModeModel: Model<SportMode>,
     private readonly petitionService: PetitionService,
     private readonly locationsService: LocationsService,
     private readonly sportModesService: SportModesService,
@@ -43,7 +44,7 @@ export class MatchService {
 
   // Servicio para crear partido, con o sin invitaciones
   async createMatch(createMatchDto: CreateMatchDto): Promise<Match> {
-    const { userId, invitedUsers, location, ...matchData } = createMatchDto;
+    const { userId, invitedUsers, location, sportMode, ...matchData } = createMatchDto;
     // Verificar si el usuario creador existe
     const user = await this.userModel.findById(userId).exec();
     if (!user) {
@@ -59,6 +60,12 @@ export class MatchService {
       }
     }
 
+    //Verificar si el sportMode existe
+    const sportModeExists = await this.sportModeModel.findById(sportMode).exec();
+    if (!sportModeExists) {
+      throw new NotFoundException("Sport Mode no encontrado");
+    }
+
     let date = null
     if (matchData.date) {
       date = moment.tz(matchData.date, 'America/Argentina/Buenos_Aires').toDate();
@@ -67,6 +74,7 @@ export class MatchService {
     // Crear el partido e incluir al creador en la lista de users
     const match = new this.matchModel({
       ...matchData,
+      sportMode: sportMode,
       userId: user._id,
       users: [user._id],
       location: location,
@@ -74,14 +82,16 @@ export class MatchService {
       hour: date && date.getHours(),
 
     })
-    const matchDto: MatchDto = {
-      ...createMatchDto,
-      location: location,
-      dayOfWeek: date && date.getDay(),
-      hour: date && date.getHours(),
-    }
 
     const savedMatch: HydratedDocument<Match> = await match.save();
+
+    //Creo un chatroom
+    await this.chatroomService.create({
+      reference: {
+        type: ChatroomModelType.match,
+        id: savedMatch._id as Types.ObjectId
+      }
+    })
 
     // Agregar el partido al array de matches de la location
 
@@ -172,13 +182,6 @@ export class MatchService {
     // Guardar el partido actualizado
     const savedMatch = await match.save();
 
-    //Creo un chatroom
-    await this.chatroomService.create({
-      reference: {
-        type: ChatroomModelType.match,
-        id: savedMatch._id as Types.ObjectId
-      }
-    })
 
     // Eliminar el matchId del array de partidos del usuario
     const matchIndex = user.matches.findIndex(
@@ -203,16 +206,15 @@ export class MatchService {
     }
   }
 
-  async findOne(id: Types.ObjectId): Promise<Match> {
-    const match = await this.matchModel
+  async findOne(id: Types.ObjectId): Promise<MatchView> {
+    const match = await this.matchViewModel
       .findById(id)
-      .populate("location")
-      .populate("users")
       .exec();
 
     if (!match) {
       throw new NotFoundException(`Partido #${id} not found`);
     }
+    console.log("BBBBBBB",match)
     return match;
   }
 
@@ -642,6 +644,11 @@ export class MatchService {
     if (!match) {
       throw new Error("Match not found");
     }
+    const user = await this.userModel.findById(userId).exec();
+    if (!user) {
+      throw new Error("User not found");
+    }
+
 
     // Preparar nuevas formaciones
     const newFormations: Formations = {
@@ -653,22 +660,22 @@ export class MatchService {
     let userAlreadyIn = false;
 
     // Helper para procesar los equipos
-    const processTeam = (players: Player[], targetTeam: Player[]) => {
+    const processTeam = (players: Player[], targetTeam: Player[], teamNumber: Number) => {
       for (const player of players) {
         if (player.userId.toString() === userId.toString()) {
           userAlreadyIn = true;
           player.position = position; // Actualizar posición
           team === 1 ? newFormations.team1.push(player) : newFormations.team2.push(player);
         } else {
-          if (player.position !== position) //Si hay alguien en la misma posición y equipo no lo agregamos
+          if ((player.position !== position || teamNumber !== team)) //Si hay alguien en la misma posición y equipo no lo agregamos
             targetTeam.push(player); // Conservar jugadores que no se modifican
         }
       }
     };
 
     // Procesar ambos equipos
-    processTeam(match.formations.team1, newFormations.team1);
-    processTeam(match.formations.team2, newFormations.team2);
+    processTeam(match.formations.team1, newFormations.team1, 1);
+    processTeam(match.formations.team2, newFormations.team2, 2);
 
     // Si no estaba en ninguno de los equipos, agregarlo
     if (!userAlreadyIn) {

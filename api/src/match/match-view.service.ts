@@ -8,7 +8,7 @@ export class MatchViewService implements OnModuleInit {
   constructor(
     @InjectConnection() private readonly connection: Connection,
     @InjectModel(MatchView.name) private readonly matchViewModel: Model<MatchView>
-  ) {}
+  ) { }
 
   async createMatchView() {
     try {
@@ -17,12 +17,13 @@ export class MatchViewService implements OnModuleInit {
       const existingView = collections.find(col => col.name === 'matchView');
 
       if (existingView) {
-        console.log('⚠️ La vista `matchView` ya existe. Eliminándola...');
-        await this.connection.db.collection('matchView').drop();
-        console.log('✅ Vista `matchView` eliminada con éxito.');
+        // If it already exists, just skip creation
+        console.log('⚠️ matchView already exists. Skipping creation...');
+        return;
       }
 
-      await this.connection.db.createCollection('matchView', {
+      await this.connection.db.command( {
+        create: "matchView",
         viewOn: 'matches',
         pipeline: [
           {
@@ -58,13 +59,24 @@ export class MatchViewService implements OnModuleInit {
           {
             $unwind: { path: '$sportMode', preserveNullAndEmptyArrays: true },
           },
+          {
+            $lookup: {
+              from: 'sports',                 // Colección "sports"
+              localField: 'sportMode.sport', // Campo donde está el _id de Sport
+              foreignField: '_id',           // Se compara con _id de la colección "sports"
+              as: 'sport',                   // Nombre del campo resultante
+            },
+          },
+          {
+            $unwind: { path: '$sport', preserveNullAndEmptyArrays: true },
+          },
         ],
       });
 
-      console.log('✅ View `matchView` creada exitosamente');
+      console.log('✅ View matchView creada exitosamente');
     } catch (error: any) {
       if (error.codeName === 'NamespaceExists') {
-        console.log('⚠️ La vista `matchView` ya existe');
+        console.log('⚠ La vista matchView ya existe');
       } else {
         console.error('❌ Error creando la view:', error);
       }
@@ -81,4 +93,5 @@ export class MatchViewService implements OnModuleInit {
   async onModuleInit() {
     await this.createMatchView();
   }
+  
 }

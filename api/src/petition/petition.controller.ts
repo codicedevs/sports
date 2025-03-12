@@ -14,18 +14,19 @@ import { PetitionService } from "./petition.service";
 import { CreatePetitionDto } from "./petition.dto";
 import { UpdatePetitionDto } from "./petition.dto";
 import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
-import { PetitionModelType } from "./petition.enum";
+import { PetitionModelType, PetitionStatus } from "./petition.enum";
 import { Types } from "mongoose";
 import { ValidateObjectIdPipe } from "pipes/validate-object-id.pipe";
 import { types } from "util";
 import { Filter } from "types/types";
+import { Public } from "authentication/public";
 
 @ApiBearerAuth()
 @ApiTags('petitions')
 @Controller("petitions")
 export class PetitionController {
   constructor(private readonly petitionService: PetitionService) {}
-
+  @Public()
   @Post()
   async createPetition(@Body() petition: CreatePetitionDto) {
     if (!Types.ObjectId.isValid(petition.emitter)) {
@@ -40,13 +41,13 @@ export class PetitionController {
     return this.petitionService.create({emitter, receiver, ...petition});
   }
 
-  //Aceptar una peticion
+  @Public()
   @Put("accept/:petitionId")
   async acceptPetition(@Param("petitionId", new ValidateObjectIdPipe()) petitionId: string) {
     return this.petitionService.acceptPetition(new Types.ObjectId(petitionId));
   }
 
-  //Rechazar peticion
+  @Public()
   @Put("decline/:petitionId")
   async declinePetition(@Param("petitionId", new ValidateObjectIdPipe()) petitionId: string) {
     return this.petitionService.declinePetition(new Types.ObjectId(petitionId));
@@ -67,7 +68,43 @@ export class PetitionController {
 
     return existingPetition;
   }
+@Public()
+@Get('match/:matchId')
+async getPetitionsByMatch(
+  @Param('matchId', new ValidateObjectIdPipe('match')) matchId: string
+) {
+  // Obtenemos todas las petitions relacionadas con el match indicado
+  const petitions = await this.petitionService.findByReference({
+    id: new Types.ObjectId(matchId),
+    type: PetitionModelType.match, // Suponiendo que en tu enum defines 'Match'
+  });
 
+  // Inicializamos el objeto de respuesta con las tres categorías
+  const result = {
+    pending: [] as any[],
+    accepted: [] as any[],
+    declined: [] as any[],
+  };
+
+  // Se recorre cada petition y se agrupa según el status, extrayendo la info del receptor
+  petitions.forEach(petition => {
+    switch (petition.status) {
+      case PetitionStatus.Pending:
+        result.pending.push(petition.receiver);
+        break;
+      case PetitionStatus.Accepted:
+        result.accepted.push(petition.receiver);
+        break;
+      case PetitionStatus.Declined:
+        result.declined.push(petition.receiver);
+        break;
+    }
+  });
+
+  return result;
+}
+
+  @Public()
   @Get()
   findAll(@Query() filter: Filter) {
     return this.petitionService.findAll(filter);

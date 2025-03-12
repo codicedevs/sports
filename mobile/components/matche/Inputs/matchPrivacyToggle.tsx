@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Div, Text } from 'react-native-magnus';
 import { customTheme } from '../../../utils/theme';
 import { verticalScale } from 'react-native-size-matters';
@@ -13,21 +13,25 @@ interface PrivacyToggleProps {
 
 const MatchPrivacyToggleInput = ({ matchDetailsRef }: PrivacyToggleProps) => {
   const [privacyOption, setPrivacyOption] = useState<PrivacyOption>(
-    matchDetailsRef.current.privacyOption? "public" : "private" 
+    matchDetailsRef.current.privacyOption ? "public" : "private"
   );
 
   const handleToggle = (option: PrivacyOption) => {
     setPrivacyOption(option);
-    if(option === "private"){
+    if (option === "private") {
       matchDetailsRef.current.privacyOption = false;
     } else {
       matchDetailsRef.current.privacyOption = true;
     }
   };
 
+  useEffect(() => {
+    setPrivacyOption(matchDetailsRef.current.privacyOption ? "public" : "private")
+  },[matchDetailsRef.current.privacyOption])
+
   const isPrivate = privacyOption === 'private';
   const isPublic = privacyOption === 'public';
-
+    
   return (
     <Div p={customTheme.spacing.medium} style={{ gap: 8 }}>
       <Div h={verticalScale(40)} flexDir="row">
