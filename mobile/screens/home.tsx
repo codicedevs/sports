@@ -6,7 +6,7 @@ import MatchModalHandler from "../components/modal/matchModalHandler";
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
-  const [open, setOpen] = useState(true)
+  const [open, setOpen] = useState(false)
 
   return (
     // <Div> 
