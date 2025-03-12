@@ -1,13 +1,19 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSportModeDto, UpdateSportModeDto } from './sport_mode.dto';
-import { InjectModel } from '@nestjs/mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { SportMode } from './sport_mode.entity';
-import { Model, Types } from 'mongoose';
+import { Connection, Model, Types } from 'mongoose';
 import { Filter, FilterResponse } from 'types/types';
+import { Match } from 'match/match.entity';
+import { User } from 'user/user.entity';
 
 @Injectable()
 export class SportModesService {
-  constructor(@InjectModel(SportMode.name) private readonly sportModeModel: Model<SportMode>) { }
+  constructor(
+    @InjectConnection() private readonly connection: Connection,
+    @InjectModel(SportMode.name) private readonly sportModeModel: Model<SportMode>,
+    @InjectModel(Match.name) private readonly matchModel: Model<Match>,
+    @InjectModel(User.name) private readonly userModel: Model<User>) { }
   async create(createSportModeDto: CreateSportModeDto) {
     const createdSportMode = new this.sportModeModel(createSportModeDto)
     return createdSportMode.save()
@@ -34,11 +40,51 @@ export class SportModesService {
     return sportMode
   }
 
-  update(id: number, updateSportModeDto: UpdateSportModeDto) {
-    return `This action updates a #${id} sportMode`;
+  async update(id: Types.ObjectId, updateSportModeDto: UpdateSportModeDto) {
+    const sportMode = await this.sportModeModel
+      .findByIdAndUpdate(id, updateSportModeDto, {
+        new: true,
+      })
+      .exec();
+
+    if (!sportMode) {
+      throw new NotFoundException(`SportMode #${id} not found`);
+    }
+
+    return sportMode
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} sportMode`;
+  async remove(id: Types.ObjectId) {
+    const session = await this.connection.startSession();
+    session.startTransaction();
+
+    try {
+      const result = await this.sportModeModel.findByIdAndDelete(id, { session });
+      if (!result) {
+        throw new NotFoundException(`SportMode con id ${id} no encontrado`);
+      }
+
+      await this.matchModel.updateMany(
+        { sportMode: id },
+        { $unset: { sportMode: '' } },
+        { session },
+      );
+
+      await this.userModel.updateMany(
+        { 'profile.preferredSportModes': id },
+        { $pull: { 'profile.preferredSportModes': id } },
+        { session },
+      );
+
+      await session.commitTransaction();
+      session.endSession();
+
+      return { deleted: true };
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
   }
+
 }

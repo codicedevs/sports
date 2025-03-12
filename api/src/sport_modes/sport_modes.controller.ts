@@ -32,11 +32,11 @@ export class SportModesController {
 
   @Patch(':id')
   update(@Param('id', new ValidateObjectIdPipe()) id: string, @Body() updateSportModeDto: UpdateSportModeDto) {
-    return this.sportModesService.update(+id, updateSportModeDto);
+    return this.sportModesService.update(new Types.ObjectId(id), updateSportModeDto);
   }
 
   @Delete(':id')
   remove(@Param('id', new ValidateObjectIdPipe()) id: string) {
-    return this.sportModesService.remove(+id);
+    return this.sportModesService.remove(new Types.ObjectId(id));
   }
 }
