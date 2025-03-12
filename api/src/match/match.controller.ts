@@ -36,7 +36,6 @@ export class MatchController {
         private readonly zonesService: ZonesService,
         private readonly petitionService: PetitionService
     ) { }
-    @Public()
     @Post()
     async createMatch(@Body() createMatchDto: CreateMatchDto) {
         if (!Types.ObjectId.isValid(createMatchDto.userId)) {
@@ -107,14 +106,12 @@ export class MatchController {
         const matches = await this.matchService.getMatchesForUserRecommendation(userId);
         return matches;
     }
-
     @Public()
     @Get(":id")
     async findOne(@Param("id", new ValidateObjectIdPipe()) id: string) {
         const match = await this.matchService.findOne(new Types.ObjectId(id));
         return match;
     }
-    @Public()
     @Patch("/:matchId/formation/:userId/add")
     async updateFormation(
         @Param("matchId", new ValidateObjectIdPipe("partido")) matchId: string,
@@ -129,7 +126,6 @@ export class MatchController {
         );
         return updatedMatch;
     }
-    @Public()
     @Patch("/:matchId/formation/:userId/remove")
     async deleteUserFromFormation(
         @Param("matchId", new ValidateObjectIdPipe("partido")) matchId: string,
@@ -141,7 +137,6 @@ export class MatchController {
         );
         return updatedMatch;
     }
-
 
     @Public()
     @Patch(":matchId/users/:userId/add")
@@ -156,7 +151,6 @@ export class MatchController {
 
         return updatedMatch;
     }
-
     @Public()
     @Patch(":matchId/users/:userId/remove")
     @UseGuards(MatchPlayerGuard)
@@ -175,7 +169,6 @@ export class MatchController {
         return updatedMatch;
     }
 
-    @Public()
     @Get(":matchId/petitions")
     async getPetitionsByMatch(
         @Param("matchId", new ValidateObjectIdPipe("match")) matchId: string

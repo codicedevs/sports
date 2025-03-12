@@ -26,7 +26,6 @@ import { Public } from "authentication/public";
 @Controller("petitions")
 export class PetitionController {
   constructor(private readonly petitionService: PetitionService) {}
-  @Public()
   @Post()
   async createPetition(@Body() petition: CreatePetitionDto) {
     if (!Types.ObjectId.isValid(petition.emitter)) {
@@ -41,13 +40,11 @@ export class PetitionController {
     return this.petitionService.create({emitter, receiver, ...petition});
   }
 
-  @Public()
   @Put("accept/:petitionId")
   async acceptPetition(@Param("petitionId", new ValidateObjectIdPipe()) petitionId: string) {
     return this.petitionService.acceptPetition(new Types.ObjectId(petitionId));
   }
 
-  @Public()
   @Put("decline/:petitionId")
   async declinePetition(@Param("petitionId", new ValidateObjectIdPipe()) petitionId: string) {
     return this.petitionService.declinePetition(new Types.ObjectId(petitionId));
@@ -68,7 +65,6 @@ export class PetitionController {
 
     return existingPetition;
   }
-@Public()
 @Get('match/:matchId')
 async getPetitionsByMatch(
   @Param('matchId', new ValidateObjectIdPipe('match')) matchId: string
@@ -104,7 +100,6 @@ async getPetitionsByMatch(
   return result;
 }
 
-  @Public()
   @Get()
   findAll(@Query() filter: Filter) {
     return this.petitionService.findAll(filter);
