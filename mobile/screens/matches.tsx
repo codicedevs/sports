@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { Div, Overlay, Text } from 'react-native-magnus'
 import { customTheme } from '../utils/theme'
 import useFetch from '../hooks/useGet'
@@ -34,46 +34,43 @@ const MatchesScreen = () => {
         hours: [] as any[]
     })
 
-    function buildMongoFilter(filters) {
-        const mongoFilter = {
-          where: {},
-        };
-      
+    const buildMongoFilter = useCallback((filters) => {
+        const mongoFilter = { where: {} }
+
         if (filters.sportModes && filters.sportModes.length > 0) {
-          mongoFilter.where["sportMode._id"] = {
-            $in: filters.sportModes.map((mode) => mode._id),
-          };
+            mongoFilter.where["sportMode._id"] = {
+                $in: filters.sportModes.map((mode) => mode._id)
+            }
         }
-      
+
         if (filters.zones && filters.zones.length > 0) {
-          mongoFilter.where["location._id"] = {
-            $in: filters.zones.map((zone) => zone._id),
-          };
+            mongoFilter.where["location._id"] = {
+                $in: filters.zones.map((zone) => zone._id)
+            }
         }
-      
+
         if (filters.hours && filters.hours.length > 0) {
-          const hoursList = filters.hours.map((h) => {
-            const [hh] = h.time.split(":");
-            return parseInt(hh, 10);
-          });
-          mongoFilter.where.hour = { $in: hoursList };
+            const hoursList = filters.hours.map((h) => {
+                const [hh] = h.time.split(":")
+                return parseInt(hh, 10)
+            })
+            mongoFilter.where.hour = { $in: hoursList }
         }
-      
-        return mongoFilter;
-      }
+
+        return mongoFilter
+    }, [])
 
     const fetchMatches = async () => {
         const mongoFilter = buildMongoFilter(filter);
-
-        console.log(mongoFilter)
         const res = await matchService.getAll(mongoFilter);
         return res
     };
-  
-const { data: matches } = useFetch(fetchMatches, [QUERY_KEYS.MATCHES, (filter.sportModes.length).toString(), (filter.hours.length).toString(), (filter.zones.length).toString()])
+
+    const { data: matches } = useFetch(fetchMatches, [QUERY_KEYS.MATCHES, (filter.sportModes.length).toString(), (filter.hours.length).toString(), (filter.zones.length).toString()])
     const { data: zonas } = useFetch(zonesService.getZones, [QUERY_KEYS.ZONES])
     const { data: allSportModes } = useFetch(sportmodeService.getAll, [QUERY_KEYS.SPORT_MODES])
-    const toggleFilterModal = (filterType: 'mode' | 'hour' | 'zone') => {
+
+    const toggleFilterModal = useCallback((filterType: 'mode' | 'hour' | 'zone') => {
         const filterMap = {
             mode: setModeFilterModal,
             hour: setHourFilterModal,
@@ -83,18 +80,18 @@ const { data: matches } = useFetch(fetchMatches, [QUERY_KEYS.MATCHES, (filter.sp
         if (toggleFunction) {
             toggleFunction((prev) => !prev)
         }
-    }
+    }, [])
 
-    const toggleZoneSelection = (zone) => {
+    const toggleZoneSelection = useCallback((zone) => {
         const isSelected = filter.zones.some((z) => z._id === zone._id)
         if (isSelected) {
             setFilter((prev) => ({ ...prev, zones: prev.zones.filter((z) => z._id !== zone._id) }))
         } else {
             setFilter((prev) => ({ ...prev, zones: [...prev.zones, zone] }))
         }
-    }
+    }, [filter.zones])
 
-    const handleSelectMode = (mode: SportMode, index: number) => {
+    const handleSelectMode = useCallback((mode: SportMode) => {
         const isSelected = filter.sportModes.some((m) => m._id === mode._id)
         if (isSelected) {
             setFilter((prev) => ({
@@ -104,11 +101,11 @@ const { data: matches } = useFetch(fetchMatches, [QUERY_KEYS.MATCHES, (filter.sp
         } else {
             setFilter((prev) => ({ ...prev, sportModes: [...prev.sportModes, mode] }))
         }
-    }
+    }, [filter.sportModes])
 
     if (!zonas || !allSportModes) return null
     const matchesInfo = matches?.data.results ?? []
-
+    console.log(zonas.data)
     return (
         <>
             <Overlay onBackdropPress={() => toggleFilterModal('mode')} visible={modeFilterModal} p="xl" w={'90%'}>
@@ -117,14 +114,14 @@ const { data: matches } = useFetch(fetchMatches, [QUERY_KEYS.MATCHES, (filter.sp
                     horizontal
                     contentContainerStyle={{ gap: scale(16) }}
                 >
-                    {allSportModes.data.results.map((mode, index) => (
+                    {allSportModes.results.map((mode, index) => (
                         <SportModeButton
                             key={mode._id}
                             mode={mode}
                             index={index}
                             onPress={handleSelectMode}
                             selected={filter.sportModes.some((m) => m._id === mode._id)}
-                            length={allSportModes.data.results.length}
+                            length={allSportModes.results.length}
                         />
                     ))}
                 </ScrollView>
@@ -166,7 +163,7 @@ const { data: matches } = useFetch(fetchMatches, [QUERY_KEYS.MATCHES, (filter.sp
                 {zonas.data.results.map((zona, index) => {
                     const isSelected = filter.zones.some((z) => z._id === zona._id)
                     return (
-                        <TouchableOpacity key={index} onPress={() => toggleZoneSelection(zona)}>
+                        <TouchableOpacity key={zona._id} onPress={() => toggleZoneSelection(zona)}>
                             <Div
                                 h={verticalScale(48)}
                                 bg={isSelected ? 'black' : 'white'}
@@ -185,22 +182,69 @@ const { data: matches } = useFetch(fetchMatches, [QUERY_KEYS.MATCHES, (filter.sp
                 })}
             </Overlay>
             <Div p={customTheme.spacing.medium}>
-                <Div mt={customTheme.spacing.medium} alignSelf='center' style={{ gap: 10 }} flexDir='row'>
-                    <TouchableOpacity onPress={() => toggleFilterModal('mode')}>
-                        <Div borderWidth={1} p={customTheme.spacing.small} rounded={'circle'}>
-                            <Text>MODO</Text>
-                        </Div>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => toggleFilterModal('hour')}>
-                        <Div borderWidth={1} p={customTheme.spacing.small} rounded={'circle'}>
-                            <Text>HORA</Text>
-                        </Div>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => toggleFilterModal('zone')}>
-                        <Div borderWidth={1} p={customTheme.spacing.small} rounded={'circle'}>
-                            <Text>ZONA</Text>
-                        </Div>
-                    </TouchableOpacity>
+                <Div w={'100%'} flexDir='row' borderWidth={1} borderColor={customTheme.colors.gray} rounded={customTheme.borderRadius.medium}>
+                    <Div
+                        flex={1}
+                        borderRightWidth={2}
+                        borderColor={customTheme.colors.gray}
+                        bg={filter.hours.length > 0 ? customTheme.colors.lightGray : "white"}
+                        py={customTheme.spacing.small}
+                        style={{ borderTopLeftRadius: customTheme.borderRadius.medium, borderBottomLeftRadius: customTheme.borderRadius.medium }}
+                    >
+                        <TouchableOpacity onPress={() => toggleFilterModal('hour')}>
+                            <Text textAlign='center'>Horario</Text>
+                            <Div justifyContent='center' flexDir='row'>
+                                <Text>{filter.hours.length > 0 ? filter.hours[0].time : "Todas"}</Text>
+                                {
+                                    filter.hours.length > 1 &&
+                                    <Div ml={customTheme.spacing.small} py={customTheme.spacing.xxs} px={customTheme.spacing.xs} borderWidth={1} rounded={customTheme.borderRadius.circle}>
+                                        <Text textAlign='center'>+1</Text>
+                                    </Div>
+                                }
+                            </Div>
+                        </TouchableOpacity>
+                    </Div>
+                    <Div
+                        flex={1}
+                        borderRightWidth={2}
+                        borderColor={customTheme.colors.gray}
+                        bg={filter.sportModes.length > 0 ? customTheme.colors.lightGray : "white"}
+                        py={customTheme.spacing.small}
+                    >
+                        <TouchableOpacity onPress={() => toggleFilterModal('mode')}>
+                            <Text textAlign='center'>Modalidad</Text>
+                            <Div justifyContent='center' flexDir='row'>
+                                <Text>{filter.sportModes.length > 0 ? filter.sportModes[0].label : "Todas"}</Text>
+                                {
+                                    filter.sportModes.length > 1 &&
+                                    <Div ml={customTheme.spacing.small} borderWidth={1} py={customTheme.spacing.xxs} px={customTheme.spacing.xs} rounded={customTheme.borderRadius.circle}>
+                                        <Text textAlign='center'>+1</Text>
+                                    </Div>
+                                }
+                            </Div>
+                        </TouchableOpacity>
+                    </Div>
+                    <Div
+                        flex={1}
+                        bg={filter.zones.length > 0 ? customTheme.colors.lightGray : "white"}
+                        py={customTheme.spacing.small}
+                        style={{ borderTopRightRadius: customTheme.borderRadius.medium, borderBottomRightRadius: customTheme.borderRadius.medium }}
+                    >
+                        <TouchableOpacity onPress={() => toggleFilterModal('zone')}>
+                            <Text textAlign='center'>Zona</Text>
+                            <Div justifyContent='center' flexDir='row'>
+                                <Text>{filter.zones.length > 0 ? filter.zones[0].name : "Todas"}</Text>
+                                {
+                                    filter.zones.length > 1 &&
+                                    <Div ml={customTheme.spacing.small} py={customTheme.spacing.xxs} px={customTheme.spacing.xs} borderWidth={1} rounded={customTheme.borderRadius.circle}>
+                                        <Text textAlign='center'>+1</Text>
+                                    </Div>
+                                }
+                            </Div>
+                        </TouchableOpacity>
+                    </Div>
+                </Div>
+                <Div>
                 </Div>
                 <ScrollView>
                     {matchesInfo.map((match: Match) => (
