@@ -16,11 +16,11 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
   const insets = useSafeAreaInsets();
 
   const iconMap: Record<string, JSX.Element> = {
-    HomeStack: <HomeIcon width={scale(30)} height={scale(30)} />,
-    SettingsStack: <BellIcon width={scale(30)} height={scale(30)} />,
-    SettingsStack1: <PlusIcon width={scale(30)} height={scale(30)} />,
-    [AppScreens.MATCH_SCREEN]: <FieldIcon width={scale(30)} height={scale(30)} />,
-    SettingsStack3: <ProfileIcon width={scale(30)} height={scale(30)} />
+    HomeStack: <HomeIcon width={scale(20)} height={scale(20)} />,
+    SettingsStack: <BellIcon width={scale(20)} height={scale(20)} />,
+    SettingsStack1: <PlusIcon width={scale(20)} height={scale(20)} />,
+    [AppScreens.MATCH_SCREEN]: <FieldIcon width={scale(20)} height={scale(20)} />,
+    SettingsStack3: <ProfileIcon width={scale(20)} height={scale(20)} />
   };
 
   const screen = getFocusedRouteNameFromRoute(state.routes[state.index]);
@@ -47,7 +47,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
             key={route.key}
             bg={customTheme.colors.secondaryBackground}
             rounded="circle"
-            p={customTheme.spacing.small}
+            p={scale(13)}
             onPress={() => navigation.navigate(route.name)}
             alignSelf="center"
           >
