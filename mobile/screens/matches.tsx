@@ -5,7 +5,7 @@ import useFetch from '../hooks/useGet';
 import matchService from '../service/match.service';
 import { QUERY_KEYS } from '../types/query.types';
 import MatchCard from '../components/matchesCards';
-import { ActivityIndicator, FlatList, TouchableOpacity } from 'react-native';
+import { ActivityIndicator, FlatList, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { scale, verticalScale } from 'react-native-size-matters';
 import zonesService from '../service/zones.service';
 import sportmodeService from '../service/sportmode.service';
@@ -51,23 +51,30 @@ const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, s
 
   return (
     <>
-      <Overlay onBackdropPress={() => toggleFilterModal('mode')} visible={filter.modeFilterModal} p="xl" w={'90%'}>
-        <FlatList
-          data={allSportModes.results}
-          horizontal
-          keyExtractor={(item) => item._id}
-          renderItem={({ item, index }) => (
-            <SportModeButton
-              mode={item}
-              index={index}
-              onPress={handleSelectMode}
-              selected={filter.sportModes.some((m) => m._id === item._id)}
-              length={allSportModes.results.length}
-            />
-          )}
-        />
+      <Overlay onBackdropPress={() => toggleFilterModal('mode')} visible={filter.modeFilterModal} py="lg" w={'90%'}>
+        <TouchableOpacity onPress={() => toggleFilterModal('mode')}>
+          <Image style={{ width: scale(25), height: scale(25),alignSelf:'flex-end' }} source={require("@assets/closeIcon.png")} />
+        </TouchableOpacity>
+        <Text textAlign='center' mb={customTheme.spacing.medium} fontSize={customTheme.fontSize.large}>Modalidad</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {allSportModes.results.map((item, index) => (
+            <Div mr={customTheme.spacing.small} key={item._id}>
+              <SportModeButton
+                mode={item}
+                index={index}
+                onPress={handleSelectMode}
+                selected={filter.sportModes.some((m) => m._id === item._id)}
+                length={allSportModes.results.length}
+              />
+            </Div>
+          ))}
+        </ScrollView>
       </Overlay>
-      <Overlay onBackdropPress={() => toggleFilterModal('hour')} visible={filter.hourFilterModal} p="xl">
+      <Overlay onBackdropPress={() => toggleFilterModal('hour')} visible={filter.hourFilterModal} p="lg">
+        <TouchableOpacity onPress={() => toggleFilterModal('hour')}>
+          <Image style={{ width: scale(25), height: scale(25),alignSelf:'flex-end' }} source={require("@assets/closeIcon.png")} />
+        </TouchableOpacity>
+        <Text textAlign='center' p={customTheme.spacing.small} mb={customTheme.spacing.medium} fontSize={customTheme.fontSize.large}>Horarios</Text>
         {schedules.map((schedule) => (
           <TouchableOpacity key={schedule.id} onPress={() => handleSelectHour(schedule)}>
             <Div
@@ -86,8 +93,11 @@ const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, s
           </TouchableOpacity>
         ))}
       </Overlay>
-      <Overlay onBackdropPress={() => toggleFilterModal('zone')} visible={filter.zoneFilterModal} p="xl">
-        {/* Zone Modal */}
+      <Overlay onBackdropPress={() => toggleFilterModal('zone')} visible={filter.zoneFilterModal} p="lg">
+        <TouchableOpacity onPress={() => toggleFilterModal('zone')}>
+          <Image style={{ width: scale(25), height: scale(25),alignSelf:'flex-end' }} source={require("@assets/closeIcon.png")} />
+        </TouchableOpacity>
+        <Text textAlign='center' p={customTheme.spacing.small} mb={customTheme.spacing.medium} fontSize={customTheme.fontSize.large}>Zonas</Text>
         {zonas.data.results.map((zona) => (
           <TouchableOpacity key={zona._id} onPress={() => toggleZoneSelection(zona)}>
             <Div
@@ -103,28 +113,65 @@ const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, s
           </TouchableOpacity>
         ))}
       </Overlay>
-      <Div w={'100%'} flexDir="row" borderWidth={1} borderColor={customTheme.colors.gray} rounded={customTheme.borderRadius.medium}>
-        {/* Filter Buttons */}
-        <Div flex={1} borderRightWidth={2} borderColor={customTheme.colors.gray} bg={filter.hours.length > 0 ? customTheme.colors.lightGray : 'white'} py={customTheme.spacing.small}
+      <Div w={'100%'} flexDir='row' borderWidth={1} borderColor={customTheme.colors.gray} rounded={customTheme.borderRadius.medium}>
+        <Div
+          flex={1}
+          borderRightWidth={2}
+          borderColor={customTheme.colors.gray}
+          bg={filter.hours.length > 0 ? customTheme.colors.lightGray : "white"}
+          py={customTheme.spacing.small}
           style={{ borderTopLeftRadius: customTheme.borderRadius.medium, borderBottomLeftRadius: customTheme.borderRadius.medium }}
         >
           <TouchableOpacity onPress={() => toggleFilterModal('hour')}>
-            <Text textAlign="center">Horario</Text>
-            <Text textAlign="center">{filter.hours.length > 0 ? filter.hours[0].time : 'Todas'}</Text>
+            <Text textAlign='center'>Horario</Text>
+            <Div justifyContent='center' flexDir='row'>
+              <Text>{filter.hours.length > 0 ? filter.hours[0].time : "Todas"}</Text>
+              {
+                filter.hours.length > 1 &&
+                <Div ml={customTheme.spacing.small} px={customTheme.spacing.xxs} borderWidth={1} rounded={customTheme.borderRadius.circle}>
+                  <Text textAlign='center'>+1</Text>
+                </Div>
+              }
+            </Div>
           </TouchableOpacity>
         </Div>
-        <Div flex={1} borderRightWidth={2} borderColor={customTheme.colors.gray} bg={filter.sportModes.length > 0 ? customTheme.colors.lightGray : 'white'} py={customTheme.spacing.small}>
+        <Div
+          flex={1}
+          borderRightWidth={2}
+          borderColor={customTheme.colors.gray}
+          bg={filter.sportModes.length > 0 ? customTheme.colors.lightGray : "white"}
+          py={customTheme.spacing.small}
+        >
           <TouchableOpacity onPress={() => toggleFilterModal('mode')}>
-            <Text textAlign="center">Modalidad</Text>
-            <Text textAlign="center">{filter.sportModes.length > 0 ? filter.sportModes[0].label : 'Todas'}</Text>
+            <Text textAlign='center'>Modalidad</Text>
+            <Div justifyContent='center' flexDir='row'>
+              <Text>{filter.sportModes.length > 0 ? filter.sportModes[0].label : "Todas"}</Text>
+              {
+                filter.sportModes.length > 1 &&
+                <Div ml={customTheme.spacing.small} px={customTheme.spacing.xxs} borderWidth={1} rounded={customTheme.borderRadius.circle}>
+                  <Text textAlign='center'>+1</Text>
+                </Div>
+              }
+            </Div>
           </TouchableOpacity>
         </Div>
-        <Div flex={1} bg={filter.zones.length > 0 ? customTheme.colors.lightGray : 'white'} py={customTheme.spacing.small}
+        <Div
+          flex={1}
+          bg={filter.zones.length > 0 ? customTheme.colors.lightGray : "white"}
+          py={customTheme.spacing.small}
           style={{ borderTopRightRadius: customTheme.borderRadius.medium, borderBottomRightRadius: customTheme.borderRadius.medium }}
         >
           <TouchableOpacity onPress={() => toggleFilterModal('zone')}>
-            <Text textAlign="center">Zona</Text>
-            <Text textAlign="center">{filter.zones.length > 0 ? filter.zones[0].name : 'Todas'}</Text>
+            <Text textAlign='center'>Zona</Text>
+            <Div justifyContent='center' flexDir='row'>
+              <Text>{filter.zones.length > 0 ? filter.zones[0].name : "Todas"}</Text>
+              {
+                filter.zones.length > 1 &&
+                <Div ml={customTheme.spacing.small} px={customTheme.spacing.xxs} borderWidth={1} rounded={customTheme.borderRadius.circle}>
+                  <Text textAlign='center'>+1</Text>
+                </Div>
+              }
+            </Div>
           </TouchableOpacity>
         </Div>
       </Div>
