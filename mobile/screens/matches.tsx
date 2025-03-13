@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect } from 'react';
-import { Div, Overlay, Text } from 'react-native-magnus';
+import { Div, Icon, Overlay, Text } from 'react-native-magnus';
 import { customTheme } from '../utils/theme';
 import useFetch from '../hooks/useGet';
 import matchService from '../service/match.service';
@@ -53,9 +53,9 @@ const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, s
     <>
       <Overlay onBackdropPress={() => toggleFilterModal('mode')} visible={filter.modeFilterModal} py="lg" w={'90%'}>
         <TouchableOpacity onPress={() => toggleFilterModal('mode')}>
-          <Image style={{ width: scale(25), height: scale(25),alignSelf:'flex-end' }} source={require("@assets/closeIcon.png")} />
+          <Image style={{ width: scale(25), height: scale(25), alignSelf: 'flex-end' }} source={require("@assets/closeIcon.png")} />
         </TouchableOpacity>
-        <Text textAlign='center' mb={customTheme.spacing.medium} fontSize={customTheme.fontSize.large}>Modalidad</Text>
+        <Text textAlign='center' mb={customTheme.spacing.medium} fontSize={customTheme.fontSize.large} >Modalidad</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
           {allSportModes.results.map((item, index) => (
             <Div mr={customTheme.spacing.small} key={item._id}>
@@ -72,7 +72,7 @@ const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, s
       </Overlay>
       <Overlay onBackdropPress={() => toggleFilterModal('hour')} visible={filter.hourFilterModal} p="lg">
         <TouchableOpacity onPress={() => toggleFilterModal('hour')}>
-          <Image style={{ width: scale(25), height: scale(25),alignSelf:'flex-end' }} source={require("@assets/closeIcon.png")} />
+          <Image style={{ width: scale(25), height: scale(25), alignSelf: 'flex-end' }} source={require("@assets/closeIcon.png")} />
         </TouchableOpacity>
         <Text textAlign='center' p={customTheme.spacing.small} mb={customTheme.spacing.medium} fontSize={customTheme.fontSize.large}>Horarios</Text>
         {schedules.map((schedule) => (
@@ -95,7 +95,7 @@ const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, s
       </Overlay>
       <Overlay onBackdropPress={() => toggleFilterModal('zone')} visible={filter.zoneFilterModal} p="lg">
         <TouchableOpacity onPress={() => toggleFilterModal('zone')}>
-          <Image style={{ width: scale(25), height: scale(25),alignSelf:'flex-end' }} source={require("@assets/closeIcon.png")} />
+          <Image style={{ width: scale(25), height: scale(25), alignSelf: 'flex-end' }} source={require("@assets/closeIcon.png")} />
         </TouchableOpacity>
         <Text textAlign='center' p={customTheme.spacing.small} mb={customTheme.spacing.medium} fontSize={customTheme.fontSize.large}>Zonas</Text>
         {zonas.data.results.map((zona) => (
@@ -123,7 +123,7 @@ const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, s
           style={{ borderTopLeftRadius: customTheme.borderRadius.medium, borderBottomLeftRadius: customTheme.borderRadius.medium }}
         >
           <TouchableOpacity onPress={() => toggleFilterModal('hour')}>
-            <Text textAlign='center'>Horario</Text>
+            <Text textAlign='center' fontFamily="NotoSans-ExtraBold">Horario</Text>
             <Div justifyContent='center' flexDir='row'>
               <Text>{filter.hours.length > 0 ? filter.hours[0].time : "Todas"}</Text>
               {
@@ -143,7 +143,7 @@ const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, s
           py={customTheme.spacing.small}
         >
           <TouchableOpacity onPress={() => toggleFilterModal('mode')}>
-            <Text textAlign='center'>Modalidad</Text>
+            <Text textAlign='center' fontFamily="NotoSans-ExtraBold">Modalidad</Text>
             <Div justifyContent='center' flexDir='row'>
               <Text>{filter.sportModes.length > 0 ? filter.sportModes[0].label : "Todas"}</Text>
               {
@@ -162,7 +162,7 @@ const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, s
           style={{ borderTopRightRadius: customTheme.borderRadius.medium, borderBottomRightRadius: customTheme.borderRadius.medium }}
         >
           <TouchableOpacity onPress={() => toggleFilterModal('zone')}>
-            <Text textAlign='center'>Zona</Text>
+            <Text textAlign='center' fontFamily="NotoSans-ExtraBold">Zona</Text>
             <Div justifyContent='center' flexDir='row'>
               <Text>{filter.zones.length > 0 ? filter.zones[0].name : "Todas"}</Text>
               {
@@ -195,7 +195,15 @@ const MatchesList = ({ matches, fetchMore, hasMore }) => {
   const keyExtractor = (item) => item._id.toString();
 
   const renderFooter = () => (hasMore ? <ActivityIndicator size="large" /> : null);
-
+  console.log(matches.length)
+  if (matches.length < 1) {
+    return (
+      <Div h={'80%'} justifyContent='center'>
+        <Icon color={customTheme.colors.gray} fontFamily='AntDesign' name='search1' fontSize={customTheme.fontSize.Fourxl} />
+        <Text mt={customTheme.spacing.medium} fontSize={customTheme.fontSize.medium} textAlign='center'>No se encontraron partidos{'\n'}con este filtro</Text>
+      </Div>
+    )
+  }
   return (
     <FlatList
       data={matches}
