@@ -12,6 +12,7 @@ export type CustomThemeType = ThemeType & {
     background: string;
     text: string;
     gray: string;
+    lightGray:string;
     grayBackground: string;
     secondaryBackground: string;
    
@@ -39,6 +40,7 @@ export type CustomThemeType = ThemeType & {
   };
   spacing: {
     none: number;
+    xxs:number;
     xs: number;
     small: number;
     medium: number;
@@ -63,7 +65,8 @@ export const customTheme: CustomThemeType = {
     secondaryBackground: "#151515",
     text: "#333333",
     gray: "#797977",
-    grayBackground: "#f2f2f0"
+    grayBackground: "#f2f2f0",
+    lightGray: "#D9D9D9"
   
   },
   fontFamily: {
@@ -89,6 +92,7 @@ export const customTheme: CustomThemeType = {
   },
   spacing: {
     none: 0,
+    xxs: scale(3),
     xs: scale(5),
     small: scale(8),
     medium: scale(16),
