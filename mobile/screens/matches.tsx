@@ -1,267 +1,235 @@
-import React, { useCallback, useState } from 'react'
-import { Div, Overlay, Text } from 'react-native-magnus'
-import { customTheme } from '../utils/theme'
-import useFetch from '../hooks/useGet'
-import matchService from '../service/match.service'
-import { QUERY_KEYS } from '../types/query.types'
-import MatchCard from '../components/matchesCards'
-import Match from '../types/match.type'
-import { ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native'
-import { scale, verticalScale } from 'react-native-size-matters'
-import zonesService from '../service/zones.service'
-import sportService from '../service/sport.service'
-import sportmodeService from '../service/sportmode.service'
-import SportModeButton from '../components/matche/Form/sportModeButton'
-import { SportMode } from '../types/form.type'
+import React, { useCallback, useState, useEffect } from 'react';
+import { Div, Overlay, Text } from 'react-native-magnus';
+import { customTheme } from '../utils/theme';
+import useFetch from '../hooks/useGet';
+import matchService from '../service/match.service';
+import { QUERY_KEYS } from '../types/query.types';
+import MatchCard from '../components/matchesCards';
+import { ActivityIndicator, FlatList, TouchableOpacity } from 'react-native';
+import { scale, verticalScale } from 'react-native-size-matters';
+import zonesService from '../service/zones.service';
+import sportmodeService from '../service/sportmode.service';
+import SportModeButton from '../components/matche/Form/sportModeButton';
 
 const schedules = [
-    { id: 1, time: '00:00', value: { startHour: '08:00', endHour: '14:00' } },
-    { id: 2, time: '08:00', value: { startHour: '08:00', endHour: '09:00' } },
-    { id: 3, time: '09:00', value: { startHour: '09:00', endHour: '10:00' } },
-    { id: 4, time: '10:00', value: { startHour: '10:00', endHour: '11:00' } },
-    { id: 5, time: '11:00', value: { startHour: '11:00', endHour: '12:00' } },
-    { id: 6, time: '12:00', value: { startHour: '12:00', endHour: '13:00' } },
-    { id: 7, time: '13:00', value: { startHour: '13:00', endHour: '14:00' } }
+  { id: 1, time: '00:00', value: { startHour: '08:00', endHour: '14:00' } },
+  { id: 2, time: '08:00', value: { startHour: '08:00', endHour: '09:00' } },
+  { id: 3, time: '09:00', value: { startHour: '09:00', endHour: '10:00' } },
+  { id: 4, time: '10:00', value: { startHour: '10:00', endHour: '11:00' } },
+  { id: 5, time: '11:00', value: { startHour: '11:00', endHour: '12:00' } },
+  { id: 6, time: '12:00', value: { startHour: '12:00', endHour: '13:00' } },
+  { id: 7, time: '13:00', value: { startHour: '13:00', endHour: '14:00' } }
 ]
 
-const MatchesScreen = () => {
-    const [modeFilterModal, setModeFilterModal] = useState(false)
-    const [hourFilterModal, setHourFilterModal] = useState(false)
-    const [zoneFilterModal, setZoneFilterModal] = useState(false)
-    const [filter, setFilter] = useState({
-        sportModes: [] as SportMode[],
-        zones: [] as any[],
-        hours: [] as any[]
-    })
+const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, schedules }) => {
+  const toggleZoneSelection = (zone) => {
+    setFilter((prev) => ({
+      ...prev,
+      zones: prev.zones.some((z) => z._id === zone._id)
+        ? prev.zones.filter((z) => z._id !== zone._id)
+        : [...prev.zones, zone],
+    }));
+  };
 
-    const buildMongoFilter = useCallback((filters) => {
-        const mongoFilter = { where: {} }
+  const handleSelectMode = (mode) => {
+    setFilter((prev) => ({
+      ...prev,
+      sportModes: prev.sportModes.some((m) => m._id === mode._id)
+        ? prev.sportModes.filter((m) => m._id !== mode._id)
+        : [...prev.sportModes, mode],
+    }));
+  };
 
-        if (filters.sportModes && filters.sportModes.length > 0) {
-            mongoFilter.where["sportMode._id"] = {
-                $in: filters.sportModes.map((mode) => mode._id)
-            }
-        }
+  const handleSelectHour = (schedule) => {
+    setFilter((prev) => ({
+      ...prev,
+      hours: prev.hours.some((h) => h.id === schedule.id)
+        ? prev.hours.filter((h) => h.id !== schedule.id)
+        : [...prev.hours, schedule],
+    }));
+  };
 
-        if (filters.zones && filters.zones.length > 0) {
-            mongoFilter.where["location._id"] = {
-                $in: filters.zones.map((zone) => zone._id)
-            }
-        }
-
-        if (filters.hours && filters.hours.length > 0) {
-            const hoursList = filters.hours.map((h) => {
-                const [hh] = h.time.split(":")
-                return parseInt(hh, 10)
-            })
-            mongoFilter.where.hour = { $in: hoursList }
-        }
-
-        return mongoFilter
-    }, [])
-
-    const fetchMatches = async () => {
-        const mongoFilter = buildMongoFilter(filter);
-        const res = await matchService.getAll(mongoFilter);
-        return res
-    };
-
-    const { data: matches } = useFetch(fetchMatches, [QUERY_KEYS.MATCHES, (filter.sportModes.length).toString(), (filter.hours.length).toString(), (filter.zones.length).toString()])
-    const { data: zonas } = useFetch(zonesService.getZones, [QUERY_KEYS.ZONES])
-    const { data: allSportModes } = useFetch(sportmodeService.getAll, [QUERY_KEYS.SPORT_MODES])
-
-    const toggleFilterModal = useCallback((filterType: 'mode' | 'hour' | 'zone') => {
-        const filterMap = {
-            mode: setModeFilterModal,
-            hour: setHourFilterModal,
-            zone: setZoneFilterModal,
-        }
-        const toggleFunction = filterMap[filterType]
-        if (toggleFunction) {
-            toggleFunction((prev) => !prev)
-        }
-    }, [])
-
-    const toggleZoneSelection = useCallback((zone) => {
-        const isSelected = filter.zones.some((z) => z._id === zone._id)
-        if (isSelected) {
-            setFilter((prev) => ({ ...prev, zones: prev.zones.filter((z) => z._id !== zone._id) }))
-        } else {
-            setFilter((prev) => ({ ...prev, zones: [...prev.zones, zone] }))
-        }
-    }, [filter.zones])
-
-    const handleSelectMode = useCallback((mode: SportMode) => {
-        const isSelected = filter.sportModes.some((m) => m._id === mode._id)
-        if (isSelected) {
-            setFilter((prev) => ({
-                ...prev,
-                sportModes: prev.sportModes.filter((m) => m._id !== mode._id)
-            }))
-        } else {
-            setFilter((prev) => ({ ...prev, sportModes: [...prev.sportModes, mode] }))
-        }
-    }, [filter.sportModes])
-
-    if (!zonas || !allSportModes) return null
-    const matchesInfo = matches?.data.results ?? []
-    console.log(zonas.data)
-    return (
-        <>
-            <Overlay onBackdropPress={() => toggleFilterModal('mode')} visible={modeFilterModal} p="xl" w={'90%'}>
-                <ScrollView
-                    showsHorizontalScrollIndicator={false}
-                    horizontal
-                    contentContainerStyle={{ gap: scale(16) }}
-                >
-                    {allSportModes.results.map((mode, index) => (
-                        <SportModeButton
-                            key={mode._id}
-                            mode={mode}
-                            index={index}
-                            onPress={handleSelectMode}
-                            selected={filter.sportModes.some((m) => m._id === mode._id)}
-                            length={allSportModes.results.length}
-                        />
-                    ))}
-                </ScrollView>
-            </Overlay>
-            <Overlay onBackdropPress={() => toggleFilterModal('hour')} visible={hourFilterModal} p="xl">
-                {schedules.map((schedule) => {
-                    const isSelected = filter.hours.some((item) => item.id === schedule.id)
-                    return (
-                        <TouchableOpacity
-                            key={schedule.id}
-                            onPress={() => {
-                                setFilter((prev) => {
-                                    if (prev.hours.some((item) => item.id === schedule.id)) {
-                                        return { ...prev, hours: prev.hours.filter((item) => item.id !== schedule.id) }
-                                    } else {
-                                        return { ...prev, hours: [...prev.hours, schedule] }
-                                    }
-                                })
-                            }}
-                        >
-                            <Div
-                                h={verticalScale(48)}
-                                bg={isSelected ? customTheme.colors.secondaryBackground : 'white'}
-                                justifyContent="center"
-                                borderWidth={1}
-                            >
-                                <Text
-                                    color={isSelected ? 'white' : customTheme.colors.secondaryBackground}
-                                    textAlign="center"
-                                >
-                                    {schedule.time === '00:00' ? 'A definir' : schedule.time}
-                                </Text>
-                            </Div>
-                        </TouchableOpacity>
-                    )
-                })}
-            </Overlay>
-            <Overlay onBackdropPress={() => toggleFilterModal('zone')} visible={zoneFilterModal} p="xl">
-                {zonas.data.results.map((zona, index) => {
-                    const isSelected = filter.zones.some((z) => z._id === zona._id)
-                    return (
-                        <TouchableOpacity key={zona._id} onPress={() => toggleZoneSelection(zona)}>
-                            <Div
-                                h={verticalScale(48)}
-                                bg={isSelected ? 'black' : 'white'}
-                                justifyContent="center"
-                                borderWidth={1}
-                            >
-                                <Text
-                                    color={isSelected ? 'white' : 'black'}
-                                    textAlign="center"
-                                >
-                                    {zona.name}
-                                </Text>
-                            </Div>
-                        </TouchableOpacity>
-                    )
-                })}
-            </Overlay>
-            <Div p={customTheme.spacing.medium}>
-                <Div w={'100%'} flexDir='row' borderWidth={1} borderColor={customTheme.colors.gray} rounded={customTheme.borderRadius.medium}>
-                    <Div
-                        flex={1}
-                        borderRightWidth={2}
-                        borderColor={customTheme.colors.gray}
-                        bg={filter.hours.length > 0 ? customTheme.colors.lightGray : "white"}
-                        py={customTheme.spacing.small}
-                        style={{ borderTopLeftRadius: customTheme.borderRadius.medium, borderBottomLeftRadius: customTheme.borderRadius.medium }}
-                    >
-                        <TouchableOpacity onPress={() => toggleFilterModal('hour')}>
-                            <Text textAlign='center'>Horario</Text>
-                            <Div justifyContent='center' flexDir='row'>
-                                <Text>{filter.hours.length > 0 ? filter.hours[0].time : "Todas"}</Text>
-                                {
-                                    filter.hours.length > 1 &&
-                                    <Div ml={customTheme.spacing.small} py={customTheme.spacing.xxs} px={customTheme.spacing.xs} borderWidth={1} rounded={customTheme.borderRadius.circle}>
-                                        <Text textAlign='center'>+1</Text>
-                                    </Div>
-                                }
-                            </Div>
-                        </TouchableOpacity>
-                    </Div>
-                    <Div
-                        flex={1}
-                        borderRightWidth={2}
-                        borderColor={customTheme.colors.gray}
-                        bg={filter.sportModes.length > 0 ? customTheme.colors.lightGray : "white"}
-                        py={customTheme.spacing.small}
-                    >
-                        <TouchableOpacity onPress={() => toggleFilterModal('mode')}>
-                            <Text textAlign='center'>Modalidad</Text>
-                            <Div justifyContent='center' flexDir='row'>
-                                <Text>{filter.sportModes.length > 0 ? filter.sportModes[0].label : "Todas"}</Text>
-                                {
-                                    filter.sportModes.length > 1 &&
-                                    <Div ml={customTheme.spacing.small} borderWidth={1} py={customTheme.spacing.xxs} px={customTheme.spacing.xs} rounded={customTheme.borderRadius.circle}>
-                                        <Text textAlign='center'>+1</Text>
-                                    </Div>
-                                }
-                            </Div>
-                        </TouchableOpacity>
-                    </Div>
-                    <Div
-                        flex={1}
-                        bg={filter.zones.length > 0 ? customTheme.colors.lightGray : "white"}
-                        py={customTheme.spacing.small}
-                        style={{ borderTopRightRadius: customTheme.borderRadius.medium, borderBottomRightRadius: customTheme.borderRadius.medium }}
-                    >
-                        <TouchableOpacity onPress={() => toggleFilterModal('zone')}>
-                            <Text textAlign='center'>Zona</Text>
-                            <Div justifyContent='center' flexDir='row'>
-                                <Text>{filter.zones.length > 0 ? filter.zones[0].name : "Todas"}</Text>
-                                {
-                                    filter.zones.length > 1 &&
-                                    <Div ml={customTheme.spacing.small} py={customTheme.spacing.xxs} px={customTheme.spacing.xs} borderWidth={1} rounded={customTheme.borderRadius.circle}>
-                                        <Text textAlign='center'>+1</Text>
-                                    </Div>
-                                }
-                            </Div>
-                        </TouchableOpacity>
-                    </Div>
-                </Div>
-                <Div>
-                </Div>
-                <ScrollView>
-                    {matchesInfo.map((match: Match) => (
-                        <MatchCard
-                            key={match.id}
-                            date={"F"}
-                            day={match.dayOfWeek}
-                            location={match.location?.address}
-                            maxPlayers={match.playersLimit}
-                            players={10}
-                            time={'horario'}
-                        />
-                    ))}
-                </ScrollView>
+  return (
+    <>
+      <Overlay onBackdropPress={() => toggleFilterModal('mode')} visible={filter.modeFilterModal} p="xl" w={'90%'}>
+        <FlatList
+          data={allSportModes.results}
+          horizontal
+          keyExtractor={(item) => item._id}
+          renderItem={({ item, index }) => (
+            <SportModeButton
+              mode={item}
+              index={index}
+              onPress={handleSelectMode}
+              selected={filter.sportModes.some((m) => m._id === item._id)}
+              length={allSportModes.results.length}
+            />
+          )}
+        />
+      </Overlay>
+      <Overlay onBackdropPress={() => toggleFilterModal('hour')} visible={filter.hourFilterModal} p="xl">
+        {schedules.map((schedule) => (
+          <TouchableOpacity key={schedule.id} onPress={() => handleSelectHour(schedule)}>
+            <Div
+              h={verticalScale(48)}
+              bg={filter.hours.some((h) => h.id === schedule.id) ? customTheme.colors.secondaryBackground : 'white'}
+              justifyContent="center"
+              borderWidth={1}
+            >
+              <Text
+                color={filter.hours.some((h) => h.id === schedule.id) ? 'white' : customTheme.colors.secondaryBackground}
+                textAlign="center"
+              >
+                {schedule.time === '00:00' ? 'A definir' : schedule.time}
+              </Text>
             </Div>
-        </>
-    )
-}
+          </TouchableOpacity>
+        ))}
+      </Overlay>
+      <Overlay onBackdropPress={() => toggleFilterModal('zone')} visible={filter.zoneFilterModal} p="xl">
+        {/* Zone Modal */}
+        {zonas.data.results.map((zona) => (
+          <TouchableOpacity key={zona._id} onPress={() => toggleZoneSelection(zona)}>
+            <Div
+              h={verticalScale(48)}
+              bg={filter.zones.some((z) => z._id === zona._id) ? 'black' : 'white'}
+              justifyContent="center"
+              borderWidth={1}
+            >
+              <Text color={filter.zones.some((z) => z._id === zona._id) ? 'white' : 'black'} textAlign="center">
+                {zona.name}
+              </Text>
+            </Div>
+          </TouchableOpacity>
+        ))}
+      </Overlay>
+      <Div w={'100%'} flexDir="row" borderWidth={1} borderColor={customTheme.colors.gray} rounded={customTheme.borderRadius.medium}>
+        {/* Filter Buttons */}
+        <Div flex={1} borderRightWidth={2} borderColor={customTheme.colors.gray} bg={filter.hours.length > 0 ? customTheme.colors.lightGray : 'white'} py={customTheme.spacing.small}
+          style={{ borderTopLeftRadius: customTheme.borderRadius.medium, borderBottomLeftRadius: customTheme.borderRadius.medium }}
+        >
+          <TouchableOpacity onPress={() => toggleFilterModal('hour')}>
+            <Text textAlign="center">Horario</Text>
+            <Text textAlign="center">{filter.hours.length > 0 ? filter.hours[0].time : 'Todas'}</Text>
+          </TouchableOpacity>
+        </Div>
+        <Div flex={1} borderRightWidth={2} borderColor={customTheme.colors.gray} bg={filter.sportModes.length > 0 ? customTheme.colors.lightGray : 'white'} py={customTheme.spacing.small}>
+          <TouchableOpacity onPress={() => toggleFilterModal('mode')}>
+            <Text textAlign="center">Modalidad</Text>
+            <Text textAlign="center">{filter.sportModes.length > 0 ? filter.sportModes[0].label : 'Todas'}</Text>
+          </TouchableOpacity>
+        </Div>
+        <Div flex={1} bg={filter.zones.length > 0 ? customTheme.colors.lightGray : 'white'} py={customTheme.spacing.small}
+          style={{ borderTopRightRadius: customTheme.borderRadius.medium, borderBottomRightRadius: customTheme.borderRadius.medium }}
+        >
+          <TouchableOpacity onPress={() => toggleFilterModal('zone')}>
+            <Text textAlign="center">Zona</Text>
+            <Text textAlign="center">{filter.zones.length > 0 ? filter.zones[0].name : 'Todas'}</Text>
+          </TouchableOpacity>
+        </Div>
+      </Div>
+    </>
+  );
+};
 
-export default MatchesScreen
+const MatchesList = ({ matches, fetchMore, hasMore }) => {
+  const renderItem = ({ item }) => (
+    <MatchCard
+      key={item.id}
+      date={'F'}
+      day={item.dayOfWeek}
+      location={item.location?.address}
+      maxPlayers={item.playersLimit}
+      players={10}
+      time={'horario'}
+    />
+  );
+
+  const keyExtractor = (item) => item._id.toString();
+
+  const renderFooter = () => (hasMore ? <ActivityIndicator size="large" /> : null);
+
+  return (
+    <FlatList
+      data={matches}
+      renderItem={renderItem}
+      keyExtractor={keyExtractor}
+      onEndReached={fetchMore}
+      onEndReachedThreshold={0.5}
+      ListFooterComponent={renderFooter}
+      initialNumToRender={10}
+      maxToRenderPerBatch={10}
+      windowSize={5}
+    />
+  );
+};
+
+// Main Screen
+const MatchesScreen = () => {
+  const [filter, setFilter] = useState({
+    sportModes: [],
+    zones: [],
+    hours: [],
+    modeFilterModal: false,
+    hourFilterModal: false,
+    zoneFilterModal: false,
+  });
+  const [limit, setLimit] = useState(10);
+  const [matches, setMatches] = useState([]);
+  const [hasMore, setHasMore] = useState(true);
+
+  const { data: zonas } = useFetch(zonesService.getZones, [QUERY_KEYS.ZONES]);
+  const { data: allSportModes } = useFetch(sportmodeService.getAll, [QUERY_KEYS.SPORT_MODES]);
+
+  const buildMongoFilter = useCallback(() => {
+    const mongoFilter = { where: {}, page: 1, limit };
+    if (filter.sportModes.length > 0) mongoFilter.where['sportMode._id'] = { $in: filter.sportModes.map((m) => m._id) };
+    if (filter.zones.length > 0) mongoFilter.where['location._id'] = { $in: filter.zones.map((z) => z._id) };
+    if (filter.hours.length > 0) mongoFilter.where.hour = { $in: filter.hours.map((h) => parseInt(h.time.split(':')[0], 10)) };
+    return mongoFilter;
+  }, [filter, limit]);
+
+  const fetchMatches = async () => {
+    const mongoFilter = buildMongoFilter();
+    const res = await matchService.getAll(mongoFilter);
+    return res.data;
+  };
+
+  useEffect(() => {
+    fetchMatches().then((data) => {
+      setMatches(data.results);
+      setHasMore(data.results.length === limit);
+    });
+  }, [filter.sportModes, filter.zones, filter.hours, limit]);
+
+  const fetchMore = () => {
+    if (hasMore) setLimit((prev) => prev + 10);
+  };
+
+  const toggleFilterModal = useCallback((filterType) => {
+    setFilter((prev) => ({
+      ...prev,
+      modeFilterModal: filterType === 'mode' ? !prev.modeFilterModal : false,
+      hourFilterModal: filterType === 'hour' ? !prev.hourFilterModal : false,
+      zoneFilterModal: filterType === 'zone' ? !prev.zoneFilterModal : false,
+    }));
+  }, []);
+
+  if (!zonas || !allSportModes) return <ActivityIndicator size="large" />;
+
+  return (
+    <Div p={customTheme.spacing.medium}>
+      <Filters
+        filter={filter}
+        setFilter={setFilter}
+        toggleFilterModal={toggleFilterModal}
+        zonas={zonas}
+        allSportModes={allSportModes}
+        schedules={schedules}
+      />
+      <MatchesList matches={matches} fetchMore={fetchMore} hasMore={hasMore} />
+    </Div>
+  );
+};
+
+export default MatchesScreen;
