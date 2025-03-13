@@ -14,7 +14,6 @@ export class SportModesController {
   create(@Body() createSportModeDto: CreateSportModeDto) {
     return this.sportModesService.create(createSportModeDto);
   }
-@Public()
   @Get()
   findAll(@Query() filter: Filter) {
     return this.sportModesService.findAll(filter);
