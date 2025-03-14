@@ -29,7 +29,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     <Div>
       <ScrollView>
         <Button onPress={showModal}>Abrir</Button>
-        <Div>
+        <Div p={customTheme.spacing.small}>
           <Text
             fontSize={customTheme.fontSize.medium}
             fontFamily="NotoSans-Italic"
@@ -40,12 +40,15 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
           <ScrollView horizontal>
             {matches?.results.map((u) => (
               <UpcomingMatchCard
-              key={u._id}
-              date={u.date}
-              hour={u.hour}
-              players={u.users}
-              maxPlayers={u.playersLimit}
-              titulo={u.name}
+                key={u._id}
+                matchId={u._id}
+                date={u.date}
+                hour={u.hour}
+                players={u.users}
+                maxPlayers={u.playersLimit}
+                titulo={u.name}
+                location={u.location}
+                sportMode={u.sportMode}
               />
             ))}
           </ScrollView>

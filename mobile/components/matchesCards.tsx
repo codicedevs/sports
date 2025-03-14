@@ -1,4 +1,3 @@
-// MatchCard.tsx
 import React from "react";
 import { View, Image, TouchableOpacity } from "react-native";
 import { Div, Text } from "react-native-magnus";
@@ -14,7 +13,15 @@ import dayjs from "dayjs";
 
 export function getDayName(dayNum?: number) {
   if (dayNum == null) return "";
-  const days = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+  const days = [
+    "Domingo",
+    "Lunes",
+    "Martes",
+    "Miércoles",
+    "Jueves",
+    "Viernes",
+    "Sábado",
+  ];
   return days[dayNum] || "";
 }
 
@@ -56,6 +63,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const dayName = getDayName(dayOfWeek);
   const dateStr = formatMatchDate(date, time);
+  
 
   return (
     <TouchableOpacity

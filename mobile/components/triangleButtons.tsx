@@ -1,25 +1,37 @@
-import React from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
-import Svg, { Defs, Pattern, Polygon, Image as SvgImage } from 'react-native-svg';
+import React from "react";
+import { View, StyleSheet, Dimensions } from "react-native";
+import { Div } from "react-native-magnus";
+import Svg, {
+  Defs,
+  Pattern,
+  Polygon,
+  Image as SvgImage,
+} from "react-native-svg";
+import { customTheme } from "../utils/theme";
 
-const { width: windowWidth } = Dimensions.get('window');
+const { width: windowWidth } = Dimensions.get("window");
 const HEIGHT = 200;
+
+const offsetLeft = 0;
+const offsetRight = 10;
 
 export default function TrianglesWithImages() {
   const handleFirstPress = () => {
-    console.log('Primer triángulo presionado (arriba-izquierda)');
+    console.log("Primer triángulo presionado (arriba-izquierda)");
   };
 
   const handleSecondPress = () => {
-    console.log('Segundo triángulo presionado (abajo-derecha)');
+    console.log("Segundo triángulo presionado (abajo-derecha)");
   };
 
   return (
-    <View style={[styles.container, { height: HEIGHT }]}>
-      <Svg width={windowWidth} height={HEIGHT}>
-        {/* Definimos patrones para cada imagen */}
-        <Defs>
-          {/* Patrón para el triángulo 1 (arriba-izquierda) */}
+    <Div
+      style={[styles.container, { height: HEIGHT }]}
+      p={customTheme.spacing.small}
+    >
+      <Svg width={windowWidth} height={HEIGHT} >
+        <Defs >
+          {/*  triángulo 1 (arriba-izquierda) */}
           <Pattern
             id="pattern1"
             patternUnits="userSpaceOnUse"
@@ -27,8 +39,7 @@ export default function TrianglesWithImages() {
             height={HEIGHT}
           >
             <SvgImage
-              // Si es remota:
-              // Si es local, usar: href={require('path/to/local-image.png')}
+              href={require("../assets/triangulo1.jpg")}
               x="0"
               y="0"
               width={windowWidth}
@@ -37,7 +48,7 @@ export default function TrianglesWithImages() {
             />
           </Pattern>
 
-          {/* Patrón para el triángulo 2 (abajo-derecha) */}
+          {/* triángulo 2 (abajo-derecha) */}
           <Pattern
             id="pattern2"
             patternUnits="userSpaceOnUse"
@@ -45,7 +56,7 @@ export default function TrianglesWithImages() {
             height={HEIGHT}
           >
             <SvgImage
-              href={{ uri: 'https://via.placeholder.com/600x400/0000ff/ffffff?text=Imagen+2' }}
+              href={require("../assets/triangulo2.jpg")}
               x="0"
               y="0"
               width={windowWidth}
@@ -64,18 +75,18 @@ export default function TrianglesWithImages() {
 
         {/* Triángulo 2 (abajo-derecha): va de (0,HEIGHT) a (windowWidth,HEIGHT) a (windowWidth,0) */}
         <Polygon
-          points={`0,${HEIGHT} ${windowWidth},${HEIGHT} ${windowWidth},0`}
+          points={`10,${HEIGHT} ${windowWidth},${HEIGHT} ${windowWidth},6`}
           fill="url(#pattern2)"
           onPress={handleSecondPress}
         />
       </Svg>
-    </View>
+    </Div>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
-    // backgroundColor: 'yellow', // para pruebas
+    width: "100%",
+     backgroundColor: 'yellow', // para pruebas
   },
 });
