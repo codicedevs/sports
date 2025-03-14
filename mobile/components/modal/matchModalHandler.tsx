@@ -80,7 +80,7 @@ export default function MatchModalHandler({
         location: matchDetailsRef.current.location?._id,
         playersLimit: matchDetailsRef.current.playerLimit,
         userId: "66e482584509915a15968bd7",
-        sportMode: '67c873ffeb647cc591249358',
+        sportMode: "67c873ffeb647cc591249358",
         open: matchDetailsRef.current.privacyOption,
       });
 
@@ -93,12 +93,11 @@ export default function MatchModalHandler({
     } catch (e) {
       console.error("Error al crear el partido:", e);
     }
-    console.log('sportmode', matchDetailsRef.current.selectedSportMode);
-  };
+  }
 
   const editMatch = async () => {
     try {
-      const res = await matchService.update('67af556cb453684f313e9a4b', {
+      const res = await matchService.update("67af556cb453684f313e9a4b", {
         name: "Prueba3",
         date: matchDetailsRef.current.matchDate,
         location: matchDetailsRef.current.location?._id,
@@ -109,26 +108,22 @@ export default function MatchModalHandler({
       });
       console.log("Partido editado:", res);
     } catch (e) {
-      console.log(e, 'ERROR')
+      console.log(e, "ERROR");
     }
-  }
+  };
 
   const handleAction = () => {
     if (!match) {
-      createMatch()
+      createMatch();
     } else {
       editMatch();
     }
-  }
+  };
 
   function closeModal() {
     setOpenId(null);
     setOpen(false);
-  };
-
-
-  console.log("RENDEEER", "Rendering MatchSchedulerInput")
-  
+  }
 
   return (
     <Modal isVisible={open} onBackButtonPress={closeModal}>
@@ -169,7 +164,10 @@ export default function MatchModalHandler({
           >
             <MatchPrivacyToggleInput matchDetailsRef={matchDetailsRef} />
           </Accordion>
-          <Div borderBottomWidth={1} borderBottomColor={customTheme.colors.gray} />
+          <Div
+            borderBottomWidth={1}
+            borderBottomColor={customTheme.colors.gray}
+          />
           <Text
             fontSize={customTheme.fontSize.medium}
             color={customTheme.colors.gray}
@@ -200,10 +198,19 @@ export default function MatchModalHandler({
         </Div>
       </ScrollView>
 
-      <Div justifyContent="center" bg="#151515E5" h={verticalScale(80)} p={customTheme.spacing.medium}>
+      <Div
+        justifyContent="center"
+        bg="#151515E5"
+        h={verticalScale(80)}
+        p={customTheme.spacing.medium}
+      >
         <TouchableOpacity onPress={handleAction}>
-          <Div h={verticalScale(45)} justifyContent='center' bg={customTheme.colors.primary}>
-            <Text textAlign='center'>{!match ? "Crear" : "Editar"}</Text>
+          <Div
+            h={verticalScale(45)}
+            justifyContent="center"
+            bg={customTheme.colors.primary}
+          >
+            <Text textAlign="center">{!match ? "Crear" : "Editar"}</Text>
           </Div>
         </TouchableOpacity>
       </Div>

@@ -218,7 +218,7 @@ export class MatchService {
   }
 
   async findAll(filter: Filter): Promise<FilterResponse<MatchView>> {
-    const results = await this.matchViewModel.find(filter).exec()
+    const results = await this.matchViewModel.find(filter).populate("sportMode").exec()
     return {
       results,
       totalCount: await this.matchViewModel.countDocuments(filter).exec()
