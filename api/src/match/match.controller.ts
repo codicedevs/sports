@@ -214,6 +214,19 @@ export class MatchController {
         return updatedMatch;
     }
 
+    @Patch(":id")
+    @UseGuards(MatchOwnerGuard) // solo el creador del partido puede editar el partido
+    async updatePatch(
+        @Param("id", new ValidateObjectIdPipe()) id: string,
+        @Body() updateMatchDto: UpdateMatchDto,
+    ) {
+        const updatedMatch = await this.matchService.update(
+            new Types.ObjectId(id),
+            updateMatchDto,
+        );
+        return updatedMatch;
+    }
+
     @Delete(":id")
     @UseGuards(MatchOwnerGuard) // Aplica el nuevo guard aquí
     async remove(@Param("id", new ValidateObjectIdPipe()) id: string) {

@@ -16,6 +16,8 @@ import { MatchViewModule } from "./match-view.module";
 import { MatchView, MatchViewSchema } from "./match-view.model";
 import { ZonesModule } from "zones/zones.module";
 import { SportMode, SportModeSchema } from "sport_modes/sport_mode.entity";
+import { serverSetting } from "settings";
+import { ActivityModule } from "activity/activity.module";
 
 @Module({
     imports: [
@@ -26,11 +28,13 @@ import { SportMode, SportModeSchema } from "sport_modes/sport_mode.entity";
             { name: MatchView.name, schema: MatchViewSchema },
             { name: SportMode.name, schema: SportModeSchema }
         ]),
+        //MongooseModule.forRoot(`mongodb://${serverSetting.DB_HOST}:${serverSetting.DB_PORT}/${serverSetting.DB_DATABASE}`),
         PetitionModule,
         LocationsModule,
         SportModesModule,
         ChatroomModule,
-        ZonesModule
+        ZonesModule,
+        ActivityModule
     ],
     controllers: [MatchController],
     providers: [MatchService, JwtService, PushNotificationService, MatchListener],
