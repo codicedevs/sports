@@ -12,6 +12,9 @@ import { GroupsService } from "groups/groups.service";
 import { ChatroomService } from "chatroom/chatroom.service";
 import { Chatroom, ChatroomSchema } from "chatroom/chatroom.entity";
 import { Message, MessageSchema } from "messages/message.entity";
+import { Activity, ActivitySchema } from "activity/activity.entity";
+import { ActivityService } from "activity/activity.service";
+import { ActivityModule } from "activity/activity.module";
 
 @Module({
   imports: [
@@ -21,11 +24,12 @@ import { Message, MessageSchema } from "messages/message.entity";
       { name: User.name, schema: UserSchema },
       { name: Group.name, schema: GroupSchema },
       { name: Chatroom.name, schema: ChatroomSchema },
-      { name: Message.name, schema: MessageSchema },
-    ])
+      { name: Message.name, schema: MessageSchema }
+    ]),
+    ActivityModule
   ],
   controllers: [PetitionController],
   providers: [PetitionService, PushNotificationService, GroupsService, ChatroomService],
-  exports:[PetitionService]
+  exports: [PetitionService]
 })
-export class PetitionModule {}
+export class PetitionModule { }

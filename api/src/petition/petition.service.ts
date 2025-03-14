@@ -15,6 +15,7 @@ import { FindManyFilter } from "filter/filter.dto";
 import { PushNotificationService } from "services/pushNotificationservice";
 import { Group } from "groups/group.entity";
 import { Filter, FilterResponse } from "types/types";
+import { ActivityService } from "activity/activity.service";
 type ModelHandlers = {
   [key in PetitionModelType]: {
     model: Model<any>;
@@ -38,6 +39,7 @@ export class PetitionService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Group.name) private readonly gorupModel: Model<Group>,
     private readonly notificationService: PushNotificationService,
+    private readonly activityService: ActivityService
   ) { }
 
   modelHandlers: ModelHandlers = {
@@ -221,6 +223,13 @@ export class PetitionService {
         throw new BadRequestException(`El usuario ya se encuentra en el ${translate[modelType]}`)
       }
       (target.users).push(petition.receiver._id);
+      if(modelType === PetitionModelType.match){
+        this.activityService.create({
+          matchId: targetId,
+          description: `Se unió ${receiver.name} al partido`
+        })
+      }
+      
 
       // Agregar el partido al array de partidos o grupos del receiver si no es el dueño
       if (!(target.userId as Types.ObjectId).equals(petition.receiver._id)) {
@@ -235,6 +244,12 @@ export class PetitionService {
       }
       // En caso contrario, agregar al emisor al partido
       target.users.push(petition.emitter._id);
+      if(modelType === PetitionModelType.match){
+        this.activityService.create({
+          matchId: targetId,
+          description: `Se unió ${emitter.name} al partido`
+        })
+      }
 
       // Agregar el partido al array de partidos del emisor
       if (!emitter[plural[modelType]].includes(target.id)) {
