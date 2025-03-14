@@ -17,6 +17,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { AuthContext } from "../context/authProvider";
 import { customTheme } from "../utils/theme";
 import TrianglesWithImages from "../components/triangleButtons";
+import UpcomingMatchCard from "../components/UpcomingMatchesCard";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
@@ -28,16 +29,37 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     <Div>
       <ScrollView>
         <Button onPress={showModal}>Abrir</Button>
-        
         <Div>
-          <Div ml={customTheme.spacing.small}>
-            <Text
-              fontSize={customTheme.fontSize.medium}
-              fontFamily="NotoSans-Italic"
-            >
-              Mis partidos
-            </Text>
-          </Div>
+          <Text
+            fontSize={customTheme.fontSize.medium}
+            fontFamily="NotoSans-Italic"
+            ml={customTheme.spacing.small}
+          >
+            Próximos partidos
+          </Text>
+          <ScrollView horizontal>
+            {matches?.results.map((u) => (
+              <UpcomingMatchCard
+              key={u._id}
+              date={u.date}
+              hour={u.hour}
+              players={u.users}
+              maxPlayers={u.playersLimit}
+              titulo={u.name}
+              />
+            ))}
+          </ScrollView>
+        </Div>
+
+        <Div>
+          <Text
+            ml={customTheme.spacing.small}
+            fontSize={customTheme.fontSize.medium}
+            fontFamily="NotoSans-Italic"
+          >
+            Mis partidos
+          </Text>
+
           {matches?.results.map((m) => (
             <MatchCard
               key={m._id}

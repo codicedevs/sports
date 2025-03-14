@@ -11,6 +11,8 @@ export class CRUDService<T> extends HttpService {
     };
 
     getById = async (id: string) => {
+        console.log(id,"hols");
+        
         const res = await this.get(`/${id}`);
         return res.data;
     };

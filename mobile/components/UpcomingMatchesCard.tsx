@@ -1,18 +1,27 @@
+import React from "react";
 import { Div, Image, Text } from "react-native-magnus";
 import { scale, verticalScale } from "react-native-size-matters";
 import { customTheme } from "../utils/theme";
+import { formatMatchDate, getDayName } from "./matchesCards";
+import { User } from "../types/user.type";
 
 type UpcomingMatchProps = {
-  fecha: string;
-  cupo: string;
+  date?: string;
+  hour?: number;
+  players?: User[];
+  maxPlayers?: number;
   titulo: string;
 };
 
 const UpcomingMatchCard: React.FC<UpcomingMatchProps> = ({
-  fecha,
-  cupo,
+  date,
+  hour,
+  players,
+  maxPlayers,
   titulo,
 }) => {
+  const fecha = formatMatchDate(date, hour);
+
   return (
     <Div
       h={verticalScale(160)}
@@ -26,7 +35,7 @@ const UpcomingMatchCard: React.FC<UpcomingMatchProps> = ({
     >
       <Div flexDir="row">
         <Image
-          source={require("../assets/iconTime.png")} 
+          source={require("../assets/iconTime.png")}
           h={customTheme.spacing.medium}
           w={scale(15)}
           mt={scale(2)}
@@ -35,13 +44,12 @@ const UpcomingMatchCard: React.FC<UpcomingMatchProps> = ({
           tintColor="black"
         />
         <Text
-          fontSize={customTheme.fontSize.medium}
+          fontSize={customTheme.fontSize.small}
           fontFamily="NotoSans-Variable"
         >
           {fecha}
         </Text>
       </Div>
-
       <Text
         fontSize={customTheme.fontSize.large}
         fontFamily="NotoSans-BoldItalic"
@@ -57,7 +65,7 @@ const UpcomingMatchCard: React.FC<UpcomingMatchProps> = ({
             w={customTheme.fontSize.medium}
           />
           <Text ml={5} fontSize={customTheme.fontSize.medium}>
-            {cupo}
+          {players?.length}/{maxPlayers}
           </Text>
         </Div>
         <Image

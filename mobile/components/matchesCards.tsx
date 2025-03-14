@@ -1,3 +1,4 @@
+// MatchCard.tsx
 import React from "react";
 import { View, Image, TouchableOpacity } from "react-native";
 import { Div, Text } from "react-native-magnus";
@@ -8,14 +9,28 @@ import { User } from "../types/user.type";
 import { AppScreens, AppScreensParamList } from "../navigation/screens";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import dayjs from "dayjs";
-import { AuthContext } from "../context/authProvider";
 import { SportMode } from "../types/form.type";
+import dayjs from "dayjs";
+
+export function getDayName(dayNum?: number) {
+  if (dayNum == null) return "";
+  const days = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
+  return days[dayNum] || "";
+}
+
+export function formatMatchDate(date?: string, hour?: number) {
+  if (!date) return "";
+  const base = dayjs(date);
+  if (hour != null) {
+    return base.hour(hour).minute(0).format("ddd DD/MM HH:mm");
+  }
+  return base.format("ddd DD/MM HH:mm");
+}
 
 interface MatchCardProps {
-  dayOfWeek?: number; // 0..6 => "Domingo".."Sábado"
-  date?: string; // "2026-07-15T17:48:00.000Z"
-  time?: number; // 22 => "22"
+  dayOfWeek?: number;
+  date?: string;
+  time?: number;
   location?: Location;
   players?: User[];
   maxPlayers?: number;
@@ -28,20 +43,6 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<
   AppScreens.HOME_SCREEN
 >;
 
-function getDayName(dayNum?: number) {
-  if (dayNum == null) return "";
-  const days = [
-    "Domingo",
-    "Lunes",
-    "Martes",
-    "Miércoles",
-    "Jueves",
-    "Viernes",
-    "Sábado",
-  ];
-  return days[dayNum] || "";
-}
-
 const MatchCard: React.FC<MatchCardProps> = ({
   dayOfWeek,
   date,
@@ -53,22 +54,8 @@ const MatchCard: React.FC<MatchCardProps> = ({
   matchId,
 }) => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
-
-  let dayName = "";
-  let dayOfMonth = "";
-  let hourText = "";
-
-  if (dayOfWeek != null) {
-    dayName = getDayName(dayOfWeek);
-  }
-  if (date) {
-    const base = dayjs(date);
-    dayOfMonth = base.date().toString();
-    if (time != null) {
-      const withHour = base.hour(time).minute(0);
-      hourText = withHour.format("HH:mm") + " hs";
-    }
-  }
+  const dayName = getDayName(dayOfWeek);
+  const dateStr = formatMatchDate(date, time);
 
   return (
     <TouchableOpacity
@@ -107,7 +94,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
                 fontFamily="NotoSans-ExtraBoldItalic"
                 fontSize={customTheme.fontSize.Fourxl}
               >
-                {dayOfMonth}
+                {dateStr.split(" ")[1]?.split("/")[0] || ""}
               </Text>
               <Div flexDir="row" alignItems="center">
                 <Image
@@ -124,7 +111,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
                   fontFamily="Notosans-Regular"
                   fontSize={customTheme.fontSize.medium}
                 >
-                  {hourText}
+                  {dateStr.slice(dateStr.indexOf(" ") + 1)}
                 </Text>
               </Div>
             </Div>
