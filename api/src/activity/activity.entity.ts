@@ -15,3 +15,4 @@ export class Activity extends Document {
 }
 
 export const ActivitySchema = SchemaFactory.createForClass(Activity);
+ActivitySchema.index({ matchId: 1, date: 1 });

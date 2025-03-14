@@ -4,11 +4,13 @@ import { Activity } from './activity.entity';
 import { Model, Types } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { Filter, FilterResponse } from 'types/types';
+import { Match } from 'match/match.entity';
 
 @Injectable()
 export class ActivityService {
   constructor(
-    @InjectModel(Activity.name) private readonly activityModel: Model<Activity>) { }
+    @InjectModel(Activity.name) private readonly activityModel: Model<Activity>,
+    @InjectModel(Match.name) private readonly matchModel: Model<Match>) { }
 
   create(createActivityDto: CreateActivityDto) {
     const createdActivity = new this.activityModel({ ...createActivityDto, date: new Date() })
@@ -31,8 +33,17 @@ export class ActivityService {
     return activity
   }
 
-  async findByMatchId(matchId: Types.ObjectId) {
-    return this.activityModel.find({ where: { matchId } }).sort({ date: -1 }).exec()
+  async findByMatchId(matchId: Types.ObjectId, filter: Filter) {
+    const matchExists = this.matchModel.findById(matchId).exec()
+    if (!matchExists) {
+      throw new NotFoundException(`Match #${matchId} not found`);
+    }
+    filter.where = { ...filter.where, matchId }
+    const results = await this.activityModel.find(filter).sort({ date: 1 }).exec()
+    return {
+      results,
+      totalCount: await this.activityModel.countDocuments(filter).exec()
+    }
   }
 
   async update(id: Types.ObjectId, updateActivityDto: UpdateActivityDto) {
