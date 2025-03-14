@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from "@nestjs/common";
@@ -189,13 +190,22 @@ export class MatchService {
       throw new BadRequestException("El usuario no está en el partido");
     }
 
+    if (match.users.length === 1) {
+      throw new ForbiddenException("No puedes irte del partido si eres el único jugador")
+    }
+
     // Eliminar el usuario de la lista de usuarios del partido
     match.users.splice(userIndex, 1);
+
+    if (new Types.ObjectId(userId).equals(match.userId)) { //si el usuario eliminado era el admin
+      match.userId = match.users[0] //Ahora el adsmin pasa a ser otro jugador
+    }
+
+
 
     // Guardar el partido actualizado
     const savedMatch = await match.save();
 
-    match.users.push(userId);
     this.activityService.create({
       matchId: matchId,
       description: `Se fue ${user.name} del partido`
@@ -214,7 +224,7 @@ export class MatchService {
     // Guardar el usuario actualizado
     await user.save();
 
-    return match;
+    return savedMatch;
   }
 
   async findAll(filter: Filter): Promise<FilterResponse<MatchView>> {
@@ -248,50 +258,50 @@ export class MatchService {
       throw new NotFoundException(`Match #${id} not found`);
     }
     let location: Location = undefined
-    if(updatedMatch.location){
+    if (updatedMatch.location) {
       location = await this.locationModel.findById(updatedMatch.location).exec()
     }
 
-    if(updatedMatch.location && !oldMatch.location){
+    if (updatedMatch.location && !oldMatch.location) {
       this.activityService.create({
         matchId: oldMatch._id as Types.ObjectId,
         description: `Se actualizó el lugar del partido, ahora es ${location?.name}, code 1`
       })
-    }else if(!updatedMatch.location && oldMatch.location){
+    } else if (!updatedMatch.location && oldMatch.location) {
       this.activityService.create({
         matchId: oldMatch._id as Types.ObjectId,
         description: "Se eliminó el lugar del partido, code 2"
       })
     }
-    else if(updatedMatch.location && oldMatch.location && !(updatedMatch.location as Types.ObjectId).equals((oldMatch.location as Types.ObjectId))){
+    else if (updatedMatch.location && oldMatch.location && !(updatedMatch.location as Types.ObjectId).equals((oldMatch.location as Types.ObjectId))) {
       this.activityService.create({
         matchId: oldMatch._id as Types.ObjectId,
         description: `Se actualizó el lugar del partido, ahora es ${location?.name}, code 3`
       })
     }
     const formattedDate = moment(updatedMatch.date)
-  .tz('America/Argentina/Buenos_Aires')  // Zona horaria UTC-3 (o la correspondiente)
-  .format('DD/MM/YYYY HH:mm');
+      .tz('America/Argentina/Buenos_Aires')  // Zona horaria UTC-3 (o la correspondiente)
+      .format('DD/MM/YYYY HH:mm');
 
-    if(updatedMatch.date && !oldMatch.date){
+    if (updatedMatch.date && !oldMatch.date) {
       this.activityService.create({
         matchId: oldMatch._id as Types.ObjectId,
         description: `Se actualizó la fecha del partido, ahora es el ${formattedDate.split(" ")[0]} a las ${formattedDate.split(" ")[1]}, code 1`
       })
-    }else if(!updatedMatch.date && oldMatch.date){
+    } else if (!updatedMatch.date && oldMatch.date) {
       this.activityService.create({
         matchId: oldMatch._id as Types.ObjectId,
         description: "Se eliminó la fecha del partido, code 2"
       })
     }
-    else if(updatedMatch.date && oldMatch.date && updatedMatch.date.getTime() !== oldMatch.date.getTime()){
+    else if (updatedMatch.date && oldMatch.date && updatedMatch.date.getTime() !== oldMatch.date.getTime()) {
       this.activityService.create({
         matchId: oldMatch._id as Types.ObjectId,
         description: `Se actualizó la fecha del partido, ahora es el ${formattedDate.split(" ")[0]} a las ${formattedDate.split(" ")[1]}, code 3`
       })
     }
 
-    
+
 
     this.eventEmitter.emit('match.updated', new MatchUpdatedEvent(updatedMatch));
 
