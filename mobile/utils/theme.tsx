@@ -103,7 +103,7 @@ export const customTheme: CustomThemeType = {
   name: "myTheme",
   components: {
     Text: {
-      fontFamily: "NotoSans-BoldItalic",
+      fontFamily: "NotoSans-Regular",
     },
   },
 };
