@@ -175,6 +175,26 @@ const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, s
           </TouchableOpacity>
         </Div>
       </Div>
+      {
+        !(filter.sportModes.length === 0 && filter.zones.length === 0 && filter.hours.length === 0) &&
+        <TouchableOpacity onPress={() => setFilter({
+          sportModes: [],
+          zones: [],
+          hours: [],
+          modeFilterModal: false,
+          hourFilterModal: false,
+          zoneFilterModal: false,
+        })}
+          style={{
+            flexDirection: "row",
+            justifyContent: "flex-end",
+            alignItems: "center",
+          }}
+        >
+          <Icon alignSelf='center' fontFamily='AntDesign' name='reload1' color='black' />
+          <Text mt={customTheme.spacing.small} ml={customTheme.spacing.small}>Reiniciar filtro</Text>
+        </TouchableOpacity>
+      }
     </>
   );
 };
