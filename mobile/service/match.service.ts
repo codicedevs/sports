@@ -10,13 +10,11 @@ class MatchService extends CRUDService<Match> {
   getAll = async (filter?) => {
     // if (!!filter) {
       if (Object.keys(filter).length !== 0) {
-      console.log(filter)
       const res = await this.get('/', {
         params: filter
       });
       return res;
     } else {
-      console.log('TODOS')
       const res = await this.get('/');
       return res;
     }
