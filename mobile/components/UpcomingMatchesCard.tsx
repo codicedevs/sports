@@ -48,7 +48,7 @@ export default function UpcomingMatchCard({
     if (colorpercentage >= 0.5 && colorpercentage < 1) {
       bgColor = "#f78f5c";
     } else if (colorpercentage >= 1) {
-      bgColor = "#ff333d";
+      bgColor = "#f5696e";
     }
     return bgColor;
   };

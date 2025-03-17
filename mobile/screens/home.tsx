@@ -31,7 +31,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
             Próximos partidos
           </Text>
           <ScrollView horizontal>
-            {matches?.results.map((u) => (
+            {matches?.results.map((u: any) => (
               <UpcomingMatchCard
                 key={u._id}
                 matchId={u._id}
@@ -39,7 +39,6 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
                 hour={u.hour}
                 players={u.users}
                 maxPlayers={u.playersLimit}
-                titulo={u.name}
                 location={u.location}
                 sportMode={u.sportMode}
               />
@@ -56,7 +55,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
             Mis partidos
           </Text>
 
-          {matches?.results.map((m) => (
+          {matches?.results.map((m: any) => (
             <MatchCard
               key={m._id}
               matchId={m._id}
