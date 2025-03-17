@@ -17,7 +17,6 @@ import { Types } from "mongoose";
 import { Filter } from "types/types";
 import { Public } from "authentication/public";
 
-@Public()
 @ApiBearerAuth()
 @ApiTags('locations')
 @Controller("locations")
@@ -28,7 +27,7 @@ export class LocationsController {
   create(@Body() createLocationDto: CreateLocationDto) {
     return this.locationsService.create(createLocationDto);
   }
-  @Public()
+  
   @Get()
   findAll(@Query() filter: Filter) {
     return this.locationsService.findAll(filter);

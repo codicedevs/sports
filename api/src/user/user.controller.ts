@@ -27,7 +27,6 @@ import { Filter } from "types/types";
 
 // All these endpoints are globally protected by the auth guard that requires a token
 
-@Public()
 @ApiBearerAuth()
 @ApiTags('users')
 @Controller("users")
@@ -37,6 +36,7 @@ export class UserController {
     /**
      * @returns
      */
+    @Public()
     @Get()
     async getAll(
         @Query()

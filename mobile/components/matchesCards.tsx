@@ -1,148 +1,201 @@
 import React from "react";
-import { View, Image } from "react-native";
+import { View, Image, TouchableOpacity } from "react-native";
 import { Div, Text } from "react-native-magnus";
 import { scale } from "react-native-size-matters";
 import { customTheme } from "../utils/theme";
+import Location from "../types/location.type";
+import { User } from "../types/user.type";
+import { AppScreens, AppScreensParamList } from "../navigation/screens";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { SportMode } from "../types/form.type";
+import dayjs from "dayjs";
 
-interface MatchCardProps {
-  day: string;
-  date: string;
-  time: string;
-  location: string;
-  players: number;
-  maxPlayers: number;
+export function getDayName(dayNum?: number) {
+  if (dayNum == null) return "";
+  const days = [
+    "Domingo",
+    "Lunes",
+    "Martes",
+    "Miércoles",
+    "Jueves",
+    "Viernes",
+    "Sábado",
+  ];
+  return days[dayNum] || "";
 }
 
+export function formatMatchDate(date?: string, hour?: number) {
+  if (!date) return "";
+  const base = dayjs(date);
+  if (hour != null) {
+    return base.hour(hour).minute(0).format("ddd DD/MM HH:mm");
+  }
+  return base.format("ddd DD/MM HH:mm");
+}
+
+interface MatchCardProps {
+  dayOfWeek?: number;
+  date?: string;
+  time?: number;
+  location?: Location;
+  players?: User[];
+  maxPlayers?: number;
+  sportMode: SportMode;
+  matchId: string;
+}
+
+type HomeScreenNavigationProp = NativeStackNavigationProp<
+  AppScreensParamList,
+  AppScreens.HOME_SCREEN
+>;
+
 const MatchCard: React.FC<MatchCardProps> = ({
-  day,
+  dayOfWeek,
   date,
   time,
   location,
   players,
   maxPlayers,
+  sportMode,
+  matchId,
 }) => {
+  const navigation = useNavigation<HomeScreenNavigationProp>();
+  const dayName = getDayName(dayOfWeek);
+  const dateStr = formatMatchDate(date, time);
+  
+
   return (
-    <Div alignItems="center" mt={scale(15)}>
-      {/* Cont Gral */}
-      <Div
-        borderWidth={scale(1)}
-        rounded={customTheme.borderRadius.medium}
-        w={"100%"}
-        h={scale(150)}
-        flexDir="row"
-      >
-        {/* Cont amarillo  */}
+    <TouchableOpacity
+      onPress={() =>
+        navigation.navigate(AppScreens.MATCH_DETAIL, { id: matchId })
+      }
+    >
+      <Div alignItems="center" p={customTheme.spacing.small}>
         <Div
-          bg={customTheme.colors.primary}
-          flex={2}
-          justifyContent="center"
+          borderWidth={scale(1)}
           rounded={customTheme.borderRadius.medium}
+          w="100%"
+          h={scale(150)}
+          flexDir="row"
         >
-          <Div justifyContent="space-evenly" alignItems="center">
-            <Text
-              fontFamily="Notosans-Regular"
-              fontSize={customTheme.fontSize.medium}
+          <Div
+            bg={customTheme.colors.primary}
+            flex={2}
+            justifyContent="center"
+            rounded={customTheme.borderRadius.medium}
+          >
+            <Div
+              alignItems="center"
+              h="100%"
+              p={customTheme.spacing.small}
+              justifyContent="space-evenly"
             >
-              {day}
-            </Text>
-            <Text
-              textAlign="center"
-              fontFamily="NotoSans-ExtraBoldItalic"
-              fontSize={customTheme.fontSize.Fourxl}
-            >
-              {date}
-            </Text>
-            <Div flexDir="row" alignItems="center">
-              <Image
-                source={require("../assets/iconTime.png")}
-                style={{
-                  width: scale(15),
-                  height: scale(15),
-                  resizeMode: "contain",
-                  tintColor: "black",
-                }}
-              />
               <Text
                 fontFamily="Notosans-Regular"
                 fontSize={customTheme.fontSize.medium}
-                ml={customTheme.spacing.small}
               >
-                {time}
+                {dayName}
+              </Text>
+              <Text
+                textAlign="center"
+                fontFamily="NotoSans-ExtraBoldItalic"
+                fontSize={customTheme.fontSize.Fourxl}
+              >
+                {dateStr.split(" ")[1]?.split("/")[0] || ""}
+              </Text>
+              <Div flexDir="row" alignItems="center">
+                <Image
+                  source={require("../assets/iconTime.png")}
+                  style={{
+                    width: scale(15),
+                    height: scale(15),
+                    resizeMode: "contain",
+                    tintColor: "black",
+                    marginRight: scale(4),
+                  }}
+                />
+                <Text
+                  fontFamily="Notosans-Regular"
+                  fontSize={customTheme.fontSize.medium}
+                >
+                  {dateStr.slice(dateStr.indexOf(" ") + 1)}
+                </Text>
+              </Div>
+            </Div>
+          </Div>
+          <View
+            style={{
+              flex: 3,
+              borderStyle: "dashed",
+              borderLeftWidth: scale(1.2),
+              justifyContent: "space-between",
+              padding: scale(10),
+            }}
+          >
+            <Div>
+              <Text fontSize={customTheme.fontSize.title}>
+                {location?.name} - {location?.address}
               </Text>
             </Div>
-          </Div>
-        </Div>
-
-        {/* Contenedor blanco */}
-        <View
-          style={{
-            flex: 3,
-            borderStyle: "dashed",
-            borderLeftWidth: scale(1.2),
-            justifyContent:"space-between",
-            padding: scale(10),
-          }}
-        >
-          <Div>
-            <Text fontSize={customTheme.fontSize.title}>{location}</Text>
-          </Div>
-          <Div w="100%" justifyContent="flex-end">
-            <Div
-              flexDir="row"
-              alignItems="center"
-              justifyContent="space-between"
-            >
-              <Div flexDir="row">
-                <Image
-                  source={require("../assets/IconPelota.png")}
-                  style={{
-                    width: scale(18),
-                    height: scale(18),
-                    resizeMode: "contain",
-                    tintColor: "black",
-                  }}
-                />
-                <Text
-                  fontFamily="Notosans-Regular"
-                  fontSize={customTheme.fontSize.medium}
-                  ml={scale(3)}
-                  mr={customTheme.spacing.medium}
-                >
-                  {players}
-                </Text>
-                <Image
-                  source={require("../assets/iconUser.png")}
-                  style={{
-                    width: scale(17),
-                    height: scale(17),
-                    resizeMode: "contain",
-                    tintColor: "black",
-                  }}
-                />
-                <Text
-                  fontFamily="Notosans-Regular"
-                  fontSize={customTheme.fontSize.medium}
-                  ml={scale(3)}
-                >
-                  {players}/{maxPlayers}
-                </Text>
-              </Div>
-              <Div>
-                <Image
-                  source={require("../assets/iconNext.png")}
-                  style={{
-                    width: scale(18),
-                    height: scale(18),
-                    resizeMode: "contain",
-                    tintColor: "black",
-                  }}
-                />
+            <Div w="100%" justifyContent="flex-end">
+              <Div
+                flexDir="row"
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <Div flexDir="row">
+                  <Image
+                    source={require("../assets/IconPelota.png")}
+                    style={{
+                      width: scale(18),
+                      height: scale(18),
+                      resizeMode: "contain",
+                      tintColor: "black",
+                    }}
+                  />
+                  <Text
+                    fontFamily="Notosans-Regular"
+                    fontSize={customTheme.fontSize.medium}
+                    ml={scale(3)}
+                    mr={customTheme.spacing.medium}
+                  >
+                    {sportMode?.label}
+                  </Text>
+                  <Image
+                    source={require("../assets/iconUser.png")}
+                    style={{
+                      width: scale(17),
+                      height: scale(17),
+                      resizeMode: "contain",
+                      tintColor: "black",
+                    }}
+                  />
+                  <Text
+                    fontFamily="Notosans-Regular"
+                    fontSize={customTheme.fontSize.medium}
+                    ml={scale(3)}
+                  >
+                    {players?.length}/{maxPlayers}
+                  </Text>
+                </Div>
+                <Div>
+                  <Image
+                    source={require("../assets/iconNext.png")}
+                    style={{
+                      width: scale(18),
+                      height: scale(18),
+                      resizeMode: "contain",
+                      tintColor: "black",
+                    }}
+                  />
+                </Div>
               </Div>
             </Div>
-          </Div>
-        </View>
+          </View>
+        </Div>
       </Div>
-    </Div>
+    </TouchableOpacity>
   );
 };
 

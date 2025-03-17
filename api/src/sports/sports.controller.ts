@@ -9,12 +9,10 @@ import { Public } from 'authentication/public';
 @Controller('sports')
 export class SportsController {
   constructor(private readonly sportsService: SportsService) { }
-  @Public()
   @Post()
   create(@Body() createSportDto: CreateSportDto) {
     return this.sportsService.create(createSportDto);
   }
-@Public()
   @Get()
   findAll(@Query() filter: Filter) {
     return this.sportsService.findAll(filter);

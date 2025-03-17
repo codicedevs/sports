@@ -21,17 +21,11 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
 
   const [activeTab, setActiveTab] = useState<TabKey>("partido");
 
-  const fetchMatchInfo = async () => {
-    const res = await matchService.getById(id);
-
-    return res.data;
-  };
-
   const {
     data: match,
     isFetching,
     error,
-  } = useFetch(fetchMatchInfo, [QUERY_KEYS.MATCH]);
+  } = useFetch(() =>  matchService.getById(id), [QUERY_KEYS.MATCH]);
 
   if (isFetching) {
     return (

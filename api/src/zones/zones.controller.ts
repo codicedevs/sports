@@ -9,7 +9,6 @@ import { Filter } from 'types/types';
 import { Public } from 'authentication/public';
 import { Types } from 'mongoose';
 import { ValidateObjectIdPipe } from 'pipes/validate-object-id.pipe';
-@Public()
 @ApiBearerAuth()
 @ApiTags('zones')
 @Controller('zones')

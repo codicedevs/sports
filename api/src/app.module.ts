@@ -23,6 +23,7 @@ import { GroupsModule } from './groups/groups.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { FilterPlugin } from 'filter/filter.plugin';
 import { MatchViewModule } from 'match/match-view.module';
+import { ActivityModule } from './activity/activity.module';
 @Module({
     imports: [
         SentryModule.forRoot(),
@@ -57,7 +58,8 @@ import { MatchViewModule } from 'match/match-view.module';
         MessagesModule,
         ChatroomModule,
         GroupsModule,
-        MatchViewModule
+        MatchViewModule,
+        ActivityModule
     ],
     controllers: [AppController],
     providers: [

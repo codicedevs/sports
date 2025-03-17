@@ -57,6 +57,9 @@ const MatchCard = () => {
 
   return (
     <TouchableOpacity onPress={() => {
+   navigation.navigate(AppScreens.MATCH_DETAIL, { id: createdMatchId });
+
+
       !currentUser?
       showModal():
       null
