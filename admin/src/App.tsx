@@ -28,7 +28,7 @@ const router = createBrowserRouter([
     children: [
       { path: "", element: <DashboardHome /> },
       { path: "partidos", element: <Matches /> },
-      { path: "profile", element: <TestUserProfile /> },
+      { path: "profile/:id", element: <TestUserProfile /> },
     ],
   },
 ]);
