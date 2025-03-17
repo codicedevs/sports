@@ -104,7 +104,7 @@ const SportModeButton = ({
               textAnimatedStyle,
             ]}
           >
-            {mode?.name ?? "5"}
+            {mode?.label ?? "5"}
           </Animated.Text>
         </Animated.View>
       </View>
