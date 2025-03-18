@@ -75,15 +75,18 @@ export class HttpService extends HttpBase {
         return response;
       },
       (error) => {
+        const logData: any = {
+          url: error.response?.config?.url || "Unknown URL",
+          message: error.message || "No error message",
+          response: error.response?.data || "No response data",
+        };
+
         if (error.response) {
-          console.error("[HttpService] Error Response:", {
-            status: error.response.status,
-            url: error.response.config.url,
-            data: error.response.data,
-          });
-        } else {
-          console.error("[HttpService] Network Error:", error.message);
+          logData["status"] = error.response.status;
         }
+
+        console.error("[HttpService] Network Error:", logData);
+
         return Promise.reject(error);
       }
     );
