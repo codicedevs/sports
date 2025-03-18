@@ -4,21 +4,20 @@ import { Image, ImageBackground } from "react-native";
 import { scale } from "react-native-size-matters";
 import { customTheme } from "../utils/theme";
 
-interface TournamentCardProps {
-  title: string;
+interface eventsCardProps {
+  name: string;
   date: string;
-  imageSource: any; 
 }
 
-const TournamentCard: React.FC<TournamentCardProps> = ({ title, date, imageSource }) => {
+const EventsCard: React.FC<eventsCardProps> = ({ name, date }) => {
   return (
-    <Div mt={customTheme.spacing.medium} w="100%">
+    <Div ml={scale(-8)}>
       <ImageBackground
-        source={imageSource}
+      source={require("../assets/fotoCardTorneo.png")}
         resizeMode="cover"
         style={{
           width: "100%",
-          minHeight: 120, 
+          minHeight: 120,
           aspectRatio: 358 / 201,
           borderTopLeftRadius: 4,
           borderTopRightRadius: 4,
@@ -26,17 +25,15 @@ const TournamentCard: React.FC<TournamentCardProps> = ({ title, date, imageSourc
           justifyContent: "space-between",
         }}
       >
-      
         <Image
           source={require("../assets/CopaCardTorneo.png")}
           style={{ margin: 15, width: 40, height: 40 }}
         />
 
-       
         <Div py={customTheme.spacing.small} px={customTheme.spacing.medium}>
           <Text
             color={customTheme.colors.primary}
-            fontSize={customTheme.fontSize.xxl}
+            fontSize={customTheme.fontSize.xl}
             fontFamily="NotoSans-BoldItalic"
             style={{
               textShadowColor: customTheme.colors.primary,
@@ -45,12 +42,11 @@ const TournamentCard: React.FC<TournamentCardProps> = ({ title, date, imageSourc
               lineHeight: customTheme.fontSize.xxl * 1.1,
             }}
           >
-            {title}
+            {name}
           </Text>
         </Div>
       </ImageBackground>
 
-      
       <Div
         bg="black"
         w="100%"
@@ -70,7 +66,11 @@ const TournamentCard: React.FC<TournamentCardProps> = ({ title, date, imageSourc
           >
             {date}
           </Text>
-          <Text fontFamily="NotoSans-Italic" fontSize={customTheme.fontSize.medium} color="white">
+          <Text
+            fontFamily="NotoSans-Italic"
+            fontSize={customTheme.fontSize.medium}
+            color="white"
+          >
             Sumá a tu equipo!
           </Text>
         </Div>
@@ -85,4 +85,4 @@ const TournamentCard: React.FC<TournamentCardProps> = ({ title, date, imageSourc
   );
 };
 
-export default TournamentCard;
+export default EventsCard;

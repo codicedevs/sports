@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
 import { Button, Div, Text } from "react-native-magnus";
 import useFetch from "../hooks/useGet";
@@ -11,16 +11,29 @@ import { ScrollView } from "react-native-gesture-handler";
 import { AuthContext } from "../context/authProvider";
 import { customTheme } from "../utils/theme";
 import UpcomingMatchCard from "../components/UpcomingMatchesCard";
+import MatchModalHandler from "../components/modal/matchModalHandler";
+import EventsCard from "../components/eventsCard";
+import eventService from "../service/event.service";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
   const { data: matches } = useFetch(matchService.getAll, [QUERY_KEYS.MATCHES]);
   const { showModal } = useSession();
+  const [open, setOpen] = useState(false);
+  const { data: events } = useFetch(eventService.getAll, [QUERY_KEYS.EVENTS]);
+ 
+  const fallbackEvent = {
+    name: "TORNEO DE VERANO FUTBOL VETERANO",
+    date: "12/3",
+  };
 
   return (
     <Div>
+      <MatchModalHandler open={open} setOpen={setOpen} />
+
       <ScrollView>
+        <Button onPress={() => setOpen(true)}>Abrir Modal</Button>
         <Button onPress={showModal}>Abrir</Button>
         <Div p={customTheme.spacing.small}>
           <Text
@@ -28,6 +41,12 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
             fontFamily="NotoSans-Italic"
             ml={customTheme.spacing.small}
           >
+            <Div>
+              <EventsCard // hardcodeado cambiar, arreglar lo coso de event!!!!!!!!
+                name={fallbackEvent.name}
+                date={fallbackEvent.date}
+              />
+            </Div>
             Próximos partidos
           </Text>
           <ScrollView horizontal>
