@@ -11,7 +11,6 @@ import { ScrollView } from "react-native-gesture-handler";
 import { AuthContext } from "../context/authProvider";
 import { customTheme } from "../utils/theme";
 import UpcomingMatchCard from "../components/UpcomingMatchesCard";
-import MatchModalHandler from "../components/modal/matchModalHandler";
 import EventsCard from "../components/eventsCard";
 import eventService from "../service/event.service";
 
@@ -20,9 +19,9 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
 }) => {
   const { data: matches } = useFetch(matchService.getAll, [QUERY_KEYS.MATCHES]);
   const { showModal } = useSession();
-  const [open, setOpen] = useState(false);
-  const { data: events } = useFetch(eventService.getAll, [QUERY_KEYS.EVENTS]);
- 
+
+  const { data: events } = useFetch(eventService.getAll, [QUERY_KEYS.EVENTS]); // llamada a eventos se va au sar
+
   const fallbackEvent = {
     name: "TORNEO DE VERANO FUTBOL VETERANO",
     date: "12/3",
@@ -30,10 +29,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
 
   return (
     <Div>
-      <MatchModalHandler open={open} setOpen={setOpen} />
-
       <ScrollView>
-        <Button onPress={() => setOpen(true)}>Abrir Modal</Button>
         <Button onPress={showModal}>Abrir</Button>
         <Div p={customTheme.spacing.small}>
           <Text
