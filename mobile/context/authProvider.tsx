@@ -33,8 +33,6 @@ export function useSession() {
 const AppProvider: FC<AppProviderProps> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [open, setOpen] = useState(false);
-
   const showModal = () => setIsModalVisible(true);
   const hideModal = () => setIsModalVisible(false);
 
@@ -48,10 +46,7 @@ const AppProvider: FC<AppProviderProps> = ({ children }) => {
         hideModal,
       }}
     >
-      <ModalContext.Provider value={{ open, setOpen }}>
         {children}
-      </ModalContext.Provider>
-      <MatchModalHandler open={open} setOpen={setOpen} />
     </AuthContext.Provider>
   );
 };
