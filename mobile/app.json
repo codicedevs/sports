@@ -5,8 +5,6 @@
         "expo-font",
         {
           "fonts": [
-           
-           
             "./assets/fonts/NotoSans-Italic-VariableFont_wdth,wght.ttf",
             "./assets/fonts/NotoSans-VariableFont_wdth,wght.ttf",
             "./assets/fonts/NotoSans_ExtraCondensed-BoldItalic.ttf",
@@ -46,6 +44,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "ed8a648f-2363-4f2b-ae94-c1e51b66512c"
+      }
     }
   }
 }
