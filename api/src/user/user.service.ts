@@ -170,7 +170,7 @@ export class UserService {
         pushToken: string,
     ): Promise<User | null> {
         const user = await this.userModel
-            .findByIdAndUpdate(userId, { pushToken }, { new: true })
+            .findByIdAndUpdate(new Types.ObjectId(userId), { pushToken }, { new: true })
             .exec();
 
         if (!user) {

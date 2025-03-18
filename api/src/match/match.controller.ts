@@ -151,7 +151,6 @@ export class MatchController {
 
         return updatedMatch;
     }
-    @Public()
     @Patch(":matchId/users/:userId/remove")
     @UseGuards(MatchPlayerGuard)
     async removeUserFromMatch(
