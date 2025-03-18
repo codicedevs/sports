@@ -11,6 +11,7 @@ import { AppScreens } from "./screens";
 import MatchDetail from "../screens/matchDetail";
 import CustomTabBar from "../components/layout/customTabBar";
 import MatchesScreen from "../screens/matches";
+import MatchHandlerScreen from "../screens/matchHandler";
 
 const SettingsStack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator()
@@ -30,15 +31,15 @@ export function HomeStackScreen() {
                     <HomeScreen {...props} />
                 </FadeWrapper>
             )} />
-              <HomeStack.Screen options={{ tabBarStyle: { display: "none" } }} name={AppScreens.MATCH_DETAIL} component={(props) => (
+            <HomeStack.Screen options={{ tabBarStyle: { display: "none" } }} name={AppScreens.MATCH_DETAIL} component={(props) => (
                 //CUANDO HAGA EL CUSTOM TAB PUEDO HACER Q NO APAREZCA EN ESTA TAB EN ESPECIFICO
                 <FadeWrapper>
                     <MatchDetail {...props} />
                 </FadeWrapper>
-            )} 
+            )}
             />
             <HomeStack.Screen name={AppScreens.TRIAL1_SCREEN} component={Trialscreen} />
-            
+
         </HomeStack.Navigator>
     );
 }
@@ -61,10 +62,9 @@ export function TabStackScreen() {
         <Tab.Navigator tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
             <Tab.Screen name="HomeStack" component={HomeStackScreen} />
             <Tab.Screen name="SettingsStack" component={SettingsStackScreen} />
-            <Tab.Screen name="SettingsStack1" component={SettingsStackScreen} />
+            <Tab.Screen name={AppScreens.MATCH_HANDLER} component={MatchHandlerScreen} />
             <Tab.Screen name={AppScreens.MATCH_SCREEN} component={MatchesScreen} />
             <Tab.Screen name="SettingsStack3" component={SettingsStackScreen} />
-
         </Tab.Navigator>
     )
 }
