@@ -8,27 +8,10 @@ import { User } from "../types/user.type";
 import { AppScreens, AppScreensParamList } from "../navigation/screens";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import dayjs from "dayjs";
-import { AuthContext } from "../context/authProvider";
 import { SportMode } from "../types/form.type";
+import dayjs from "dayjs";
 
-interface MatchCardProps {
-  dayOfWeek?: number; // 0..6 => "Domingo".."Sábado"
-  date?: string; // "2026-07-15T17:48:00.000Z"
-  time?: number; // 22 => "22"
-  location?: Location;
-  players?: User[];
-  maxPlayers?: number;
-  sportMode: SportMode;
-  matchId: string;
-}
-
-type HomeScreenNavigationProp = NativeStackNavigationProp<
-  AppScreensParamList,
-  AppScreens.HOME_SCREEN
->;
-
-function getDayName(dayNum?: number) {
+export function getDayName(dayNum?: number) {
   if (dayNum == null) return "";
   const days = [
     "Domingo",
@@ -42,6 +25,31 @@ function getDayName(dayNum?: number) {
   return days[dayNum] || "";
 }
 
+export function formatMatchDate(date?: string, hour?: number) {
+  if (!date) return "";
+  const base = dayjs(date);
+  if (hour != null) {
+    return base.hour(hour).minute(0).format("ddd DD/MM HH:mm");
+  }
+  return base.format("ddd DD/MM HH:mm");
+}
+
+interface MatchCardProps {
+  dayOfWeek?: number;
+  date?: string;
+  time?: number;
+  location?: Location;
+  players: User[];
+  maxPlayers: number;
+  sportMode: SportMode;
+  matchId: string;
+}
+
+type HomeScreenNavigationProp = NativeStackNavigationProp<
+  AppScreensParamList,
+  AppScreens.HOME_SCREEN
+>;
+
 const MatchCard: React.FC<MatchCardProps> = ({
   dayOfWeek,
   date,
@@ -54,20 +62,15 @@ const MatchCard: React.FC<MatchCardProps> = ({
 }) => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
 
-  let dayName = "";
-  let dayOfMonth = "";
-  let hourText = "";
+  // verificamos hora fecha etc
+  const hasDateTime = !!date && time != null;
+  const hasLocation = !!location?.name && location?.address != null;
 
-  if (dayOfWeek != null) {
+  let dayName = "";
+  let dateStr = "";
+  if (hasDateTime) {
     dayName = getDayName(dayOfWeek);
-  }
-  if (date) {
-    const base = dayjs(date);
-    dayOfMonth = base.date().toString();
-    if (time != null) {
-      const withHour = base.hour(time).minute(0);
-      hourText = withHour.format("HH:mm") + " hs";
-    }
+    dateStr = formatMatchDate(date, time);
   }
 
   return (
@@ -84,51 +87,70 @@ const MatchCard: React.FC<MatchCardProps> = ({
           h={scale(150)}
           flexDir="row"
         >
+          {/* Cont amarilla */}
           <Div
             bg={customTheme.colors.primary}
             flex={2}
             justifyContent="center"
             rounded={customTheme.borderRadius.medium}
           >
-            <Div
-              alignItems="center"
-              h="100%"
-              p={customTheme.spacing.small}
-              justifyContent="space-evenly"
-            >
-              <Text
-                fontFamily="Notosans-Regular"
-                fontSize={customTheme.fontSize.medium}
+            {hasDateTime ? (
+              <Div
+                alignItems="center"
+                h="100%"
+                p={customTheme.spacing.small}
+                justifyContent="space-evenly"
               >
-                {dayName}
-              </Text>
-              <Text
-                textAlign="center"
-                fontFamily="NotoSans-ExtraBoldItalic"
-                fontSize={customTheme.fontSize.Fourxl}
-              >
-                {dayOfMonth}
-              </Text>
-              <Div flexDir="row" alignItems="center">
-                <Image
-                  source={require("../assets/iconTime.png")}
-                  style={{
-                    width: scale(15),
-                    height: scale(15),
-                    resizeMode: "contain",
-                    tintColor: "black",
-                    marginRight: scale(4),
-                  }}
-                />
+                {/* Nombre del día */}
                 <Text
                   fontFamily="Notosans-Regular"
                   fontSize={customTheme.fontSize.medium}
                 >
-                  {hourText}
+                  {dayName}
+                </Text>
+                {/* Día del mes */}
+                <Text
+                  textAlign="center"
+                  fontFamily="NotoSans-ExtraBoldItalic"
+                  fontSize={customTheme.fontSize.Fourxl}
+                >
+                  {dateStr.split(" ")[1]?.split("/")[0] || ""}
+                </Text>
+                {/* Resto de la fecha/hora */}
+                <Div flexDir="row" alignItems="center">
+                  <Image
+                    source={require("../assets/iconTime.png")}
+                    style={{
+                      width: scale(15),
+                      height: scale(15),
+                      resizeMode: "contain",
+                      tintColor: "black",
+                      marginRight: scale(4),
+                    }}
+                  />
+                  <Text
+                    fontFamily="Notosans-Regular"
+                    fontSize={customTheme.fontSize.medium}
+                  >
+                    {dateStr.slice(dateStr.indexOf(" ") + 1)}
+                  </Text>
+                </Div>
+              </Div>
+            ) : (
+              // Si NO
+              <Div alignItems="center" justifyContent="center" h="100%">
+                <Text
+                  textAlign="center"
+                  fontFamily="NotoSans-ExtraBoldItalic"
+                  fontSize={customTheme.fontSize.title}
+                >
+                  A DEFINIR
                 </Text>
               </Div>
-            </Div>
+            )}
           </Div>
+
+          {/* Cont blanco */}
           <View
             style={{
               flex: 3,
@@ -138,11 +160,16 @@ const MatchCard: React.FC<MatchCardProps> = ({
               padding: scale(10),
             }}
           >
-            <Div>
-              <Text fontSize={customTheme.fontSize.title}>
-                {location?.name} - {location?.address}
-              </Text>
-            </Div>
+            {hasLocation ? (
+              <Div>
+                <Text fontSize={customTheme.fontSize.title}>
+                  {location?.name} {location?.address}
+                </Text>
+              </Div>
+            ) : (
+              <Text fontSize={customTheme.fontSize.title}>A CONFIRMAR</Text>
+            )}
+
             <Div w="100%" justifyContent="flex-end">
               <Div
                 flexDir="row"
@@ -204,4 +231,4 @@ const MatchCard: React.FC<MatchCardProps> = ({
   );
 };
 
-export default MatchCard;
+export default React.memo(MatchCard);

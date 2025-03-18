@@ -5,16 +5,22 @@ import { Icon, Div, Button } from "react-native-magnus";
 import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import { AppScreens } from "../../navigation/screens";
 import { customTheme } from "../../utils/theme";
+import HomeIcon from "@assets/tabIcons/Icons/Home";
+import { scale } from "react-native-size-matters";
+import BellIcon from "@assets/tabIcons/Icons/Bell";
+import PlusIcon from "@assets/tabIcons/Icons/Plus";
+import FieldIcon from "@assets/tabIcons/Icons/Field";
+import ProfileIcon from "@assets/tabIcons/Icons/Profile";
 
 const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
   const insets = useSafeAreaInsets();
 
   const iconMap: Record<string, JSX.Element> = {
-    HomeStack: <Icon fontFamily="Octicons" name="home" fontSize={customTheme.fontSize.xl} color="#aaa" />,
-    SettingsStack: <Icon fontFamily="Feather" name="bell" fontSize={customTheme.fontSize.xl} color="#aaa" />,
-    SettingsStack1: <Icon fontFamily="Feather" name="plus" fontSize={customTheme.fontSize.xl} color="#aaa" />,
-    SettingsStack2: <Icon fontFamily="MaterialCommunityIcons" name="soccer-field" fontSize={customTheme.fontSize.xl} color="#aaa"   style={{ transform: [{ rotate: "90deg" }] }} />,
-    SettingsStack3: <Icon fontFamily="Feather" name="user" fontSize={customTheme.fontSize.xl} color="#aaa" />,
+    HomeStack: <HomeIcon width={scale(20)} height={scale(20)} />,
+    SettingsStack: <BellIcon width={scale(20)} height={scale(20)} />,
+    SettingsStack1: <PlusIcon width={scale(20)} height={scale(20)} />,
+    [AppScreens.MATCH_SCREEN]: <FieldIcon width={scale(20)} height={scale(20)} />,
+    SettingsStack3: <ProfileIcon width={scale(20)} height={scale(20)} />
   };
 
   const screen = getFocusedRouteNameFromRoute(state.routes[state.index]);
@@ -41,12 +47,12 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
             key={route.key}
             bg={customTheme.colors.secondaryBackground}
             rounded="circle"
-            p={customTheme.spacing.small}
+            p={scale(13)}
             onPress={() => navigation.navigate(route.name)}
             alignSelf="center"
           >
             {React.cloneElement(iconMap[route.name] || <Icon name="circle" fontSize={24} />, {
-              color: isFocused ? customTheme.colors.primary : "white",
+              fill: isFocused ? customTheme.colors.primary : "white",
             })}
           </Button>
         );

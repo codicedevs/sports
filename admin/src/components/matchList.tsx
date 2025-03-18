@@ -3,91 +3,9 @@ import { useState } from "react";
 import { useGetMatchesQuery } from "../store/features/match/matchApi";
 import { CheckCircleTwoTone, CloseCircleTwoTone } from "@ant-design/icons";
 import { Location, Match, User } from "../interfaces/interfaces";
+import { useNavigate } from "react-router-dom";
 const { Search } = Input;
-const columns = [
-  {
-    title: "Nombre del partido",
-    dataIndex: "name",
-    key: "name",
-  },
-  {
-    title: "Fecha",
-    dataIndex: "date",
-    key: "date",
-    render: (date: Date) => {
-      const dateObj = new Date(date);
-      const day = ("0" + dateObj.getDate()).slice(-2);
-      const month = ("0" + (dateObj.getMonth() + 1)).slice(-2);
-      const year = dateObj.getFullYear();
-      return `${day}/${month}/${year}`;
-    },
-  },
-  {
-    title: "Hora",
-    dataIndex: "date",
-    key: "time",
-    render: (date: Date) => {
-      const dateObj = new Date(date);
-      const hours = ("0" + dateObj.getHours()).slice(-2);
-      const minutes = ("0" + dateObj.getMinutes()).slice(-2);
-      return `${hours}:${minutes}`;
-    },
-  },
-  {
-    title: "Cancha",
-    dataIndex: "location",
-    key: "location",
-    render: (location: Location) =>
-      location ? `${location.name}` : "Sin definir",
-  },
-  {
-    title: "Reserva hecha por",
-    dataIndex: "user",
-    key: "userId",
-    render: (user: User) => `${user?.name}`,
-  },
-  {
-    title: "Abierto",
-    dataIndex: "open",
-    key: "open",
-    render: (open: boolean) => {
-      return (
-        <div style={{ display: "flex", justifyContent: "center" }}>
-          {open ? (
-            <CheckCircleTwoTone twoToneColor="#52c41a" />
-          ) : (
-            <CloseCircleTwoTone twoToneColor="#c4521a" />
-          )}
-        </div>
-      );
-    },
-  },
-  // {
-  //   title: "Jugadores",
-  //   dataIndex: "users",
-  //   key: "users",
-  // },
-  {
-    title: "Acción",
-    key: "action",
-    width: "25%",
-    align: "right" as const,
-    render: (record: Match) => (
-      <Space
-        size="middle"
-        style={{
-          display: "flex",
 
-          justifyContent: "right",
-        }}
-      >
-        <a>Escribir a {record.user.name}</a>
-        <Button>Editar</Button>
-        <Button>Borrar</Button>
-      </Space>
-    ),
-  },
-];
 const stateOptions = [
   { label: "Abierto", value: true },
   { label: "Cerrado", value: false },
@@ -96,6 +14,93 @@ const stateOptions = [
 const likeInputs = ["name", "location", "user"];
 
 const MatchList = () => {
+  const navigate = useNavigate();
+  const columns = [
+    {
+      title: "Nombre del partido",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Fecha",
+      dataIndex: "date",
+      key: "date",
+      render: (date: Date) => {
+        const dateObj = new Date(date);
+        const day = ("0" + dateObj.getDate()).slice(-2);
+        const month = ("0" + (dateObj.getMonth() + 1)).slice(-2);
+        const year = dateObj.getFullYear();
+        return `${day}/${month}/${year}`;
+      },
+    },
+    {
+      title: "Hora",
+      dataIndex: "date",
+      key: "time",
+      render: (date: Date) => {
+        const dateObj = new Date(date);
+        const hours = ("0" + dateObj.getHours()).slice(-2);
+        const minutes = ("0" + dateObj.getMinutes()).slice(-2);
+        return `${hours}:${minutes}`;
+      },
+    },
+    {
+      title: "Cancha",
+      dataIndex: "location",
+      key: "location",
+      render: (location: Location) =>
+        location ? `${location.name}` : "Sin definir",
+    },
+    {
+      title: "Reserva hecha por",
+      dataIndex: "user",
+      key: "userId",
+      render: (user: User) => `${user?.name}`,
+    },
+    {
+      title: "Abierto",
+      dataIndex: "open",
+      key: "open",
+      render: (open: boolean) => {
+        return (
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            {open ? (
+              <CheckCircleTwoTone twoToneColor="#52c41a" />
+            ) : (
+              <CloseCircleTwoTone twoToneColor="#c4521a" />
+            )}
+          </div>
+        );
+      },
+    },
+    // {
+    //   title: "Jugadores",
+    //   dataIndex: "users",
+    //   key: "users",
+    // },
+    {
+      title: "Acción",
+      key: "action",
+      width: "25%",
+      align: "right" as const,
+      render: (record: Match) => (
+        <Space
+          size="middle"
+          style={{
+            display: "flex",
+
+            justifyContent: "right",
+          }}
+        >
+          <a onClick={() => navigate(`../profile/${record.user._id}`)}>
+            Ver {record.user.name}
+          </a>
+          <Button>Editar</Button>
+          <Button>Borrar</Button>
+        </Space>
+      ),
+    },
+  ];
   const [filter, setFilter] = useState<{}>();
   const { data } = useGetMatchesQuery(filter);
   const handleSearch = (filterName: string, value: string | boolean) => {

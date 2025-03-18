@@ -1,22 +1,16 @@
 import React, { useContext } from "react";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
 import { Button, Div, Text } from "react-native-magnus";
-import MatchPreferencesModal from "../components/modal/matchPreferences";
-import { ModalContext } from "../context/modalProvider";
-import MatchModalHandler from "../components/modal/matchModalHandler";
 import useFetch from "../hooks/useGet";
 import matchService from "../service/match.service";
 import { QUERY_KEYS } from "../types/query.types";
-import { TouchableOpacity } from "react-native";
 import MatchCard from "../components/matchesCards";
 import Match from "../types/match.type";
-import { MatchDetails } from "../types/form.type";
-import RestrictiveModal from "../components/modal/restrictiveModal";
 import { useSession } from "../context/authProvider";
 import { ScrollView } from "react-native-gesture-handler";
 import { AuthContext } from "../context/authProvider";
 import { customTheme } from "../utils/theme";
-import TrianglesWithImages from "../components/triangleButtons";
+import UpcomingMatchCard from "../components/UpcomingMatchesCard";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
@@ -28,17 +22,40 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     <Div>
       <ScrollView>
         <Button onPress={showModal}>Abrir</Button>
-        
+        <Div p={customTheme.spacing.small}>
+          <Text
+            fontSize={customTheme.fontSize.medium}
+            fontFamily="NotoSans-Italic"
+            ml={customTheme.spacing.small}
+          >
+            Próximos partidos
+          </Text>
+          <ScrollView horizontal>
+            {matches?.results.map((u: any) => (
+              <UpcomingMatchCard
+                key={u._id}
+                matchId={u._id}
+                date={u.date}
+                hour={u.hour}
+                players={u.users}
+                maxPlayers={u.playersLimit}
+                location={u.location}
+                sportMode={u.sportMode}
+              />
+            ))}
+          </ScrollView>
+        </Div>
+
         <Div>
-          <Div ml={customTheme.spacing.small}>
-            <Text
-              fontSize={customTheme.fontSize.medium}
-              fontFamily="NotoSans-Italic"
-            >
-              Mis partidos
-            </Text>
-          </Div>
-          {matches?.results.map((m) => (
+          <Text
+            ml={customTheme.spacing.small}
+            fontSize={customTheme.fontSize.medium}
+            fontFamily="NotoSans-Italic"
+          >
+            Mis partidos
+          </Text>
+
+          {matches?.results.map((m: any) => (
             <MatchCard
               key={m._id}
               matchId={m._id}
