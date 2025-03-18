@@ -14,11 +14,11 @@ import { SportMode } from "../types/form.type";
 type UpcomingMatchProps = {
   date?: string;
   hour?: number;
-  players?: User[];
-  maxPlayers?: number;
-  titulo: string;
+  players: User[];
+  maxPlayers: number;
+
   matchId: string;
-  location: Location;
+  location?: Location;
   sportMode: SportMode;
 };
 
@@ -32,7 +32,7 @@ export default function UpcomingMatchCard({
   hour,
   players,
   maxPlayers,
-  titulo,
+
   matchId,
   location,
   sportMode,
@@ -46,16 +46,21 @@ export default function UpcomingMatchCard({
     const colorpercentage = players / maxPlayers;
     let bgColor = "#D9FA53";
     if (colorpercentage >= 0.5 && colorpercentage < 1) {
-      bgColor = "#f78f5c"; 
+      bgColor = "#f78f5c";
     } else if (colorpercentage >= 1) {
-      bgColor = "#ff333d";
+      bgColor = "#f5696e";
     }
     return bgColor;
   };
 
   const bgColor = getBgColor(playerCount, total);
 
-  const fecha = formatMatchDate(date, hour);
+  let finalDateStr = "A DEFINIR"; // render condicional fecha
+  if (date && hour != null) {
+    const fecha = formatMatchDate(date, hour);
+    finalDateStr = fecha || "A DEFINIR";
+  }
+  const hasLocation = !!location?.name && location?.address != null; // render condi location
 
   return (
     <TouchableOpacity
@@ -83,20 +88,46 @@ export default function UpcomingMatchCard({
             resizeMode="contain"
             tintColor="black"
           />
-          <Text
-            fontSize={customTheme.fontSize.small}
-            fontFamily="NotoSans-Variable"
-          >
-            {fecha}
-          </Text>
+          {/* si no hay fecha*/}
+          {finalDateStr === "A DEFINIR" ? (
+            <Div alignItems="center" justifyContent="center">
+              <Text
+                fontSize={customTheme.fontSize.medium}
+                fontFamily="NotoSans-BoldItalic"
+              >
+                A CONFIRMAR
+              </Text>
+            </Div>
+          ) : (
+            <Text
+              fontSize={customTheme.fontSize.small}
+              fontFamily="NotoSans-Variable"
+            >
+              {/* si hay */}
+              {finalDateStr}
+            </Text>
+          )}
         </Div>
-
-        <Text fontSize={customTheme.fontSize.large} fontFamily="NotoSans-BoldItalic">
-          {location?.name} - {sportMode?.label}
-        </Text>
+        {hasLocation ? (
+          <Text
+            fontSize={customTheme.fontSize.large}
+            fontFamily="NotoSans-BoldItalic"
+          >
+            {location?.name} - {sportMode?.label}
+          </Text>
+        ) : (
+          <Div alignItems="center">
+            <Text
+              fontSize={customTheme.fontSize.large}
+              fontFamily="NotoSans-BoldItalic"
+            >
+              A DEFINIR
+            </Text>
+          </Div>
+        )}
 
         <Div flexDir="row" justifyContent="space-between">
-          {/* Aquí usamos la variable bgColor */}
+          {/* condicional bgColor */}
           <Div bg={bgColor} flexDir="row">
             <Image
               source={require("../assets/iconUser.png")}
@@ -104,7 +135,10 @@ export default function UpcomingMatchCard({
               resizeMode="contain"
               w={customTheme.fontSize.medium}
             />
-            <Text ml={customTheme.spacing.small} fontSize={customTheme.fontSize.medium}>
+            <Text
+              ml={customTheme.spacing.small}
+              fontSize={customTheme.fontSize.medium}
+            >
               {playerCount}/{maxPlayers}
             </Text>
           </Div>

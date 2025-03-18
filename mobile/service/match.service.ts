@@ -6,7 +6,7 @@ class MatchService extends CRUDService<Match> {
     super("matches");
   }
 
-  getAll = async (filter?) => {
+  getAlFiltered = async (filter?) => {
     // if (!!filter) {
       if (Object.keys(filter).length !== 0) {
       const res = await this.get('/', {

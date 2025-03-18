@@ -44,10 +44,10 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
     getItem("Partidos", "2", <TableOutlined />, null, () =>
       navigate("partidos")
     ),
-    getItem("Jugadores", "sub2", <UserOutlined />, [
-      getItem("Tom", "3", null, null, () => navigate("profile")),
-      getItem("Bill", "4", null, null, () => navigate("profile")),
-      getItem("Alex", "5", null, null, () => navigate("profile")),
+    getItem("Menu Auxiliar", "sub2", <UserOutlined />, [
+      getItem("Opcion 1", "3", null, null, () => navigate("profile")),
+      getItem("Opcion 2", "4", null, null, () => navigate("profile")),
+      getItem("Opcion 3", "5", null, null, () => navigate("profile")),
     ]),
   ];
   return (

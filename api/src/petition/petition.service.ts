@@ -16,6 +16,7 @@ import { PushNotificationService } from "services/pushNotificationservice";
 import { Group } from "groups/group.entity";
 import { Filter, FilterResponse } from "types/types";
 import { ActivityService } from "activity/activity.service";
+import { UserService } from "user/user.service";
 type ModelHandlers = {
   [key in PetitionModelType]: {
     model: Model<any>;
@@ -37,8 +38,9 @@ export class PetitionService {
     @InjectModel(Petition.name) private readonly petitionModel: Model<Petition>,
     @InjectModel(Match.name) private readonly matchModel: Model<Match>,
     @InjectModel(User.name) private readonly userModel: Model<User>,
-    @InjectModel(Group.name) private readonly gorupModel: Model<Group>,
+    @InjectModel(Group.name) private readonly groupModel: Model<Group>,
     private readonly notificationService: PushNotificationService,
+    private readonly userService: UserService,
     private readonly activityService: ActivityService
   ) { }
 
@@ -52,7 +54,7 @@ export class PetitionService {
       },
     },
     [PetitionModelType.group]: {
-      model: this.gorupModel,
+      model: this.groupModel,
       validate: async (target) => {
         if (!target) {
           throw new NotFoundException("GRUPO no encontrado");
@@ -60,7 +62,7 @@ export class PetitionService {
       },
     },
   };
-  
+
   async create(createPetitionDto: CreatePetitionDto): Promise<Petition> {
     const { emitter, receiver, reference } = createPetitionDto;
     const targetId = reference.id
@@ -217,19 +219,32 @@ export class PetitionService {
     }
 
 
+    let match: Match = null
+    let tokens: string[] = null
     // Si el emisor es el creador del partido, agregar al receptor en lugar del emisor
     if ((target.userId as Types.ObjectId).equals(petition.emitter._id as Types.ObjectId)) {
       if (target.users.includes(petition.receiver._id)) {
         throw new BadRequestException(`El usuario ya se encuentra en el ${translate[modelType]}`)
       }
       (target.users).push(petition.receiver._id);
-      if(modelType === PetitionModelType.match){
+      if (modelType === PetitionModelType.match) {
         this.activityService.create({
           matchId: targetId,
           description: `Se unió ${receiver.name} al partido`
         })
+
+        match = await this.matchModel.findById(targetId).exec()
+
+        tokens = await this.userService.getTokenUsersIdsList(match.users)
+        await this.notificationService.sendPushNotification(
+          tokens,
+          `Partido ${match.name}`,
+          `Se unió ${receiver.name} al partido`,
+          { matchId: petitionId.toString() },
+        );
       }
-      
+
+
 
       // Agregar el partido al array de partidos o grupos del receiver si no es el dueño
       if (!(target.userId as Types.ObjectId).equals(petition.receiver._id)) {
@@ -244,11 +259,23 @@ export class PetitionService {
       }
       // En caso contrario, agregar al emisor al partido
       target.users.push(petition.emitter._id);
-      if(modelType === PetitionModelType.match){
+      if (modelType === PetitionModelType.match) {
         this.activityService.create({
           matchId: targetId,
           description: `Se unió ${emitter.name} al partido`
         })
+
+        if (!match) match = await this.matchModel.findById(targetId).exec()
+
+        if (!tokens) tokens = await this.userService.getTokenUsersIdsList(match.users)
+
+        await this.notificationService.sendPushNotification(
+          tokens,
+          `Partido ${match.name}`,
+          `Se unió ${receiver.name} al partido`,
+          { matchId: petitionId.toString() },
+        );
+
       }
 
       // Agregar el partido al array de partidos del emisor

@@ -5,9 +5,14 @@ export default function objectToQueryString<T>(data: Filter<T>): string {
   let first = true;
 
   for (const key in data) {
+    if (key === "populate") {
+      queryParts.push(`populate=${data[key]}`);
+      first = false;
+      continue;
+    }
     if (Object.prototype.hasOwnProperty.call(data, key)) {
       const value = data[key];
-      // Si el valor es un objeto (y no un array ni null)
+
       if (
         value !== null &&
         typeof value === "object" &&
@@ -29,6 +34,7 @@ export default function objectToQueryString<T>(data: Filter<T>): string {
         }
       } else {
         // Valor directo
+        console.log("entro");
         if (value !== "all") {
           if (first) {
             queryParts.push(`where[${key}]=${value}`);

@@ -5,9 +5,12 @@ import { useSession } from "../../context/authProvider";
 import { customTheme } from "../../utils/theme";
 import authService from "../../service/auth.service";
 import { useMutate } from "../../hooks/useMutate";
+import Constants from "expo-constants";
+import registerForPushNotificationsAsync from "../../notifications/pushNotifications";
+import userService from "../../service/user.service";
 //En useSession agregue un showModal, en los lugares que no debe poder accederse sin usuario se debe preguntar si hay un currentUser y si no hay se hace un showModal() 
 const RestrictiveModal = () => {
-    const { isModalVisible, hideModal, setCurrentUser } = useSession();
+    const { isModalVisible, hideModal, setCurrentUser, pushToken } = useSession();
 
     // GoogleSignin.configure();
     // const handleGoogleSignIn = async () => {
@@ -26,19 +29,26 @@ const RestrictiveModal = () => {
     // };
 
     const login = async () => {
-        try{
-            const res = await authService.login("orefici.diego+1@gmail.com", "12345678")
-            console.log('res', res)
-             setCurrentUser(res.user)
-            if(res){
-                hideModal()
-            }
-        } catch(e){
-            console.log(e)
-        }
-    }
+        try {
+            const res = await authService.login("orefici.diego+1@gmail.com", "12345678");
+            setCurrentUser(res.user);
 
-    const loginQuery = useMutate(login, (res) =>{ setCurrentUser(res.user)}, (err) => {console.error(err)})
+            if (res) {
+                // Si ya tenemos el pushToken almacenado en el contexto, lo usamos
+                if (pushToken) {
+                    await userService.updatePushToken(res.user._id, pushToken);
+                    res.user.pushToken = pushToken;
+                }
+                setCurrentUser(res.user);
+                hideModal();
+            }
+            return res;
+        } catch (e) {
+            console.log("Ocurrió un error en el login");
+            console.log(e);
+        }
+    };
+    const loginQuery = useMutate(login, (res) => { setCurrentUser(res.user) }, (err) => { console.error(err) })
 
     if (!isModalVisible) return
     return (

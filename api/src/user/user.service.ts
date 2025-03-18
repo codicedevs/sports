@@ -139,38 +139,38 @@ export class UserService {
      */
     async update(id: Types.ObjectId, updateUserDto: UpdateUserDto): Promise<User> {
         // 1) Buscar el usuario
-        const user : User = await this.userModel.findById(id).exec();
+        const user: User = await this.userModel.findById(id).exec();
         if (!user) {
-          throw new NotFoundException(`User with id ${id} not found`);
+            throw new NotFoundException(`User with id ${id} not found`);
         }
-    
+
         // 2) Separar campos que requieren lógica especial
         const { password, profile, ...restFields } = updateUserDto;
-    
+
         // 3) Si hay password, hashearla antes de asignar
         if (password) {
-          user.password = await bcrypt.hash(password, 8);
+            user.password = await bcrypt.hash(password, 8);
         }
-    
+
         // 4) Fusionar profile (si lo hay) con el subdocumento existente
         if (profile) {
-          const currentProfile = user.profile ?( user.profile as HydratedDocument<Profile>).toObject() : {};
-          user.profile = { ...currentProfile, ...profile };
+            const currentProfile = user.profile ? (user.profile as HydratedDocument<Profile>).toObject() : {};
+            user.profile = { ...currentProfile, ...profile };
         }
-    
+
         // 5) Hacer "merge" genérico del resto de campos en el usuario
         Object.assign(user, restFields);
-    
+
         // 6) Guardar el documento
         return user.save();
-      }
+    }
 
     async updatePushToken(
         userId: string,
         pushToken: string,
     ): Promise<User | null> {
         const user = await this.userModel
-            .findByIdAndUpdate(userId, { pushToken }, { new: true })
+            .findByIdAndUpdate(new Types.ObjectId(userId), { pushToken }, { new: true })
             .exec();
 
         if (!user) {
@@ -225,5 +225,21 @@ export class UserService {
         user.friends = user.friends.filter((f) => !f.equals(friendId));
 
         return user.save();
+    }
+
+    async getTokenUsersIdsList(userIds: Types.ObjectId[]): Promise<string[]> {
+        // Buscamos todos los usuarios cuyos _id estén en el array y que tengan definido un pushToken
+        const users = await this.userModel
+            .find({
+                _id: { $in: userIds },
+                pushToken: { $exists: true, $ne: null }
+            })
+            .select('pushToken')
+            .exec();
+
+        // Extraemos el pushToken de cada usuario y filtramos los valores falsy (por si acaso)
+        const tokens = users.map(user => user.pushToken).filter(token => !!token);
+
+        return tokens;
     }
 }
