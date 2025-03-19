@@ -15,7 +15,12 @@ import UpcomingMatchCard from "../components/UpcomingMatchesCard";
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
-  const { data: matches } = useFetch(matchService.getAll, [QUERY_KEYS.MATCHES]);
+  const { currentUser } = useSession()
+  const { data: matches } = useFetch(() => matchService.getAll({
+    where: {
+      "user._id": currentUser._id
+    }
+  }), [QUERY_KEYS.MATCHES, currentUser]);
   const { showModal } = useSession();
 
   return (
