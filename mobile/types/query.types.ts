@@ -6,5 +6,6 @@ export enum QUERY_KEYS {
     SPORT_MODES = "sportModes",
     LOCATIONS = "locations",
     MATCH = "match",
-    ZONES ="zones"
+    ZONES ="zones",
+    PLAYERS_STATUS = 'playerStatus'
   }
