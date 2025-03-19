@@ -34,7 +34,6 @@ export const StepSport: React.FC<StepSportProps> = ({ userInfo, setUserInfo, onN
       const resMode = await sportmodeService.getAll();
       const res = await sportService.getAll();
       setSports(res.data);
-      console.log(res.data)
       setSportModes(resMode.data);
     } catch (e) {
       console.log(e);
