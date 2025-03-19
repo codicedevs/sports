@@ -11,6 +11,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { AuthContext } from "../context/authProvider";
 import { customTheme } from "../utils/theme";
 import UpcomingMatchCard from "../components/UpcomingMatchesCard";
+import MatchModalHandler from "../components/modal/matchModalHandler";
 import EventsCard from "../components/eventsCard";
 import eventService from "../service/event.service";
 
@@ -20,10 +21,10 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   const { data: matches } = useFetch(matchService.getAll, [QUERY_KEYS.MATCHES]);
   const { showModal } = useSession();
 
-  const { data: events } = useFetch(eventService.getAll, [QUERY_KEYS.EVENTS]); // llamada a eventos se va au sar
+  const { data: events } = useFetch(eventService.getAll, [QUERY_KEYS.EVENTS]); // pa hacer la llamada
 
   const fallbackEvent = {
-    name: "TORNEO DE VERANO FUTBOL VETERANO",
+    name: "TORNEO DE VERANO FUTBOL VETERANO", // pa hardcodear
     date: "12/3",
   };
 

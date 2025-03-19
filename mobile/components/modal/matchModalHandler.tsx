@@ -12,10 +12,6 @@ import SearchLocationInput from "../matche/Inputs/searchLocation";
 import { MatchDetails } from "../../types/form.type";
 import matchService from "../../service/match.service";
 
-/* =======================================
-   1) Declaramos la interfaz de props,
-      incluyendo onMatchCreated
-   ======================================= */
 interface MatchModalHandlerProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -23,10 +19,6 @@ interface MatchModalHandlerProps {
   onMatchCreated?: (matchId: string) => void; // <-- MARCADO: Agregamos prop opcional
 }
 
-/* =======================================
-   2) Definimos el componente, usando la
-      interfaz en la desestructuración
-   ======================================= */
 export default function MatchModalHandler({
   open,
   setOpen,
