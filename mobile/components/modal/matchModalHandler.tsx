@@ -25,10 +25,6 @@ interface MatchModalHandlerProps {
   onMatchCreated?: (matchId: string) => void; // <-- MARCADO: Agregamos prop opcional
 }
 
-/* =======================================
-   2) Definimos el componente, usando la
-      interfaz en la desestructuración
-   ======================================= */
 export default function MatchModalHandler({
   open,
   setOpen,

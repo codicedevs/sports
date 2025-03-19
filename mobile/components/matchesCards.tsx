@@ -167,7 +167,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
                 </Text>
               </Div>
             ) : (
-              <Text fontSize={customTheme.fontSize.title}>A CONFIRMAR</Text>
+              <Text fontSize={customTheme.fontSize.title}>A Confirmar</Text>
             )}
 
             <Div w="100%" justifyContent="flex-end">

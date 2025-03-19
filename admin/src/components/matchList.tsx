@@ -15,6 +15,7 @@ const likeInputs = ["name", "location", "user"];
 
 const MatchList = () => {
   const navigate = useNavigate();
+
   const columns = [
     {
       title: "Nombre del partido",
@@ -73,11 +74,6 @@ const MatchList = () => {
         );
       },
     },
-    // {
-    //   title: "Jugadores",
-    //   dataIndex: "users",
-    //   key: "users",
-    // },
     {
       title: "Acción",
       key: "action",
@@ -92,9 +88,14 @@ const MatchList = () => {
             justifyContent: "right",
           }}
         >
-          <a onClick={() => navigate(`../profile/${record.user._id}`)}>
-            Ver {record.user.name}
-          </a>
+          {record.user ? (
+            <a onClick={() => navigate(`../profile/${record.user._id}`)}>
+              Ver {record.user.name}
+            </a>
+          ) : (
+            <p>No hay usuario</p>
+          )}
+
           <Button>Editar</Button>
           <Button>Borrar</Button>
         </Space>
@@ -103,6 +104,7 @@ const MatchList = () => {
   ];
   const [filter, setFilter] = useState<{}>();
   const { data } = useGetMatchesQuery(filter);
+
   const handleSearch = (filterName: string, value: string | boolean) => {
     if (likeInputs.includes(filterName)) {
       setFilter((prevFilter) => ({
