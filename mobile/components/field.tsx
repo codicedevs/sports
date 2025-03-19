@@ -55,6 +55,7 @@ interface TeamFieldProps {
   playersAssignments: Record<string, any>;
   teamData?: { posicion: number, user: string }[];
   onAutoAssign?: (assignments: Record<string, { persona: any, circleNumber: number }>) => void;
+  isAdmin: boolean
 }
 
 const TeamField = ({
@@ -63,7 +64,8 @@ const TeamField = ({
   onPlayerPress,
   playersAssignments,
   teamData,
-  onAutoAssign
+  onAutoAssign,
+  isAdmin
 }: TeamFieldProps) => {
   const fieldPlayers = playersCount - 1;
   const maxPerRow = playersCount === 5 ? 2 : 4;
@@ -99,10 +101,11 @@ const TeamField = ({
         const assignedPersona = playersAssignments[playerId];
         const displayLabel = assignedPersona && assignedPersona.persona && assignedPersona.persona.name
           ? assignedPersona.persona.name.split(" ").map(word => word[0]).join("")
-          : "+";
+          : isAdmin? "+": "";;
         const currentCircleNumber = circleNumber;
         players.push(
           <TouchableOpacity
+            disabled={!isAdmin}
             key={playerId}
             onPress={() => onPlayerPress(playerId, currentCircleNumber)}
           >
@@ -122,7 +125,7 @@ const TeamField = ({
   useEffect(() => {
     if (layout && teamData && teamData.length > 0 && onAutoAssign) {
       let assignments = {};
-      let circleNum = 2; 
+      let circleNum = 2;
       for (let row = 0; row < numRows; row++) {
         const playersInRow = row < numRows - 1 ? maxPerRow : fieldPlayers - row * maxPerRow;
         for (let i = 0; i < playersInRow; i++) {
@@ -151,9 +154,10 @@ const TeamField = ({
 
 interface FieldProps {
   match: Match;
+  isAdmin: boolean
 }
 
-const Field = ({ match }: FieldProps) => {
+const Field = ({ match, isAdmin }: FieldProps) => {
   const [open, setOpen] = useState(false);
   const [selectedPlayerId, setSelectedPlayerId] = useState(null);
   const [selectedCircleNumber, setSelectedCircleNumber] = useState(null);
@@ -162,7 +166,6 @@ const Field = ({ match }: FieldProps) => {
 
   const totalPlayers = match.playersLimit;
   const teamPlayers = totalPlayers / 2;
-  console.log(playersAssignments)
   useEffect(() => {
     setPlayersAssignments(prev => ({
       ...prev,
@@ -179,7 +182,6 @@ const Field = ({ match }: FieldProps) => {
 
   const addToFormation = async (player: any) => {
     const team = (selectedPlayerId.split('-')[0] === "top" ? 1 : 2)
-    console.log(team)
     await matchService.addPlayerToFormation("676d8fc473a26a0de5f38bd1", player._id, {
       team: team,
       position: selectedCircleNumber
@@ -187,7 +189,6 @@ const Field = ({ match }: FieldProps) => {
   }
 
   const removeFromFormation = async (player: any) => {
-    console.log(player, 'SACANDO')
     await matchService.removePlayerFromFormation("676d8fc473a26a0de5f38bd1", player._id)
   }
 
@@ -223,7 +224,7 @@ const Field = ({ match }: FieldProps) => {
     const entry = playersAssignments[playerId];
     return entry && entry.persona && entry.persona.name
       ? entry.persona.name.split(" ").map(word => word[0]).join("")
-      : "+";
+      : isAdmin? "+": "";
   };
 
   return (
@@ -279,7 +280,7 @@ const Field = ({ match }: FieldProps) => {
         <Div p={20} h="100%">
           <Div id="first-half" flex={1}>
             <Div h="15%" alignItems="center" justifyContent="center">
-              <TouchableOpacity id="Top-GK" onPress={() => handlePlayerPress("Top-GK", 1)}>
+              <TouchableOpacity disabled={!isAdmin} id="Top-GK" onPress={() => handlePlayerPress("Top-GK", 1)}>
                 <FPlayer size={scale(50)} initials={iniciales("Top-GK")} />
               </TouchableOpacity>
             </Div>
@@ -291,7 +292,8 @@ const Field = ({ match }: FieldProps) => {
               onAutoAssign={(assignments) =>
                 setPlayersAssignments(prev => ({ ...prev, ...assignments }))
               }
-              teamData={match.formations.team2}
+              teamData={match.formations?.team2}
+              isAdmin={isAdmin}
             />
           </Div>
 
@@ -304,10 +306,11 @@ const Field = ({ match }: FieldProps) => {
               onAutoAssign={(assignments) =>
                 setPlayersAssignments(prev => ({ ...prev, ...assignments }))
               }
-              teamData={match.formations.team1}
+              teamData={match.formations?.team1}
+              isAdmin={isAdmin}
             />
             <Div h="15%" alignItems="center" justifyContent="center">
-              <TouchableOpacity id="Bottom-GK" onPress={() => handlePlayerPress("Bottom-GK", 1)}>
+              <TouchableOpacity disabled={!isAdmin} id="Bottom-GK" onPress={() => handlePlayerPress("Bottom-GK", 1)}>
                 <FPlayer size={scale(50)} initials={iniciales("Bottom-GK")} />
               </TouchableOpacity>
             </Div>
