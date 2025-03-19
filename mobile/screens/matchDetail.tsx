@@ -11,6 +11,7 @@ import MatchPrivacyDisplay from "../components/matche/Inputs/matchPrivacyDisplay
 import MatchSchedulerInput from "../components/matche/Inputs/matchScheduler";
 import SearchLocationInput from "../components/matche/Inputs/searchLocation";
 import { scale } from "react-native-size-matters";
+import Field from "../components/field";
 
 type TabKey = "partido" | "jugadores" | "actividad" | "equipos";
 
@@ -25,7 +26,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
     data: match,
     isFetching,
     error,
-  } = useFetch(() =>  matchService.getById(id), [QUERY_KEYS.MATCH]);
+  } = useFetch(() => matchService.getById(id), [QUERY_KEYS.MATCH]);
 
   if (isFetching) {
     return (
@@ -43,7 +44,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
     );
   }
 
-  const { _id, open, playersLimit, users, date, sportMode, location } = match;
+  const { _id, open, playersLimit, users, date, sportMode, location } = match.data;
   const playerCount = users?.length || 0;
   const dateObject = new Date(date);
 
@@ -59,61 +60,58 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
         mb={customTheme.spacing.medium}
         mt={customTheme.spacing.small}
       >
-        <TouchableOpacity onPress={() => setActiveTab("partido")}>
-          <Text
-            bg={
-              activeTab === "partido"
-                ? customTheme.colors.primary
-                : "transparent"
-            }
-          >
+        <TouchableOpacity onPress={() => setActiveTab("partido")} style={{
+          backgroundColor: activeTab === "partido"
+            ? customTheme.colors.primary
+            : "transparent",
+          padding: customTheme.spacing.small
+        }}>
+          <Text>
             Partido
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => setActiveTab("jugadores")}>
-          <Text
-            bg={
-              activeTab === "jugadores"
-                ? customTheme.colors.primary
-                : "transparent"
-            }
-          >
+        <TouchableOpacity onPress={() => setActiveTab("jugadores")} style={{
+          backgroundColor: activeTab === "jugadores"
+            ? customTheme.colors.primary
+            : "transparent",
+          padding: customTheme.spacing.small
+        }}>
+          <Text>
             Jugadores
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => setActiveTab("actividad")}>
-          <Text
-            bg={
-              activeTab === "actividad"
-                ? customTheme.colors.primary
-                : "transparent"
-            }
-          >
+        <TouchableOpacity onPress={() => setActiveTab("actividad")} style={{
+          backgroundColor: activeTab === "actividad"
+            ? customTheme.colors.primary
+            : "transparent",
+          padding: customTheme.spacing.small
+        }}>
+          <Text>
             Actividad
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => setActiveTab("equipos")}>
-          <Text
-            bg={
-              activeTab === "equipos"
-                ? customTheme.colors.primary
-                : "transparent"
-            }
-          >
+        <TouchableOpacity onPress={() => setActiveTab("equipos")} style={{
+          backgroundColor: activeTab === "equipos"
+            ? customTheme.colors.primary
+            : "transparent",
+          padding: customTheme.spacing.small
+        }}>
+          <Text>
             Equipos
           </Text>
         </TouchableOpacity>
       </Div>
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{
-          paddingBottom: 120,
-        }}
-      >
-        {activeTab === "partido" && (
+
+      {activeTab === "partido" && (
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{
+            paddingBottom: 120,
+          }}
+        >
           <Div flex={1}>
             <Div p={customTheme.spacing.small}>
               {/* yttulo */}
@@ -223,26 +221,26 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
               </Div>
             </Div>
           </Div>
-        )}
+        </ScrollView>
+      )}
 
-        {activeTab === "jugadores" && (
-          <Div>
-            <Text>endeiente </Text>
-          </Div>
-        )}
+      {activeTab === "jugadores" && (
+        <Div>
+          <Text>endeiente </Text>
+        </Div>
+      )}
 
-        {activeTab === "actividad" && (
-          <Div>
-            <Text>pendiente</Text>
-          </Div>
-        )}
+      {activeTab === "actividad" && (
+        <Div>
+          <Text>pendiente</Text>
+        </Div>
+      )}
 
-        {activeTab === "equipos" && (
-          <Div>
-            <Text>pendiente</Text>
-          </Div>
-        )}
-      </ScrollView>
+      {activeTab === "equipos" && (
+        <Div h={"100%"} >
+          <Field match={match.data} />
+        </Div>
+      )}
       {/* Botones Eliminar / Guardar */}
       <Div
         justifyContent="flex-end"
