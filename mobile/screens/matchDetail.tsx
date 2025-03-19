@@ -11,9 +11,10 @@ import MatchPrivacyDisplay from "../components/matche/Inputs/matchPrivacyDisplay
 import MatchSchedulerInput from "../components/matche/Inputs/matchScheduler";
 import SearchLocationInput from "../components/matche/Inputs/searchLocation";
 import { scale } from "react-native-size-matters";
-import Field from "../components/field";
 import { useSession } from "../context/authProvider";
 import MatchModalHandler from "../components/modal/matchModalHandler";
+import Field from "../components/matche/Detail/field";
+import PlayerStatusList from "../components/matche/Detail/playerStatusList";
 
 type TabKey = "partido" | "jugadores" | "actividad" | "equipos";
 
@@ -274,7 +275,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
 
         {activeTab === "jugadores" && (
           <Div>
-            <Text>endeiente </Text>
+            <PlayerStatusList matchId={match.data._id} />
           </Div>
         )}
 

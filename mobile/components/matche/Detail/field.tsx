@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Div, Input, Text } from "react-native-magnus";
 import { scale, verticalScale } from "react-native-size-matters";
-import Match from "../types/match.type";
 import { ImageBackground, ScrollView, TouchableOpacity } from "react-native";
-import { customTheme } from "../utils/theme";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import matchService from "../service/match.service";
+import Match from "../../../types/match.type";
+import matchService from "../../../service/match.service";
+import { customTheme } from "../../../utils/theme";
 
 
 // match id 66e482584509915a15968bd7
@@ -274,7 +274,7 @@ const Field = ({ match, isAdmin }: FieldProps) => {
         </Div>
       )}
       <ImageBackground
-        source={require('../assets/match/canchaF.jpg')}
+        source={require('../../../assets/match/canchaF.jpg')}
         style={{ height: "100%" }}
       >
         <Div p={20} h="100%">
