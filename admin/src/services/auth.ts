@@ -1,18 +1,30 @@
 import { User } from "../interfaces/interfaces";
 import { CrudService } from "./crud";
+interface loginData {
+  email: string;
+  password: string;
+}
 
 class AuthService extends CrudService<User> {
   constructor() {
     super("auth");
   }
 
-  async login() {
+  async login(data: loginData) {
     const res = await this.post("/signin", {
-      email: "orefici.diego@gmail.com",
-      password: "12345678",
+      email: data.email,
+      password: data.password,
     });
     this.saveAccessToken(res.data.access_token);
     return res;
+  }
+
+  logout() {
+    this.removeAccessToken();
+  }
+
+  removeAccessToken() {
+    localStorage.removeItem("jwt");
   }
 }
 

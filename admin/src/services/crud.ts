@@ -8,7 +8,17 @@ export class CrudService<T> extends HttpBase {
     super(`${API_URL}/${baseURL}`);
   }
 
-  async find(data: any, filter: Filter<T>): Promise<Match> {
+  async find(filter: Filter<T>): Promise<Match> {
+    const params = objectToQueryString(filter);
+    return this.get(`?${params}`);
+  }
+
+  async findById(id: string, filter: Filter<T>): Promise<Match> {
+    const params = objectToQueryString(filter);
+    return this.get(`/${id}?${params}`);
+  }
+
+  async findAll(filter: Filter<T>): Promise<Match> {
     const params = objectToQueryString(filter);
     return this.get(`?${params}`);
   }
