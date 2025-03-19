@@ -26,6 +26,7 @@ import { EventEmitter2 } from "@nestjs/event-emitter";
 import { MatchUpdatedEvent } from "app-events.ts/match.events";
 import { MatchView } from "./match-view.model";
 import { ActivityService } from "activity/activity.service";
+import { UserService } from "user/user.service";
 
 
 
@@ -43,7 +44,9 @@ export class MatchService {
     private readonly pushNotificationService: PushNotificationService,
     private readonly chatroomService: ChatroomService,
     private readonly eventEmitter: EventEmitter2,
-    private readonly activityService: ActivityService
+    private readonly activityService: ActivityService,
+    private readonly userService: UserService,
+
   ) { }
 
   // Servicio para crear partido, con o sin invitaciones
@@ -93,6 +96,7 @@ export class MatchService {
       matchId: savedMatch._id as Types.ObjectId,
       description: "Se creó el partido"
     })
+
 
     //Creo un chatroom
     await this.chatroomService.create({
@@ -161,6 +165,15 @@ export class MatchService {
       description: `Se unió ${user.name} al partido`
     })
 
+    const tokens = await this.userService.getTokenUsersIdsList(match.users)
+
+    await this.pushNotificationService.sendPushNotification(
+      tokens,
+      `Partido ${match.name}`,
+      `Se unió ${user.name} al partido`,
+      { matchId: matchId.toString() },
+    );
+
 
     return match.save();
   }
@@ -210,6 +223,15 @@ export class MatchService {
       matchId: matchId,
       description: `Se fue ${user.name} del partido`
     })
+
+    const tokens = await this.userService.getTokenUsersIdsList(match.users)
+    await this.pushNotificationService.sendPushNotification(
+      tokens,
+      `Partido ${match.name}`,
+      `Se fué ${user.name} al partido`,
+      { matchId: matchId.toString() },
+    );
+
 
 
     // Eliminar el matchId del array de partidos del usuario
@@ -262,43 +284,73 @@ export class MatchService {
       location = await this.locationModel.findById(updatedMatch.location).exec()
     }
 
+
+    const tokens = await this.userService.getTokenUsersIdsList(oldMatch.users)
+
+    let message: string = null
     if (updatedMatch.location && !oldMatch.location) {
+      message = `Se actualizó el lugar del partido, ahora es ${location?.name}`
       this.activityService.create({
         matchId: oldMatch._id as Types.ObjectId,
         description: `Se actualizó el lugar del partido, ahora es ${location?.name}, code 1`
       })
     } else if (!updatedMatch.location && oldMatch.location) {
+      message = "Se eliminó el lugar del partido"
       this.activityService.create({
         matchId: oldMatch._id as Types.ObjectId,
         description: "Se eliminó el lugar del partido, code 2"
       })
     }
     else if (updatedMatch.location && oldMatch.location && !(updatedMatch.location as Types.ObjectId).equals((oldMatch.location as Types.ObjectId))) {
+      message = `Se actualizó el lugar del partido, ahora es ${location?.name}`
       this.activityService.create({
         matchId: oldMatch._id as Types.ObjectId,
         description: `Se actualizó el lugar del partido, ahora es ${location?.name}, code 3`
       })
     }
+
+    if (message) {
+      await this.pushNotificationService.sendPushNotification(
+        tokens,
+        `Partido ${oldMatch.name}`,
+        message,
+        { matchId: id.toString() },
+      );
+    }
+
+    message = null
     const formattedDate = moment(updatedMatch.date)
       .tz('America/Argentina/Buenos_Aires')  // Zona horaria UTC-3 (o la correspondiente)
       .format('DD/MM/YYYY HH:mm');
 
     if (updatedMatch.date && !oldMatch.date) {
+      message = `Se actualizó la fecha del partido, ahora es el ${formattedDate.split(" ")[0]} a las ${formattedDate.split(" ")[1]}`
       this.activityService.create({
         matchId: oldMatch._id as Types.ObjectId,
         description: `Se actualizó la fecha del partido, ahora es el ${formattedDate.split(" ")[0]} a las ${formattedDate.split(" ")[1]}, code 1`
       })
     } else if (!updatedMatch.date && oldMatch.date) {
+      message = "Se eliminó la fecha del partido"
       this.activityService.create({
         matchId: oldMatch._id as Types.ObjectId,
         description: "Se eliminó la fecha del partido, code 2"
       })
     }
     else if (updatedMatch.date && oldMatch.date && updatedMatch.date.getTime() !== oldMatch.date.getTime()) {
+      message = `Se actualizó la fecha del partido, ahora es el ${formattedDate.split(" ")[0]} a las ${formattedDate.split(" ")[1]}`
       this.activityService.create({
         matchId: oldMatch._id as Types.ObjectId,
         description: `Se actualizó la fecha del partido, ahora es el ${formattedDate.split(" ")[0]} a las ${formattedDate.split(" ")[1]}, code 3`
       })
+    }
+
+    if (message) {
+      await this.pushNotificationService.sendPushNotification(
+        tokens,
+        `Partido ${oldMatch.name}`,
+        message,
+        { matchId: id.toString() },
+      );
     }
 
 

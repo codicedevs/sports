@@ -32,7 +32,6 @@ export default function UpcomingMatchCard({
   hour,
   players,
   maxPlayers,
-
   matchId,
   location,
   sportMode,
@@ -78,7 +77,7 @@ export default function UpcomingMatchCard({
         mr={15}
         justifyContent="space-between"
       >
-        <Div flexDir="row">
+        <Div flexDir="row" justifyContent="center" alignItems="center">
           <Image
             source={require("../assets/iconTime.png")}
             h={customTheme.spacing.medium}
@@ -93,9 +92,9 @@ export default function UpcomingMatchCard({
             <Div alignItems="center" justifyContent="center">
               <Text
                 fontSize={customTheme.fontSize.medium}
-                fontFamily="NotoSans-BoldItalic"
+                fontFamily="NotoSans-Variable"
               >
-                A CONFIRMAR
+                A Confirmar
               </Text>
             </Div>
           ) : (
@@ -121,7 +120,7 @@ export default function UpcomingMatchCard({
               fontSize={customTheme.fontSize.large}
               fontFamily="NotoSans-BoldItalic"
             >
-              A DEFINIR
+              POR DEFINIR
             </Text>
           </Div>
         )}

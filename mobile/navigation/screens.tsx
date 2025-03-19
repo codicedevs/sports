@@ -8,7 +8,8 @@ export enum AppScreens {
     TRIAL2_SCREEN = 'Trial2',
     SETTINGS_SCREEN = 'Settings',
     MATCH_DETAIL = 'MatchDetail',
-    MATCH_SCREEN = 'MatchScreen'
+    MATCH_SCREEN = 'MatchScreen',
+    MATCH_HANDLER = 'MatchHandler'
 }
 
 export type AppScreensParamList = {
@@ -18,7 +19,8 @@ export type AppScreensParamList = {
     [AppScreens.TRIAL2_SCREEN]: undefined;
     [AppScreens.SETTINGS_SCREEN]: undefined
     [AppScreens.MATCH_DETAIL]: { id: string }
-    [AppScreens.MATCH_SCREEN]: undefined
+    [AppScreens.MATCH_SCREEN]: undefined;
+    [AppScreens.MATCH_HANDLER]: undefined;
 }
 
 export type AppScreenProps<T extends AppScreens> = {

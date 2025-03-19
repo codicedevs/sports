@@ -1,30 +1,28 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Div, Text, Modal } from "react-native-magnus";
+import { ScrollView, TouchableOpacity, View, StyleSheet } from "react-native";
+import { Div, Text } from "react-native-magnus";
 import { verticalScale } from "react-native-size-matters";
-import { ScrollView, TouchableOpacity } from "react-native";
-import { customTheme } from "../../utils/theme";
-import { Accordion } from "../collapsibleView";
-import PlayersCounterInput from "../matche/Inputs/playersCounter";
-import SportInput from "../matche/Inputs/sport";
-import MatchPrivacyToggleInput from "../matche/Inputs/matchPrivacyToggle";
-import MatchSchedulerInput from "../matche/Inputs/matchScheduler";
-import SearchLocationInput from "../matche/Inputs/searchLocation";
-import { MatchDetails } from "../../types/form.type";
-import matchService from "../../service/match.service";
+import { useNavigation } from "@react-navigation/native";
+import { MatchDetails } from "../types/form.type";
+import matchService from "../service/match.service";
+import { customTheme } from "../utils/theme";
+import { Accordion } from "../components/collapsibleView";
+import SportInput from "../components/matche/Inputs/sport";
+import PlayersCounterInput from "../components/matche/Inputs/playersCounter";
+import MatchPrivacyToggleInput from "../components/matche/Inputs/matchPrivacyToggle";
+import MatchSchedulerInput from "../components/matche/Inputs/matchScheduler";
+import SearchLocationInput from "../components/matche/Inputs/searchLocation";
 
-interface MatchModalHandlerProps {
-  open: boolean;
-  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+interface MatchHandlerScreenProps {
   match?: string;
-  onMatchCreated?: (matchId: string) => void; // <-- MARCADO: Agregamos prop opcional
+  onMatchCreated?: (matchId: string) => void;
 }
 
-export default function MatchModalHandler({
-  open,
-  setOpen,
+export default function MatchHandlerScreen({
   match,
-  onMatchCreated, // <-- MARCADO: desestructuramos
-}: MatchModalHandlerProps) {
+  onMatchCreated,
+}: MatchHandlerScreenProps) {
+  const navigation = useNavigation();
   const [openId, setOpenId] = useState<null | string>(null);
 
   // Objeto con la info del partido a crear/editar
@@ -56,14 +54,9 @@ export default function MatchModalHandler({
       matchDetailsRef.current.location = res.data.location || null;
     } catch (e) {
       console.error("Error al fetchMatch:", e);
-      console.log(e);
     }
   }
 
-  /* =======================================
-     3) Función para crear el partido:
-        si onMatchCreated existe, se llama
-     ======================================= */
   async function createMatch() {
     try {
       const res = await matchService.create({
@@ -75,19 +68,17 @@ export default function MatchModalHandler({
         sportMode: "67c873ffeb647cc591249358",
         open: matchDetailsRef.current.privacyOption,
       });
-
       const createdMatchId = res.data._id;
-      // <-- MARCADO: si onMatchCreated está definido, lo llamamos
       if (onMatchCreated) {
         onMatchCreated(createdMatchId);
       }
-      closeModal();
+      closeScreen();
     } catch (e) {
       console.error("Error al crear el partido:", e);
     }
   }
 
-  const editMatch = async () => {
+  async function editMatch() {
     try {
       const res = await matchService.update("67af556cb453684f313e9a4b", {
         name: "Prueba3",
@@ -100,9 +91,9 @@ export default function MatchModalHandler({
       });
       console.log("Partido editado:", res);
     } catch (e) {
-      console.log(e, "ERROR");
+      console.error("Error al editar el partido:", e);
     }
-  };
+  }
 
   const handleAction = () => {
     if (!match) {
@@ -112,14 +103,34 @@ export default function MatchModalHandler({
     }
   };
 
-  function closeModal() {
-    setOpenId(null);
-    setOpen(false);
+  function closeScreen() {
+    navigation.goBack();
   }
 
   return (
-    <Modal isVisible={open} onBackButtonPress={closeModal}>
-      <ScrollView>
+    <View style={styles.container}>
+      {/* Header con botón de cerrar */}
+      {/* <Div
+        p="md"
+        bg={customTheme.colors.primary}
+        flexDir="row"
+        alignItems="center"
+        justifyContent="space-between"
+      >
+        <Text
+          color="white"
+          fontSize="xl"
+          fontFamily="NotoSans-Variable"
+        >
+          {match ? "Editar Partido" : "Crear Partido"}
+        </Text>
+        <TouchableOpacity onPress={closeScreen}>
+          <Text color="white" fontSize="md">
+            Cerrar
+          </Text>
+        </TouchableOpacity>
+      </Div> */}
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <Div
           flex={1}
           style={{ gap: verticalScale(16) }}
@@ -156,10 +167,7 @@ export default function MatchModalHandler({
           >
             <MatchPrivacyToggleInput matchDetailsRef={matchDetailsRef} />
           </Accordion>
-          <Div
-            borderBottomWidth={1}
-            borderBottomColor={customTheme.colors.gray}
-          />
+          <Div borderBottomWidth={1} borderBottomColor={customTheme.colors.gray} />
           <Text
             fontSize={customTheme.fontSize.medium}
             color={customTheme.colors.gray}
@@ -189,7 +197,6 @@ export default function MatchModalHandler({
           </Accordion>
         </Div>
       </ScrollView>
-
       <Div
         justifyContent="center"
         bg="#151515E5"
@@ -202,10 +209,21 @@ export default function MatchModalHandler({
             justifyContent="center"
             bg={customTheme.colors.primary}
           >
-            <Text textAlign="center">{!match ? "Crear" : "Editar"}</Text>
+            <Text textAlign="center" color="black">
+              {!match ? "Crear" : "Editar"}
+            </Text>
           </Div>
         </TouchableOpacity>
       </Div>
-    </Modal>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+  },
+});
