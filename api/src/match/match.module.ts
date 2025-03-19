@@ -18,6 +18,7 @@ import { ZonesModule } from "zones/zones.module";
 import { SportMode, SportModeSchema } from "sport_modes/sport_mode.entity";
 import { serverSetting } from "settings";
 import { ActivityModule } from "activity/activity.module";
+import { UserModule } from "user/user.module";
 
 @Module({
     imports: [
@@ -34,7 +35,8 @@ import { ActivityModule } from "activity/activity.module";
         SportModesModule,
         ChatroomModule,
         ZonesModule,
-        ActivityModule
+        ActivityModule,
+        UserModule
     ],
     controllers: [MatchController],
     providers: [MatchService, JwtService, PushNotificationService, MatchListener],

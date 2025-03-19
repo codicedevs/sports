@@ -18,13 +18,15 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
   const iconMap: Record<string, JSX.Element> = {
     HomeStack: <HomeIcon width={scale(20)} height={scale(20)} />,
     SettingsStack: <BellIcon width={scale(20)} height={scale(20)} />,
-    SettingsStack1: <PlusIcon width={scale(20)} height={scale(20)} />,
+    [AppScreens.MATCH_HANDLER]: <PlusIcon width={scale(20)} height={scale(20)} />,
     [AppScreens.MATCH_SCREEN]: <FieldIcon width={scale(20)} height={scale(20)} />,
     SettingsStack3: <ProfileIcon width={scale(20)} height={scale(20)} />
   };
 
   const screen = getFocusedRouteNameFromRoute(state.routes[state.index]);
   if (screen === AppScreens.MATCH_DETAIL) return null;
+  if(state.routes[state.index].name === AppScreens.MATCH_HANDLER) return null;
+// console.log(state.routes)
 
   return (
     <Div

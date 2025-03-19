@@ -55,7 +55,7 @@ class UserService extends CRUDService<IUser> {
   };
 
   updatePushToken = async (id: string, pushToken: string) => {
-    return this.patch(`/update-push-token/${id}/`, { pushToken });
+    return (await this.patch(`/update-push-token/${id}`, { pushToken })).data;
   };
 
   changePassword = async ({
