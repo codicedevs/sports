@@ -66,7 +66,7 @@ function PushNotificationInitializer() {
     async function register() {
       const token = await registerForPushNotificationsAsync();
       if (token) {
-        console.log("Push Notification token:", token);
+        // console.log("Push Notification token:", token);
         setPushToken(token);
       }
     }
