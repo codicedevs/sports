@@ -275,7 +275,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
 
         {activeTab === "jugadores" && (
           <Div>
-            <PlayerStatusList matchId={match.data._id} />
+            <PlayerStatusList match={match.data} />
           </Div>
         )}
 
