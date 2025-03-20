@@ -89,7 +89,7 @@ const MatchList = () => {
           }}
         >
           {record.user ? (
-            <a onClick={() => navigate(`../profile/${record.user._id}`)}>
+            <a onClick={() => navigate(`../users/${record.user._id}`)}>
               Ver {record.user.name}
             </a>
           ) : (

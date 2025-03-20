@@ -1,7 +1,7 @@
 import { BaseQueryFn, createApi } from "@reduxjs/toolkit/query/react";
 import { AxiosError, AxiosResponse } from "axios";
 import { userService } from "../../../services/user";
-import { User } from "../../../interfaces/interfaces";
+import { NewUserDto, User } from "../../../interfaces/interfaces";
 
 interface UserResponse {
   results: User[];
@@ -37,6 +37,8 @@ const axiosBaseQuery =
     unknown
   > =>
   async ({ method, data, params }) => {
+    console.log("axiosBaseQuery:", { method, data, params }); // <-- Agrega esto
+
     try {
       const result: AxiosResponse<T> = await service[method](data, params);
 
@@ -73,7 +75,22 @@ export const userApi = createApi({
       }),
       transformResponse: (response: UserResponse) => response.results[0],
     }),
+    registerUser: builder.mutation<NewUserDto, User>({
+      query: (newUser: NewUserDto) => ({
+        url: "",
+        method: "createUser",
+        data: newUser,
+      }),
+    }),
+    deleteUser: builder.mutation<User, User>({
+      query: (userId: any) => ({
+        url: "",
+        method: "deleteUser",
+        data: userId,
+      }),
+    }),
   }),
 });
 
-export const { useGetUsersQuery, useGetUserQuery } = userApi;
+export const { useGetUsersQuery, useGetUserQuery, useRegisterUserMutation } =
+  userApi;

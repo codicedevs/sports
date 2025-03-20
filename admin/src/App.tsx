@@ -11,6 +11,8 @@ import TestUserProfile from "./views/testProfile";
 import Dashboard from "./pages/dashboard";
 import { useState } from "react";
 import { lightTheme } from "./utils/theme";
+import NewUser from "./pages/users/newUser";
+import UsersList from "./components/usersList";
 
 const router = createBrowserRouter([
   {
@@ -28,7 +30,9 @@ const router = createBrowserRouter([
     children: [
       { path: "", element: <DashboardHome /> },
       { path: "partidos", element: <Matches /> },
-      { path: "profile/:id", element: <TestUserProfile /> },
+      { path: "newUser", element: <NewUser /> },
+      { path: "users", element: <UsersList /> },
+      { path: "users/:id", element: <TestUserProfile /> },
     ],
   },
 ]);
