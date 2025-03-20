@@ -1,16 +1,17 @@
 import React from 'react'
-import { View } from 'react-native'
+import { Image, View } from 'react-native'
 import useFetch from '../../../hooks/useGet'
 import matchService from '../../../service/match.service'
 import { QUERY_KEYS } from '../../../types/query.types'
 import { Div, Text } from 'react-native-magnus'
 import { customTheme } from '../../../utils/theme'
 import Match from '../../../types/match.type'
+import { scale } from 'react-native-size-matters'
 
 const PlayerStatusList = ({ match }: { match: Match }) => {
 
   const { data: statusList } = useFetch(() => matchService.getPlayerInvitations(match._id), [QUERY_KEYS.PLAYERS_STATUS])
-
+  if (!statusList) return
   const acceptedPercentage = match.playersLimit
     ? (statusList.accepted.length / match.playersLimit) * 100
     : 0
@@ -26,9 +27,9 @@ const PlayerStatusList = ({ match }: { match: Match }) => {
   return (
     <Div px={customTheme.spacing.large}>
       <Div h={'20%'} p={customTheme.spacing.small}>
-        <Text textAlign='center'>Estado de jugadores</Text>
+        <Text fontSize={customTheme.fontSize.medium} textAlign='center'>Estado de jugadores</Text>
       </Div>
-      <Div w={"100%"} flexDir='row' justifyContent='space-between'>
+      <Div w={"100%"} flexDir='row' justifyContent='space-between' mb={customTheme.spacing.small}>
         <Div w='50%' h={10} bg={customTheme.colors.grayBackground} rounded='md' my={customTheme.spacing.xs}>
           <Div
             w={`${acceptedPercentage}%`}
@@ -37,18 +38,21 @@ const PlayerStatusList = ({ match }: { match: Match }) => {
             rounded='md'
           />
         </Div>
-        <Text textAlign='right'>Confirmados ({`${statusList?.accepted.length}`})</Text>
+        <Text fontFamily='NotoSans-Italic' textAlign='right'>Confirmados ({`${statusList?.accepted.length}`})</Text>
       </Div>
-      {
-        statusList?.accepted.map((person) => (
-          <Div>
-            <Text>{person.name}</Text>
-          </Div>
-        ))
-      }
-      <Div borderBottomWidth={1} borderColor='grey' my={customTheme.spacing.medium} />
+      <Div style={{ gap: 5 }}>
+        {
+          statusList?.accepted.map((person) => (
+            <Div flexDir='row'>
+              <Image style={{ width: scale(18), height: scale(18), marginRight: customTheme.spacing.small }} source={require("../../../assets/match/profileICon.png")} />
+              <Text>{person.name}</Text>
+            </Div>
+          ))
+        }
+      </Div>
+      <Div borderBottomWidth={1} borderColor={customTheme.colors.lightGray} my={customTheme.spacing.medium} />
 
-      <Div w={"100%"} flexDir='row' justifyContent='space-between'>
+      <Div w={"100%"} flexDir='row' justifyContent='space-between' mb={customTheme.spacing.small}>
         <Div w='50%' h={10} bg={customTheme.colors.grayBackground} rounded='md' my={customTheme.spacing.xs}>
           <Div
             w={`${pendingPercentage}%`}
@@ -57,17 +61,20 @@ const PlayerStatusList = ({ match }: { match: Match }) => {
             rounded='md'
           />
         </Div>
-        <Text textAlign='right'>A confirmar ({`${statusList?.pending.length}`})</Text>
+        <Text fontFamily='NotoSans-Italic' textAlign='right'>A confirmar ({`${statusList?.pending.length}`})</Text>
       </Div>
-      {
-        statusList?.pending.map((person) => (
-          <Div>
-            <Text>{person.name}</Text>
-          </Div>
-        ))
-      }
-      <Div borderBottomWidth={1} borderColor='grey' my={customTheme.spacing.medium} />
-      <Div w={"100%"} flexDir='row' justifyContent='space-between'>
+      <Div style={{ gap: 5 }}>
+        {
+          statusList?.pending.map((person) => (
+            <Div flexDir='row'>
+              <Image style={{ width: scale(18), height: scale(18), marginRight: customTheme.spacing.small }} source={require("../../../assets/match/profileICon.png")} />
+              <Text>{person.name}</Text>
+            </Div>
+          ))
+        }
+      </Div>
+      <Div borderBottomWidth={1} borderColor={customTheme.colors.lightGray} my={customTheme.spacing.medium} />
+      <Div w={"100%"} flexDir='row' justifyContent='space-between' mb={customTheme.spacing.small}>
         <Div w='50%' h={10} bg={customTheme.colors.grayBackground} rounded='md' my={customTheme.spacing.xs}>
           <Div
             w={`${declinedPercentage}%`}
@@ -76,15 +83,19 @@ const PlayerStatusList = ({ match }: { match: Match }) => {
             rounded='md'
           />
         </Div>
-        <Text textAlign='right'>No aceptaron ({`${statusList?.declined.length}`})</Text>
+        <Text fontFamily='NotoSans-Italic' textAlign='right'>No aceptaron ({`${statusList?.declined.length}`})</Text>
       </Div>
-      {
-        statusList?.declined.map((person) => (
-          <Div>
-            <Text>{person.name}</Text>
-          </Div>
-        ))
-      }
+      <Div style={{ gap: 5 }}>
+        {
+          statusList?.declined.map((person) => (
+            <Div flexDir='row'>
+              <Image style={{ width: scale(18), height: scale(18), marginRight: customTheme.spacing.small }} source={require("../../../assets/match/profileICon.png")} />
+              <Text>{person.name}</Text>
+            </Div>
+          ))
+        }
+      </Div>
+      <Div borderBottomWidth={1} borderColor={customTheme.colors.lightGray} my={customTheme.spacing.medium} />
     </Div>)
 }
 
