@@ -10,7 +10,6 @@ import {
 import { Types } from "mongoose";
 import { Profile, User } from "user/user.entity";
 
-
 export class CreateUserDto {
   @MinLength(4)
   name: string;
@@ -32,6 +31,9 @@ export class CreateUserDto {
   @IsEnum(Role, { each: true })
   @IsOptional()
   roles?: Role[];
+
+  @IsOptional()
+  phone?: string;
 
   @IsOptional()
   pushToken?: string;

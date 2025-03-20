@@ -59,7 +59,6 @@ export class Profile {
     type: [{ type: mongoose.Schema.Types.ObjectId, ref: "SportMode" }],
   })
   preferredSportModes?: Types.ObjectId[] | SportMode[];
-
 }
 export const ProfileSchema = SchemaFactory.createForClass(Profile);
 
@@ -106,9 +105,10 @@ export class User extends Document {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: "Group" }] })
   groups?: Types.ObjectId[] | Group[];
 
+  @Prop({ type: String, required: false })
+  phone?: string;
 }
 
 // Creación de esquemas
-
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -66,7 +66,6 @@ const LoginPage = () => {
   const onSubmit = async (data: { email: string; password: string }) => {
     try {
       const response = await login(data).unwrap();
-      console.log("response", response);
       const userData = {
         user: { id: response.user.id, name: response.user.name },
         token: response.access_token,
