@@ -47,7 +47,7 @@ export default function App() {
             <AppProvider>
               <PushNotificationInitializer />
               <SafeAreaView style={{ flex: 1 }}>
-                <StatusBar translucent backgroundColor="transparent" style="light" />
+                <StatusBar translucent  backgroundColor={customTheme.colors.grayBackground} style="dark" />
                 <AppNavigator />
               </SafeAreaView>
             </AppProvider>
