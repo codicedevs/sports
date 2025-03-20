@@ -26,7 +26,6 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
   const screen = getFocusedRouteNameFromRoute(state.routes[state.index]);
   if (screen === AppScreens.MATCH_DETAIL) return null;
   if(state.routes[state.index].name === AppScreens.MATCH_HANDLER) return null;
-// console.log(state.routes)
 
   return (
     <Div

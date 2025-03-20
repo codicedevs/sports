@@ -18,7 +18,12 @@ import eventService from "../service/event.service";
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
-  const { data: matches } = useFetch(matchService.getAll, [QUERY_KEYS.MATCHES]);
+  const { currentUser } = useSession()
+  const { data: matches } = useFetch(() => matchService.getAll({
+    where: {
+      "user._id": currentUser._id
+    }
+  }), [QUERY_KEYS.MATCHES, currentUser]);
   const { showModal } = useSession();
 
   const { data: events } = useFetch(eventService.getAll, [QUERY_KEYS.EVENTS]); // pa hacer la llamada

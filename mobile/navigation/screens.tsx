@@ -20,7 +20,7 @@ export type AppScreensParamList = {
     [AppScreens.SETTINGS_SCREEN]: undefined
     [AppScreens.MATCH_DETAIL]: { id: string }
     [AppScreens.MATCH_SCREEN]: undefined;
-    [AppScreens.MATCH_HANDLER]: undefined;
+    [AppScreens.MATCH_HANDLER]: {id?: string};
 }
 
 export type AppScreenProps<T extends AppScreens> = {

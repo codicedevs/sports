@@ -33,6 +33,11 @@ class MatchService extends CRUDService<Match> {
   //   return res
   // };
 
+  getPlayerInvitations = async (matchId:string) => {
+    const res = await this.get(`/${matchId}/petitions`)
+    return res.data
+  }
+
   addPlayerToFormation = async (
     matchId: string,
     userId: string,

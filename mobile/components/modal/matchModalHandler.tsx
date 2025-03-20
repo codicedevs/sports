@@ -11,11 +11,17 @@ import MatchSchedulerInput from "../matche/Inputs/matchScheduler";
 import SearchLocationInput from "../matche/Inputs/searchLocation";
 import { MatchDetails } from "../../types/form.type";
 import matchService from "../../service/match.service";
-
+import { QueryObserverResult } from "@tanstack/react-query";
+//falta hacer un cambio que se muestre bien los datos actuales, estan hardcodeados
+/* =======================================
+   1) Declaramos la interfaz de props,
+      incluyendo onMatchCreated
+   ======================================= */
 interface MatchModalHandlerProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   match?: string;
+  refetch?: () => Promise<QueryObserverResult<any, Error>>;
   onMatchCreated?: (matchId: string) => void; // <-- MARCADO: Agregamos prop opcional
 }
 
@@ -23,10 +29,10 @@ export default function MatchModalHandler({
   open,
   setOpen,
   match,
+  refetch,
   onMatchCreated, // <-- MARCADO: desestructuramos
 }: MatchModalHandlerProps) {
   const [openId, setOpenId] = useState<null | string>(null);
-
   // Objeto con la info del partido a crear/editar
   const matchDetailsRef = useRef<MatchDetails>({
     selectedSport: null,
@@ -46,7 +52,7 @@ export default function MatchModalHandler({
   async function fetchMatch() {
     if (!match) return;
     try {
-      const res = await matchService.getById(match);
+      const res = await matchService.getById(match._id);
       // Ajusta según la forma real de la respuesta
       matchDetailsRef.current.selectedSport = res.data.sportMode?.sport || null;
       matchDetailsRef.current.selectedSportMode = res.data.sportMode || null;
@@ -89,7 +95,7 @@ export default function MatchModalHandler({
 
   const editMatch = async () => {
     try {
-      const res = await matchService.update("67af556cb453684f313e9a4b", {
+      const res = await matchService.update(match._id, {
         name: "Prueba3",
         date: matchDetailsRef.current.matchDate,
         location: matchDetailsRef.current.location?._id,
@@ -98,6 +104,8 @@ export default function MatchModalHandler({
         sportMode: matchDetailsRef.current.selectedSportMode?._id,
         open: matchDetailsRef.current.privacyOption,
       });
+      if(res) refetch();
+      closeModal();
       console.log("Partido editado:", res);
     } catch (e) {
       console.log(e, "ERROR");

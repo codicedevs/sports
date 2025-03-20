@@ -13,13 +13,9 @@ const AppNavigator = () => {
   return (
     <NavigationContainer ref={navigationRef}>
       <VersionModal />
-
-      <MatchModalHandler open={open} setOpen={setOpen} />
       <RestrictiveModal />
       <SplashScreen />
-      <ModalContext.Provider value={{ open, setOpen }}>
       <Principal />
-      </ModalContext.Provider>
     </NavigationContainer>
   );
 };

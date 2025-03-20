@@ -12,6 +12,7 @@ import PlayersCounterInput from "../components/matche/Inputs/playersCounter";
 import MatchPrivacyToggleInput from "../components/matche/Inputs/matchPrivacyToggle";
 import MatchSchedulerInput from "../components/matche/Inputs/matchScheduler";
 import SearchLocationInput from "../components/matche/Inputs/searchLocation";
+import { useSession } from "../context/authProvider";
 
 interface MatchHandlerScreenProps {
   match?: string;
@@ -24,6 +25,7 @@ export default function MatchHandlerScreen({
 }: MatchHandlerScreenProps) {
   const navigation = useNavigation();
   const [openId, setOpenId] = useState<null | string>(null);
+  const {currentUser} = useSession()
 
   // Objeto con la info del partido a crear/editar
   const matchDetailsRef = useRef<MatchDetails>({
@@ -62,19 +64,19 @@ export default function MatchHandlerScreen({
       const res = await matchService.create({
         name: "Prueba3",
         date: matchDetailsRef.current.matchDate,
-        location: matchDetailsRef.current.location?._id,
+        location: matchDetailsRef.current.location?._id ,
         playersLimit: matchDetailsRef.current.playerLimit,
-        userId: "66e482584509915a15968bd7",
-        sportMode: "67c873ffeb647cc591249358",
+        userId: currentUser._id,
+        sportMode: matchDetailsRef.current.selectedSportMode?._id,
         open: matchDetailsRef.current.privacyOption,
       });
-      const createdMatchId = res.data._id;
+      const createdMatchId = res._id;
       if (onMatchCreated) {
         onMatchCreated(createdMatchId);
       }
       closeScreen();
     } catch (e) {
-      console.error("Error al crear el partido:", e);
+       console.error("Error al crear el partido:", e);
     }
   }
 
