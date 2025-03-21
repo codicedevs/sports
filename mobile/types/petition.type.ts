@@ -8,10 +8,9 @@ interface Petition {
   _id: string;
   emitter: Emitter;
   receiver: string;
-  match: {
-    name: string;
-    date: string;
-    location: Location;
+  reference: {
+    type: string;
+    id: string;
   };
   status: string;
 }
