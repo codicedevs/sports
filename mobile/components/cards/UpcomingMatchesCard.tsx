@@ -1,15 +1,14 @@
 import React from "react";
 import { Div, Image, Text } from "react-native-magnus";
 import { scale, verticalScale } from "react-native-size-matters";
-import { customTheme } from "../utils/theme";
 import { formatMatchDate } from "./matchesCards";
-import { User } from "../types/user.type";
 import { TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { AppScreens, AppScreensParamList } from "../navigation/screens";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import Location from "../types/location.type";
-import { SportMode } from "../types/form.type";
+import { User } from "../../types/user.type";
+import { SportMode } from "../../types/form.type";
+import { AppScreens, AppScreensParamList } from "../../navigation/screens";
+import { customTheme } from "../../utils/theme";
 
 type UpcomingMatchProps = {
   date?: string;
@@ -79,7 +78,7 @@ export default function UpcomingMatchCard({
       >
         <Div flexDir="row" justifyContent="center" alignItems="center">
           <Image
-            source={require("../assets/iconTime.png")}
+            source={require("../../assets/iconTime.png")}
             h={customTheme.spacing.medium}
             w={scale(15)}
             mt={scale(2)}
@@ -129,7 +128,7 @@ export default function UpcomingMatchCard({
           {/* condicional bgColor */}
           <Div bg={bgColor} flexDir="row">
             <Image
-              source={require("../assets/iconUser.png")}
+              source={require("../../assets/iconUser.png")}
               bg={bgColor}
               resizeMode="contain"
               w={customTheme.fontSize.medium}
@@ -143,7 +142,7 @@ export default function UpcomingMatchCard({
           </Div>
 
           <Image
-            source={require("../assets/iconNext.png")}
+            source={require("../../assets/iconNext.png")}
             resizeMode="contain"
             w={customTheme.fontSize.title}
           />

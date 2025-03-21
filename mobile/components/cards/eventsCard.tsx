@@ -2,7 +2,7 @@ import React from "react";
 import { Div, Text } from "react-native-magnus";
 import { Image, ImageBackground } from "react-native";
 import { scale } from "react-native-size-matters";
-import { customTheme } from "../utils/theme";
+import { customTheme } from "../../utils/theme";
 
 interface eventsCardProps {
   name: string;
@@ -11,9 +11,9 @@ interface eventsCardProps {
 
 const EventsCard: React.FC<eventsCardProps> = ({ name, date }) => {
   return (
-    <Div ml={scale(-8)}>
+    <Div>
       <ImageBackground
-      source={require("../assets/fotoCardTorneo.png")}
+        source={require("../../assets/fotoCardTorneo.png")}
         resizeMode="cover"
         style={{
           width: "100%",
@@ -26,7 +26,7 @@ const EventsCard: React.FC<eventsCardProps> = ({ name, date }) => {
         }}
       >
         <Image
-          source={require("../assets/CopaCardTorneo.png")}
+          source={require("../../assets/CopaCardTorneo.png")}
           style={{ margin: 15, width: 40, height: 40 }}
         />
 
@@ -77,7 +77,7 @@ const EventsCard: React.FC<eventsCardProps> = ({ name, date }) => {
         <Div mr={customTheme.fontSize.small}>
           <Image
             style={{ width: 25, height: 25, resizeMode: "contain" }}
-            source={require("../assets/flechaCardTorneo.png")}
+            source={require("../../assets/flechaCardTorneo.png")}
           />
         </Div>
       </Div>

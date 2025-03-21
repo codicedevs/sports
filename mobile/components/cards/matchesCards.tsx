@@ -2,14 +2,13 @@ import React from "react";
 import { View, Image, TouchableOpacity } from "react-native";
 import { Div, Text } from "react-native-magnus";
 import { scale } from "react-native-size-matters";
-import { customTheme } from "../utils/theme";
-import Location from "../types/location.type";
-import { User } from "../types/user.type";
-import { AppScreens, AppScreensParamList } from "../navigation/screens";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { SportMode } from "../types/form.type";
 import dayjs from "dayjs";
+import { User } from "../../types/user.type";
+import { SportMode } from "../../types/form.type";
+import { AppScreens, AppScreensParamList } from "../../navigation/screens";
+import { customTheme } from "../../utils/theme";
 
 export function getDayName(dayNum?: number) {
   if (dayNum == null) return "";
@@ -79,7 +78,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
         navigation.navigate(AppScreens.MATCH_DETAIL, { id: matchId })
       }
     >
-      <Div alignItems="center" p={customTheme.spacing.small}>
+      <Div alignItems="center" >
         <Div
           borderWidth={scale(1)}
           rounded={customTheme.borderRadius.medium}
@@ -119,7 +118,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
                 {/* Resto de la fecha/hora */}
                 <Div flexDir="row" alignItems="center">
                   <Image
-                    source={require("../assets/iconTime.png")}
+                    source={require("../../assets/iconTime.png")}
                     style={{
                       width: scale(15),
                       height: scale(15),
@@ -178,7 +177,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
               >
                 <Div flexDir="row">
                   <Image
-                    source={require("../assets/IconPelota.png")}
+                    source={require("../../assets/IconPelota.png")}
                     style={{
                       width: scale(18),
                       height: scale(18),
@@ -195,7 +194,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
                     {sportMode?.label}
                   </Text>
                   <Image
-                    source={require("../assets/iconUser.png")}
+                    source={require("../../assets/iconUser.png")}
                     style={{
                       width: scale(17),
                       height: scale(17),
@@ -213,7 +212,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
                 </Div>
                 <Div>
                   <Image
-                    source={require("../assets/iconNext.png")}
+                    source={require("../../assets/iconNext.png")}
                     style={{
                       width: scale(18),
                       height: scale(18),
