@@ -26,6 +26,7 @@ import { MatchViewModule } from 'match/match-view.module';
 import { ActivityModule } from './activity/activity.module';
 import { QuestionModule } from './question/question.module';
 import { QuizModule } from './quiz/quiz.module';
+import { AnswerModule } from './answer/answer.module';
 @Module({
     imports: [
         SentryModule.forRoot(),
