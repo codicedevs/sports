@@ -4,11 +4,13 @@ import { scale, verticalScale } from "react-native-size-matters";
 import { formatMatchDate } from "./matchesCards";
 import { TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import Location from "../../types/location.type";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { User } from "../../types/user.type";
-import { SportMode } from "../../types/form.type";
+import { SportMode } from "../../types/sport-mode";
 import { AppScreens, AppScreensParamList } from "../../navigation/screens";
 import { customTheme } from "../../utils/theme";
+
 
 type UpcomingMatchProps = {
   date?: string;
@@ -149,5 +151,5 @@ export default function UpcomingMatchCard({
         </Div>
       </Div>
     </TouchableOpacity>
-  );
+  );
 }

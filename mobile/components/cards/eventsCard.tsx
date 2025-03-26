@@ -85,4 +85,4 @@ const EventsCard: React.FC<eventsCardProps> = ({ name, date }) => {
   );
 };
 
-export default EventsCard;
+export default EventsCard;
