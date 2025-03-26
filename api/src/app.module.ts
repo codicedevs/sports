@@ -24,6 +24,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { FilterPlugin } from 'filter/filter.plugin';
 import { MatchViewModule } from 'match/match-view.module';
 import { ActivityModule } from './activity/activity.module';
+import { QuestionModule } from './question/question.module';
+import { QuizModule } from './quiz/quiz.module';
 @Module({
     imports: [
         SentryModule.forRoot(),
@@ -59,7 +61,10 @@ import { ActivityModule } from './activity/activity.module';
         ChatroomModule,
         GroupsModule,
         MatchViewModule,
-        ActivityModule
+        ActivityModule,
+        QuestionModule,
+        QuizModule,
+        AnswerModule
     ],
     controllers: [AppController],
     providers: [
