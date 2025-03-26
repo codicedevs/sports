@@ -1,26 +1,26 @@
 import { Button, Input, Segmented, Select, Space, Table } from "antd";
 import { useState } from "react";
-import { useGetMatchesQuery } from "../store/features/match/matchApi";
+import {
+  useDeleteMatchMutation,
+  useGetMatchesQuery,
+} from "../store/features/match/matchApi";
 import { CheckCircleTwoTone, CloseCircleTwoTone } from "@ant-design/icons";
-import { Location, Match, User } from "../interfaces/interfaces";
+import { Location, Match, MatchList, User } from "../interfaces/interfaces";
 import { useNavigate } from "react-router-dom";
+import Delete from "./Delete";
+import { ColumnType } from "antd/es/table";
 const { Search } = Input;
 
-const stateOptions = [
-  { label: "Abierto", value: true },
-  { label: "Cerrado", value: false },
-  { label: "Todas", value: "all" },
-];
-const likeInputs = ["name", "location", "user"];
-
-const MatchList = () => {
-  const navigate = useNavigate();
-
-  const columns = [
+const getColumns = (
+  handleDeleteMatch: (id: string) => void,
+  navigate: any
+): ColumnType<MatchList>[] => {
+  return [
     {
       title: "Nombre del partido",
       dataIndex: "name",
       key: "name",
+      sorter: (a: any, b: any) => a.name - b.name,
     },
     {
       title: "Fecha",
@@ -96,14 +96,35 @@ const MatchList = () => {
             <p>No hay usuario</p>
           )}
 
-          <Button>Editar</Button>
-          <Button>Borrar</Button>
+          <Button onClick={() => navigate(`../partidos/${record._id}`)}>
+            Editar
+          </Button>
+
+          <Delete handleDelete={handleDeleteMatch} id={record._id} />
         </Space>
       ),
     },
   ];
+};
+
+const stateOptions = [
+  { label: "Abierto", value: true },
+  { label: "Cerrado", value: false },
+  { label: "Todas", value: "all" },
+];
+const likeInputs = ["name", "location", "user"];
+
+const MatchsList = () => {
+  const navigate = useNavigate();
+
   const [filter, setFilter] = useState<{}>();
   const { data } = useGetMatchesQuery(filter);
+  const [deleteMatch] = useDeleteMatchMutation();
+
+  const handleDeleteMatch = (id: string) => {
+    deleteMatch(id);
+  };
+  const columns = getColumns(handleDeleteMatch, navigate);
 
   const handleSearch = (filterName: string, value: string | boolean) => {
     if (likeInputs.includes(filterName)) {
@@ -193,10 +214,29 @@ const MatchList = () => {
             ]}
           />
         </div>
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: "5px",
+          }}
+        >
+          <label htmlFor="switchBordered">Turno</label>
+          <Button
+            type="primary"
+            onClick={() => {
+              navigate("../../home/nuevoPartido");
+            }}
+          >
+            Nuevo Partido
+          </Button>
+        </div>
       </div>
       <Table dataSource={data?.results || []} columns={columns} />
     </div>
   );
 };
 
-export default MatchList;
+export default MatchsList;

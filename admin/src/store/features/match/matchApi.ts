@@ -2,6 +2,7 @@
 import { BaseQueryFn, createApi } from "@reduxjs/toolkit/query/react";
 import { AxiosError, AxiosResponse } from "axios";
 import { matchService } from "../../../services/match";
+import { Match } from "../../../interfaces/interfaces";
 
 interface MatchFilter {
   _id: string;
@@ -54,6 +55,7 @@ const axiosBaseQuery =
 export const matchApi = createApi({
   reducerPath: "matchApi",
   baseQuery: axiosBaseQuery<ApiResponse<any>>(matchService),
+  tagTypes: ["Matches"],
   endpoints: (builder) => ({
     getMatches: builder.query<any, any>({
       query: (filter: any) => {
@@ -63,8 +65,46 @@ export const matchApi = createApi({
           params: filter,
         };
       },
+      providesTags: ["Matches"],
+    }),
+    createMatch: builder.mutation<any, any>({
+      query: (data: any) => {
+        return {
+          url: ``,
+          method: "create",
+          data,
+        };
+      },
+      invalidatesTags: ["Matches"],
+    }),
+    deleteMatch: builder.mutation<string, string>({
+      query: (matchId: any) => {
+        return {
+          url: ``,
+          method: "remove",
+          data: matchId,
+        };
+      },
+      async onQueryStarted(matchId, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          matchApi.util.updateQueryData("getMatches", undefined, (draft) => {
+            draft.results = draft.results.filter(
+              (match: Match) => match._id !== matchId
+            );
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
     }),
   }),
 });
 
-export const { useGetMatchesQuery } = matchApi;
+export const {
+  useGetMatchesQuery,
+  useCreateMatchMutation,
+  useDeleteMatchMutation,
+} = matchApi;
