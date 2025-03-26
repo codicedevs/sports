@@ -62,7 +62,8 @@ export function TabStackScreen() {
     return (
         <Tab.Navigator tabBar={(props) => <CustomTabBar {...props} />}  screenOptions={{
             header: () => <CustomHeader />, 
-            headerShown: true
+            headerShown: true,
+            animation: "fade"
         }}>
             <Tab.Screen name="HomeStack" component={HomeStackScreen} />
             <Tab.Screen name="SettingsStack" component={SettingsStackScreen} />
