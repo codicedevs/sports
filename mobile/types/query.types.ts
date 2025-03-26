@@ -1,6 +1,7 @@
 export enum QUERY_KEYS {
     USERS = "users",
     MATCHES = "matches",
+    PUBLIC_MATCHES = "publicMatches",
     PETITIONS = "petitions",
     SPORTS = "sports",
     SPORT_MODES = "sportModes",
