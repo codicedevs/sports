@@ -201,15 +201,15 @@ const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, s
 
 const MatchesList = ({ matches, fetchMore, hasMore }) => {
   const renderItem = ({ item }) => (
-    <MatchesCards
-      key={item.id}
-      date={'F'}
-      day={item.dayOfWeek}
-      location={item.location?.address}
-      maxPlayers={item.playersLimit}
-      players={10}
-      time={'horario'}
-    />
+      <MatchesCards
+        key={item.id}
+        date={'F'}
+        day={item.dayOfWeek}
+        location={item.location?.address}
+        maxPlayers={item.playersLimit}
+        players={10}
+        time={'horario'}
+      />
   );
 
   const keyExtractor = (item) => item._id.toString();
@@ -225,17 +225,17 @@ const MatchesList = ({ matches, fetchMore, hasMore }) => {
     )
   }
   return (
-    <FlatList
-      data={matches}
-      renderItem={renderItem}
-      keyExtractor={keyExtractor}
-      onEndReached={fetchMore}
-      onEndReachedThreshold={0.5}
-      ListFooterComponent={renderFooter}
-      initialNumToRender={10}
-      maxToRenderPerBatch={10}
-      windowSize={5}
-    />
+      <FlatList
+        data={matches}
+        renderItem={renderItem}
+        keyExtractor={keyExtractor}
+        onEndReached={fetchMore}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={renderFooter}
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
+        windowSize={5}
+      />
   );
 };
 
@@ -267,7 +267,7 @@ const MatchesScreen = () => {
   const fetchMatches = async () => {
     const mongoFilter = buildMongoFilter();
     const res = await matchService.getAll(mongoFilter);
-    return res.data;
+    return res;
   };
 
   useEffect(() => {

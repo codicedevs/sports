@@ -31,8 +31,7 @@ const RestrictiveModal = () => {
     const login = async () => {
         try {
             const res = await authService.login("mtrovant@gmail.com", "123123123");
-            setCurrentUser(res.user)
-            console.log("RESP LOGIN:", res);
+            setCurrentUser(res.user);
 
             if (res) {
                 // Si ya tenemos el pushToken almacenado en el contexto, lo usamos
