@@ -29,6 +29,22 @@ export interface User {
   profile: Profile;
 }
 
+export interface UserList {
+  _id: string;
+  name: string;
+  email: string;
+  phone: string;
+  roles: string[];
+  calificacion: string;
+}
+
+export interface NewUserDto {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+}
+
 export interface GeoLocation {
   type: string;
   coordinates: [number, number];
@@ -57,6 +73,15 @@ export interface Match {
   groups: Group[];
 }
 
+export interface MatchList {
+  _id: string;
+  name: string;
+  date: string; // o Date, según cómo lo manejes internamente
+  location: Location | null;
+  user: User | null;
+  open: boolean;
+}
+
 export interface Group {
   name: string;
   users: string[]; // IDs de usuarios
@@ -69,10 +94,3 @@ type FilterOperator<T> = T | { LIKE: string };
 export type Filter<T> = {
   [P in keyof T]?: FilterOperator<T[P]>;
 };
-
-export interface NewUserDto {
-  name: string;
-  email: string;
-  phone: string;
-  password: string;
-}

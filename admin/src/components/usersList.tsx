@@ -1,16 +1,20 @@
 import { Button, Input, Segmented, Select, Space, Table } from "antd";
 import { useState } from "react";
-import { CheckCircleTwoTone, CloseCircleTwoTone } from "@ant-design/icons";
-import { Location, Match, User } from "../interfaces/interfaces";
+import { Location, Match, User, UserList } from "../interfaces/interfaces";
 import { useNavigate } from "react-router-dom";
-import { useGetUsersQuery } from "../store/features/user/userApi";
+import {
+  useDeleteUserMutation,
+  useGetUsersQuery,
+} from "../store/features/user/userApi";
+import { ColumnType } from "antd/es/table";
+import Delete from "./Delete";
 const { Search } = Input;
 
-const likeInputs = ["name", "location", "user"];
-const UsersList = () => {
-  const navigate = useNavigate();
-
-  const columns = [
+const getColumns = (
+  handleDeleteUser: (id: string) => void,
+  navigate: any
+): ColumnType<UserList>[] => {
+  return [
     {
       title: "Nombre",
       dataIndex: "name",
@@ -62,15 +66,26 @@ const UsersList = () => {
             <p>No hay telefono</p>
           )}
 
-          <Button>Editar</Button>
-          <Button>Borrar</Button>
+          <Button onClick={() => navigate(`../users/${record._id}`)}>
+            Editar
+          </Button>
+
+          <Delete handleDelete={handleDeleteUser} id={record._id} />
         </Space>
       ),
     },
   ];
+};
+
+const likeInputs = ["name", "location", "user"];
+const UsersList = () => {
+  const navigate = useNavigate();
+  const [deleteUser] = useDeleteUserMutation();
   const [filter, setFilter] = useState<{}>();
   const { data } = useGetUsersQuery(filter);
-  console.log("data", data);
+  const handleDeleteUser = (id: string) => {
+    deleteUser(id);
+  };
 
   const handleSearch = (filterName: string, value: string | boolean) => {
     if (likeInputs.includes(filterName)) {
@@ -85,11 +100,8 @@ const UsersList = () => {
       }));
     }
   };
-  const handleOpenChange = (value: string) => {
-    console.log(value);
 
-    handleSearch("open", value);
-  };
+  const columns = getColumns(handleDeleteUser, navigate);
 
   return (
     <div>
@@ -108,9 +120,9 @@ const UsersList = () => {
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
+            flexDirection: "row",
             alignItems: "center",
-            gap: "5px",
+            gap: "10px",
           }}
         >
           <label>Buscar</label>
@@ -120,6 +132,14 @@ const UsersList = () => {
             size="middle"
             name="like-name"
           />
+          <Button
+            type="primary"
+            onClick={() => {
+              navigate("../../home/users/newUser");
+            }}
+          >
+            Nuevo
+          </Button>
         </div>
       </div>
       <Table dataSource={data?.results || []} columns={columns} />

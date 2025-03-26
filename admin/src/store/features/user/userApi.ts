@@ -41,7 +41,6 @@ const axiosBaseQuery =
 
     try {
       const result: AxiosResponse<T> = await service[method](data, params);
-
       return { data: result.data };
     } catch (error) {
       const axiosError = error as AxiosError;
@@ -57,40 +56,79 @@ const axiosBaseQuery =
 export const userApi = createApi({
   reducerPath: "userApi",
   baseQuery: axiosBaseQuery<UserResponse>(userService),
+  tagTypes: ["Users"],
   endpoints: (builder) => ({
-    getUsers: builder.query<any, any>({
-      query: (filter: any) => {
+    getUsers: builder.query<UserResponse, any | void>({
+      query: (filter?: any) => {
         return {
           url: ``,
           method: "find",
           params: filter,
         };
       },
+      providesTags: ["Users"],
     }),
     getUser: builder.query<User, any>({
-      query: ({ id, populate }) => ({
-        url: ``,
-        method: "find",
-        params: { "where[_id][id]": id, ...(populate ? { populate } : {}) },
-      }),
-      transformResponse: (response: UserResponse) => response.results[0],
+      query: ({ id, populate }) => {
+        console.log("getUser:", { id, populate });
+        return {
+          url: ``,
+          method: "findById",
+          data: id,
+          params: populate ? { populate } : {},
+        };
+      },
+      // transformResponse: (response: UserResponse) => {
+      //   console.log("response", response);
+      //   return response.results[0];
+      // },
     }),
     registerUser: builder.mutation<NewUserDto, User>({
       query: (newUser: NewUserDto) => ({
         url: "",
-        method: "createUser",
+        method: "create",
         data: newUser,
       }),
+      invalidatesTags: ["Users"],
     }),
-    deleteUser: builder.mutation<User, User>({
-      query: (userId: any) => ({
+    updateUser: builder.mutation<any, { userId: string; user: User }>({
+      query: ({ userId, user }) => ({
         url: "",
-        method: "deleteUser",
+        method: "update",
+        data: userId,
+        params: user,
+      }),
+      invalidatesTags: ["Users"],
+    }),
+    deleteUser: builder.mutation<string, string>({
+      query: (userId: string) => ({
+        url: "",
+        method: "remove",
         data: userId,
       }),
+      async onQueryStarted(userId, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          userApi.util.updateQueryData("getUsers", undefined, (draft) => {
+            draft.results = draft.results.filter(
+              (user: User) => user._id !== userId
+            );
+          })
+        );
+        try {
+          await queryFulfilled;
+        } catch {
+          patchResult.undo();
+        }
+      },
     }),
   }),
 });
 
-export const { useGetUsersQuery, useGetUserQuery, useRegisterUserMutation } =
-  userApi;
+export const {
+  useGetUsersQuery,
+  useLazyGetUsersQuery,
+  useGetUserQuery,
+  useRegisterUserMutation,
+  useDeleteUserMutation,
+  useUpdateUserMutation,
+} = userApi;
