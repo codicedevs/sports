@@ -225,6 +225,7 @@ const MatchesList = ({ matches, fetchMore, hasMore }) => {
     )
   }
   return (
+    <Div style={{gap:20}}>
       <FlatList
         data={matches}
         renderItem={renderItem}
@@ -236,6 +237,7 @@ const MatchesList = ({ matches, fetchMore, hasMore }) => {
         maxToRenderPerBatch={10}
         windowSize={5}
       />
+    </Div>
   );
 };
 
