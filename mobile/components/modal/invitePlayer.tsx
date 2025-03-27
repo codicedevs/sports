@@ -1,25 +1,34 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Button, Div, Image, Modal, Text } from "react-native-magnus";
 import { customTheme } from "../../utils/theme";
 import Autocomplete from "react-native-autocomplete-input";
 import { scale } from "react-native-size-matters";
 import { User } from "../../types/user.type";
 import userService from "../../service/user.service";
+import petitionService from "../../service/petition.service";
 import useFetch from "../../hooks/useGet";
 import { QUERY_KEYS } from "../../types/query.types";
+import { useSession } from "../../context/authProvider";
 
 interface InviteModalProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  emitterId: string;
+  matchId: string;
 }
 
-export default function InviteModal({ open, setOpen }: InviteModalProps) {
+export default function InviteModal({
+  open,
+  setOpen,
+  emitterId,
+  matchId,
+}: InviteModalProps) {
   const [query, setQuery] = useState("");
-  const [selectedPlayer, setSelectedPlayers] = useState<User[]>([]);
-
+  const [selectedPlayers, setSelectedPlayers] = useState<User[]>([]);
+  const { currentUser } = useSession();
   const handlePlayersSelected = (player: User) => {
-    if (!selectedPlayer.includes(player)) {
-      setSelectedPlayers([...selectedPlayer, player]);
+    if (!selectedPlayers.some((p) => p._id === player._id)) {
+      setSelectedPlayers([...selectedPlayers, player]);
       setQuery("");
     }
   };
@@ -29,13 +38,35 @@ export default function InviteModal({ open, setOpen }: InviteModalProps) {
   ]);
   if (!playersData) return null;
 
-  const filteredPlayers = playersData.results.filter((p: any) =>
+  const filteredPlayers = playersData.results.filter((p: User) =>
     p.name.toLowerCase().includes(query.toLowerCase())
   );
 
   const handleRemovePlayer = (id: string) => {
     setSelectedPlayers((prev) => prev.filter((p) => p._id !== id));
   };
+
+  async function handleSendInvitations() {
+    try {
+      for (const players of selectedPlayers) {
+        const petitionload = {
+          emitter: currentUser._id,
+          receiver: players._id,
+          reference: {
+            type: "Match",
+            id: matchId,
+          },
+        };
+        await petitionService.create(petitionload);
+      }
+      console.log("Invitaciones enviadas");
+
+      setSelectedPlayers([]);
+      setOpen(false);
+    } catch (error) {
+      console.error("Error al enviar las invitaciones:", error);
+    }
+  }
 
   return (
     <Modal isVisible={open} onBackButtonPress={() => setOpen(false)}>
@@ -55,6 +86,7 @@ export default function InviteModal({ open, setOpen }: InviteModalProps) {
         </Div>
       </Div>
 
+      {/* autocomplete */}
       <Div position="relative">
         <Autocomplete
           data={filteredPlayers}
@@ -77,12 +109,9 @@ export default function InviteModal({ open, setOpen }: InviteModalProps) {
           }}
           hideResults={query === ""}
           flatListProps={{
-            keyExtractor: (item: any) => item._id,
+            keyExtractor: (item: User) => item._id,
             keyboardShouldPersistTaps: "always",
-            style: {
-              borderWidth: 0,
-              
-            },
+            style: { borderWidth: 0 },
             renderItem: ({ item }) => (
               <Div
                 ml={customTheme.spacing.small}
@@ -96,11 +125,7 @@ export default function InviteModal({ open, setOpen }: InviteModalProps) {
                   h={28}
                 />
                 <Text
-                  style={{
-                    padding: 5,
-                    borderWidth: 0,
-                    marginLeft: scale(5),
-                  }}
+                  style={{ padding: 5, borderWidth: 0, marginLeft: scale(5) }}
                   fontFamily="NotoSans-Variable"
                   fontSize={customTheme.fontSize.medium}
                   onPress={() => handlePlayersSelected(item)}
@@ -114,16 +139,18 @@ export default function InviteModal({ open, setOpen }: InviteModalProps) {
             borderTopWidth: 0,
             borderWidth: 1,
             borderColor: "#cfc8c8",
-            height:scale(37),
-            marginTop:scale(5)
+            height: scale(37),
+            marginTop: scale(5),
+            backgroundColor: "white",
           }}
         />
 
+        {/* jug selecc.*/}
         <Div mt={60} p={customTheme.spacing.medium}>
           <Text textAlign="center" fontSize={customTheme.fontSize.medium}>
             Jugadores seleccionados:
           </Text>
-          {selectedPlayer.map((player, index) => (
+          {selectedPlayers.map((player, index) => (
             <Div
               key={index}
               flexDir="row"
@@ -132,24 +159,34 @@ export default function InviteModal({ open, setOpen }: InviteModalProps) {
             >
               <Div flexDir="row">
                 <Image
-                 source={require("../../assets/icon.png")} 
-                 resizeMode="contain"
-                 w={scale(28)}
-                 h={scale(28)}/>
-              <Text
-                fontFamily="NotoSans-Variable"
-                fontSize={customTheme.fontSize.medium}
-                ml={scale(5)}
+                  source={require("../../assets/icon.png")}
+                  resizeMode="contain"
+                  w={scale(28)}
+                  h={scale(28)}
+                />
+                <Text
+                  fontFamily="NotoSans-Variable"
+                  fontSize={customTheme.fontSize.medium}
+                  ml={scale(5)}
+                >
+                  {player.name}
+                </Text>
+              </Div>
+              <Button
+                bg="white"
+                color="black"
+                onPress={() => handleRemovePlayer(player._id)}
               >
-                {player.name}
-              </Text></Div>
-              <Button bg="white" color="black" onPress={() => handleRemovePlayer(player._id)} >
                 X
               </Button>
             </Div>
           ))}
         </Div>
       </Div>
-    </Modal>
-  );
+
+      <Div alignItems="center" bg={customTheme.colors.secondary}>
+        <Button onPress={handleSendInvitations}>Enviar Invitaciones</Button>
+      </Div>
+    </Modal>
+  );
 }
