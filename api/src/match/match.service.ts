@@ -406,7 +406,12 @@ export class MatchService {
       }
     }
 
-    // 5. Finalmente, eliminamos el partido de la colección `matches`
+    // 5. Eliminar las petitions que tienen al partido como reference.id, y que tienen como reference.type matches
+    await this.petitionService.removeAllOfOneMatch(id)
+
+
+
+    // 6. Finalmente, eliminamos el partido de la colección `matches`
     await this.matchModel.findByIdAndDelete(id).exec();
   }
 
