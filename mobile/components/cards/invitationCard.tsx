@@ -3,12 +3,15 @@ import { Div, Text, Button } from "react-native-magnus";
 import { scale } from "react-native-size-matters";
 import { Image } from "react-native";
 import { customTheme } from "../../utils/theme";
+import petitionService from "../../service/petition.service";
+import Petition from "../../types/petition.type";
 
 interface MatchInvitationProps {
   title: string;
   matchType: string;
   date: string;
   time: string;
+  petition: Petition
 }
 
 const MatchInvitation: React.FC<MatchInvitationProps> = ({
@@ -16,7 +19,25 @@ const MatchInvitation: React.FC<MatchInvitationProps> = ({
   matchType,
   date,
   time,
+  petition
 }) => {
+
+const aceptar = async () => {
+  try{
+    await petitionService.acceptPetition(petition._id)
+  } catch(e){
+    console.log(e)
+  }
+}
+
+const declinar = async () => {
+  try{
+    await petitionService.declinePetition(petition._id)
+  } catch(e){
+    console.log(e)
+  }
+}
+
   return (
     <Div
       bg="black"
@@ -67,7 +88,7 @@ const MatchInvitation: React.FC<MatchInvitationProps> = ({
       </Div>
 
       <Div flexDir="row" mt={customTheme.fontSize.medium} style={{ gap: 20}}>
-        <Button flex={1} bg="black" borderColor="white" borderWidth={1}>
+        <Button flex={1} bg="black" borderColor="white" borderWidth={1} onPress={declinar}>
           <Text
             color="white"
             fontFamily="NotoSans-BoldItalic"
@@ -76,7 +97,7 @@ const MatchInvitation: React.FC<MatchInvitationProps> = ({
             Rechazar
           </Text>
         </Button>
-        <Button flex={1} bg={customTheme.colors.primary}>
+        <Button flex={1} bg={customTheme.colors.primary} onPress={aceptar}>
           <Text
             fontFamily="NotoSans-BoldItalic"
             fontSize={customTheme.fontSize.medium}

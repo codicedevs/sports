@@ -1,17 +1,13 @@
 import React, { useCallback } from "react";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
-import { Button, Div, Text } from "react-native-magnus";
+import { Div, Text } from "react-native-magnus";
 import useFetch from "../hooks/useGet";
 import matchService from "../service/match.service";
 import { QUERY_KEYS } from "../types/query.types";
-import matchesCards from "../components/cards/matchesCards";
-import Match from "../types/match.type";
 import { useSession } from "../context/authProvider";
 import { ScrollView } from "react-native-gesture-handler";
-import { AuthContext } from "../context/authProvider";
 import { customTheme } from "../utils/theme";
 import UpcomingMatchCard from "../components/cards/UpcomingMatchesCard";
-import MatchModalHandler from "../components/modal/matchModalHandler";
 import EventsCard from "../components/cards/eventsCard";
 import eventService from "../service/event.service";
 import MatchesCards from "../components/cards/matchesCards";
@@ -26,36 +22,30 @@ import MatchInvitation from "../components/cards/invitationCard";
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
-  const { currentUser } = useSession();
-  const { data: matches, refetch } = useFetch(
-    () =>
-      matchService.getAll({
-        where: {
-          "user._id": currentUser._id,
-        },
-      }),
-    [QUERY_KEYS.MATCHES, currentUser]
-  );
-  const { data: publicMatches } = useFetch(
-    () =>
-      matchService.getAll({
-        where: {
-          open: true,
-          //falta agregar q sea de la fecha actual en adelante
-        },
-      }),
-    [QUERY_KEYS.PUBLIC_MATCHES]
-  );
+  const { currentUser } = useSession()
+  const { data: matches, refetch } = useFetch(() => matchService.getAll({
+    where: {
+      "user._id": currentUser._id
+    }
+  }), [QUERY_KEYS.MATCHES, currentUser]);
+  const now = new Date().toISOString();
+  const { data: publicMatches } = useFetch(() => matchService.getAll({
+    where: {
+      "open": true,
+      "date": { $gte: now }
+    }
+  }), [QUERY_KEYS.PUBLIC_MATCHES]);
 
-  const { data: petitions } = useFetch<{ results: Petition[] }>(
-    () =>
-      petitionService.getAll({
-        // "receiver": currentUser._id,
-        populate: ["reference.id"],
-      }),
-    [QUERY_KEYS.PETITIONS, currentUser]
-  );
+  const { data: petitions } = useFetch<{ results: Petition[] }>(() => petitionService.getAll(
 
+    {
+      // "receiver": currentUser._id,
+      populate: ["reference.id"],
+      status:['pending']
+    }
+
+  ), [QUERY_KEYS.PETITIONS, currentUser]);
+  // console.log(petitions.results)
   const { data: events } = useFetch(eventService.getAll, [QUERY_KEYS.EVENTS]); // pa hacer la llamada
 
   useFocusEffect(
@@ -63,7 +53,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
       refetch();
     }, [])
   );
-
+// console.log(petitions.results[petitions.results.length -1])
   const fallbackEvent = {
     name: "TORNEO DE VERANO FUTBOL VETERANO", // pa hardcodear
     date: "12/3",
@@ -74,7 +64,10 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
       <ScrollView>
         <Div p={customTheme.spacing.medium}>
           <Div mb={customTheme.spacing.medium}>
-            {/* <MatchInvitation date={petitions.results[0]?.reference.id.date} time="10" title="Stalagol" matchType={petitions.results[0]?.reference.type} /> */}
+            {
+                (currentUser && petitions) &&
+              <MatchInvitation date={petitions.results[petitions.results.length -1].reference.id.date} time="10" title="Stalagol" matchType={petitions.results[petitions.results.length -1].reference.type} petition={petitions.results[petitions.results.length -1]} />
+            }
           </Div>
           <Div mb={customTheme.spacing.medium}>
             <EventsCard // hardcodeado cambiar, arreglar lo coso de event!!!!!!!!
