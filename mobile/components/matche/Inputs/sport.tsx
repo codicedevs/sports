@@ -59,14 +59,10 @@ const SportInput = ({ matchDetailsRef }: SportInputProps) => {
         (mode: SportMode) => mode.sport === selectedSport._id
       );
 
-      console.log('filteredModes', filteredModes);
-      
-
       if (matchDetailsRef.current.selectedSportMode) {
         const foundMode = filteredModes.find(
           (mode: SportMode) => mode._id === matchDetailsRef.current.selectedSportMode._id
         );
-        console.log('foundMode', foundMode);
         
         if (foundMode) {
           setSelectedSportMode(foundMode);
@@ -77,6 +73,7 @@ const SportInput = ({ matchDetailsRef }: SportInputProps) => {
       if (filteredModes.length > 0) {
         setSelectedSportMode(filteredModes[0]);
         matchDetailsRef.current.selectedSportMode = filteredModes[0];
+        matchDetailsRef.current.playerLimit = Number(filteredModes[0].label) *2
       } else {
         setSelectedSportMode(null);
         matchDetailsRef.current.selectedSportMode = null;
@@ -91,9 +88,9 @@ const SportInput = ({ matchDetailsRef }: SportInputProps) => {
   };
 
   const handleSelectMode = (mode: SportMode, index: number) => {
-    console.log('mode', mode);
     
     setSelectedSportMode(mode);
+    matchDetailsRef.current.playerLimit = Number(mode.label) * 2
     matchDetailsRef.current.selectedSportMode = mode;
   };
 
