@@ -22,38 +22,45 @@ import petitionService from "../service/petition.service";
 import Petition from "../types/petition.type";
 import MatchInvitation from "../components/cards/invitationCard";
 
+
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
-  const { currentUser } = useSession()
-  const { data: matches, refetch } = useFetch(() => matchService.getAll({
-    where: {
-      "user._id": currentUser._id
-    }
-  }), [QUERY_KEYS.MATCHES, currentUser]);
-  const { data: publicMatches } = useFetch(() => matchService.getAll({
-    where: {
-      "open": true
-      //falta agregar q sea de la fecha actual en adelante
-    }
-  }), [QUERY_KEYS.PUBLIC_MATCHES]);
-  const { data: petitions } = useFetch<
-    { results: Petition[] }
-  >(() => petitionService.getAll(
+  const { currentUser } = useSession();
+  const { data: matches, refetch } = useFetch(
+    () =>
+      matchService.getAll({
+        where: {
+          "user._id": currentUser._id,
+        },
+      }),
+    [QUERY_KEYS.MATCHES, currentUser]
+  );
+  const { data: publicMatches } = useFetch(
+    () =>
+      matchService.getAll({
+        where: {
+          open: true,
+          //falta agregar q sea de la fecha actual en adelante
+        },
+      }),
+    [QUERY_KEYS.PUBLIC_MATCHES]
+  );
 
-    {
-      // "receiver": currentUser._id,
-      populate: ["reference.id"]
-    }
-
-  ), [QUERY_KEYS.PETITIONS, currentUser]);
+  const { data: petitions } = useFetch<{ results: Petition[] }>(
+    () =>
+      petitionService.getAll({
+        // "receiver": currentUser._id,
+        populate: ["reference.id"],
+      }),
+    [QUERY_KEYS.PETITIONS, currentUser]
+  );
 
   const { data: events } = useFetch(eventService.getAll, [QUERY_KEYS.EVENTS]); // pa hacer la llamada
 
   useFocusEffect(
     useCallback(() => {
       refetch();
-
     }, [])
   );
 
@@ -67,7 +74,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
       <ScrollView>
         <Div p={customTheme.spacing.medium}>
           <Div mb={customTheme.spacing.medium}>
-            <MatchInvitation date={petitions.results[0].reference.id.date} time="10" title="Stalagol" matchType={petitions.results[0].reference.type} />
+            {/* <MatchInvitation date={petitions.results[0]?.reference.id.date} time="10" title="Stalagol" matchType={petitions.results[0]?.reference.type} /> */}
           </Div>
           <Div mb={customTheme.spacing.medium}>
             <EventsCard // hardcodeado cambiar, arreglar lo coso de event!!!!!!!!
@@ -85,7 +92,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
             </Text>
           </Div>
           <ScrollView horizontal>
-            {publicMatches?.results.map((u: any) => (
+            {publicMatches?.results?.map((u: any) => (
               <UpcomingMatchCard
                 key={u._id}
                 matchId={u._id}
@@ -102,8 +109,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
         <Div mb={customTheme.spacing.medium} px={customTheme.spacing.medium}>
           <HandleMatchesButton />
         </Div>
-        {
-          currentUser &&
+        {currentUser && (
           <Div px={customTheme.spacing.medium}>
             <Text
               fontSize={customTheme.fontSize.medium}
@@ -112,7 +118,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
               Mis partidos
             </Text>
             <Div style={{ gap: scale(16) }}>
-              {matches?.results.map((m: any) => (
+              {matches?.results?.map((m: any) => (
                 <MatchesCards
                   key={m._id}
                   matchId={m._id}
@@ -127,12 +133,11 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
               ))}
             </Div>
           </Div>
-        }
-        <Div minH={verticalScale(150)}>
-        </Div>
+        )}
+        <Div minH={verticalScale(150)}></Div>
       </ScrollView>
     </Div>
   );
 };
 
-export default HomeScreen;
+export default HomeScreen;
