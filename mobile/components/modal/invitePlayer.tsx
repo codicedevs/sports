@@ -13,14 +13,12 @@ import { useSession } from "../../context/authProvider";
 interface InviteModalProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  emitterId: string;
   matchId: string;
 }
 
 export default function InviteModal({
   open,
   setOpen,
-  emitterId,
   matchId,
 }: InviteModalProps) {
   const [query, setQuery] = useState("");
