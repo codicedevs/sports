@@ -17,8 +17,8 @@ const PlayersCounterInput = ({ matchDetailsRef }: PlayersCounterInputProps) => {
   const highLimit = lowLimit + 5;
   const initialAmount =
     matchDetailsRef.current.playerLimit > 0 ? matchDetailsRef.current.playerLimit : lowLimit;
-  const [amount, setAmount] = useState<number>(initialAmount === 0? 10: initialAmount);
-  //Ta medio con alambre esto
+  const [amount, setAmount] = useState<number>(initialAmount); //Probar que no pase mas lo de q aparezca 0
+  
   useEffect(() => {
     if (matchDetailsRef.current.playerLimit === lowLimit) {
       setAmount(lowLimit);
@@ -26,7 +26,7 @@ const PlayersCounterInput = ({ matchDetailsRef }: PlayersCounterInputProps) => {
     } else {
       setAmount(matchDetailsRef.current.playerLimit)
     }
-  }, [lowLimit]);
+  }, [matchDetailsRef.current.selectedSportMode]);
 
   const increaseAmount = () => {
     if (amount < highLimit) {
