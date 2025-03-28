@@ -12,6 +12,7 @@ import MatchDetail from "../screens/matchDetail";
 import CustomTabBar from "../components/layout/customTabBar";
 import MatchesScreen from "../screens/matches";
 import MatchHandlerScreen from "../screens/matchHandler";
+import { CustomHeader } from "../components/layout/customHeader";
 
 const SettingsStack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator()
@@ -59,7 +60,11 @@ export function SettingsStackScreen() {
 
 export function TabStackScreen() {
     return (
-        <Tab.Navigator tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{ headerShown: false }}>
+        <Tab.Navigator tabBar={(props) => <CustomTabBar {...props} />}  screenOptions={{
+            header: () => <CustomHeader />, 
+            headerShown: true,
+            animation: "fade"
+        }}>
             <Tab.Screen name="HomeStack" component={HomeStackScreen} />
             <Tab.Screen name="SettingsStack" component={SettingsStackScreen} />
             <Tab.Screen name={AppScreens.MATCH_HANDLER} component={MatchHandlerScreen} />

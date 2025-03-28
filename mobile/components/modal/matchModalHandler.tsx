@@ -72,6 +72,8 @@ export default function MatchModalHandler({
      ======================================= */
   async function createMatch() {
     try {
+      console.log(1);
+      
       const res = await matchService.create({
         name: "Prueba3",
         date: matchDetailsRef.current.matchDate,
@@ -80,9 +82,10 @@ export default function MatchModalHandler({
         userId: "66e482584509915a15968bd7",
         sportMode: "67c873ffeb647cc591249358",
         open: matchDetailsRef.current.privacyOption,
-      });
-
+      }); 
+      console.log(2);
       const createdMatchId = res.data._id;
+      console.log(3); 
       // <-- MARCADO: si onMatchCreated está definido, lo llamamos
       if (onMatchCreated) {
         onMatchCreated(createdMatchId);
@@ -214,6 +217,6 @@ export default function MatchModalHandler({
           </Div>
         </TouchableOpacity>
       </Div>
-    </Modal>
-  );
+    </Modal>
+  );
 }

@@ -4,12 +4,12 @@ import { customTheme } from '../utils/theme';
 import useFetch from '../hooks/useGet';
 import matchService from '../service/match.service';
 import { QUERY_KEYS } from '../types/query.types';
-import MatchCard from '../components/matchesCards';
 import { ActivityIndicator, FlatList, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { scale, verticalScale } from 'react-native-size-matters';
 import zonesService from '../service/zones.service';
 import sportmodeService from '../service/sportmode.service';
 import SportModeButton from '../components/matche/Form/sportModeButton';
+import MatchesCards from '../components/cards/matchesCards';
 
 const schedules = [
   { id: 1, time: '00:00', value: { startHour: '08:00', endHour: '14:00' } },
@@ -201,15 +201,15 @@ const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, s
 
 const MatchesList = ({ matches, fetchMore, hasMore }) => {
   const renderItem = ({ item }) => (
-    <MatchCard
-      key={item.id}
-      date={'F'}
-      day={item.dayOfWeek}
-      location={item.location?.address}
-      maxPlayers={item.playersLimit}
-      players={10}
-      time={'horario'}
-    />
+      <MatchesCards
+        key={item.id}
+        date={'F'}
+        day={item.dayOfWeek}
+        location={item.location?.address}
+        maxPlayers={item.playersLimit}
+        players={10}
+        time={'horario'}
+      />
   );
 
   const keyExtractor = (item) => item._id.toString();
@@ -225,17 +225,19 @@ const MatchesList = ({ matches, fetchMore, hasMore }) => {
     )
   }
   return (
-    <FlatList
-      data={matches}
-      renderItem={renderItem}
-      keyExtractor={keyExtractor}
-      onEndReached={fetchMore}
-      onEndReachedThreshold={0.5}
-      ListFooterComponent={renderFooter}
-      initialNumToRender={10}
-      maxToRenderPerBatch={10}
-      windowSize={5}
-    />
+    <Div style={{gap:20}}>
+      <FlatList
+        data={matches}
+        renderItem={renderItem}
+        keyExtractor={keyExtractor}
+        onEndReached={fetchMore}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={renderFooter}
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
+        windowSize={5}
+      />
+    </Div>
   );
 };
 
@@ -267,7 +269,7 @@ const MatchesScreen = () => {
   const fetchMatches = async () => {
     const mongoFilter = buildMongoFilter();
     const res = await matchService.getAll(mongoFilter);
-    return res.data;
+    return res;
   };
 
   useEffect(() => {

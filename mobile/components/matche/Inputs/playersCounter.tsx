@@ -6,7 +6,7 @@ import { TouchableOpacity } from 'react-native';
 
 interface PlayersCounterInputProps {
   matchDetailsRef: React.MutableRefObject<{
-    playerLimit: number; 
+    playerLimit: number;
     selectedSportMode?: { label: number };
   }>;
 }
@@ -17,8 +17,8 @@ const PlayersCounterInput = ({ matchDetailsRef }: PlayersCounterInputProps) => {
   const highLimit = lowLimit + 5;
   const initialAmount =
     matchDetailsRef.current.playerLimit > 0 ? matchDetailsRef.current.playerLimit : lowLimit;
-  const [amount, setAmount] = useState<number>(initialAmount);
-
+  const [amount, setAmount] = useState<number>(initialAmount === 0? 10: initialAmount);
+  //Ta medio con alambre esto
   useEffect(() => {
     if (matchDetailsRef.current.playerLimit === lowLimit) {
       setAmount(lowLimit);
@@ -42,7 +42,7 @@ const PlayersCounterInput = ({ matchDetailsRef }: PlayersCounterInputProps) => {
       setAmount(newAmount);
       matchDetailsRef.current.playerLimit = newAmount;
     }
-  };  
+  };
 
   return (
     <Div rounded="xl" h={verticalScale(123)} p={customTheme.spacing.medium} style={{ gap: 8 }}>

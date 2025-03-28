@@ -1,33 +1,62 @@
-import React, { useContext, useState } from "react";
+import React, { useCallback } from "react";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
-import { Button, Div, Text } from "react-native-magnus";
+import { Div, Text } from "react-native-magnus";
 import useFetch from "../hooks/useGet";
 import matchService from "../service/match.service";
 import { QUERY_KEYS } from "../types/query.types";
-import MatchCard from "../components/matchesCards";
-import Match from "../types/match.type";
 import { useSession } from "../context/authProvider";
 import { ScrollView } from "react-native-gesture-handler";
-import { AuthContext } from "../context/authProvider";
 import { customTheme } from "../utils/theme";
-import UpcomingMatchCard from "../components/UpcomingMatchesCard";
-import MatchModalHandler from "../components/modal/matchModalHandler";
-import EventsCard from "../components/eventsCard";
+import UpcomingMatchCard from "../components/cards/UpcomingMatchesCard";
+import EventsCard from "../components/cards/eventsCard";
 import eventService from "../service/event.service";
+import MatchesCards from "../components/cards/matchesCards";
+import { scale, verticalScale } from "react-native-size-matters";
+import HandleMatchesButton from "../components/handleMatchesButton";
+import { useFocusEffect } from "@react-navigation/native";
+import petitionService from "../service/petition.service";
+import Petition from "../types/petition.type";
+import MatchInvitation from "../components/cards/invitationCard";
+
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
   const { currentUser } = useSession()
-  const { data: matches } = useFetch(() => matchService.getAll({
+  const { data: matches, refetch } = useFetch(() => matchService.getAll({
     where: {
       "user._id": currentUser._id
     }
   }), [QUERY_KEYS.MATCHES, currentUser]);
-  const { showModal } = useSession();
+  const now = new Date().toISOString();
+  const { data: publicMatches, refetch: refetchPublic } = useFetch(() => matchService.getAll({
+    where: {
+      "open": true,
+      "date": { $gte: now }
+    }
+  }), [QUERY_KEYS.PUBLIC_MATCHES]);
 
+  const { data: petitions, refetch: refetchPetition } = useFetch<{ results: Petition[] }>(() => petitionService.getAll(
+
+    {
+      populate: ["reference.id"],
+      where: {
+        status: ['pending'],
+        receiver: [currentUser._id]
+      }
+    }
+
+  ), [QUERY_KEYS.PETITIONS, currentUser]);
   const { data: events } = useFetch(eventService.getAll, [QUERY_KEYS.EVENTS]); // pa hacer la llamada
 
+  useFocusEffect(
+    useCallback(() => {
+      refetch();
+      refetchPetition();
+      refetchPublic()
+    }, [])
+  );
+  
   const fallbackEvent = {
     name: "TORNEO DE VERANO FUTBOL VETERANO", // pa hardcodear
     date: "12/3",
@@ -36,23 +65,30 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   return (
     <Div>
       <ScrollView>
-        <Button onPress={showModal}>Abrir</Button>
-        <Div p={customTheme.spacing.small}>
-          <Text
-            fontSize={customTheme.fontSize.medium}
-            fontFamily="NotoSans-Italic"
-            ml={customTheme.spacing.small}
-          >
-            <Div>
-              <EventsCard // hardcodeado cambiar, arreglar lo coso de event!!!!!!!!
-                name={fallbackEvent.name}
-                date={fallbackEvent.date}
-              />
-            </Div>
-            Próximos partidos
-          </Text>
+        <Div p={customTheme.spacing.medium}>
+          <Div mb={customTheme.spacing.medium}>
+            {
+              (currentUser && petitions) &&
+              <MatchInvitation date={petitions.results[0].reference.id.date} time="10" title="Stalagol" matchType={petitions.results[petitions.results.length - 1].reference.type} petition={petitions.results[petitions.results.length - 1]} />
+            }
+          </Div>
+          <Div mb={customTheme.spacing.medium}>
+            <EventsCard // hardcodeado cambiar, arreglar lo coso de event!!!!!!!!
+              name={fallbackEvent.name}
+              date={fallbackEvent.date}
+            />
+          </Div>
+          <Div>
+            <Text
+              mt={customTheme.spacing.small}
+              fontSize={customTheme.fontSize.medium}
+              fontFamily="NotoSans-Italic"
+            >
+              Próximos partidos
+            </Text>
+          </Div>
           <ScrollView horizontal>
-            {matches?.results.map((u: any) => (
+            {publicMatches?.results?.map((u: any) => (
               <UpcomingMatchCard
                 key={u._id}
                 matchId={u._id}
@@ -66,30 +102,35 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
             ))}
           </ScrollView>
         </Div>
-
-        <Div>
-          <Text
-            ml={customTheme.spacing.small}
-            fontSize={customTheme.fontSize.medium}
-            fontFamily="NotoSans-Italic"
-          >
-            Mis partidos
-          </Text>
-
-          {matches?.results.map((m: any) => (
-            <MatchCard
-              key={m._id}
-              matchId={m._id}
-              dayOfWeek={m.dayOfWeek}
-              date={m.date} // string, ej: "2026-07-15T17:48:00.000Z"
-              time={m.hour} // number, ej: 22
-              location={m.location} // { name, address }
-              players={m.users}
-              maxPlayers={m.playersLimit}
-              sportMode={m.sportMode}
-            />
-          ))}
+        <Div mb={customTheme.spacing.medium} px={customTheme.spacing.medium}>
+          <HandleMatchesButton />
         </Div>
+        {currentUser && (
+          <Div px={customTheme.spacing.medium}>
+            <Text
+              fontSize={customTheme.fontSize.medium}
+              fontFamily="NotoSans-Italic"
+            >
+              Mis partidos
+            </Text>
+            <Div style={{ gap: scale(16) }}>
+              {matches?.results?.map((m: any) => (
+                <MatchesCards
+                  key={m._id}
+                  matchId={m._id}
+                  dayOfWeek={m.dayOfWeek}
+                  date={m.date} // string, ej: "2026-07-15T17:48:00.000Z"
+                  time={m.hour} // number, ej: 22
+                  location={m.location} // { name, address }
+                  players={m.users}
+                  maxPlayers={m.playersLimit}
+                  sportMode={m.sportMode}
+                />
+              ))}
+            </Div>
+          </Div>
+        )}
+        <Div minH={verticalScale(150)}></Div>
       </ScrollView>
     </Div>
   );

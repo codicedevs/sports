@@ -18,8 +18,9 @@ export class CRUDService<T> extends HttpService {
     };
 
     create = async (data: T) => {
-        const res = await this.post("/", data);
+        const res = await this.post("/", data); console.log("REESSSSS",res)
         return res.data;
+       
     };
 
     update = async (id: string, data: Partial<T>) => {

@@ -370,4 +370,17 @@ export class PetitionService {
   remove(id: number) {
     return `This action removes a #${id} peticione`;
   }
+
+  async removeAllOfOneMatch(matchId: Types.ObjectId) {
+    const result = await this.petitionModel.deleteMany({
+      'reference.type': PetitionModelType.match,
+      'reference.id': matchId,
+    });
+  
+    if (result.deletedCount === 0) {
+      throw new NotFoundException('No se encontró ninguna petición para eliminar.');
+    }
+  
+    return { message: `Se eliminaron ${result.deletedCount} peticiones correctamente.` };
+  }
 }

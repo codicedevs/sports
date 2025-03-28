@@ -15,6 +15,7 @@ import { useSession } from "../context/authProvider";
 import MatchModalHandler from "../components/modal/matchModalHandler";
 import Field from "../components/matche/Detail/field";
 import PlayerStatusList from "../components/matche/Detail/playerStatusList";
+import InviteModal from "../components/modal/invitePlayer";
 
 type TabKey = "partido" | "jugadores" | "actividad" | "equipos";
 
@@ -26,6 +27,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
 
   const [activeTab, setActiveTab] = useState<TabKey>("partido");
   const [visible, setVisible] = useState(false)
+  const [inviteOpen, setInviteOpen] = useState(false)
   const {
     data: match,
     isFetching,
@@ -193,7 +195,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                       justifyContent="center"
                       alignItems="center"
                     >
-                      <Button mb={customTheme.spacing.small} bg="black" block>
+                      <Button mb={customTheme.spacing.small} bg="black" block onPress={() => setInviteOpen(true)}>
                         <Image
                           source={require("../assets/iconUserAdd.png")}
                           style={{ width: 20, height: 20, resizeMode: "contain" }}
@@ -275,7 +277,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
 
         {activeTab === "jugadores" && (
           <Div>
-            <PlayerStatusList match={match.data} />
+           <PlayerStatusList match={match.data} />
           </Div>
         )}
 
@@ -292,7 +294,24 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
         )}
         {/* Botones Eliminar / Guardar */}
 
-      </Div>
+      {activeTab === "equipos" && (
+        <Div>
+          <Text>pendiente</Text>
+        </Div>
+      )}
+
+      {/* Botones Eliminar / Guardar */}
+      <Div
+        justifyContent="flex-end"
+        flex={3}
+        position="absolute"
+        bottom={0}
+        left={0}
+        right={0}
+        bg="black"
+      ></Div>
+      <InviteModal open={inviteOpen} setOpen={setInviteOpen} matchId={id}/>
+    </Div>
     </>
   );
 };

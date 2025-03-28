@@ -161,7 +161,9 @@ export default function MatchSchedulerInput({
         locale="es"
         minDate={new Date()}
         onDayPress={(day) => {
-          setSelected(new Date(day.dateString));
+          const [year, month, dayOfMonth] = day.dateString.split("-").map(Number);
+          const localDate = new Date(year, month - 1, dayOfMonth, 12); // 12:00 PM para evitar problemas de conversión
+          setSelected(localDate);
         }}
         markedDates={
           selected
