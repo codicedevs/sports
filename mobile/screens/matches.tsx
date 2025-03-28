@@ -201,15 +201,15 @@ const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, s
 
 const MatchesList = ({ matches, fetchMore, hasMore }) => {
   const renderItem = ({ item }) => (
-      <MatchesCards
-        key={item.id}
-        date={'F'}
-        day={item.dayOfWeek}
-        location={item.location?.address}
-        maxPlayers={item.playersLimit}
-        players={10}
-        time={'horario'}
-      />
+    <MatchesCards
+      key={item.id}
+      date={'F'}
+      day={item.dayOfWeek}
+      location={item.location?.address}
+      maxPlayers={item.playersLimit}
+      players={10}
+      time={'horario'}
+    />
   );
 
   const keyExtractor = (item) => item._id.toString();
@@ -225,19 +225,18 @@ const MatchesList = ({ matches, fetchMore, hasMore }) => {
     )
   }
   return (
-    <Div style={{gap:20}}>
-      <FlatList
-        data={matches}
-        renderItem={renderItem}
-        keyExtractor={keyExtractor}
-        onEndReached={fetchMore}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={renderFooter}
-        initialNumToRender={10}
-        maxToRenderPerBatch={10}
-        windowSize={5}
-      />
-    </Div>
+    <FlatList
+      data={matches}
+      renderItem={renderItem}
+      keyExtractor={keyExtractor}
+      onEndReached={fetchMore}
+      onEndReachedThreshold={0.5}
+      ListFooterComponent={renderFooter}
+      initialNumToRender={10}
+      maxToRenderPerBatch={10}
+      windowSize={5}
+      contentContainerStyle={{ paddingBottom: verticalScale(100), paddingTop: verticalScale(20), gap: verticalScale(20) }}
+    />
   );
 };
 
