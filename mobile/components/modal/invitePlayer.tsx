@@ -197,7 +197,7 @@ export default function InviteModal({
       >
         {/* Botón “Elegir” */}
         <Button
-          bg={customTheme.colors.text} 
+          bg={customTheme.colors.secondaryBackground} 
           onPress={handleSendInvitations}
           w="100%"
           h={scale(45)}

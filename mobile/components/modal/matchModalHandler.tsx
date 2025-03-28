@@ -207,7 +207,7 @@ export default function MatchModalHandler({
         h={verticalScale(80)}
         p={customTheme.spacing.medium}
       >
-        <TouchableOpacity onPress={handleAction}>
+        <TouchableOpacity onPress={handleAction} >
           <Div
             h={verticalScale(45)}
             justifyContent="center"
