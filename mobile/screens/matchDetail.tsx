@@ -195,7 +195,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                       justifyContent="center"
                       alignItems="center"
                     >
-                      <Button mb={customTheme.spacing.small} bg="black" block>
+                      <Button mb={customTheme.spacing.small} bg="black" block onPress={() => setInviteOpen(true)}>
                         <Image
                           source={require("../assets/iconUserAdd.png")}
                           style={{ width: 20, height: 20, resizeMode: "contain" }}
