@@ -73,15 +73,16 @@ export default function InviteModal({
         p={customTheme.spacing.small}
         justifyContent="center"
         alignItems="center"
-      >
+      > <Div p={customTheme.spacing.small}
+       w="93%">
+          <Text fontSize={customTheme.fontSize.title} fontFamily="NotoSans-ExtraBoldItalic">Elegir jugador</Text>
+        </Div>
         <Button bg="white" onPress={() => setOpen(false)}>
-          <Text color="black" fontSize={customTheme.fontSize.medium}>
+          <Text color="black" fontSize={customTheme.fontSize.title}>
             X
           </Text>
         </Button>
-        <Div alignItems="center" w="93%">
-          <Text fontSize={customTheme.fontSize.medium}>Elegir jugador</Text>
-        </Div>
+       
       </Div>
 
       {/* autocomplete */}
@@ -145,7 +146,7 @@ export default function InviteModal({
 
         {/* jug selecc.*/}
         <Div mt={60} p={customTheme.spacing.medium}>
-          <Text textAlign="center" fontSize={customTheme.fontSize.medium}>
+          <Text textAlign="center" fontSize={customTheme.fontSize.medium} fontFamily="NotoSans-ExtraBoldItalic">
             Jugadores seleccionados:
           </Text>
           {selectedPlayers.map((player, index) => (
@@ -196,7 +197,7 @@ export default function InviteModal({
       >
         {/* Botón “Elegir” */}
         <Button
-          bg={customTheme.colors.text} // O el color que desees para el fondo del botón
+          bg={customTheme.colors.text} 
           onPress={handleSendInvitations}
           w="100%"
           h={scale(45)}
