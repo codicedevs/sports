@@ -37,8 +37,6 @@ const axiosBaseQuery =
     unknown
   > =>
   async ({ method, data, params }) => {
-    console.log("axiosBaseQuery:", { method, data, params }); // <-- Agrega esto
-
     try {
       const result: AxiosResponse<T> = await service[method](data, params);
       return { data: result.data };
@@ -60,6 +58,7 @@ export const userApi = createApi({
   endpoints: (builder) => ({
     getUsers: builder.query<UserResponse, any | void>({
       query: (filter?: any) => {
+        console.log("elfio", filter);
         return {
           url: ``,
           method: "find",

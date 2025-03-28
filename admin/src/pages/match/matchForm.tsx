@@ -9,9 +9,7 @@ import {
   message,
   Row,
   Select,
-  Spin,
   Switch,
-  Typography,
 } from "antd";
 import { Controller, useForm } from "react-hook-form";
 import {
@@ -24,15 +22,19 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useNavigate, useParams } from "react-router-dom";
 import { skipToken } from "@reduxjs/toolkit/query";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import dayjs from "dayjs";
 import { Option } from "antd/es/mentions";
 import { useCreateMatchMutation } from "../../store/features/match/matchApi";
+import { Location, SportMode, User } from "../../interfaces/interfaces";
+import { useGetLocationsQuery } from "../../store/features/locations/locationApi";
+import { useGetSportModeQuery } from "../../store/features/sportMode/sportModeApi";
 
 type FormValues = {
   name: string;
   open: boolean;
   date: string;
+  hour: string;
   userId: string;
   sportMode: string;
   playersLimit: number;
@@ -43,6 +45,7 @@ const schema = yup.object({
   name: yup.string().required("El nombre es requerido"),
   open: yup.boolean().required("El estado es requerido"),
   date: yup.string().required("La fecha es requerida"),
+  hour: yup.string().required("La hora es requerida"),
   userId: yup.string().required("El usuario es requerido"),
   sportMode: yup.string().required("El modo de deporte es requerido"),
   playersLimit: yup.number().required("El limite de jugadores es requerido"),
@@ -67,6 +70,7 @@ const MatchForm = () => {
       name: "",
       open: false,
       date: "",
+      hour: "",
       userId: "",
       sportMode: "",
       playersLimit: 10,
@@ -75,25 +79,37 @@ const MatchForm = () => {
     mode: "onBlur",
   });
 
+  const [filter, setFilter] = useState({});
   const [createMatch] = useCreateMatchMutation();
-  const [trigger, { data, isFetching }] = useLazyGetUsersQuery({});
-  const [userList, setUserList] = useState([{}]);
-  const [fetching, setFetching] = useState(false);
 
-  const fetchUsers = async (searchText: string = "") => {
-    const result = await trigger({ q: searchText }).unwrap();
-    const mappedOptions = result.results.map((user) => ({
-      label: user.name,
-      value: user._id,
-    }));
+  const [triggerSearchUsers, { data: userData }] = useLazyGetUsersQuery(filter);
+  const { data: sportModeData } = useGetSportModeQuery(filter);
 
-    setUserList(mappedOptions);
-    setFetching(false);
+  const { data: locationData } = useGetLocationsQuery({});
+
+  const searchTimeoutRef = useRef<number | null>(null);
+
+  const handleSearch = (value: string) => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    searchTimeoutRef.current = setTimeout(() => {
+      if (value) {
+        triggerSearchUsers({
+          where: { name: { $regex: value, $options: "i" } },
+        });
+      } else {
+        triggerSearchUsers({});
+      }
+    }, 200);
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  const handleDropdownOpen = (open: boolean) => {
+    if (open && !userData) {
+      triggerSearchUsers({});
+    }
+  };
 
   const onSubmit = async (data: any) => {
     try {
@@ -168,6 +184,15 @@ const MatchForm = () => {
                 render={({ field }) => (
                   <DatePicker
                     style={{ width: "100%" }}
+                    showTime={{
+                      format: "HH:mm",
+                      disabledMinutes: () =>
+                        Array.from({ length: 60 }, (_, i) => i).filter(
+                          (m) => m !== 0 && m !== 30
+                        ),
+                    }}
+                    format="YYYY-MM-DD HH:mm"
+                    minuteStep={30}
                     value={field.value ? dayjs(field.value) : null}
                     onChange={(date) =>
                       field.onChange(date ? date.toISOString() : "")
@@ -187,18 +212,26 @@ const MatchForm = () => {
               <Controller
                 name="userId"
                 control={control}
-                render={({ field }) => (
-                  <Select
-                    showSearch
-                    labelInValue={false}
-                    placeholder="Buscar organizador"
-                    onSearch={fetchUsers}
-                    loading={isFetching}
-                    onChange={field.onChange}
-                    value={field.value}
-                    options={userList}
-                  />
-                )}
+                render={({ field }) => {
+                  return (
+                    <Select
+                      showSearch
+                      allowClear
+                      placeholder="Buscar organizador"
+                      onChange={field.onChange}
+                      onSearch={handleSearch}
+                      filterOption={false}
+                      value={field.value}
+                      loading={!userData}
+                      onDropdownVisibleChange={handleDropdownOpen}
+                      notFoundContent={"No se encontraron resultados"}
+                      options={(userData?.results || []).map((user: User) => ({
+                        label: user.name,
+                        value: user._id,
+                      }))}
+                    />
+                  );
+                }}
               />
             </Form.Item>
           </Col>
@@ -213,9 +246,16 @@ const MatchForm = () => {
                 name="sportMode"
                 control={control}
                 render={({ field }) => (
-                  <Select {...field} placeholder="Seleccionar">
-                    <Option value="676d903173a26a0de5f38bda">Fútbol</Option>
-                  </Select>
+                  <Select
+                    {...field}
+                    placeholder="Seleccionar"
+                    options={sportModeData?.results.map(
+                      (sportMode: SportMode) => ({
+                        label: sportMode.name,
+                        value: sportMode._id,
+                      })
+                    )}
+                  />
                 )}
               />
             </Form.Item>
@@ -251,7 +291,22 @@ const MatchForm = () => {
               <Controller
                 name="location"
                 control={control}
-                render={({ field }) => <Input {...field} />}
+                render={({ field }) => (
+                  <Select
+                    showSearch
+                    labelInValue={false}
+                    placeholder="Buscar Establecimiento"
+                    // onSearch={fetchLocations}
+                    onChange={field.onChange}
+                    value={field.value}
+                    options={locationData?.results.map(
+                      (location: Location) => ({
+                        label: location.name,
+                        value: location._id,
+                      })
+                    )}
+                  />
+                )}
               />
             </Form.Item>
           </Col>
