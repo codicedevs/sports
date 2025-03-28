@@ -182,8 +182,35 @@ export default function InviteModal({
         </Div>
       </Div>
 
-      <Div alignItems="center" bg={customTheme.colors.secondary}>
-        <Button onPress={handleSendInvitations}>Enviar Invitaciones</Button>
+      <Div
+        position="absolute"
+        bottom={0}
+        left={0}
+        right={0}
+        bg="white"
+        borderTopWidth={1}
+        borderTopColor="rgb(223, 223, 220)"
+        p={customTheme.spacing.medium}
+        alignItems="center"
+        justifyContent="center"
+      >
+        {/* Botón “Elegir” */}
+        <Button
+          bg={customTheme.colors.text} // O el color que desees para el fondo del botón
+          onPress={handleSendInvitations}
+          w="100%"
+          h={scale(45)}
+          rounded="md"
+        >
+          <Text
+            color="white"
+            textAlign="center"
+            fontSize={customTheme.fontSize.medium}
+            fontFamily="NotoSans-BoldItalic"
+          >
+            Elegir
+          </Text>
+        </Button>
       </Div>
     </Modal>
   );
