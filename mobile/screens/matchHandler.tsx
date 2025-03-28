@@ -13,6 +13,7 @@ import MatchPrivacyToggleInput from "../components/matche/Inputs/matchPrivacyTog
 import MatchSchedulerInput from "../components/matche/Inputs/matchScheduler";
 import SearchLocationInput from "../components/matche/Inputs/searchLocation";
 import { useSession } from "../context/authProvider";
+import { formatDate } from "../utils/date";
 
 interface MatchHandlerScreenProps {
   match?: string;
@@ -25,7 +26,7 @@ export default function MatchHandlerScreen({
 }: MatchHandlerScreenProps) {
   const navigation = useNavigation();
   const [openId, setOpenId] = useState<null | string>(null);
-  const {currentUser} = useSession()
+  const { currentUser } = useSession()
 
   // Objeto con la info del partido a crear/editar
   const matchDetailsRef = useRef<MatchDetails>({
@@ -64,7 +65,7 @@ export default function MatchHandlerScreen({
       const res = await matchService.create({
         name: "Prueba3",
         date: matchDetailsRef.current.matchDate,
-        location: matchDetailsRef.current.location?._id ,
+        location: matchDetailsRef.current.location?._id,
         playersLimit: matchDetailsRef.current.playerLimit,
         userId: currentUser._id,
         sportMode: matchDetailsRef.current.selectedSportMode?._id,
@@ -76,7 +77,7 @@ export default function MatchHandlerScreen({
       }
       closeScreen();
     } catch (e) {
-       console.error("Error al crear el partido:", e);
+      console.error("Error al crear el partido:", e);
     }
   }
 
@@ -111,27 +112,6 @@ export default function MatchHandlerScreen({
 
   return (
     <View style={styles.container}>
-      {/* Header con botón de cerrar */}
-      {/* <Div
-        p="md"
-        bg={customTheme.colors.primary}
-        flexDir="row"
-        alignItems="center"
-        justifyContent="space-between"
-      >
-        <Text
-          color="white"
-          fontSize="xl"
-          fontFamily="NotoSans-Variable"
-        >
-          {match ? "Editar Partido" : "Crear Partido"}
-        </Text>
-        <TouchableOpacity onPress={closeScreen}>
-          <Text color="white" fontSize="md">
-            Cerrar
-          </Text>
-        </TouchableOpacity>
-      </Div> */}
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Div
           flex={1}
@@ -144,7 +124,7 @@ export default function MatchHandlerScreen({
             openId={openId}
             setOpenId={setOpenId}
             title="Deporte"
-            rightText="Futbol 5"
+            rightText={matchDetailsRef.current.selectedSportMode ? matchDetailsRef.current.selectedSportMode.name : "A definir"}
             size={342}
           >
             <SportInput matchDetailsRef={matchDetailsRef} />
@@ -164,7 +144,7 @@ export default function MatchHandlerScreen({
             openId={openId}
             setOpenId={setOpenId}
             title="Privacidad"
-            rightText="Privada"
+            rightText={matchDetailsRef.current.privacyOption ? "Publico" : "Privado"}
             size={134}
           >
             <MatchPrivacyToggleInput matchDetailsRef={matchDetailsRef} />
@@ -182,7 +162,7 @@ export default function MatchHandlerScreen({
             openId={openId}
             setOpenId={setOpenId}
             title="Horario"
-            rightText="A definir"
+            rightText={matchDetailsRef.current.matchDate ? formatDate(matchDetailsRef.current.matchDate) : "A definir"}
             size={802}
           >
             <MatchSchedulerInput matchDetailsRef={matchDetailsRef} />
@@ -192,7 +172,7 @@ export default function MatchHandlerScreen({
             openId={openId}
             setOpenId={setOpenId}
             title="¿Donde juegan?"
-            rightText="A definir"
+            rightText={matchDetailsRef.current.location ? matchDetailsRef.current.location.name : "A definir"}
             size={300}
           >
             <SearchLocationInput matchDetailsRef={matchDetailsRef} />
