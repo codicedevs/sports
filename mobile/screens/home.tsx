@@ -29,31 +29,34 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     }
   }), [QUERY_KEYS.MATCHES, currentUser]);
   const now = new Date().toISOString();
-  const { data: publicMatches } = useFetch(() => matchService.getAll({
+  const { data: publicMatches, refetch: refetchPublic } = useFetch(() => matchService.getAll({
     where: {
       "open": true,
       "date": { $gte: now }
     }
   }), [QUERY_KEYS.PUBLIC_MATCHES]);
 
-  const { data: petitions } = useFetch<{ results: Petition[] }>(() => petitionService.getAll(
+  const { data: petitions, refetch: refetchPetition } = useFetch<{ results: Petition[] }>(() => petitionService.getAll(
 
     {
-      // "receiver": currentUser._id,
       populate: ["reference.id"],
-      status:['pending']
+      where: {
+        status: ['pending'],
+        receiver: [currentUser._id]
+      }
     }
 
   ), [QUERY_KEYS.PETITIONS, currentUser]);
-  // console.log(petitions.results)
   const { data: events } = useFetch(eventService.getAll, [QUERY_KEYS.EVENTS]); // pa hacer la llamada
 
   useFocusEffect(
     useCallback(() => {
       refetch();
+      refetchPetition();
+      refetchPublic()
     }, [])
   );
-// console.log(petitions.results[petitions.results.length -1])
+  
   const fallbackEvent = {
     name: "TORNEO DE VERANO FUTBOL VETERANO", // pa hardcodear
     date: "12/3",
@@ -65,8 +68,8 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
         <Div p={customTheme.spacing.medium}>
           <Div mb={customTheme.spacing.medium}>
             {
-                (currentUser && petitions) &&
-              <MatchInvitation date={petitions.results[petitions.results.length -1].reference.id.date} time="10" title="Stalagol" matchType={petitions.results[petitions.results.length -1].reference.type} petition={petitions.results[petitions.results.length -1]} />
+              (currentUser && petitions) &&
+              <MatchInvitation date={petitions.results[0].reference.id.date} time="10" title="Stalagol" matchType={petitions.results[petitions.results.length - 1].reference.type} petition={petitions.results[petitions.results.length - 1]} />
             }
           </Div>
           <Div mb={customTheme.spacing.medium}>
