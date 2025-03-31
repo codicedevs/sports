@@ -21,7 +21,7 @@ export const CustomHeader = () => {
 
     return (
         <Div flexDir="row" alignItems="center" p={customTheme.spacing.medium} justifyContent="space-between">
-            <Div flexDir="row" alignItems="center" style={{ gap: scale(20) }}>
+            <Div flexDir="row" alignItems="center" justifyContent="space-between" style={{ gap: scale(20) }}  w="55%">
                 <TouchableOpacity onPress={handleBackPress}>
                     <Image
                         style={{ height: scale(20), width: scale(15), padding: customTheme.spacing.small }}
