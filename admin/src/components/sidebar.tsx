@@ -40,7 +40,7 @@ interface SidebarProps {
 const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
   const navigate = useNavigate();
   const items: MenuItem[] = [
-    getItem("Dashboard", "1", <PieChartOutlined />, null, () => navigate("")),
+    // getItem("Dashboard", "1", <PieChartOutlined />, null, () => navigate("")),
     getItem("Partidos", "2", <TableOutlined />, null, () =>
       navigate("partidos")
     ),
@@ -59,31 +59,37 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
       // onCollapse={(value) => setCollapsed(value)}
       trigger={null}
       style={{
-        minHeight: "100vh",
+        minHeight: "98vh",
         marginLeft: 10,
         borderRadius: 20,
         padding: "0 10px",
         overflow: "auto",
         position: "fixed",
         width: collapsed ? "80px" : "200px",
+        margin: 10,
       }}
     >
-      <div style={{ display: "flex", justifyContent: "center" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "column",
+          gap: 10,
+          padding: 20,
+        }}
+      >
         {collapsed ? (
           <img
             src={logoColap}
             alt="logo"
-            style={{ width: "50px", margin: "10px" }}
+            style={{ width: "30px", margin: "10px" }}
           />
         ) : (
-          <div>
-            <img
-              src={logo}
-              alt="logo"
-              style={{ width: "150px", marginRight: "10px" }}
-            />
-            <h2 style={{ color: lightColors.pressed }}>Loyal Futbol 5</h2>
-          </div>
+          <>
+            <img src={logo} alt="logo" style={{ width: "100px" }} />
+            <h2 style={{ color: lightColors.secondary }}>Loyal Futbol 5</h2>
+          </>
         )}
       </div>
 

@@ -36,8 +36,8 @@ const HomePage = () => {
       >
         <h1
           style={{
-            color: "white",
-            backgroundColor: lightColors.primary,
+            color: "black",
+            backgroundColor: "white",
             padding: 10,
             borderRadius: 20,
           }}

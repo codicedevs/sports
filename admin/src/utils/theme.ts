@@ -6,19 +6,20 @@ export const lightTheme: ThemeConfig = {
   components: {
     Layout: {
       triggerBg: lightColors.primary,
-      siderBg: lightColors.primary,
+      siderBg: lightColors.siderBack,
       colorTextBase: "#3434dd",
-      headerBg: "#ffffff",
+      headerBg: lightColors.cleary,
       headerPadding: "10px 0",
       headerHeight: "auto",
     },
     Menu: {
-      subMenuItemBg: lightColors.cleary,
-      itemBg: lightColors.primary,
-      itemSelectedBg: lightColors.secondary,
+      subMenuItemBg: lightColors.siderBack,
+      itemBg: lightColors.siderBack,
+      itemSelectedBg: lightColors.cleary,
       itemSelectedColor: lightColors.primary,
-      colorText: "#ffffff",
-      subMenuItemSelectedColor: lightColors.secondary,
+      subMenuItemSelectedColor: lightColors.primary,
+      itemHoverBg: lightColors.cleary,
+      // itemColor: lightColors.primary,
     },
     Table: {
       headerBg: lightColors.primary,

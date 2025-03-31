@@ -29,7 +29,7 @@ const router = createBrowserRouter([
     element: <Dashboard />,
     loader: authLoader,
     children: [
-      { path: "", element: <DashboardHome /> },
+      { path: "", element: <Matches /> },
       { path: "partidos", element: <Matches /> },
       { path: "nuevoPartido", element: <MatchForm /> },
       { path: "users", element: <UsersList /> },
