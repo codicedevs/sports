@@ -1,4 +1,4 @@
-import MatchsList from "../components/matchList";
+import MatchsList from "../pages/match/list";
 
 const Matches = () => {
   return (

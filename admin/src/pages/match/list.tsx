@@ -3,18 +3,18 @@ import { useState } from "react";
 import {
   useDeleteMatchMutation,
   useGetMatchesQuery,
-} from "../store/features/match/matchApi";
+} from "../../store/features/match/matchApi";
 import { CheckCircleTwoTone, CloseCircleTwoTone } from "@ant-design/icons";
-import { Location, Match, MatchList, User } from "../interfaces/interfaces";
+import { Location, Match, MatchList, User } from "../../interfaces/interfaces";
 import { useNavigate } from "react-router-dom";
-import Delete from "./Delete";
 import { ColumnType } from "antd/es/table";
+import Delete from "../../components/delete";
 const { Search } = Input;
 
 const getColumns = (
   handleDeleteMatch: (id: string) => void,
   navigate: any
-): ColumnType<MatchList>[] => {
+): ColumnType<Match>[] => {
   return [
     {
       title: "Nombre del partido",

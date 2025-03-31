@@ -1,19 +1,19 @@
 import { Button, Input, Segmented, Select, Space, Table } from "antd";
 import { useState } from "react";
-import { Location, Match, User, UserList } from "../interfaces/interfaces";
+import { Location, Match, User, UserList } from "../../interfaces/interfaces";
 import { useNavigate } from "react-router-dom";
 import {
   useDeleteUserMutation,
   useGetUsersQuery,
-} from "../store/features/user/userApi";
+} from "../../store/features/user/userApi";
 import { ColumnType } from "antd/es/table";
-import Delete from "./Delete";
+import Delete from "../../components/delete";
 const { Search } = Input;
 
 const getColumns = (
   handleDeleteUser: (id: string) => void,
   navigate: any
-): ColumnType<UserList>[] => {
+): ColumnType<User>[] => {
   return [
     {
       title: "Nombre",

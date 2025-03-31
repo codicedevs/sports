@@ -5,26 +5,31 @@ import { lightColors } from "../utils/colors";
 import { Breadcrumbs } from "./breadcrumbs";
 import { SetStateType } from "../interfaces/types";
 import { authService } from "../services/auth";
+import { useNavigate } from "react-router-dom";
 
 interface HeaderProps {
   collapsed: boolean;
   setCollapsed: SetStateType<boolean>;
 }
-const menu = (
-  <Menu
-    items={[
-      {
-        key: "1",
-        label: "Cerrar sesión",
-        onClick: () => {
-          authService.logout();
-          console.log("Cerrando sesión");
-        },
-      },
-    ]}
-  />
-);
+
 const HeaderAdmin = ({ collapsed, setCollapsed }: HeaderProps) => {
+  const navigate = useNavigate();
+
+  const menu = (
+    <Menu
+      items={[
+        {
+          key: "1",
+          label: "Cerrar sesión",
+          onClick: () => {
+            authService.logout();
+            navigate("/login");
+            console.log("Cerrando sesión");
+          },
+        },
+      ]}
+    />
+  );
   return (
     <Header
       style={{
