@@ -14,11 +14,23 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div style={{ display: "flex", flexDirection: "row", minHeight: "100vh" }}>
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "row",
+        minHeight: "100vh",
+        overflow: "hidden",
+      }}
+    >
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
 
       <Content
-        style={{ flex: 1, marginLeft: collapsed ? 90 : 210, padding: 15 }}
+        style={{
+          flex: 1,
+          marginLeft: collapsed ? 90 : 210,
+          padding: 15,
+          overflow: "auto",
+        }}
       >
         <HeaderAdmin collapsed={collapsed} setCollapsed={setCollapsed} />
         <Outlet />
