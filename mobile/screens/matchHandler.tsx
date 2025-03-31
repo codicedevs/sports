@@ -116,7 +116,7 @@ export default function MatchHandlerScreen({
         <Div
           flex={1}
           style={{ gap: verticalScale(16) }}
-          bg={customTheme.colors.background}
+          bg={customTheme.colors.grayBackground}
           p={customTheme.spacing.medium}
         >
           <Accordion
