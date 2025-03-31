@@ -46,10 +46,7 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
     ),
     getItem("Menu Usuarios", "sub2", <UserOutlined />, [
       getItem("Lista de usuarios", "3", null, null, () => navigate("users")),
-      getItem("Crear Nuevo Usuario", "4", null, null, () =>
-        navigate("newUser")
-      ),
-      getItem("Opcion 3", "5", null, null, () => navigate("users")),
+      getItem("Nuevo Usuario", "4", null, null, () => navigate("newUser")),
     ]),
   ];
   return (

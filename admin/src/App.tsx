@@ -5,15 +5,12 @@ import HomePage from "./pages/home";
 import LoginPage from "./pages/login";
 import { authLoader } from "./pages/loaders/authLoader";
 import { ConfigProvider } from "antd";
-import DashboardHome from "./views/dashboardHome";
 import Matches from "./views/matches";
-import TestUserProfile from "./views/testProfile";
 import Dashboard from "./pages/dashboard";
-import { useState } from "react";
 import { lightTheme } from "./utils/theme";
-import UserForm from "./pages/users/userForm";
-import UsersList from "./components/usersList";
-import MatchForm from "./pages/match/matchForm";
+import UserForm from "./pages/users/form";
+import UsersList from "./pages/users/list";
+import MatchForm from "./pages/match/form";
 
 const router = createBrowserRouter([
   {
