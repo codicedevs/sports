@@ -24,17 +24,17 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
   route,
 }) => {
   const { id } = route.params;
-  const { currentUser } = useSession()
+  const { currentUser } = useSession();
 
   const [activeTab, setActiveTab] = useState<TabKey>("partido");
-  const [visible, setVisible] = useState(false)
-  const [inviteOpen, setInviteOpen] = useState(false)
-  const [deleteModal, setDeleteModal] = useState(false)
+  const [visible, setVisible] = useState(false);
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
   const {
     data: match,
     isFetching,
     error,
-    refetch
+    refetch,
   } = useFetch(() => matchService.getById(id), [QUERY_KEYS.MATCH]);
 
   if (isFetching) {
@@ -52,19 +52,51 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
       </Div>
     );
   }
-  const { _id, open, playersLimit, users, date, sportMode, location, user } = match.data;
+  const { _id, open, playersLimit, users, date, sportMode, location, user } =
+    match.data;
   const playerCount = users?.length || 0;
   const dateObject = new Date(date);
-  const isAdmin = user?._id === currentUser?._id //SI el usuario que creo el partido dejo de existir genera conflictos
+  const isAdmin = user?._id === currentUser?._id; //SI el usuario que creo el partido dejo de existir genera conflictos
 
   return (
     <>
-      <MatchModalHandler open={visible} setOpen={setVisible} match={match.data} refetch={refetch} />
-      <Overlay visible={deleteModal} bg="black" style={{ borderWidth: 1, borderColor: "#FFAF26" }} p={customTheme.spacing.medium}>
-        <Text my={customTheme.spacing.small} p={customTheme.spacing.small} color="white">¿Estas seguro que quieres eliminar el partido?</Text>
-        <Div flexDir="row" justifyContent="space-between" style={{ gap: scale(10) }}>
-          <Button flex={1} onPress={() => setDeleteModal(false)} borderWidth={1} borderColor="white" bg="black" color="white">Cancelar</Button>
-          <Button flex={1} bg={"#FFAF26"} color="black">Eliminar</Button>
+      <MatchModalHandler
+        open={visible}
+        setOpen={setVisible}
+        match={match.data}
+        refetch={refetch}
+      />
+      <Overlay
+        visible={deleteModal}
+        bg="black"
+        style={{ borderWidth: 1, borderColor: "#FFAF26" }}
+        p={customTheme.spacing.medium}
+      >
+        <Text
+          my={customTheme.spacing.small}
+          p={customTheme.spacing.small}
+          color="white"
+        >
+          ¿Estas seguro que quieres eliminar el partido?
+        </Text>
+        <Div
+          flexDir="row"
+          justifyContent="space-between"
+          style={{ gap: scale(10) }}
+        >
+          <Button
+            flex={1}
+            onPress={() => setDeleteModal(false)}
+            borderWidth={1}
+            borderColor="white"
+            bg="black"
+            color="white"
+          >
+            Cancelar
+          </Button>
+          <Button flex={1} bg={"#FFAF26"} color="black">
+            Eliminar
+          </Button>
         </Div>
       </Overlay>
       <Div flex={1}>
@@ -77,47 +109,55 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
           mb={customTheme.spacing.medium}
           mt={customTheme.spacing.small}
         >
-          <TouchableOpacity onPress={() => setActiveTab("partido")} style={{
-            backgroundColor: activeTab === "partido"
-              ? customTheme.colors.primary
-              : "transparent",
-            padding: customTheme.spacing.small
-          }}>
-            <Text>
-              Partido
-            </Text>
+          <TouchableOpacity
+            onPress={() => setActiveTab("partido")}
+            style={{
+              backgroundColor:
+                activeTab === "partido"
+                  ? customTheme.colors.primary
+                  : "transparent",
+              padding: customTheme.spacing.small,
+            }}
+          >
+            <Text>Partido</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => setActiveTab("jugadores")} style={{
-            backgroundColor: activeTab === "jugadores"
-              ? customTheme.colors.primary
-              : "transparent",
-            padding: customTheme.spacing.small
-          }}>
-            <Text>
-              Jugadores
-            </Text>
+          <TouchableOpacity
+            onPress={() => setActiveTab("jugadores")}
+            style={{
+              backgroundColor:
+                activeTab === "jugadores"
+                  ? customTheme.colors.primary
+                  : "transparent",
+              padding: customTheme.spacing.small,
+            }}
+          >
+            <Text>Jugadores</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={() => setActiveTab("actividad")} style={{
-            backgroundColor: activeTab === "actividad"
-              ? customTheme.colors.primary
-              : "transparent",
-            padding: customTheme.spacing.small
-          }}>
-            <Text>
-              Actividad
-            </Text>
+          <TouchableOpacity
+            onPress={() => setActiveTab("actividad")}
+            style={{
+              backgroundColor:
+                activeTab === "actividad"
+                  ? customTheme.colors.primary
+                  : "transparent",
+              padding: customTheme.spacing.small,
+            }}
+          >
+            <Text>Actividad</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setActiveTab("equipos")} style={{
-            backgroundColor: activeTab === "equipos"
-              ? customTheme.colors.primary
-              : "transparent",
-            padding: customTheme.spacing.small
-          }}>
-            <Text>
-              Equipos
-            </Text>
+          <TouchableOpacity
+            onPress={() => setActiveTab("equipos")}
+            style={{
+              backgroundColor:
+                activeTab === "equipos"
+                  ? customTheme.colors.primary
+                  : "transparent",
+              padding: customTheme.spacing.small,
+            }}
+          >
+            <Text>Equipos</Text>
           </TouchableOpacity>
         </Div>
 
@@ -133,7 +173,10 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                 <Div p={customTheme.spacing.small}>
                   {/* yttulo */}
                   <Div flexDir="row" alignItems="center">
-                    <Div justifyContent="flex-start" p={customTheme.spacing.small}>
+                    <Div
+                      justifyContent="flex-start"
+                      p={customTheme.spacing.small}
+                    >
                       <Image
                         source={require("../assets/iconflecha2.png")}
                         style={{ width: 20, height: 20, resizeMode: "contain" }}
@@ -204,10 +247,19 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                       justifyContent="center"
                       alignItems="center"
                     >
-                      <Button mb={customTheme.spacing.small} bg="black" block onPress={() => setInviteOpen(true)}>
+                      <Button
+                        mb={customTheme.spacing.small}
+                        bg="black"
+                        block
+                        onPress={() => setInviteOpen(true)}
+                      >
                         <Image
                           source={require("../assets/iconUserAdd.png")}
-                          style={{ width: 20, height: 20, resizeMode: "contain" }}
+                          style={{
+                            width: 20,
+                            height: 20,
+                            resizeMode: "contain",
+                          }}
                         />
                         <Text
                           fontSize={customTheme.fontSize.medium}
@@ -222,7 +274,11 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                         <Button bg="black" block>
                           <Image
                             source={require("../assets/iconShare.png")}
-                            style={{ width: 18, height: 18, resizeMode: "contain" }}
+                            style={{
+                              width: 18,
+                              height: 18,
+                              resizeMode: "contain",
+                            }}
                           />
                           <Text
                             fontSize={customTheme.fontSize.medium}
@@ -237,52 +293,56 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                     </Div>
                   </Div>
                 </Div>
-
               </Div>
-
             </ScrollView>
-            {
-              isAdmin && (
-                <Div
-                  justifyContent="flex-end"
-                  flex={3}
-                  position="absolute"
-                  bottom={0}
-                  left={0}
-                  right={0}
-                  bg={customTheme.colors.background}
-
-                >
-                  <Div >
-                    <Div
-                      mb={customTheme.spacing.small}
-                      w="100%"
-                      borderTopColor="black"
-                      borderTopWidth={scale(1)}
-                    />
-                    <Div
-                      flexDir="row"
-                      justifyContent="space-between"
-                      p={customTheme.spacing.small}
+            {isAdmin && (
+              <Div
+                justifyContent="flex-end"
+                flex={3}
+                position="absolute"
+                bottom={0}
+                left={0}
+                right={0}
+              >
+                <Div>
+                  <Div
+                    mb={customTheme.spacing.small}
+                    w="100%"
+                    borderTopColor="rgb(214, 214, 214)"
+                    borderTopWidth={scale(1)}
+                  />
+                  <Div
+                    flexDir="row"
+                    justifyContent="space-between"
+                    p={customTheme.spacing.small}
+                  >
+                    <Button
+                      w="48%"
+                      bg="white"
+                      borderWidth={1}
+                      borderColor="black"
+                      block
+                      onPress={() => setDeleteModal(true)}
                     >
-                      <Button
-                        w="48%"
-                        bg="white"
-                        borderWidth={1}
-                        borderColor="black"
-                        block
-                        onPress={() => setDeleteModal(true)}
+                      <Text fontFamily="NotoSans-BoldItalic">Eliminar</Text>
+                    </Button>
+                    <Button
+                      w="48%"
+                      block
+                      bg={customTheme.colors.secondaryBackground}
+                      onPress={() => setVisible(true)}
+                    >
+                      <Text
+                        color={customTheme.colors.background}
+                        fontFamily="NotoSans-BoldItalic"
                       >
-                        <Text fontFamily="NotoSans-BoldItalic">Eliminar</Text>
-                      </Button>
-                      <Button w="48%" block bg={customTheme.colors.secondaryBackground} onPress={() => setVisible(true)}>
-                        <Text color={customTheme.colors.background} fontFamily="NotoSans-BoldItalic">Editar</Text>
-                      </Button>
-                    </Div>
+                        Editar
+                      </Text>
+                    </Button>
                   </Div>
                 </Div>
-              )
-            }
+              </Div>
+            )}
           </>
         )}
 
@@ -299,7 +359,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
         )}
 
         {activeTab === "equipos" && (
-          <Div h={"90%"} >
+          <Div h={"90%"}>
             <Field match={match.data} isAdmin={isAdmin} />
           </Div>
         )}
