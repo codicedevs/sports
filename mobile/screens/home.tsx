@@ -69,7 +69,10 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
           <Div mb={customTheme.spacing.medium}>
             {
               (currentUser && petitions) &&
-              <MatchInvitation date={petitions.results[0].reference.id.date} time="10" title="Stalagol" matchType={petitions.results[petitions.results.length - 1].reference.type} petition={petitions.results[petitions.results.length - 1]} />
+              (
+                petitions.totalCount !== 0 &&
+                <MatchInvitation date={petitions.results[0]?.reference?.id.date} time="10" title="Stalagol" matchType={petitions.results[0]?.reference.type} petition={petitions.results[0]} />
+              )
             }
           </Div>
           <Div mb={customTheme.spacing.medium}>
