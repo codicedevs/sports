@@ -1,23 +1,8 @@
 // src/features/auth/authApi.ts
 import { BaseQueryFn, createApi } from "@reduxjs/toolkit/query/react";
 import { AxiosError, AxiosResponse } from "axios";
-import { matchService } from "../../../services/match";
-import { Match } from "../../../interfaces/interfaces";
-
-interface MatchFilter {
-  _id: string;
-}
-
-interface LoginResponse {
-  user: { id: string; name: string };
-  access_token: string;
-  refresh_token: string;
-}
-
-interface LoginRequest {
-  email: string;
-  password: string;
-}
+import { SportMode } from "../../../interfaces/interfaces";
+import { sportModeService } from "../../../services/sportMode";
 
 interface ApiResponse<T> {
   data: T;
@@ -52,12 +37,12 @@ const axiosBaseQuery =
     }
   };
 
-export const matchApi = createApi({
-  reducerPath: "matchApi",
-  baseQuery: axiosBaseQuery<ApiResponse<any>>(matchService),
-  tagTypes: ["Matches"],
+export const sportModeApi = createApi({
+  reducerPath: "sportModeApi",
+  baseQuery: axiosBaseQuery<any>(sportModeService),
+  tagTypes: ["SportMode"],
   endpoints: (builder) => ({
-    getMatches: builder.query<any, any>({
+    getSportMode: builder.query<any, any>({
       query: (filter: any) => {
         return {
           url: ``,
@@ -65,9 +50,9 @@ export const matchApi = createApi({
           params: filter,
         };
       },
-      providesTags: ["Matches"],
+      providesTags: ["SportMode"],
     }),
-    createMatch: builder.mutation<any, any>({
+    createSportMode: builder.mutation<any, any>({
       query: (data: any) => {
         return {
           url: ``,
@@ -75,23 +60,27 @@ export const matchApi = createApi({
           data,
         };
       },
-      invalidatesTags: ["Matches"],
+      invalidatesTags: ["SportMode"],
     }),
-    deleteMatch: builder.mutation<string, string>({
-      query: (matchId: any) => {
+    deleteSportMode: builder.mutation<string, string>({
+      query: (sportModeId: any) => {
         return {
           url: ``,
           method: "remove",
-          data: matchId,
+          data: sportModeId,
         };
       },
-      async onQueryStarted(matchId, { dispatch, queryFulfilled }) {
+      async onQueryStarted(sportModeId, { dispatch, queryFulfilled }) {
         const patchResult = dispatch(
-          matchApi.util.updateQueryData("getMatches", undefined, (draft) => {
-            draft.results = draft.results.filter(
-              (match: Match) => match._id !== matchId
-            );
-          })
+          sportModeApi.util.updateQueryData(
+            "getSportMode",
+            undefined,
+            (draft) => {
+              draft.results = draft.results.filter(
+                (sportMode: SportMode) => sportMode._id !== sportModeId
+              );
+            }
+          )
         );
         try {
           await queryFulfilled;
@@ -104,7 +93,8 @@ export const matchApi = createApi({
 });
 
 export const {
-  useGetMatchesQuery,
-  useCreateMatchMutation,
-  useDeleteMatchMutation,
-} = matchApi;
+  useGetSportModeQuery,
+  useCreateSportModeMutation,
+  useDeleteSportModeMutation,
+  useLazyGetSportModeQuery,
+} = sportModeApi;

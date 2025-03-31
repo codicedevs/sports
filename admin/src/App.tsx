@@ -11,8 +11,9 @@ import TestUserProfile from "./views/testProfile";
 import Dashboard from "./pages/dashboard";
 import { useState } from "react";
 import { lightTheme } from "./utils/theme";
-import NewUser from "./pages/users/newUser";
+import UserForm from "./pages/users/userForm";
 import UsersList from "./components/usersList";
+import MatchForm from "./pages/match/matchForm";
 
 const router = createBrowserRouter([
   {
@@ -30,9 +31,10 @@ const router = createBrowserRouter([
     children: [
       { path: "", element: <DashboardHome /> },
       { path: "partidos", element: <Matches /> },
-      { path: "newUser", element: <NewUser /> },
+      { path: "nuevoPartido", element: <MatchForm /> },
       { path: "users", element: <UsersList /> },
-      { path: "users/:id", element: <TestUserProfile /> },
+      { path: "users/:id", element: <UserForm /> },
+      { path: "newUser", element: <UserForm /> },
     ],
   },
 ]);

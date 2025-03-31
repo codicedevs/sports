@@ -6,11 +6,24 @@ export const Breadcrumbs = () => {
   const location = useLocation();
   const pathSnippets = location.pathname.split("/").filter((i) => i);
 
-  const breadcrumbItems = pathSnippets.map((_, index, arr) => {
+  const routeNameMap: Record<string, string> = {
+    home: "Inicio",
+    users: "Usuarios",
+    edit: "Editar Usuario",
+    newUser: "Nuevo Usuario",
+    profile: "Perfil",
+    settings: "Configuración",
+    matches: "Partidos",
+  };
+
+  const breadcrumbItems = pathSnippets.map((segment, index, arr) => {
     const url = `/${arr.slice(0, index + 1).join("/")}`;
+    const isLast = index === arr.length - 1;
+    const alias = routeNameMap[segment] || segment;
+
     return (
       <Breadcrumb.Item key={url}>
-        <Link to={url}>{decodeURIComponent(arr[index])}</Link>
+        {isLast ? alias : <Link to={url}>{alias}</Link>}
       </Breadcrumb.Item>
     );
   });

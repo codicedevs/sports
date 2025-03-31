@@ -4,6 +4,8 @@ import authReducer from "./features/auth/authSlice";
 import { authApi } from "./features/auth/authApi";
 import { matchApi } from "./features/match/matchApi";
 import { userApi } from "./features/user/userApi";
+import { locationApi } from "./features/locations/locationApi";
+import { sportModeApi } from "./features/sportMode/sportModeApi";
 
 const store = configureStore({
   reducer: {
@@ -11,12 +13,16 @@ const store = configureStore({
     [authApi.reducerPath]: authApi.reducer,
     [matchApi.reducerPath]: matchApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
+    [locationApi.reducerPath]: locationApi.reducer,
+    [sportModeApi.reducerPath]: sportModeApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
       authApi.middleware,
       matchApi.middleware,
-      userApi.middleware
+      userApi.middleware,
+      locationApi.middleware,
+      sportModeApi.middleware
     ),
 });
 

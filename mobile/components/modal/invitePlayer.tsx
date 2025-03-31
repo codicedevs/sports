@@ -73,15 +73,16 @@ export default function InviteModal({
         p={customTheme.spacing.small}
         justifyContent="center"
         alignItems="center"
-      >
+      > <Div p={customTheme.spacing.small}
+       w="93%">
+          <Text fontSize={customTheme.fontSize.title} fontFamily="NotoSans-ExtraBoldItalic">Elegir jugador</Text>
+        </Div>
         <Button bg="white" onPress={() => setOpen(false)}>
-          <Text color="black" fontSize={customTheme.fontSize.medium}>
+          <Text color="black" fontSize={customTheme.fontSize.title}>
             X
           </Text>
         </Button>
-        <Div alignItems="center" w="93%">
-          <Text fontSize={customTheme.fontSize.medium}>Elegir jugador</Text>
-        </Div>
+       
       </Div>
 
       {/* autocomplete */}
@@ -145,7 +146,7 @@ export default function InviteModal({
 
         {/* jug selecc.*/}
         <Div mt={60} p={customTheme.spacing.medium}>
-          <Text textAlign="center" fontSize={customTheme.fontSize.medium}>
+          <Text textAlign="center" fontSize={customTheme.fontSize.medium} fontFamily="NotoSans-ExtraBoldItalic">
             Jugadores seleccionados:
           </Text>
           {selectedPlayers.map((player, index) => (
@@ -182,8 +183,35 @@ export default function InviteModal({
         </Div>
       </Div>
 
-      <Div alignItems="center" bg={customTheme.colors.secondary}>
-        <Button onPress={handleSendInvitations}>Enviar Invitaciones</Button>
+      <Div
+        position="absolute"
+        bottom={0}
+        left={0}
+        right={0}
+        bg="white"
+        borderTopWidth={1}
+        borderTopColor="rgb(223, 223, 220)"
+        p={customTheme.spacing.medium}
+        alignItems="center"
+        justifyContent="center"
+      >
+        {/* Botón “Elegir” */}
+        <Button
+          bg={customTheme.colors.secondaryBackground} 
+          onPress={handleSendInvitations}
+          w="100%"
+          h={scale(45)}
+          rounded="md"
+        >
+          <Text
+            color="white"
+            textAlign="center"
+            fontSize={customTheme.fontSize.medium}
+            fontFamily="NotoSans-BoldItalic"
+          >
+            Elegir
+          </Text>
+        </Button>
       </Div>
     </Modal>
   );

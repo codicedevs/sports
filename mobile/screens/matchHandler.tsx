@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ScrollView, TouchableOpacity, View, StyleSheet } from "react-native";
-import { Div, Text } from "react-native-magnus";
-import { verticalScale } from "react-native-size-matters";
+import { Div, Image, Text } from "react-native-magnus";
+import { scale, verticalScale } from "react-native-size-matters";
 import { useNavigation } from "@react-navigation/native";
 import { MatchDetails } from "../types/form.type";
 import matchService from "../service/match.service";
@@ -26,7 +26,7 @@ export default function MatchHandlerScreen({
 }: MatchHandlerScreenProps) {
   const navigation = useNavigation();
   const [openId, setOpenId] = useState<null | string>(null);
-  const { currentUser } = useSession()
+  const { currentUser } = useSession();
 
   // Objeto con la info del partido a crear/editar
   const matchDetailsRef = useRef<MatchDetails>({
@@ -124,7 +124,11 @@ export default function MatchHandlerScreen({
             openId={openId}
             setOpenId={setOpenId}
             title="Deporte"
-            rightText={matchDetailsRef.current.selectedSportMode ? matchDetailsRef.current.selectedSportMode.name : "A definir"}
+            rightText={
+              matchDetailsRef.current.selectedSportMode
+                ? matchDetailsRef.current.selectedSportMode.name
+                : "A definir"
+            }
             size={342}
           >
             <SportInput matchDetailsRef={matchDetailsRef} />
@@ -144,12 +148,17 @@ export default function MatchHandlerScreen({
             openId={openId}
             setOpenId={setOpenId}
             title="Privacidad"
-            rightText={matchDetailsRef.current.privacyOption ? "Publico" : "Privado"}
+            rightText={
+              matchDetailsRef.current.privacyOption ? "Publico" : "Privado"
+            }
             size={134}
           >
             <MatchPrivacyToggleInput matchDetailsRef={matchDetailsRef} />
           </Accordion>
-          <Div borderBottomWidth={1} borderBottomColor={customTheme.colors.gray} />
+          <Div
+            borderBottomWidth={1}
+            borderBottomColor={customTheme.colors.gray}
+          />
           <Text
             fontSize={customTheme.fontSize.medium}
             color={customTheme.colors.gray}
@@ -162,7 +171,11 @@ export default function MatchHandlerScreen({
             openId={openId}
             setOpenId={setOpenId}
             title="Horario"
-            rightText={matchDetailsRef.current.matchDate ? formatDate(matchDetailsRef.current.matchDate) : "A definir"}
+            rightText={
+              matchDetailsRef.current.matchDate
+                ? formatDate(matchDetailsRef.current.matchDate)
+                : "A definir"
+            }
             size={802}
           >
             <MatchSchedulerInput matchDetailsRef={matchDetailsRef} />
@@ -172,7 +185,11 @@ export default function MatchHandlerScreen({
             openId={openId}
             setOpenId={setOpenId}
             title="¿Donde juegan?"
-            rightText={matchDetailsRef.current.location ? matchDetailsRef.current.location.name : "A definir"}
+            rightText={
+              matchDetailsRef.current.location
+                ? matchDetailsRef.current.location.name
+                : "A definir"
+            }
             size={300}
           >
             <SearchLocationInput matchDetailsRef={matchDetailsRef} />
@@ -181,17 +198,34 @@ export default function MatchHandlerScreen({
       </ScrollView>
       <Div
         justifyContent="center"
-        bg="#151515E5"
+        bg={customTheme.colors.background}
         h={verticalScale(80)}
         p={customTheme.spacing.medium}
+        borderTopColor="rgb(223, 223, 220)"
+        borderTopWidth={1}
       >
         <TouchableOpacity onPress={handleAction}>
           <Div
             h={verticalScale(45)}
             justifyContent="center"
-            bg={customTheme.colors.primary}
+            alignItems="center"
+            bg={customTheme.colors.secondaryBackground}
+            flexDir="row"
           >
-            <Text textAlign="center" color="black">
+
+            <Image
+              source={require("../assets/+.png")}
+              resizeMode="contain"
+              w={scale(15)}
+              h={scale(15)}
+              mr={customTheme.spacing.small}
+            />
+            <Text
+              textAlign="center"
+              color={customTheme.colors.background}
+              fontSize={customTheme.fontSize.medium}
+              fontFamily="NotoSans-BoldItalic"
+            >
               {!match ? "Crear" : "Editar"}
             </Text>
           </Div>

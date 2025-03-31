@@ -241,9 +241,10 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                   bottom={0}
                   left={0}
                   right={0}
-                  bg="black"
+                  bg={customTheme.colors.background}
+                
                 >
-                  <Div bg="black">
+                  <Div >
                     <Div
                       mb={customTheme.spacing.small}
                       w="100%"
@@ -262,10 +263,10 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                         borderColor="black"
                         block
                       >
-                        <Text>Eliminar</Text>
+                        <Text fontFamily="NotoSans-BoldItalic">Eliminar</Text>
                       </Button>
-                      <Button w="48%" block bg={customTheme.colors.primary} onPress={() => setVisible(true)}>
-                        <Text color={customTheme.colors.text}>Editar</Text>
+                      <Button w="48%" block bg={customTheme.colors.secondaryBackground} onPress={() => setVisible(true)}>
+                        <Text color={customTheme.colors.background} fontFamily="NotoSans-BoldItalic">Editar</Text>
                       </Button>
                     </Div>
                   </Div>

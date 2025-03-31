@@ -2,21 +2,12 @@
 import { BaseQueryFn, createApi } from "@reduxjs/toolkit/query/react";
 import { AxiosError, AxiosResponse } from "axios";
 import { matchService } from "../../../services/match";
-import { Match } from "../../../interfaces/interfaces";
+import { Location, Match } from "../../../interfaces/interfaces";
+import { locationService } from "../../../services/location";
+import { isCompositeComponent } from "react-dom/test-utils";
 
-interface MatchFilter {
+interface LocationFilter {
   _id: string;
-}
-
-interface LoginResponse {
-  user: { id: string; name: string };
-  access_token: string;
-  refresh_token: string;
-}
-
-interface LoginRequest {
-  email: string;
-  password: string;
 }
 
 interface ApiResponse<T> {
@@ -52,12 +43,12 @@ const axiosBaseQuery =
     }
   };
 
-export const matchApi = createApi({
-  reducerPath: "matchApi",
-  baseQuery: axiosBaseQuery<ApiResponse<any>>(matchService),
-  tagTypes: ["Matches"],
+export const locationApi = createApi({
+  reducerPath: "locationApi",
+  baseQuery: axiosBaseQuery<any>(locationService),
+  tagTypes: ["Locations"],
   endpoints: (builder) => ({
-    getMatches: builder.query<any, any>({
+    getLocations: builder.query<any, any>({
       query: (filter: any) => {
         return {
           url: ``,
@@ -65,9 +56,9 @@ export const matchApi = createApi({
           params: filter,
         };
       },
-      providesTags: ["Matches"],
+      providesTags: ["Locations"],
     }),
-    createMatch: builder.mutation<any, any>({
+    createLocations: builder.mutation<any, any>({
       query: (data: any) => {
         return {
           url: ``,
@@ -75,23 +66,27 @@ export const matchApi = createApi({
           data,
         };
       },
-      invalidatesTags: ["Matches"],
+      invalidatesTags: ["Locations"],
     }),
-    deleteMatch: builder.mutation<string, string>({
-      query: (matchId: any) => {
+    deleteLocations: builder.mutation<string, string>({
+      query: (locationId: any) => {
         return {
           url: ``,
           method: "remove",
-          data: matchId,
+          data: locationId,
         };
       },
-      async onQueryStarted(matchId, { dispatch, queryFulfilled }) {
+      async onQueryStarted(locationId, { dispatch, queryFulfilled }) {
         const patchResult = dispatch(
-          matchApi.util.updateQueryData("getMatches", undefined, (draft) => {
-            draft.results = draft.results.filter(
-              (match: Match) => match._id !== matchId
-            );
-          })
+          locationApi.util.updateQueryData(
+            "getLocations",
+            undefined,
+            (draft) => {
+              draft.results = draft.results.filter(
+                (location: Location) => location._id !== locationId
+              );
+            }
+          )
         );
         try {
           await queryFulfilled;
@@ -104,7 +99,8 @@ export const matchApi = createApi({
 });
 
 export const {
-  useGetMatchesQuery,
-  useCreateMatchMutation,
-  useDeleteMatchMutation,
-} = matchApi;
+  useGetLocationsQuery,
+  useCreateLocationsMutation,
+  useDeleteLocationsMutation,
+  useLazyGetLocationsQuery,
+} = locationApi;

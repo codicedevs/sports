@@ -1,11 +1,24 @@
 import { Button, Card, Form, Input, message, Typography } from "antd";
 import { Controller, useForm } from "react-hook-form";
-import { NewUserDto } from "../interfaces/interfaces";
-import { useRegisterUserMutation } from "../store/features/user/userApi";
+import { NewUserDto } from "../../interfaces/interfaces";
+import {
+  useGetUserQuery,
+  useRegisterUserMutation,
+} from "../../store/features/user/userApi";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { replace, useNavigate, useParams } from "react-router-dom";
+import { skipToken } from "@reduxjs/toolkit/query";
+import { useEffect } from "react";
 
-const schema = yup.object({
+type FormValues = {
+  name: string;
+  email: string;
+  phone: string;
+  password: string;
+};
+
+const schemaNew = yup.object({
   name: yup.string().required("El nombre es requerido"),
   email: yup
     .string()
@@ -14,30 +27,79 @@ const schema = yup.object({
   phone: yup.string().required("El telefono es requerido"),
   password: yup.string().required("La contraseña es requerida"),
 });
+const schemaEdit = yup.object({
+  name: yup.string().required("El nombre es requerido"),
+  email: yup
+    .string()
+    .email("Ingrese un email valido")
+    .required("El email es requerido"),
+  phone: yup.string().required("El telefono es requerido"),
+  password: yup.string(),
+});
 
-const NewUser = () => {
+const UserForm = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [registerUser, { isLoading }] = useRegisterUserMutation();
+  const [updateUser] = useRegisterUserMutation();
+  const { data: userData, isLoading: isFetching } = useGetUserQuery(
+    id ? { id } : skipToken
+  );
+  const isEdit = Boolean(id);
   const {
     control,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(isEdit ? schemaNew : schemaEdit, {
+      context: { isEdit },
+    }),
+    defaultValues: {
+      name: "",
+      email: "",
+      phone: "",
+      password: "",
+    },
+    mode: "onBlur",
   });
-  const [registerUser, { isLoading }] = useRegisterUserMutation();
+
+  useEffect(() => {
+    if (userData) {
+      const values = {
+        name: userData.name,
+        email: userData.email,
+        phone: userData.phone,
+        password: "", // nunca precargues password real
+      };
+
+      Object.entries(values).forEach(([key, value]) => {
+        setValue(key as keyof FormValues, value);
+      });
+    }
+  }, [userData]);
 
   const onSubmit = async (data: any) => {
-    console.log("data", data);
-    try {
-      await registerUser(data);
-      message.success("Usuario creado correctamente");
-    } catch (error) {
-      console.error("Error al crear usuario:", error);
-      message.error("Error al crear el usuario");
+    if (isEdit) {
+      // updateUser({ data: id, params: userData });
+    } else {
+      try {
+        await registerUser(data);
+        message.success("Usuario creado correctamente");
+        navigate("/home/users");
+      } catch (error) {
+        console.error("Error al crear usuario:", error);
+        message.error("Error al crear el usuario");
+      }
     }
   };
+  console.log("user", userData);
   return (
     <div>
-      <Card title="Crear Nuevo Usuario" style={{ width: 300 }}>
+      <Card
+        title={id ? "Editar Usuario" : "Crear Nuevo Usuario"}
+        style={{ width: "100%" }}
+      >
         <div
           style={{
             display: "flex",
@@ -50,6 +112,7 @@ const NewUser = () => {
             onFinish={handleSubmit(onSubmit)}
             layout="vertical"
             style={{ width: 300 }}
+            autoComplete="off"
           >
             <Form.Item
               label="Nombre"
@@ -63,9 +126,7 @@ const NewUser = () => {
                 name="name"
                 control={control}
                 render={({ field }) => (
-                  <>
-                    <Input {...field} placeholder="Nombre" />
-                  </>
+                  <Input {...field} placeholder="Nombre" />
                 )}
               />
             </Form.Item>
@@ -111,7 +172,7 @@ const NewUser = () => {
                 name="password"
                 control={control}
                 render={({ field }) => (
-                  <Input {...field} placeholder="Contraseña" />
+                  <Input.Password {...field} placeholder="Contraseña" />
                 )}
               />
             </Form.Item>
@@ -122,7 +183,7 @@ const NewUser = () => {
               disabled={isLoading}
               loading={isLoading}
             >
-              Crear
+              {isEdit ? "Guardar Cambios" : "Crear"}
             </Button>
           </Form>
         </div>
@@ -131,4 +192,4 @@ const NewUser = () => {
   );
 };
 
-export default NewUser;
+export default UserForm;

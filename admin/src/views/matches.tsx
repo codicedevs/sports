@@ -1,9 +1,9 @@
-import MatchList from "../components/matchList";
+import MatchsList from "../components/matchList";
 
 const Matches = () => {
   return (
     <div>
-      <MatchList />
+      <MatchsList />
     </div>
   );
 };
