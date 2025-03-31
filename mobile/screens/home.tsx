@@ -17,19 +17,20 @@ import { useFocusEffect } from "@react-navigation/native";
 import petitionService from "../service/petition.service";
 import Petition from "../types/petition.type";
 import MatchInvitation from "../components/cards/invitationCard";
-
+import MatchesCardSK from "../components/cards/matchesCardSK";
+import UpcomingMatchesCardSK from "../components/cards/upcomingMatchesCardSK";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
   const { currentUser } = useSession()
-  const { data: matches, refetch } = useFetch(() => matchService.getAll({
+  const { data: matches, refetch, isFetching: isFetchingMatches } = useFetch(() => matchService.getAll({
     where: {
       "user._id": currentUser._id
     }
   }), [QUERY_KEYS.MATCHES, currentUser]);
   const now = new Date().toISOString();
-  const { data: publicMatches, refetch: refetchPublic } = useFetch(() => matchService.getAll({
+  const { data: publicMatches, refetch: refetchPublic, isFetching: isFetchingPublic } = useFetch(() => matchService.getAll({
     where: {
       "open": true,
       "date": { $gte: now }
@@ -56,7 +57,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
       refetchPublic()
     }, [])
   );
-  
+
   const fallbackEvent = {
     name: "TORNEO DE VERANO FUTBOL VETERANO", // pa hardcodear
     date: "12/3",
@@ -90,20 +91,25 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
               Próximos partidos
             </Text>
           </Div>
-          <ScrollView horizontal>
-            {publicMatches?.results?.map((u: any) => (
-              <UpcomingMatchCard
-                key={u._id}
-                matchId={u._id}
-                date={u.date}
-                hour={u.hour}
-                players={u.users}
-                maxPlayers={u.playersLimit}
-                location={u.location}
-                sportMode={u.sportMode}
-              />
-            ))}
-          </ScrollView>
+          {
+            isFetchingPublic ?
+              <UpcomingMatchesCardSK />
+              :
+              <ScrollView horizontal>
+                {publicMatches?.results?.map((u: any) => (
+                  <UpcomingMatchCard
+                    key={u._id}
+                    matchId={u._id}
+                    date={u.date}
+                    hour={u.hour}
+                    players={u.users}
+                    maxPlayers={u.playersLimit}
+                    location={u.location}
+                    sportMode={u.sportMode}
+                  />
+                ))}
+              </ScrollView>
+          }
         </Div>
         <Div mb={customTheme.spacing.medium} px={customTheme.spacing.medium}>
           <HandleMatchesButton />
@@ -116,21 +122,26 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
             >
               Mis partidos
             </Text>
-            <Div style={{ gap: scale(16) }}>
-              {matches?.results?.map((m: any) => (
-                <MatchesCards
-                  key={m._id}
-                  matchId={m._id}
-                  dayOfWeek={m.dayOfWeek}
-                  date={m.date} // string, ej: "2026-07-15T17:48:00.000Z"
-                  time={m.hour} // number, ej: 22
-                  location={m.location} // { name, address }
-                  players={m.users}
-                  maxPlayers={m.playersLimit}
-                  sportMode={m.sportMode}
-                />
-              ))}
-            </Div>
+            {
+              isFetchingMatches ?
+                <MatchesCardSK />
+                :
+                <Div style={{ gap: scale(16) }}>
+                  {matches?.results?.map((m: any) => (
+                    <MatchesCards
+                      key={m._id}
+                      matchId={m._id}
+                      dayOfWeek={m.dayOfWeek}
+                      date={m.date} // string, ej: "2026-07-15T17:48:00.000Z"
+                      time={m.hour} // number, ej: 22
+                      location={m.location} // { name, address }
+                      players={m.users}
+                      maxPlayers={m.playersLimit}
+                      sportMode={m.sportMode}
+                    />
+                  ))}
+                </Div>
+            }
           </Div>
         )}
         <Div minH={verticalScale(150)}></Div>
