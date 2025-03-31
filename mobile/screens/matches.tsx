@@ -10,6 +10,7 @@ import zonesService from '../service/zones.service';
 import sportmodeService from '../service/sportmode.service';
 import SportModeButton from '../components/matche/Form/sportModeButton';
 import MatchesCards from '../components/cards/matchesCards';
+import MatchesCardSK from '../components/cards/matchesCardSK';
 
 const schedules = [
   { id: 1, time: '00:00', value: { startHour: '08:00', endHour: '14:00' } },
@@ -253,6 +254,7 @@ const MatchesScreen = () => {
   const [limit, setLimit] = useState(10);
   const [matches, setMatches] = useState([]);
   const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { data: zonas } = useFetch(zonesService.getZones, [QUERY_KEYS.ZONES]);
   const { data: allSportModes } = useFetch(sportmodeService.getAll, [QUERY_KEYS.SPORT_MODES]);
@@ -266,9 +268,16 @@ const MatchesScreen = () => {
   }, [filter, limit]);
 
   const fetchMatches = async () => {
-    const mongoFilter = buildMongoFilter();
-    const res = await matchService.getAll(mongoFilter);
-    return res;
+    try {
+      setIsLoading(true)
+      const mongoFilter = buildMongoFilter();
+      const res = await matchService.getAll(mongoFilter);
+      return res;
+    } catch (e) {
+      console.log(e)
+    } finally {
+      setIsLoading(false)
+    }
   };
 
   useEffect(() => {
@@ -291,10 +300,14 @@ const MatchesScreen = () => {
     }));
   }, []);
 
-  if (!zonas || !allSportModes) return <ActivityIndicator size="large" />;
+  if (!zonas || !allSportModes) return (
+    <Div flex={1} alignItems='center' justifyContent='center'>
+      <ActivityIndicator size="large" />
+    </Div>
+  );
 
   return (
-    <Div p={customTheme.spacing.medium}>
+    <Div p={customTheme.spacing.medium} h={'100%'}>
       <Filters
         filter={filter}
         setFilter={setFilter}
@@ -303,7 +316,15 @@ const MatchesScreen = () => {
         allSportModes={allSportModes}
         schedules={schedules}
       />
-      <MatchesList matches={matches} fetchMore={fetchMore} hasMore={hasMore} />
+      {
+        isLoading ?
+          <Div my={customTheme.spacing.medium} style={{ gap: verticalScale(20) }} >
+            <MatchesCardSK />
+            <MatchesCardSK />
+          </Div>
+          :
+          <MatchesList matches={matches} fetchMore={fetchMore} hasMore={hasMore} />
+      }
     </Div>
   );
 };
