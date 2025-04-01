@@ -1,6 +1,5 @@
 import { Button } from "antd";
 import { useNavigate } from "react-router-dom";
-import { lightColors } from "../utils/colors";
 
 const HomePage = () => {
   const navigate = useNavigate();

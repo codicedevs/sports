@@ -1,37 +1,32 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { Provider } from "react-redux";
 import store from "./store";
-import HomePage from "./pages/home";
 import LoginPage from "./pages/login";
-import { authLoader } from "./pages/loaders/authLoader";
+import { authLoader } from "./pages/auth.loader";
 import { ConfigProvider } from "antd";
-import Matches from "./views/matches";
-import Dashboard from "./pages/dashboard";
-import { lightTheme } from "./utils/theme";
+import Dashboard from "./components/layout/main";
+import { lightTheme } from "./theme/antdTheme";
 import UserForm from "./pages/users/form";
 import UsersList from "./pages/users/list";
-import MatchForm from "./pages/match/form";
+import MatchForm from "./pages/matches/form";
+import MatchesList from "./pages/matches/list";
 
 const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <HomePage />,
-  },
   {
     path: "/login",
     element: <LoginPage />,
   },
   {
-    path: "/home",
+    path: "/",
     element: <Dashboard />,
     loader: authLoader,
     children: [
-      { path: "", element: <Matches /> },
-      { path: "partidos", element: <Matches /> },
-      { path: "nuevoPartido", element: <MatchForm /> },
-      { path: "users", element: <UsersList /> },
-      { path: "users/:id", element: <UserForm /> },
-      { path: "newUser", element: <UserForm /> },
+      { path: "", element: <MatchesList /> },
+      { path: "partidos", element: <MatchesList /> },
+      { path: "partidos/nuevo", element: <MatchForm /> },
+      { path: "usuarios", element: <UsersList /> },
+      { path: "usuarios/:id", element: <UserForm /> },
+      { path: "users/nuevo", element: <UserForm /> },
     ],
   },
 ]);

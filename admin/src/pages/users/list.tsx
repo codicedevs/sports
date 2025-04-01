@@ -1,13 +1,13 @@
 import { Button, Input, Segmented, Select, Space, Table } from "antd";
 import { useState } from "react";
-import { Location, Match, User, UserList } from "../../interfaces/interfaces";
 import { useNavigate } from "react-router-dom";
 import {
   useDeleteUserMutation,
   useGetUsersQuery,
-} from "../../store/features/user/userApi";
+} from "../../store/features/users";
 import { ColumnType } from "antd/es/table";
-import Delete from "../../components/delete";
+import Delete from "../../components/actions/delete";
+import { User } from "../../types/users.types";
 const { Search } = Input;
 
 const getColumns = (
@@ -66,7 +66,7 @@ const getColumns = (
             <p>No hay telefono</p>
           )}
 
-          <Button onClick={() => navigate(`../users/${record._id}`)}>
+          <Button onClick={() => navigate(`../usuarios/${record._id}`)}>
             Editar
           </Button>
 
@@ -135,7 +135,7 @@ const UsersList = () => {
           <Button
             type="primary"
             onClick={() => {
-              navigate("../../home/users/newUser");
+              navigate("/usuarios/nuevo");
             }}
           >
             Nuevo

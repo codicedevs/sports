@@ -1,4 +1,4 @@
-import { User } from "../interfaces/interfaces";
+import { User } from "../types/interfaces";
 import { CrudService } from "./crud";
 interface loginData {
   email: string;
