@@ -1,13 +1,14 @@
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Form, Input, message, Card, Button, Image } from "antd";
+import { Form, Input, message, Card, Button } from "antd";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import styled from "styled-components";
 import { useLoginMutation } from "../store/features/auth/authApi";
 import { setCredentials } from "../store/features/auth/authSlice";
-import logo from "../assets/Pelota Logo negro.png";
+import logo from "../assets/Pelota Logo Negro.png";
+import { FlexCenter } from "../styled/GlobalStyle";
 
 const validationSchema = yup.object().shape({
   email: yup
@@ -19,12 +20,6 @@ const validationSchema = yup.object().shape({
     .min(8, "La contraseña debe tener al menos 8 caracteres")
     .required("La contraseña es obligatoria"),
 });
-
-const StyledContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
 
 const StyledImage = styled.img`
   width: 200px;
@@ -80,7 +75,7 @@ const LoginPage = () => {
   };
 
   return (
-    <StyledContainer className="homePageBackground">
+    <FlexCenter className="homePageBackground">
       <StyledCard
         style={{
           backgroundColor: "#EEEEEE",
@@ -90,12 +85,9 @@ const LoginPage = () => {
           flexDirection: "column",
         }}
       >
-        <div
+        <FlexCenter
+          direction="column"
           style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
             marginBottom: 20,
           }}
         >
@@ -105,7 +97,7 @@ const LoginPage = () => {
             style={{ width: 150, margin: 0 }}
           />
           <h2>Iniciar sesión</h2>
-        </div>
+        </FlexCenter>
         <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
           <Form.Item
             label="Email"
@@ -145,7 +137,7 @@ const LoginPage = () => {
           </Form.Item>
         </Form>
       </StyledCard>
-    </StyledContainer>
+    </FlexCenter>
   );
 };
 

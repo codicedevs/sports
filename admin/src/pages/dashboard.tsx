@@ -3,6 +3,14 @@ import { Outlet, useNavigate } from "react-router-dom";
 import HeaderAdmin from "../components/header";
 import Sidebar from "../components/sidebar";
 import { Content } from "antd/es/layout/layout";
+import styled from "styled-components";
+
+const StyledDiv = styled.div`
+  display: "flex",
+  flexDirection: "row",
+  minHeight: "100vh",
+  overflow: "hidden",
+`;
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -14,14 +22,7 @@ const Dashboard: React.FC = () => {
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        minHeight: "100vh",
-        overflow: "hidden",
-      }}
-    >
+    <StyledDiv>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
 
       <Content
@@ -35,8 +36,7 @@ const Dashboard: React.FC = () => {
         <HeaderAdmin collapsed={collapsed} setCollapsed={setCollapsed} />
         <Outlet />
       </Content>
-      {/* </div> */}
-    </div>
+    </StyledDiv>
   );
 };
 

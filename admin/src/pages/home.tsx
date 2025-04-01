@@ -1,49 +1,42 @@
 import { Button } from "antd";
 import { useNavigate } from "react-router-dom";
-import { lightColors } from "../utils/colors";
+import { FlexCenter } from "../styled/GlobalStyle";
+import styled from "styled-components";
+
+const StyledTitle = styled.h1`
+  color: black;
+  background-color: white;
+  padding: 10px;
+  border-radius: 20px;
+`;
+
+const StyledDiv = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  z-index: 1000;
+  opacity: 0.5;
+`;
 
 const HomePage = () => {
   const navigate = useNavigate();
+
   return (
-    <div
+    <FlexCenter
       className="homePageBackground"
       style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
         height: "100vh",
       }}
     >
-      <div
-        style={{
-          position: "absolute",
-          width: "100%",
-          height: "100%",
-          backgroundColor: "black",
-          zIndex: 1000,
-          opacity: "0.5 ",
-        }}
-      />
-      <div
+      <StyledDiv />
+      <FlexCenter
+        direction="column"
         style={{
           zIndex: 2000,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
         }}
       >
-        <h1
-          style={{
-            color: "black",
-            backgroundColor: "white",
-            padding: 10,
-            borderRadius: 20,
-          }}
-        >
-          Bienvenidxs a MatchUp!
-        </h1>
+        <StyledTitle>Bienvenidxs a MatchUp!</StyledTitle>
         <Button
           style={{ width: 80 }}
           onClick={() => {
@@ -52,8 +45,8 @@ const HomePage = () => {
         >
           LOGIN
         </Button>
-      </div>
-    </div>
+      </FlexCenter>
+    </FlexCenter>
   );
 };
 

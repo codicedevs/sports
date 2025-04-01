@@ -10,6 +10,14 @@ import * as yup from "yup";
 import { replace, useNavigate, useParams } from "react-router-dom";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useEffect } from "react";
+import styled from "styled-components";
+
+const StyledDiv = styled.div`
+  display: "flex",
+  flexDirection: "row",
+  gap: 5,
+  marginLeft: 20,
+`;
 
 type FormValues = {
   name: string;
@@ -93,21 +101,13 @@ const UserForm = () => {
       }
     }
   };
-  console.log("user", userData);
   return (
     <div>
       <Card
         title={id ? "Editar Usuario" : "Crear Nuevo Usuario"}
         style={{ width: "100%" }}
       >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            gap: 5,
-            marginLeft: 20,
-          }}
-        >
+        <StyledDiv>
           <Form
             onFinish={handleSubmit(onSubmit)}
             layout="vertical"
@@ -186,7 +186,7 @@ const UserForm = () => {
               {isEdit ? "Guardar Cambios" : "Crear"}
             </Button>
           </Form>
-        </div>
+        </StyledDiv>
       </Card>
     </div>
   );
