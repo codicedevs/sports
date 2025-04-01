@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ScrollView, TouchableOpacity } from "react-native";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
-import { Button, Div, Image, Text } from "react-native-magnus";
+import { Button, Div, Image, Overlay, Text } from "react-native-magnus";
 import matchService from "../service/match.service";
 import useFetch from "../hooks/useGet";
 import { QUERY_KEYS } from "../types/query.types";
@@ -16,6 +16,7 @@ import MatchModalHandler from "../components/modal/matchModalHandler";
 import Field from "../components/matche/Detail/field";
 import PlayerStatusList from "../components/matche/Detail/playerStatusList";
 import InviteModal from "../components/modal/invitePlayer";
+import { ActivityScreen } from "./activityScreen";
 
 type TabKey = "partido" | "jugadores" | "actividad" | "equipos";
 
@@ -28,6 +29,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
   const [activeTab, setActiveTab] = useState<TabKey>("partido");
   const [visible, setVisible] = useState(false)
   const [inviteOpen, setInviteOpen] = useState(false)
+  const [deleteModal, setDeleteModal] = useState(false)
   const {
     data: match,
     isFetching,
@@ -37,8 +39,8 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
 
   if (isFetching) {
     return (
-      <Div justifyContent="center" alignItems="center">
-        <ActivityIndicator size="large" color={customTheme.colors.primary} />
+      <Div justifyContent="center" alignItems="center" flex={1}>
+        <ActivityIndicator size="large" color={customTheme.colors.black} />
       </Div>
     );
   }
@@ -53,12 +55,19 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
   const { _id, open, playersLimit, users, date, sportMode, location, user } = match.data;
   const playerCount = users?.length || 0;
   const dateObject = new Date(date);
-  const isAdmin = user?._id === currentUser?._id
+  const isAdmin = user?._id === currentUser?._id //SI el usuario que creo el partido dejo de existir genera conflictos
+
   return (
     <>
       <MatchModalHandler open={visible} setOpen={setVisible} match={match.data} refetch={refetch} />
+      <Overlay visible={deleteModal} bg="black" style={{ borderWidth: 1, borderColor: "#FFAF26" }} p={customTheme.spacing.medium}>
+        <Text my={customTheme.spacing.small} p={customTheme.spacing.small} color="white">¿Estas seguro que quieres eliminar el partido?</Text>
+        <Div flexDir="row" justifyContent="space-between" style={{ gap: scale(10) }}>
+          <Button flex={1} onPress={() => setDeleteModal(false)} borderWidth={1} borderColor="white" bg="black" color="white">Cancelar</Button>
+          <Button flex={1} bg={"#FFAF26"} color="black">Eliminar</Button>
+        </Div>
+      </Overlay>
       <Div flex={1}>
-        {/*  pestañas */}
         <Div
           flexDir="row"
           justifyContent="space-around"
@@ -242,7 +251,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                   left={0}
                   right={0}
                   bg={customTheme.colors.background}
-                
+
                 >
                   <Div >
                     <Div
@@ -262,6 +271,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                         borderWidth={1}
                         borderColor="black"
                         block
+                        onPress={() => setDeleteModal(true)}
                       >
                         <Text fontFamily="NotoSans-BoldItalic">Eliminar</Text>
                       </Button>
@@ -278,13 +288,13 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
 
         {activeTab === "jugadores" && (
           <Div>
-           <PlayerStatusList match={match.data} />
+            <PlayerStatusList match={match.data} />
           </Div>
         )}
 
         {activeTab === "actividad" && (
           <Div>
-            <Text>pendiente</Text>
+            <ActivityScreen match={match.data} />
           </Div>
         )}
 
@@ -295,24 +305,24 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
         )}
         {/* Botones Eliminar / Guardar */}
 
-      {activeTab === "equipos" && (
-        <Div>
-          <Text>pendiente</Text>
-        </Div>
-      )}
+        {activeTab === "equipos" && (
+          <Div>
+            <Text>pendiente</Text>
+          </Div>
+        )}
 
-      {/* Botones Eliminar / Guardar */}
-      <Div
-        justifyContent="flex-end"
-        flex={3}
-        position="absolute"
-        bottom={0}
-        left={0}
-        right={0}
-        bg="black"
-      ></Div>
-      <InviteModal open={inviteOpen} setOpen={setInviteOpen} matchId={id}/>
-    </Div>
+        {/* Botones Eliminar / Guardar */}
+        <Div
+          justifyContent="flex-end"
+          flex={3}
+          position="absolute"
+          bottom={0}
+          left={0}
+          right={0}
+          bg="black"
+        ></Div>
+        <InviteModal open={inviteOpen} setOpen={setInviteOpen} matchId={id} />
+      </Div>
     </>
   );
 };

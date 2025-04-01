@@ -130,11 +130,11 @@ export default function MatchModalHandler({
 
   return (
     <Modal isVisible={open} onBackButtonPress={closeModal}>
-      <ScrollView>
+      <ScrollView contentContainerStyle={{flexGrow:1}}>
         <Div
           flex={1}
           style={{ gap: verticalScale(16) }}
-          bg={customTheme.colors.background}
+          bg={customTheme.colors.grayBackground}
           p={customTheme.spacing.medium}
         >
           <Accordion

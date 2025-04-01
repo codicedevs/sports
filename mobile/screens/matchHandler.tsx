@@ -198,10 +198,10 @@ export default function MatchHandlerScreen({
       </ScrollView>
       <Div
         justifyContent="center"
-        bg={customTheme.colors.background}
+        bg={customTheme.colors.grayBackground}
         h={verticalScale(80)}
         p={customTheme.spacing.medium}
-        borderTopColor="rgb(223, 223, 220)"
+        borderTopColor="rgb(214, 214, 214)"
         borderTopWidth={1}
       >
         <TouchableOpacity onPress={handleAction}>
