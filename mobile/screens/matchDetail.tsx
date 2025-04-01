@@ -170,58 +170,22 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
               }}
             >
               <Div flex={1}>
-                <Div p={customTheme.spacing.small}>
-                  {/* yttulo */}
-                  <Div flexDir="row" alignItems="center">
-                    <Div
-                      justifyContent="flex-start"
-                      p={customTheme.spacing.small}
-                    >
-                      <Image
-                        source={require("../assets/iconflecha2.png")}
-                        style={{ width: 20, height: 20, resizeMode: "contain" }}
-                      />
-                    </Div>
-                    <Div w="75%" alignItems="center">
-                      <Text
-                        fontSize={customTheme.fontSize.medium}
-                        fontFamily="NotoSans-Variable"
-                      >
-                        Detalle del partido
+                <Div>
+                  <Div flexDir="column" p={customTheme.spacing.small}>
+                    <Div flexDir="row">
+                      <Text fontFamily="NotoSans-Variable">
+                        Deporte:{" "}
+                        <Text fontFamily="NotoSans_Condensed-Black">
+                          {sportMode.name}
+                        </Text>
                       </Text>
                     </Div>
-                  </Div>
-                  {/* tipo y cant de jug */}
-                  <Div
-                    flexDir="row"
-                    justifyContent="space-between"
-                    alignItems="center"
-                    p={customTheme.spacing.small}
-                  >
                     <Div>
-                      <Text
-                        fontSize={customTheme.fontSize.large}
-                        fontFamily="NotoSans-BoldItalic"
-                      >
-                        Fútbol 5 {/* hardcodeado{sportMode} */}
-                      </Text>
-                    </Div>
-                    <Div
-                      flexDir="row"
-                      justifyContent="center"
-                      bg={customTheme.colors.primary}
-                    >
-                      <Image
-                        source={require("../assets/iconUser.png")}
-                        w={customTheme.fontSize.medium}
-                        resizeMode="contain"
-                        mr={customTheme.spacing.small}
-                      />
-                      <Text
-                        fontSize={customTheme.fontSize.medium}
-                        fontFamily="NotoSans-BoldItalic"
-                      >
-                        {playerCount}/{playersLimit}
+                      <Text fontFamily="NotoSans-Variable">
+                        Cupo:{" "}
+                        <Text fontFamily="NotoSans_Condensed-Black">
+                          {playerCount}/{playersLimit}
+                        </Text>
                       </Text>
                     </Div>
                   </Div>
@@ -303,6 +267,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                 bottom={0}
                 left={0}
                 right={0}
+                bg="white"
               >
                 <Div>
                   <Div
