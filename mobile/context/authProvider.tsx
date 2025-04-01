@@ -1,6 +1,5 @@
 import React, { FC, ReactNode, useState } from "react";
 import { ModalContext } from "./modalProvider";
-import MatchModalHandler from "../components/modal/matchModalHandler";
 
 export const AuthContext = React.createContext<{
   currentUser: any;
