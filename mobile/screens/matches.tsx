@@ -307,7 +307,7 @@ const MatchesScreen = () => {
   );
 
   return (
-    <Div p={customTheme.spacing.medium} h={'100%'}>
+    <Div bg='white' p={customTheme.spacing.medium} h={'100%'}>
       <Filters
         filter={filter}
         setFilter={setFilter}

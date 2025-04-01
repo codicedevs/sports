@@ -116,7 +116,7 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
         <Div
           flex={1}
           style={{ gap: verticalScale(16) }}
-          bg={customTheme.colors.grayBackground}
+          bg={"white"}
           p={customTheme.spacing.medium}
         >
           <Accordion

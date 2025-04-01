@@ -184,7 +184,7 @@ export default function MatchSchedulerInput({
           selectedDayTextColor: "#ffffff",
           todayTextColor: "#2d4150",
           dayTextColor: "#2d4150",
-          textDisabledColor: customTheme.colors.grayBackground,
+          textDisabledColor: "white",
           textDayFontFamily: "NotoSans_Condensed-Black",
           textMonthFontFamily: "NotoSans_Condensed-Black",
           textDayHeaderFontFamily: "NotoSans_Condensed-Black",

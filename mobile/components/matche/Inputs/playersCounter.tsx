@@ -55,7 +55,7 @@ const PlayersCounterInput = ({ matchDetailsRef }: PlayersCounterInputProps) => {
             justifyContent="center"
             bg={
               amount === lowLimit
-                ? customTheme.colors.grayBackground
+                ? "white"
                 : customTheme.colors.secondaryBackground
             }
           >
@@ -84,7 +84,7 @@ const PlayersCounterInput = ({ matchDetailsRef }: PlayersCounterInputProps) => {
             justifyContent="center"
             bg={
               amount === highLimit
-                ? customTheme.colors.grayBackground
+                ? "white"
                 : customTheme.colors.secondaryBackground
             }
           >

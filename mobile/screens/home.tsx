@@ -64,7 +64,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   };
 
   return (
-    <Div>
+    <Div bg="white">
       <ScrollView>
         <Div p={customTheme.spacing.medium}>
           <Div mb={customTheme.spacing.medium}>

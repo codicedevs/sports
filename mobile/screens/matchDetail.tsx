@@ -67,7 +67,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
           <Button flex={1} bg={"#FFAF26"} color="black">Eliminar</Button>
         </Div>
       </Overlay>
-      <Div flex={1}>
+      <Div bg="white" flex={1}>
         <Div
           flexDir="row"
           justifyContent="space-around"

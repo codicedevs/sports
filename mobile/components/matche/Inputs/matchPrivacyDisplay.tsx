@@ -36,7 +36,7 @@ export default function MatchPrivacyDisplay({
           h={verticalScale(40)}
           justifyContent="center"
           borderWidth={1}
-          bg={isPublic ? customTheme.colors.secondaryBackground : customTheme.colors.grayBackground}
+          bg={isPublic ? customTheme.colors.secondaryBackground : "white"}
         >
           <TouchableOpacity disabled>
             <Text color={isPublic ? "white" : "black"} textAlign="center">
