@@ -1,6 +1,7 @@
 import { API_URL } from "../config";
-import { Filter, Match } from "../interfaces/interfaces";
-import objectToQueryString from "../utils/queryToString";
+import { Filter } from "../types/filters.type";
+import { Match } from "../types/matches.type";
+import objectToQueryString from "../utils/string";
 import { HttpBase } from "./http";
 
 export class CrudService<T> extends HttpBase {

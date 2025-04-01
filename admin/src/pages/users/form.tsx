@@ -1,13 +1,12 @@
 import { Button, Card, Form, Input, message, Typography } from "antd";
 import { Controller, useForm } from "react-hook-form";
-import { NewUserDto } from "../../interfaces/interfaces";
 import {
   useGetUserQuery,
   useRegisterUserMutation,
-} from "../../store/features/user/userApi";
+} from "../../store/features/users";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { replace, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useEffect } from "react";
 
@@ -86,7 +85,7 @@ const UserForm = () => {
       try {
         await registerUser(data);
         message.success("Usuario creado correctamente");
-        navigate("/home/users");
+        navigate("/usuarios");
       } catch (error) {
         console.error("Error al crear usuario:", error);
         message.error("Error al crear el usuario");
