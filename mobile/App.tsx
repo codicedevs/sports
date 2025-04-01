@@ -16,6 +16,7 @@ import { useFonts } from "expo-font";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import registerForPushNotificationsAsync from "./notifications/pushNotifications";
+import { GlobalUIProvider } from "./context/globalUiContext";
 
 const queryClient = new QueryClient();
 
@@ -45,11 +46,13 @@ export default function App() {
         <MagnusThemeProvider theme={customTheme}>
           <LoadingProvider>
             <AppProvider>
-              <PushNotificationInitializer />
-              <SafeAreaView style={{ flex: 1 }}>
-                <StatusBar translucent  backgroundColor={customTheme.colors.grayBackground} style="dark" />
-                <AppNavigator />
-              </SafeAreaView>
+              <GlobalUIProvider>
+                <PushNotificationInitializer />
+                <SafeAreaView style={{ flex: 1 }}>
+                  <StatusBar translucent backgroundColor={customTheme.colors.grayBackground} style="dark" />
+                  <AppNavigator />
+                </SafeAreaView>
+              </GlobalUIProvider>
             </AppProvider>
           </LoadingProvider>
         </MagnusThemeProvider>
