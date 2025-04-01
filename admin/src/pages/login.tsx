@@ -7,8 +7,8 @@ import * as yup from "yup";
 import styled from "styled-components";
 import { useLoginMutation } from "../store/features/auth/authApi";
 import { setCredentials } from "../store/features/auth/authSlice";
-import logo from "../assets/Pelota Logo Negro.png";
 import { FlexCenter } from "../styled/GlobalStyle";
+import logo from "../assets/logo.png";
 
 const validationSchema = yup.object().shape({
   email: yup
@@ -67,7 +67,7 @@ const LoginPage = () => {
         refreshToken: response.refresh_token,
       };
       dispatch(setCredentials(userData));
-      navigate("/home");
+      navigate("/");
     } catch (error) {
       console.error("Error al iniciar sesión:", error);
       message.error("Error en el inicio de sesión.");
@@ -89,6 +89,7 @@ const LoginPage = () => {
           direction="column"
           style={{
             marginBottom: 20,
+            gap: 10,
           }}
         >
           <StyledImage
