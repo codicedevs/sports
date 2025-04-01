@@ -25,7 +25,7 @@ const PlayerStatusList = ({ match }: { match: Match }) => {
     : 0
 
   return (
-    <Div px={customTheme.spacing.large}>
+    <Div px={customTheme.spacing.medium}>
       <Div h={'20%'} p={customTheme.spacing.small}>
         <Text fontSize={customTheme.fontSize.medium} textAlign='center'>Estado de jugadores</Text>
       </Div>
@@ -42,7 +42,9 @@ const PlayerStatusList = ({ match }: { match: Match }) => {
       </Div>
       <Div style={{ gap: 5 }}>
         {
-          statusList?.accepted.map((person) => (
+          statusList?.accepted
+          .filter(person => person !== null)
+          .map((person) => (
             <Div flexDir='row'>
               <Image style={{ width: scale(18), height: scale(18), marginRight: customTheme.spacing.small }} source={require("../../../assets/match/profileIcon.png")} />
               <Text>{person.name}</Text>
@@ -65,7 +67,9 @@ const PlayerStatusList = ({ match }: { match: Match }) => {
       </Div>
       <Div style={{ gap: 5 }}>
         {
-          statusList?.pending.map((person) => (
+          statusList?.pending
+          .filter(person => person !== null)
+          .map((person) => (
             <Div flexDir='row'>
               <Image style={{ width: scale(18), height: scale(18), marginRight: customTheme.spacing.small }} source={require("../../../assets/match/profileIcon.png")} />
               <Text>{person.name}</Text>
@@ -87,7 +91,9 @@ const PlayerStatusList = ({ match }: { match: Match }) => {
       </Div>
       <Div style={{ gap: 5 }}>
         {
-          statusList?.declined.map((person) => (
+          statusList?.declined 
+          .filter(person => person !== null)
+          .map((person) => (
             <Div flexDir='row'>
               <Image style={{ width: scale(18), height: scale(18), marginRight: customTheme.spacing.small }} source={require("../../../assets/match/profileIcon.png")} />
               <Text>{person.name}</Text>
