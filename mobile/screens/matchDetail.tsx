@@ -347,7 +347,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
         )}
 
         {activeTab === "jugadores" && (
-          <Div>
+          <Div flex={1}>
             <PlayerStatusList match={match.data} />
           </Div>
         )}
