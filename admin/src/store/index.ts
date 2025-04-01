@@ -2,10 +2,10 @@
 import { configureStore } from "@reduxjs/toolkit";
 import authReducer from "./features/auth/authSlice";
 import { authApi } from "./features/auth/authApi";
-import { matchApi } from "./features/match/matchApi";
-import { userApi } from "./features/user/userApi";
-import { locationApi } from "./features/locations/locationApi";
-import { sportModeApi } from "./features/sportMode/sportModeApi";
+import { matchApi } from "./features/matches";
+import { userApi } from "./features/users";
+import { locationApi } from "./features/locations";
+import { sportModeApi } from "./features/sportModes";
 
 const store = configureStore({
   reducer: {
