@@ -1,19 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
-import { ScrollView, TouchableOpacity, View, StyleSheet } from "react-native";
-import { Div, Image, Text } from "react-native-magnus";
-import { scale, verticalScale } from "react-native-size-matters";
+import React, { useRef, useState } from "react";
+import { View, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { MatchDetails } from "../types/form.type";
-import matchService from "../service/match.service";
-import { customTheme } from "../utils/theme";
-import { Accordion } from "../components/collapsibleView";
-import SportInput from "../components/matche/Inputs/sport";
-import PlayersCounterInput from "../components/matche/Inputs/playersCounter";
-import MatchPrivacyToggleInput from "../components/matche/Inputs/matchPrivacyToggle";
-import MatchSchedulerInput from "../components/matche/Inputs/matchScheduler";
-import SearchLocationInput from "../components/matche/Inputs/searchLocation";
-import { useSession } from "../context/authProvider";
-import { formatDate } from "../utils/date";
+import { useGlobalUI } from "../context/globalUiContext";
+import MatchForm from "../components/matche/Form/match";
 
 interface MatchHandlerScreenProps {
   match?: string;
@@ -25,8 +15,7 @@ export default function MatchHandlerScreen({
   onMatchCreated,
 }: MatchHandlerScreenProps) {
   const navigation = useNavigation();
-  const [openId, setOpenId] = useState<null | string>(null);
-  const { currentUser } = useSession();
+  const { showSnackBar } = useGlobalUI();
 
   // Objeto con la info del partido a crear/editar
   const matchDetailsRef = useRef<MatchDetails>({
@@ -38,199 +27,13 @@ export default function MatchHandlerScreen({
     location: null,
   });
 
-  useEffect(() => {
-    if (match) {
-      fetchMatch();
-    }
-  }, [match]);
-
-  async function fetchMatch() {
-    if (!match) return;
-    try {
-      const res = await matchService.getById(match);
-      // Ajusta según la forma real de la respuesta
-      matchDetailsRef.current.selectedSport = res.data.sportMode?.sport || null;
-      matchDetailsRef.current.selectedSportMode = res.data.sportMode || null;
-      matchDetailsRef.current.playerLimit = res.data.playersLimit || 0;
-      matchDetailsRef.current.privacyOption = res.data.open || false;
-      matchDetailsRef.current.matchDate = res.data.date;
-      matchDetailsRef.current.location = res.data.location || null;
-    } catch (e) {
-      console.error("Error al fetchMatch:", e);
-    }
-  }
-
-  async function createMatch() {
-    try {
-      const res = await matchService.create({
-        name: "Prueba3",
-        date: matchDetailsRef.current.matchDate,
-        location: matchDetailsRef.current.location?._id,
-        playersLimit: matchDetailsRef.current.playerLimit,
-        userId: currentUser._id,
-        sportMode: matchDetailsRef.current.selectedSportMode?._id,
-        open: matchDetailsRef.current.privacyOption,
-      });
-      const createdMatchId = res._id;
-      if (onMatchCreated) {
-        onMatchCreated(createdMatchId);
-      }
-      closeScreen();
-    } catch (e) {
-      console.error("Error al crear el partido:", e);
-    }
-  }
-
-  async function editMatch() {
-    try {
-      const res = await matchService.update("67af556cb453684f313e9a4b", {
-        name: "Prueba3",
-        date: matchDetailsRef.current.matchDate,
-        location: matchDetailsRef.current.location?._id,
-        playersLimit: matchDetailsRef.current.playerLimit,
-        userId: "6720ef0e3a78ebc10564e979",
-        sportMode: matchDetailsRef.current.selectedSportMode?._id,
-        open: matchDetailsRef.current.privacyOption,
-      });
-      console.log("Partido editado:", res);
-    } catch (e) {
-      console.error("Error al editar el partido:", e);
-    }
-  }
-
-  const handleAction = () => {
-    if (!match) {
-      createMatch();
-    } else {
-      editMatch();
-    }
-  };
-
   function closeScreen() {
     navigation.goBack();
   }
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Div
-          flex={1}
-          style={{ gap: verticalScale(16) }}
-          bg={customTheme.colors.grayBackground}
-          p={customTheme.spacing.medium}
-        >
-          <Accordion
-            id="Deportes"
-            openId={openId}
-            setOpenId={setOpenId}
-            title="Deporte"
-            rightText={
-              matchDetailsRef.current.selectedSportMode
-                ? matchDetailsRef.current.selectedSportMode.name
-                : "A definir"
-            }
-            size={342}
-          >
-            <SportInput matchDetailsRef={matchDetailsRef} />
-          </Accordion>
-          <Accordion
-            id="PlayerInput"
-            openId={openId}
-            setOpenId={setOpenId}
-            title="Cupo"
-            rightText="Agrega participantes"
-            size={123}
-          >
-            <PlayersCounterInput matchDetailsRef={matchDetailsRef} />
-          </Accordion>
-          <Accordion
-            id="PrivacyToggle"
-            openId={openId}
-            setOpenId={setOpenId}
-            title="Privacidad"
-            rightText={
-              matchDetailsRef.current.privacyOption ? "Publico" : "Privado"
-            }
-            size={134}
-          >
-            <MatchPrivacyToggleInput matchDetailsRef={matchDetailsRef} />
-          </Accordion>
-          <Div
-            borderBottomWidth={1}
-            borderBottomColor={customTheme.colors.gray}
-          />
-          <Text
-            fontSize={customTheme.fontSize.medium}
-            color={customTheme.colors.gray}
-            fontFamily="NotoSans-Variable"
-          >
-            Campos no obligatorios para crear
-          </Text>
-          <Accordion
-            id="Horario"
-            openId={openId}
-            setOpenId={setOpenId}
-            title="Horario"
-            rightText={
-              matchDetailsRef.current.matchDate
-                ? formatDate(matchDetailsRef.current.matchDate)
-                : "A definir"
-            }
-            size={802}
-          >
-            <MatchSchedulerInput matchDetailsRef={matchDetailsRef} />
-          </Accordion>
-          <Accordion
-            id="Busqueda"
-            openId={openId}
-            setOpenId={setOpenId}
-            title="¿Donde juegan?"
-            rightText={
-              matchDetailsRef.current.location
-                ? matchDetailsRef.current.location.name
-                : "A definir"
-            }
-            size={300}
-          >
-            <SearchLocationInput matchDetailsRef={matchDetailsRef} />
-          </Accordion>
-        </Div>
-      </ScrollView>
-      <Div
-        justifyContent="center"
-        bg={customTheme.colors.background}
-        h={verticalScale(80)}
-        p={customTheme.spacing.medium}
-        borderTopColor="rgb(223, 223, 220)"
-        borderTopWidth={1}
-      >
-        <TouchableOpacity onPress={handleAction}>
-          <Div
-            h={verticalScale(45)}
-            justifyContent="center"
-            alignItems="center"
-            bg={customTheme.colors.secondaryBackground}
-            flexDir="row"
-          >
-
-            <Image
-              source={require("../assets/+.png")}
-              resizeMode="contain"
-              w={scale(15)}
-              h={scale(15)}
-              mr={customTheme.spacing.small}
-            />
-            <Text
-              textAlign="center"
-              color={customTheme.colors.background}
-              fontSize={customTheme.fontSize.medium}
-              fontFamily="NotoSans-BoldItalic"
-            >
-              {!match ? "Crear" : "Editar"}
-            </Text>
-          </Div>
-        </TouchableOpacity>
-      </Div>
+      <MatchForm match={match} onGoBack={closeScreen} />
     </View>
   );
 }
@@ -238,8 +41,5 @@ export default function MatchHandlerScreen({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
+  }
 });
