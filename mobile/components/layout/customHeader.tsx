@@ -49,7 +49,6 @@ export const CustomHeader = () => {
               style={{
                 height: scale(28),
                 width: scale(28),
-                
                 resizeMode: "contain",
               }}
               source={require("../../assets/logoDeball.png")}
