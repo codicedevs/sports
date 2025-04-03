@@ -8,11 +8,12 @@ import {
 import { ColumnType } from "antd/es/table";
 import Delete from "../../components/actions/delete";
 import { User } from "../../types/users.types";
+import { NavigateFunction } from "react-router-dom";
 const { Search } = Input;
 
 const getColumns = (
   handleDeleteUser: (id: string) => void,
-  navigate: any
+  navigate: NavigateFunction
 ): ColumnType<User>[] => {
   return [
     {

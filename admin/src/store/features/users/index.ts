@@ -58,7 +58,6 @@ export const userApi = createApi({
   endpoints: (builder) => ({
     getUsers: builder.query<UserResponse, any | void>({
       query: (filter?: any) => {
-        console.log("elfio", filter);
         return {
           url: ``,
           method: "find",
@@ -82,7 +81,7 @@ export const userApi = createApi({
       //   return response.results[0];
       // },
     }),
-    registerUser: builder.mutation<NewUserDto, User>({
+    registerUser: builder.mutation<User, NewUserDto>({
       query: (newUser: NewUserDto) => ({
         url: "",
         method: "create",

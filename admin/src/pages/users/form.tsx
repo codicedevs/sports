@@ -9,6 +9,7 @@ import * as yup from "yup";
 import { useNavigate, useParams } from "react-router-dom";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useEffect } from "react";
+import { NewUserDto } from "../../types/users.types";
 
 type FormValues = {
   name: string;
@@ -69,7 +70,7 @@ const UserForm = () => {
         name: userData.name,
         email: userData.email,
         phone: userData.phone,
-        password: "", // nunca precargues password real
+        password: "",
       };
 
       Object.entries(values).forEach(([key, value]) => {
@@ -78,7 +79,7 @@ const UserForm = () => {
     }
   }, [userData]);
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: NewUserDto) => {
     if (isEdit) {
       // updateUser({ data: id, params: userData });
     } else {
@@ -92,7 +93,6 @@ const UserForm = () => {
       }
     }
   };
-  console.log("user", userData);
   return (
     <div>
       <Card

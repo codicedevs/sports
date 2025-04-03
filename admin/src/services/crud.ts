@@ -9,7 +9,7 @@ export class CrudService<T> extends HttpBase {
     super(`${API_URL}/${baseURL}`);
   }
 
-  async create(data: any) {
+  async create<D = T>(data: D) {
     try {
       const response = await this.post("/", data);
       return response;
@@ -18,46 +18,46 @@ export class CrudService<T> extends HttpBase {
     }
   }
 
-  async find(data: any, filter: Filter<T>): Promise<Match> {
+  async find(data: any, filter: Filter<T>): Promise<T> {
     return this.get("", { params: filter });
   }
 
-  async findById(id: string, filter: Filter<T>): Promise<Match> {
+  async findById(id: string, filter: Filter<T>): Promise<T> {
     const params = objectToQueryString(filter);
     return this.get(`/${id}?${params}`);
   }
 
-  async findAll(filter: Filter<T>): Promise<Match> {
+  async findAll(filter: Filter<T>): Promise<T> {
     const params = objectToQueryString(filter);
     console.log("params", params);
     return this.get(`?${params}`);
   }
 
-  async remove(id: string): Promise<any> {
+  async remove(id: string): Promise<T> {
     return this.delete(`/${id}`);
   }
 
-  async update(id: string, data: T): Promise<any> {
+  async update(id: string, data: T): Promise<T> {
     return this.put(`/${id}`, data);
   }
 
-  getAccessToken(): any {
+  getAccessToken(): string | null {
     return localStorage.getItem("jwt");
   }
 
-  saveAccessToken(accessToken: string): any {
+  saveAccessToken(accessToken: string): void {
     localStorage.setItem("jwt", accessToken);
   }
 
-  refreshAccessToken(): any {
-    return 1;
+  refreshAccessToken(): Promise<string | null> | string | null {
+    return "1";
   }
 
-  getRefreshToken(): any {
-    return 1;
+  getRefreshToken(): Promise<string | null> | string | null {
+    return "1";
   }
 
-  saveRefreshToken(refreshToken: string | null): any {
-    return 1;
+  saveRefreshToken(refreshToken: string | null): Promise<void> | void {
+    // return 1;
   }
 }

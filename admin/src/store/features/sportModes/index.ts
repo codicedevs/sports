@@ -63,7 +63,7 @@ export const sportModeApi = createApi({
       invalidatesTags: ["SportMode"],
     }),
     deleteSportMode: builder.mutation<string, string>({
-      query: (sportModeId: any) => {
+      query: (sportModeId: string) => {
         return {
           url: ``,
           method: "remove",
