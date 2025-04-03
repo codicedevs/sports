@@ -6,7 +6,7 @@ import { customTheme } from "../../utils/theme";
 import {
   useNavigation,
   useRoute,
-  getFocusedRouteNameFromRoute,
+  useNavigationState,
 } from "@react-navigation/native";
 import { AppScreens } from "../../navigation/screens";
 
@@ -14,10 +14,19 @@ export const CustomHeader = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const currentRouteName = getFocusedRouteNameFromRoute(route) ?? route.name;
+  const currentRouteName = useNavigationState((state) => {
+    const activeRoute = state.routes[state.index];
+  
+    if (activeRoute.state) {
+      const nestedActiveRoute = activeRoute.state.routes[activeRoute.state.index];
+      console.log(nestedActiveRoute.name, "Pantalla dentro del Stack");
+      return nestedActiveRoute.name;
+    }
+  
+    return activeRoute.name;
+  });
 
   const isHomeScreen = currentRouteName === AppScreens.HOME_SCREEN;
-
   const handleBackPress = () => {
     if (navigation.canGoBack()) {
       navigation.goBack();
@@ -39,11 +48,11 @@ export const CustomHeader = () => {
       <Div
         bg="white"
         flexDir="row"
-        alignItems="center"
+        alignItems="flex-start"
         p={customTheme.spacing.medium}
         justifyContent="space-between"
       >
-        <Div flexDir="row" alignItems="center" style={{ gap: scale(20) }}>
+        <Div flexDir="row" alignItems="flex-start" style={{ gap: scale(20) }}>
           <TouchableOpacity onPress={handleBackPress}>
             <Image
               style={{
@@ -82,11 +91,12 @@ export const CustomHeader = () => {
         alignItems="center"
         p={customTheme.spacing.medium}
         justifyContent="space-between"
+        bg="white"
       >
         <Div
           flexDir="row"
           alignItems="center"
-          justifyContent="space-between"
+          justifyContent="flex-start"
           style={{ gap: scale(20) }}
           w="55%"
         >
@@ -101,8 +111,12 @@ export const CustomHeader = () => {
             />
           </TouchableOpacity>
           <Image
-            style={{ height: scale(35), width: scale(35) }}
-            source={require("../../assets/match/logoF.png")}
+            style={{
+              height: scale(28),
+              width: scale(28),
+              resizeMode: "contain",
+            }}
+            source={require("../../assets/logoDeball.png")}
           />
         </Div>
         <Div position="relative">
