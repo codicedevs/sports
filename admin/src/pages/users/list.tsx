@@ -8,7 +8,16 @@ import {
 import { ColumnType } from "antd/es/table";
 import Delete from "../../components/actions/delete";
 import { User } from "../../types/users.types";
+import styled from "styled-components";
+import { SearchHeader } from "../../styled/GlobalStyle";
 const { Search } = Input;
+
+const FlexContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+`;
 
 const getColumns = (
   handleDeleteUser: (id: string) => void,
@@ -107,24 +116,8 @@ const UsersList = () => {
     <div>
       <h2>Usuarios</h2>
 
-      <div
-        id="searchHeader"
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          alignItems: "center",
-          marginBottom: 20,
-          gap: 10,
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            gap: "10px",
-          }}
-        >
+      <SearchHeader id="searchHeader">
+        <FlexContainer>
           <label>Buscar</label>
           <Search
             placeholder="ingrese algun dato de interes"
@@ -140,8 +133,8 @@ const UsersList = () => {
           >
             Nuevo
           </Button>
-        </div>
-      </div>
+        </FlexContainer>
+      </SearchHeader>
       <Table dataSource={data?.results || []} columns={columns} />
     </div>
   );

@@ -12,3 +12,11 @@ export const FlexCenter = styled.div<FlexProps>`
   flex-direction: ${(props) => props.direction || "row"};
   gap: ${(props) => props.gap || "0"};
 `;
+
+export const SearchHeader = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 10px;
+`;

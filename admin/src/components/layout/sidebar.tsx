@@ -1,11 +1,11 @@
+import styled from "styled-components";
 import {
   PieChartOutlined,
   TableOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Menu, MenuProps, Typography } from "antd";
+import { Menu, MenuProps } from "antd";
 import Sider from "antd/es/layout/Sider";
-import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import logoColap from "../../assets/Pelota logo.png";
@@ -37,10 +37,38 @@ interface SidebarProps {
   setCollapsed: SetStateType<boolean>;
 }
 
+const StyledSider = styled(Sider)<{ collapsed: boolean }>`
+  min-height: 98vh;
+  margin-left: 10px;
+  border-radius: 20px;
+  padding: 0 10px;
+  overflow: auto;
+  position: fixed;
+  width: ${(props) => (props.collapsed ? "80px" : "200px")};
+  margin: 10px;
+`;
+
+const LogoContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px;
+`;
+
+const LogoImage = styled.img<{ collapsed: boolean }>`
+  width: ${(props) => (props.collapsed ? "30px" : "100px")};
+  margin: 10px;
+`;
+
+const Title = styled.h2`
+  color: ${lightColors.secondary};
+`;
+
 const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
   const navigate = useNavigate();
   const items: MenuItem[] = [
-    // getItem("Dashboard", "1", <PieChartOutlined />, null, () => navigate("")),
     getItem("Partidos", "2", <TableOutlined />, null, () =>
       navigate("partidos")
     ),
@@ -51,49 +79,19 @@ const Sidebar = ({ collapsed, setCollapsed }: SidebarProps) => {
       ),
     ]),
   ];
-  return (
-    <Sider
-      collapsible
-      collapsed={collapsed}
-      // onCollapse={(value) => setCollapsed(value)}
-      trigger={null}
-      style={{
-        minHeight: "98vh",
-        marginLeft: 10,
-        borderRadius: 20,
-        padding: "0 10px",
-        overflow: "auto",
-        position: "fixed",
-        width: collapsed ? "80px" : "200px",
-        margin: 10,
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          flexDirection: "column",
-          gap: 10,
-          padding: 20,
-        }}
-      >
-        {collapsed ? (
-          <img
-            src={logoColap}
-            alt="logo"
-            style={{ width: "30px", margin: "10px" }}
-          />
-        ) : (
-          <>
-            <img src={logo} alt="logo" style={{ width: "100px" }} />
-            <h2 style={{ color: lightColors.secondary }}>Loyal Futbol 5</h2>
-          </>
-        )}
-      </div>
 
+  return (
+    <StyledSider collapsible collapsed={collapsed} trigger={null}>
+      <LogoContainer>
+        <LogoImage
+          src={collapsed ? logoColap : logo}
+          alt="logo"
+          collapsed={collapsed}
+        />
+        {!collapsed && <Title>Loyal Futbol 5</Title>}
+      </LogoContainer>
       <Menu defaultSelectedKeys={["1"]} mode="inline" items={items} />
-    </Sider>
+    </StyledSider>
   );
 };
 

@@ -11,7 +11,16 @@ import Delete from "../../components/actions/delete";
 import { Match } from "../../types/matches.type";
 import { Location } from "../../types/locations.type";
 import { User } from "../../types/users.types";
+import { SearchHeader } from "../../styled/GlobalStyle";
+import styled from "styled-components";
 const { Search } = Input;
+
+const FlexContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+`;
 
 const getColumns = (
   handleDeleteMatch: (id: string) => void,
@@ -151,24 +160,8 @@ const MatchesList = () => {
     <div>
       <h2>Partidos</h2>
 
-      <div
-        id="searchHeader"
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          alignItems: "center",
-          marginBottom: 20,
-          gap: 10,
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "5px",
-          }}
-        >
+      <SearchHeader id="searchHeader">
+        <FlexContainer>
           <label>Buscar</label>
           <Search
             placeholder="ingrese algun dato de interes"
@@ -176,16 +169,9 @@ const MatchesList = () => {
             size="middle"
             name="like-name"
           />
-        </div>
+        </FlexContainer>
 
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "5px",
-          }}
-        >
+        <FlexContainer>
           <label htmlFor="switchBordered">Estado</label>
 
           <Select
@@ -196,16 +182,9 @@ const MatchesList = () => {
             options={stateOptions}
             style={{ width: 150, textAlign: "center" }}
           />
-        </div>
+        </FlexContainer>
 
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "5px",
-          }}
-        >
+        <FlexContainer>
           <label htmlFor="switchBordered">Turno</label>
           <Segmented
             value={filter}
@@ -215,16 +194,9 @@ const MatchesList = () => {
               { label: "Noche", value: "Opcion 3" },
             ]}
           />
-        </div>
+        </FlexContainer>
 
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "5px",
-          }}
-        >
+        <FlexContainer>
           <label htmlFor="switchBordered">Turno</label>
           <Button
             type="primary"
@@ -234,8 +206,8 @@ const MatchesList = () => {
           >
             Nuevo Partido
           </Button>
-        </div>
-      </div>
+        </FlexContainer>
+      </SearchHeader>
       <Table dataSource={data?.results || []} columns={columns} />
     </div>
   );
