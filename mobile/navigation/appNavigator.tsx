@@ -6,7 +6,6 @@ import { AuthStackScreen, Principal } from "./stacks";
 import RestrictiveModal from "../components/modal/restrictiveModal";
 import { navigationRef } from "../utils/navigation";
 import { ModalContext } from "../context/modalProvider";
-import MatchModalHandler from "../components/modal/matchModalHandler";
 
 const AppNavigator = () => {
   const [open, setOpen] = useState(false);

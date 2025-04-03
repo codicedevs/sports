@@ -141,9 +141,7 @@ export default function MatchSchedulerInput({
         <Div   borderWidth={1} rounded="md" p={customTheme.spacing.small}>
           <Div h={scale(25)} flexDir="row" justifyContent="space-between" alignItems="center">
             <Text fontFamily="NotoSans-Variable">Horario</Text>
-            <Text fontFamily="NotoSans-BoldItalic">
-              {formatDateTime(displayDate)}
-            </Text>
+            <Text fontFamily="NotoSans-BoldItalic">A definir</Text>
           </Div>
         </Div>
       </Div>
@@ -159,7 +157,7 @@ export default function MatchSchedulerInput({
       </Div>
       <Calendar
         locale="es"
-        minDate={new Date()}
+        minDate={new Date().toISOString().split("T")[0]}
         onDayPress={(day) => {
           const [year, month, dayOfMonth] = day.dateString.split("-").map(Number);
           const localDate = new Date(year, month - 1, dayOfMonth, 12); // 12:00 PM para evitar problemas de conversión
@@ -184,7 +182,7 @@ export default function MatchSchedulerInput({
           selectedDayTextColor: "#ffffff",
           todayTextColor: "#2d4150",
           dayTextColor: "#2d4150",
-          textDisabledColor: customTheme.colors.grayBackground,
+          textDisabledColor: "white",
           textDayFontFamily: "NotoSans_Condensed-Black",
           textMonthFontFamily: "NotoSans_Condensed-Black",
           textDayHeaderFontFamily: "NotoSans_Condensed-Black",

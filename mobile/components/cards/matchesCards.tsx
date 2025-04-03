@@ -137,11 +137,12 @@ const MatchCard: React.FC<MatchCardProps> = ({
               </Div>
             ) : (
               // Si NO
-              <Div alignItems="center" justifyContent="center" h="100%">
+              <Div alignItems="center" justifyContent="center" h="100%"
+              p={customTheme.spacing.small}>
                 <Text
                   textAlign="center"
                   fontFamily="NotoSans-ExtraBoldItalic"
-                  fontSize={customTheme.fontSize.title}
+                  fontSize={customTheme.fontSize.large}
                 >
                   A DEFINIR
                 </Text>
@@ -165,8 +166,9 @@ const MatchCard: React.FC<MatchCardProps> = ({
                   {location?.name} {location?.address}
                 </Text>
               </Div>
-            ) : (
-              <Text fontSize={customTheme.fontSize.title}>A Confirmar</Text>
+            ) : (<Div alignItems="center">
+              <Text fontFamily="NotoSans-ExtraBoldItalic"
+              fontSize={customTheme.fontSize.title}>A CONFIRMAR</Text></Div>
             )}
 
             <Div w="100%" justifyContent="flex-end">
