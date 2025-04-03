@@ -10,6 +10,7 @@ import Delete from "../../components/actions/delete";
 import { User } from "../../types/users.types";
 import styled from "styled-components";
 import { SearchHeader } from "../../styled/GlobalStyle";
+import { NavigateFunction } from "react-router-dom";
 const { Search } = Input;
 
 const FlexContainer = styled.div`
@@ -21,7 +22,7 @@ const FlexContainer = styled.div`
 
 const getColumns = (
   handleDeleteUser: (id: string) => void,
-  navigate: any
+  navigate: NavigateFunction
 ): ColumnType<User>[] => {
   return [
     {

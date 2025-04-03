@@ -23,3 +23,10 @@ export interface MatchList {
   user: User | null;
   open: boolean;
 }
+
+export interface newMatchDto {
+  name: string;
+  date: string;
+  location: string;
+  playersLimit: number;
+}

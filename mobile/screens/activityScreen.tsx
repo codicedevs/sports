@@ -40,7 +40,7 @@ export const ActivityScreen = ({ match }: { match: Match }) => {
 
         {/* Columna del Medio - Línea de tiempo */}
         <Div alignItems="center">
-          {index !== 0 && <Div bg="gray300" w={2} h={30} />}
+          {index !== 0 && <Div style={{flexGrow:1}} bg="gray300" w={2} h={30} />}
           <Div bg="gray300" w={10} h={10} rounded="circle" />
           {index !== activity.results.length - 1 && <Div bg="gray300" w={2} h={30} />}
         </Div>

@@ -26,7 +26,7 @@ const router = createBrowserRouter([
       { path: "partidos/nuevo", element: <MatchForm /> },
       { path: "usuarios", element: <UsersList /> },
       { path: "usuarios/:id", element: <UserForm /> },
-      { path: "users/nuevo", element: <UserForm /> },
+      { path: "usuarios/nuevo", element: <UserForm /> },
     ],
   },
 ]);
