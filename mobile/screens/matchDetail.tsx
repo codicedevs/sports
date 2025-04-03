@@ -38,21 +38,23 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
   const [isParticipe, setIsParticipe] = useState(false);
 
   function isPlayer() {
-    if (!match) return
+    if (!match) return;
     if (currentUser === null || undefined) {
-      return
+      return;
     }
     if (currentUser) {
-      const user = match.data?.users.find(u => u === currentUser._id)
+      const user = match.data?.users.find((u) => u === currentUser._id);
       if (user) {
-        setIsParticipe(true)
+        setIsParticipe(true);
       } else {
-        setIsParticipe(false)
+        setIsParticipe(false);
       }
     }
-  };
+  }
 
-  useEffect(() => { isPlayer() }, [match])
+  useEffect(() => {
+    isPlayer();
+  }, [match]);
 
   if (isFetching) {
     return (
@@ -123,7 +125,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
           alignItems="center"
           borderBottomWidth={1}
           borderBottomColor="#bbbbbf"
-          mb={customTheme.spacing.medium}
+          mb={customTheme.spacing.small}
           mt={customTheme.spacing.small}
         >
           <TouchableOpacity
@@ -138,8 +140,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
           >
             <Text>Partido</Text>
           </TouchableOpacity>
-          {
-            isParticipe &&
+          {isParticipe && (
             <>
               <TouchableOpacity
                 onPress={() => setActiveTab("jugadores")}
@@ -179,112 +180,63 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                 <Text>Equipos</Text>
               </TouchableOpacity>
             </>
-          }
+          )}
         </Div>
 
         {activeTab === "partido" && (
           <>
             <ScrollView
               style={{ flex: 1 }}
-              contentContainerStyle={{
-                paddingBottom: 120,
-              }}
+              contentContainerStyle={{ paddingBottom: 120 }}
             >
               <Div flex={1}>
                 <Div>
-                  <Div flexDir="column" p={customTheme.spacing.small}>
-                    <Div flexDir="row">
-                      <Text fontFamily="NotoSans-Variable">
-                        Deporte:{" "}
-                        <Text fontFamily="NotoSans_Condensed-Black">
+                  <Div  flexDir="column" justifyContent="space-between">
+                    <Div flexDir="row" justifyContent="space-between" w="100%"  p={customTheme.spacing.small}>
+                      <Div>
+                        <Text
+                          fontSize={customTheme.fontSize.large}
+                          fontFamily="NotoSans-BoldItalic"
+                        >
                           {sportMode.name}
                         </Text>
-                      </Text>
-                    </Div>
-                    <Div>
-                      <Text fontFamily="NotoSans-Variable">
-                        Cupo:{" "}
-                        <Text fontFamily="NotoSans_Condensed-Black">
+                      </Div>
+                      <Div
+                        flexDir="row"
+                        justifyContent="center"
+                        bg={customTheme.colors.primary}
+                      >
+                        <Image
+                          source={require("../assets/iconUser.png")}
+                          w={customTheme.fontSize.medium}
+                          resizeMode="contain"
+                          mr={customTheme.spacing.small}
+                        />
+                        <Text
+                          fontSize={customTheme.fontSize.medium}
+                          fontFamily="NotoSans-BoldItalic"
+                        >
                           {playerCount}/{playersLimit}
                         </Text>
-                      </Text>
+                      </Div>
                     </Div>
+                    {isParticipe && (
+                      <Div>
+                        <MatchPrivacyDisplay isPublic={open} />
+                      </Div>
+                    )}
                   </Div>
-                  {/* privacidad */}
-                  {
-                    isParticipe &&
-                    <Div>
-                      <MatchPrivacyDisplay isPublic={open} />
-                    </Div>
-                  }
                   <Div
                     mb={customTheme.spacing.small}
                     mt={customTheme.spacing.small}
                     borderTopColor="#bbbbbf"
                     borderTopWidth={scale(1)}
                   />
-                  {/* fecha y lugar */}
                   <Div mb={customTheme.spacing.small}>
                     <MatchSchedulerInput date={dateObject} readOnly />
                     <SearchLocationInput readOnly location={location} />
                   </Div>
-                  {/* Bot Invitar / Compartir */}
-                  {
-                    isParticipe &&
-                    <Div>
-                      <Div
-                        p={customTheme.spacing.small}
-                        justifyContent="center"
-                        alignItems="center"
-                      >
-                        <Button
-                          mb={customTheme.spacing.small}
-                          bg="black"
-                          block
-                          onPress={() => setInviteOpen(true)}
-                        >
-                          <Image
-                            source={require("../assets/iconUserAdd.png")}
-                            style={{
-                              width: 20,
-                              height: 20,
-                              resizeMode: "contain",
-                            }}
-                          />
-                          <Text
-                            fontSize={customTheme.fontSize.medium}
-                            fontFamily="NotoSans-BoldItalic"
-                            ml={customTheme.spacing.small}
-                            color="white"
-                          >
-                            Invitar
-                          </Text>
-                        </Button>
-                        <Div>
-                          <Button bg="black" block>
-                            <Image
-                              source={require("../assets/iconShare.png")}
-                              style={{
-                                width: 18,
-                                height: 18,
-                                resizeMode: "contain",
-                              }}
-                            />
-                            <Text
-                              fontSize={customTheme.fontSize.medium}
-                              fontFamily="NotoSans-BoldItalic"
-                              ml={customTheme.spacing.small}
-                              color="white"
-                            >
-                              Compartir
-                            </Text>
-                          </Button>
-                        </Div>
-                      </Div>
-                    </Div>
-                  }
-                  {
-                    !isParticipe &&
+                  {isParticipe ? (
                     <Div
                       p={customTheme.spacing.small}
                       justifyContent="center"
@@ -294,8 +246,53 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                         mb={customTheme.spacing.small}
                         bg="black"
                         block
-                      // onPress={() => setInviteOpen(true)} ===== solucioanr\
+                        onPress={() => setInviteOpen(true)}
                       >
+                        <Image
+                          source={require("../assets/iconUserAdd.png")}
+                          style={{
+                            width: 20,
+                            height: 20,
+                            resizeMode: "contain",
+                          }}
+                        />
+                        <Text
+                          fontSize={customTheme.fontSize.medium}
+                          fontFamily="NotoSans-BoldItalic"
+                          ml={customTheme.spacing.small}
+                          color="white"
+                        >
+                          Invitar
+                        </Text>
+                      </Button>
+                      <Div>
+                        <Button bg="black" block>
+                          <Image
+                            source={require("../assets/iconShare.png")}
+                            style={{
+                              width: 18,
+                              height: 18,
+                              resizeMode: "contain",
+                            }}
+                          />
+                          <Text
+                            fontSize={customTheme.fontSize.medium}
+                            fontFamily="NotoSans-BoldItalic"
+                            ml={customTheme.spacing.small}
+                            color="white"
+                          >
+                            Compartir
+                          </Text>
+                        </Button>
+                      </Div>
+                    </Div>
+                  ) : (
+                    <Div
+                      p={customTheme.spacing.small}
+                      justifyContent="center"
+                      alignItems="center"
+                    >
+                      <Button mb={customTheme.spacing.small} bg="black" block>
                         <Image
                           source={require("../assets/iconUserAdd.png")}
                           style={{
@@ -314,7 +311,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                         </Text>
                       </Button>
                     </Div>
-                  }
+                  )}
                 </Div>
               </Div>
             </ScrollView>

@@ -203,13 +203,15 @@ const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, s
 const MatchesList = ({ matches, fetchMore, hasMore }) => {
   const renderItem = ({ item }) => (
     <MatchesCards
-      key={item.id}
-      date={'F'}
-      day={item.dayOfWeek}
-      location={item.location?.address}
-      maxPlayers={item.playersLimit}
-      players={10}
-      time={'horario'}
+    key={item._id}
+    matchId={item._id}
+    dayOfWeek={item.dayOfWeek}
+    date={item.date} 
+    time={item.hour} 
+    location={item.location} 
+    players={item.users}
+    maxPlayers={item.playersLimit}
+    sportMode={item.sportMode}
     />
   );
 
