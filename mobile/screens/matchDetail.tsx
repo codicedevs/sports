@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ScrollView, TouchableOpacity } from "react-native";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
 import { Button, Div, Image, Overlay, Text } from "react-native-magnus";
@@ -25,7 +25,6 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
 }) => {
   const { id } = route.params;
   const { currentUser } = useSession();
-
   const [activeTab, setActiveTab] = useState<TabKey>("partido");
   const [visible, setVisible] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
@@ -36,6 +35,24 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
     error,
     refetch,
   } = useFetch(() => matchService.getById(id), [QUERY_KEYS.MATCH]);
+  const [isParticipe, setIsParticipe] = useState(false);
+
+  function isPlayer() {
+    if (!match) return
+    if (currentUser === null || undefined) {
+      return
+    }
+    if (currentUser) {
+      const user = match.data?.users.find(u => u === currentUser._id)
+      if (user) {
+        setIsParticipe(true)
+      } else {
+        setIsParticipe(false)
+      }
+    }
+  };
+
+  useEffect(() => { isPlayer() }, [match])
 
   if (isFetching) {
     return (
@@ -121,44 +138,48 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
           >
             <Text>Partido</Text>
           </TouchableOpacity>
+          {
+            isParticipe &&
+            <>
+              <TouchableOpacity
+                onPress={() => setActiveTab("jugadores")}
+                style={{
+                  backgroundColor:
+                    activeTab === "jugadores"
+                      ? customTheme.colors.primary
+                      : "transparent",
+                  padding: customTheme.spacing.small,
+                }}
+              >
+                <Text>Jugadores</Text>
+              </TouchableOpacity>
 
-          <TouchableOpacity
-            onPress={() => setActiveTab("jugadores")}
-            style={{
-              backgroundColor:
-                activeTab === "jugadores"
-                  ? customTheme.colors.primary
-                  : "transparent",
-              padding: customTheme.spacing.small,
-            }}
-          >
-            <Text>Jugadores</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => setActiveTab("actividad")}
-            style={{
-              backgroundColor:
-                activeTab === "actividad"
-                  ? customTheme.colors.primary
-                  : "transparent",
-              padding: customTheme.spacing.small,
-            }}
-          >
-            <Text>Actividad</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => setActiveTab("equipos")}
-            style={{
-              backgroundColor:
-                activeTab === "equipos"
-                  ? customTheme.colors.primary
-                  : "transparent",
-              padding: customTheme.spacing.small,
-            }}
-          >
-            <Text>Equipos</Text>
-          </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setActiveTab("actividad")}
+                style={{
+                  backgroundColor:
+                    activeTab === "actividad"
+                      ? customTheme.colors.primary
+                      : "transparent",
+                  padding: customTheme.spacing.small,
+                }}
+              >
+                <Text>Actividad</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => setActiveTab("equipos")}
+                style={{
+                  backgroundColor:
+                    activeTab === "equipos"
+                      ? customTheme.colors.primary
+                      : "transparent",
+                  padding: customTheme.spacing.small,
+                }}
+              >
+                <Text>Equipos</Text>
+              </TouchableOpacity>
+            </>
+          }
         </Div>
 
         {activeTab === "partido" && (
@@ -190,9 +211,12 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                     </Div>
                   </Div>
                   {/* privacidad */}
-                  <Div>
-                    <MatchPrivacyDisplay isPublic={open} />
-                  </Div>
+                  {
+                    isParticipe &&
+                    <Div>
+                      <MatchPrivacyDisplay isPublic={open} />
+                    </Div>
+                  }
                   <Div
                     mb={customTheme.spacing.small}
                     mt={customTheme.spacing.small}
@@ -205,7 +229,62 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                     <SearchLocationInput readOnly location={location} />
                   </Div>
                   {/* Bot Invitar / Compartir */}
-                  <Div>
+                  {
+                    isParticipe &&
+                    <Div>
+                      <Div
+                        p={customTheme.spacing.small}
+                        justifyContent="center"
+                        alignItems="center"
+                      >
+                        <Button
+                          mb={customTheme.spacing.small}
+                          bg="black"
+                          block
+                          onPress={() => setInviteOpen(true)}
+                        >
+                          <Image
+                            source={require("../assets/iconUserAdd.png")}
+                            style={{
+                              width: 20,
+                              height: 20,
+                              resizeMode: "contain",
+                            }}
+                          />
+                          <Text
+                            fontSize={customTheme.fontSize.medium}
+                            fontFamily="NotoSans-BoldItalic"
+                            ml={customTheme.spacing.small}
+                            color="white"
+                          >
+                            Invitar
+                          </Text>
+                        </Button>
+                        <Div>
+                          <Button bg="black" block>
+                            <Image
+                              source={require("../assets/iconShare.png")}
+                              style={{
+                                width: 18,
+                                height: 18,
+                                resizeMode: "contain",
+                              }}
+                            />
+                            <Text
+                              fontSize={customTheme.fontSize.medium}
+                              fontFamily="NotoSans-BoldItalic"
+                              ml={customTheme.spacing.small}
+                              color="white"
+                            >
+                              Compartir
+                            </Text>
+                          </Button>
+                        </Div>
+                      </Div>
+                    </Div>
+                  }
+                  {
+                    !isParticipe &&
                     <Div
                       p={customTheme.spacing.small}
                       justifyContent="center"
@@ -215,7 +294,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                         mb={customTheme.spacing.small}
                         bg="black"
                         block
-                        onPress={() => setInviteOpen(true)}
+                      // onPress={() => setInviteOpen(true)} ===== solucioanr\
                       >
                         <Image
                           source={require("../assets/iconUserAdd.png")}
@@ -231,31 +310,11 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                           ml={customTheme.spacing.small}
                           color="white"
                         >
-                          Invitar
+                          Solicitar unirse al partido
                         </Text>
                       </Button>
-                      <Div>
-                        <Button bg="black" block>
-                          <Image
-                            source={require("../assets/iconShare.png")}
-                            style={{
-                              width: 18,
-                              height: 18,
-                              resizeMode: "contain",
-                            }}
-                          />
-                          <Text
-                            fontSize={customTheme.fontSize.medium}
-                            fontFamily="NotoSans-BoldItalic"
-                            ml={customTheme.spacing.small}
-                            color="white"
-                          >
-                            Compartir
-                          </Text>
-                        </Button>
-                      </Div>
                     </Div>
-                  </Div>
+                  }
                 </Div>
               </Div>
             </ScrollView>
@@ -318,7 +377,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
         )}
 
         {activeTab === "actividad" && (
-          <Div>
+          <Div flex={1}>
             <ActivityScreen match={match.data} />
           </Div>
         )}
