@@ -24,6 +24,13 @@ import { useGetSportModeQuery } from "../../store/features/sportModes";
 import { SportMode } from "../../types/sportModes.type";
 import { Location } from "../../types/locations.type";
 import { User } from "../../types/users.types";
+import styled from "styled-components";
+
+const StyledDiv = styled.div`
+  display: "flex",
+  alignItems: "center",
+  gap: "10px",
+`;
 
 type FormValues = {
   name: string;
@@ -138,17 +145,11 @@ const MatchForm = () => {
                 name="open"
                 control={control}
                 render={({ field }) => (
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px",
-                    }}
-                  >
+                  <StyledDiv>
                     <p>Cerrado</p>
                     <Switch checked={field.value} onChange={field.onChange} />
                     <p>Abierto</p>
-                  </div>
+                  </StyledDiv>
                 )}
               />
             </Form.Item>

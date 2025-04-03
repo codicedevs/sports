@@ -6,11 +6,36 @@ import { SetStateType } from "../../types/types";
 import { authService } from "../../services/auth";
 import { useNavigate } from "react-router-dom";
 import { lightColors } from "../../theme/antdTheme";
+import styled from "styled-components";
 
 interface HeaderProps {
   collapsed: boolean;
   setCollapsed: SetStateType<boolean>;
 }
+
+const StyledHeader = styled(Header)`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid gray;
+  margin-bottom: 10px;
+`;
+
+const LeftContainer = styled.div`
+  display: flex;
+  gap: 15px;
+`;
+
+const RightContainer = styled.div`
+  display: flex;
+  gap: 15px;
+`;
+
+const StyledAvatar = styled(Avatar)`
+  background-color: ${lightColors.primary};
+  width: 30px;
+  cursor: pointer;
+`;
 
 const HeaderAdmin = ({ collapsed, setCollapsed }: HeaderProps) => {
   const navigate = useNavigate();
@@ -30,32 +55,20 @@ const HeaderAdmin = ({ collapsed, setCollapsed }: HeaderProps) => {
       ]}
     />
   );
+
   return (
-    <Header
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        borderBottom: "1px solid gray",
-        marginBottom: "10px",
-      }}
-    >
-      <div style={{ display: "flex", gap: 15 }}>
+    <StyledHeader>
+      <LeftContainer>
         <Button
           type="text"
           icon={<MenuOutlined />}
           onClick={() => setCollapsed(!collapsed)}
         />
         <Breadcrumbs />
-      </div>
-      <div style={{ display: "flex", gap: 15 }}>
+      </LeftContainer>
+      <RightContainer>
         <Dropdown overlay={menu} trigger={["click"]}>
-          <Avatar
-            style={{
-              backgroundColor: lightColors.primary,
-              width: "30px",
-              cursor: "pointer",
-            }}
+          <StyledAvatar
             icon={<UserOutlined />}
             alt="Desloguearse"
             onClick={() => console.log("out")}
@@ -66,8 +79,8 @@ const HeaderAdmin = ({ collapsed, setCollapsed }: HeaderProps) => {
           suffix={<SearchOutlined style={{ color: "rgba(0,0,0,.45)" }} />}
           style={{ width: 200 }}
         />
-      </div>
-    </Header>
+      </RightContainer>
+    </StyledHeader>
   );
 };
 

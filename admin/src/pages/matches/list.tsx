@@ -12,6 +12,7 @@ import { Match } from "../../types/matches.type";
 import { Location } from "../../types/locations.type";
 import { User } from "../../types/users.types";
 import { NavigateFunction } from "react-router-dom";
+import { StyledSearchHeader } from "../../styled/globalStyled";
 const { Search } = Input;
 
 const getColumns = (
@@ -151,16 +152,7 @@ const MatchesList = () => {
     <div>
       <h2>Partidos</h2>
 
-      <div
-        id="searchHeader"
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          alignItems: "center",
-          marginBottom: 20,
-          gap: 10,
-        }}
-      >
+      <StyledSearchHeader id="searchHeader">
         <div
           style={{
             display: "flex",
@@ -235,7 +227,7 @@ const MatchesList = () => {
             Nuevo Partido
           </Button>
         </div>
-      </div>
+      </StyledSearchHeader>
       <Table dataSource={data?.results || []} columns={columns} />
     </div>
   );
