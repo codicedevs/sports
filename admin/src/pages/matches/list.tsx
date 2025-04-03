@@ -13,6 +13,7 @@ import { Location } from "../../types/locations.type";
 import { User } from "../../types/users.types";
 import { SearchHeader } from "../../styled/GlobalStyle";
 import styled from "styled-components";
+import { NavigateFunction } from "react-router-dom";
 const { Search } = Input;
 
 const FlexContainer = styled.div`
@@ -24,14 +25,13 @@ const FlexContainer = styled.div`
 
 const getColumns = (
   handleDeleteMatch: (id: string) => void,
-  navigate: any
+  navigate: NavigateFunction
 ): ColumnType<Match>[] => {
   return [
     {
       title: "Nombre del partido",
       dataIndex: "name",
       key: "name",
-      sorter: (a: any, b: any) => a.name - b.name,
     },
     {
       title: "Fecha",
