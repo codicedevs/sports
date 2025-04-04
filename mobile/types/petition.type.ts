@@ -1,7 +1,18 @@
+// petition.type.ts
+
 import Location from "./location.type";
 
 interface Emitter {
   name: string;
+}
+
+// Definición de la interfaz para la información del partido
+interface MatchReference {
+  _id: string;
+  date: string;
+  hour: number;
+  name: string;
+  // Agrega otras propiedades según la respuesta de tu API
 }
 
 interface Petition {
@@ -10,7 +21,7 @@ interface Petition {
   receiver: string;
   reference: {
     type: string;
-    id: string;
+    id: MatchReference; // Ahora id es un objeto de tipo MatchReference
   };
   status: string;
 }
@@ -21,6 +32,7 @@ export interface PetitionDto {
   match: string;
   status: string;
 }
+
 export interface CreatePetitionDto {
   emitter: string;
   receiver: string;

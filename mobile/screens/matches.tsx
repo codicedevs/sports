@@ -201,21 +201,19 @@ const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, s
 };
 
 const MatchesList = ({ matches, fetchMore, hasMore }) => {
-  const renderItem = ({ item }) => {
-    return (
-      <MatchesCards
-        key={item._id}
-        matchId={item._id}
-        dayOfWeek={item.dayOfWeek}
-        date={item.date} 
-        time={item.hour} 
-        location={item.location} 
-        players={item.users}
-        maxPlayers={item.playersLimit}
-        sportMode={item.sportMode}
-      />
-    )
-  };
+  const renderItem = ({ item }) => (
+    <MatchesCards
+    key={item._id}
+    matchId={item._id}
+    dayOfWeek={item.dayOfWeek}
+    date={item.date} 
+    time={item.hour} 
+    location={item.location} 
+    players={item.users}
+    maxPlayers={item.playersLimit}
+    sportMode={item.sportMode}
+    />
+  );
 
   const keyExtractor = (item) => item._id.toString();
 

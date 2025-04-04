@@ -92,24 +92,28 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
             </Text>
           </Div>
           {
-            isFetchingPublic ?
+            isFetchingPublic ? (
               <UpcomingMatchesCardSK />
-              :
+            ) : (
               <ScrollView horizontal>
-                {publicMatches?.results?.map((u: any) => (
-                  <UpcomingMatchCard
-                    key={u._id}
-                    matchId={u._id}
-                    date={u.date}
-                    hour={u.hour}
-                    players={u.users}
-                    maxPlayers={u.playersLimit}
-                    location={u.location}
-                    sportMode={u.sportMode}
-                  />
-                ))}
+                {publicMatches?.results
+                  ?.sort((a, b) => new Date(a.date) - new Date(b.date))
+                  .map((u: any) => (
+                    <UpcomingMatchCard
+                      key={u._id}
+                      matchId={u._id}
+                      date={u.date}
+                      hour={u.hour}
+                      players={u.users}
+                      maxPlayers={u.playersLimit}
+                      location={u.location}
+                      sportMode={u.sportMode}
+                    />
+                  ))}
               </ScrollView>
+            )
           }
+
         </Div>
         <Div mb={customTheme.spacing.medium} px={customTheme.spacing.medium}>
           <HandleMatchesButton />
@@ -127,19 +131,21 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
                 <MatchesCardSK />
                 :
                 <Div style={{ gap: scale(16) }}>
-                  {matches?.results?.map((m: any) => (
-                    <MatchesCards
-                      key={m._id}
-                      matchId={m._id}
-                      dayOfWeek={m.dayOfWeek}
-                      date={m.date} // string, ej: "2026-07-15T17:48:00.000Z"
-                      time={m.hour} // number, ej: 22
-                      location={m.location} // { name, address }
-                      players={m.users}
-                      maxPlayers={m.playersLimit}
-                      sportMode={m.sportMode}
-                    />
-                  ))}
+                  {matches?.results
+                    ?.sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                    .map((m: any) => (
+                      <MatchesCards
+                        key={m._id}
+                        matchId={m._id}
+                        dayOfWeek={m.dayOfWeek}
+                        date={m.date}
+                        time={m.hour}
+                        location={m.location}
+                        players={m.users}
+                        maxPlayers={m.playersLimit}
+                        sportMode={m.sportMode}
+                      />
+                    ))}
                 </Div>
             }
           </Div>
