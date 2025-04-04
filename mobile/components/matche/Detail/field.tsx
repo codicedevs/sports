@@ -167,7 +167,7 @@ const Field = ({ match, isAdmin }: FieldProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const { data: statusList } = useFetch(() => matchService.getPlayerInvitations(match._id), [QUERY_KEYS.PLAYERS_STATUS, match])
  
-  if(!statusList) return
+
 
   const totalPlayers = match.playersLimit;
   const teamPlayers = totalPlayers / 2;
@@ -220,7 +220,7 @@ const Field = ({ match, isAdmin }: FieldProps) => {
   };
 
   const filteredPersonas = React.useMemo(() => {
-    return statusList.accepted.filter((personaObj) =>
+    return statusList?.accepted.filter((personaObj) =>
       personaObj.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [searchQuery]);
