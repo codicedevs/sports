@@ -10,6 +10,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useEffect } from "react";
 import { NewUserDto } from "../../types/users.types";
+import styled from "styled-components";
+
+const StyledFormContainer = styled.div`
+  display: flex,
+  flexDirection: row,
+  gap: 5,
+  marginLeft: 100,
+`;
 
 type FormValues = {
   name: string;
@@ -99,14 +107,7 @@ const UserForm = () => {
         title={id ? "Editar Usuario" : "Crear Nuevo Usuario"}
         style={{ width: "100%" }}
       >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            gap: 5,
-            marginLeft: 20,
-          }}
-        >
+        <StyledFormContainer>
           <Form
             onFinish={handleSubmit(onSubmit)}
             layout="vertical"
@@ -185,7 +186,7 @@ const UserForm = () => {
               {isEdit ? "Guardar Cambios" : "Crear"}
             </Button>
           </Form>
-        </div>
+        </StyledFormContainer>
       </Card>
     </div>
   );

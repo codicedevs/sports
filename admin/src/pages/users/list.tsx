@@ -9,7 +9,16 @@ import { ColumnType } from "antd/es/table";
 import Delete from "../../components/actions/delete";
 import { User } from "../../types/users.types";
 import { NavigateFunction } from "react-router-dom";
+import { StyledSearchHeader } from "../../styled/globalStyled";
+import styled from "styled-components";
 const { Search } = Input;
+
+const StyledSearchContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+`;
 
 const getColumns = (
   handleDeleteUser: (id: string) => void,
@@ -108,24 +117,8 @@ const UsersList = () => {
     <div>
       <h2>Usuarios</h2>
 
-      <div
-        id="searchHeader"
-        style={{
-          display: "flex",
-          justifyContent: "flex-end",
-          alignItems: "center",
-          marginBottom: 20,
-          gap: 10,
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            gap: "10px",
-          }}
-        >
+      <StyledSearchHeader id="searchHeader">
+        <StyledSearchContainer>
           <label>Buscar</label>
           <Search
             placeholder="ingrese algun dato de interes"
@@ -141,8 +134,8 @@ const UsersList = () => {
           >
             Nuevo
           </Button>
-        </div>
-      </div>
+        </StyledSearchContainer>
+      </StyledSearchHeader>
       <Table dataSource={data?.results || []} columns={columns} />
     </div>
   );
