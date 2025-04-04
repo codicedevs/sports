@@ -3,6 +3,14 @@ import { Outlet, useNavigate } from "react-router-dom";
 import HeaderAdmin from "./header";
 import Sidebar from "./sidebar";
 import { Content } from "antd/es/layout/layout";
+import styled from "styled-components";
+
+const DashboardContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
+  overflow: hidden;
+`;
 
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -10,20 +18,12 @@ const Dashboard: React.FC = () => {
 
   const user = {
     name: "Nombre del Usuario",
-    avatar: "/path-to-avatar.jpg", // Cambia esto al path real de tu imagen de avatar
+    avatar: "/path-to-avatar.jpg",
   };
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "row",
-        minHeight: "100vh",
-        overflow: "hidden",
-      }}
-    >
+    <DashboardContainer>
       <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
-
       <Content
         style={{
           flex: 1,
@@ -35,8 +35,7 @@ const Dashboard: React.FC = () => {
         <HeaderAdmin collapsed={collapsed} setCollapsed={setCollapsed} />
         <Outlet />
       </Content>
-      {/* </div> */}
-    </div>
+    </DashboardContainer>
   );
 };
 
