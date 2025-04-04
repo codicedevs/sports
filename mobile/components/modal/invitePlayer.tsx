@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Div, Image, Modal, Text } from "react-native-magnus";
 import { customTheme } from "../../utils/theme";
 import Autocomplete from "react-native-autocomplete-input";
-import { scale } from "react-native-size-matters";
+import { scale, verticalScale } from "react-native-size-matters";
 import { User } from "../../types/user.type";
 import userService from "../../service/user.service";
 import petitionService from "../../service/petition.service";
@@ -138,8 +138,7 @@ export default function InviteModal({
             borderTopWidth: 0,
             borderWidth: 1,
             borderColor: "#cfc8c8",
-            height: scale(37),
-            marginTop: scale(5),
+            height: verticalScale(150),
             backgroundColor: "white",
           }}
         />

@@ -80,7 +80,7 @@ export const CustomHeader = () => {
             bg="orange"
             px={scale(3)}
           >
-            <Text fontSize={7}>2</Text>
+            <Text fontSize={7}>2</Text> 
           </Div>
         </Div>
       </Div>

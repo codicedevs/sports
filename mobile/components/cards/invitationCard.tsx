@@ -11,7 +11,8 @@ interface MatchInvitationProps {
   matchType: string;
   date: string;
   time: string;
-  petition: Petition
+  petition: Petition;
+  onActionCompleted: () => void; 
 }
 
 const MatchInvitation: React.FC<MatchInvitationProps> = ({
@@ -19,24 +20,26 @@ const MatchInvitation: React.FC<MatchInvitationProps> = ({
   matchType,
   date,
   time,
-  petition
+  petition,
+  onActionCompleted,
 }) => {
+  const aceptar = async () => {
+    try {
+      await petitionService.acceptPetition(petition._id);
+      onActionCompleted(); 
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
-const aceptar = async () => {
-  try{
-    await petitionService.acceptPetition(petition._id)
-  } catch(e){
-    console.log(e)
-  }
-}
-
-const declinar = async () => {
-  try{
-    await petitionService.declinePetition(petition._id)
-  } catch(e){
-    console.log(e)
-  }
-}
+  const declinar = async () => {
+    try {
+      await petitionService.declinePetition(petition._id);
+      onActionCompleted(); 
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   return (
     <Div
@@ -56,7 +59,10 @@ const declinar = async () => {
 
       <Div flexDir="row" alignItems="center">
         <Div flexDir="row" alignItems="center">
-          <Image source={require("../../assets/IconPelota.png")} style={{ width: 18, height: 18, resizeMode: "contain" }}/>
+          <Image
+            source={require("../../assets/IconPelota.png")}
+            style={{ width: 18, height: 18, resizeMode: "contain" }}
+          />
           <Text
             color="white"
             fontSize={customTheme.fontSize.medium}
@@ -67,7 +73,10 @@ const declinar = async () => {
           </Text>
         </Div>
 
-        <Image source={require("../../assets/iconTime.png")}  style={{ width: 18, height: 18, resizeMode: "contain" }} />
+        <Image
+          source={require("../../assets/iconTime.png")}
+          style={{ width: 18, height: 18, resizeMode: "contain" }}
+        />
         <Text
           color="white"
           ml={customTheme.spacing.small}
@@ -87,8 +96,14 @@ const declinar = async () => {
         </Div>
       </Div>
 
-      <Div flexDir="row" mt={customTheme.fontSize.medium} style={{ gap: 20}}>
-        <Button flex={1} bg="black" borderColor="white" borderWidth={1} onPress={declinar}>
+      <Div flexDir="row" mt={customTheme.fontSize.medium} style={{ gap: 20 }}>
+        <Button
+          flex={1}
+          bg="black"
+          borderColor="white"
+          borderWidth={1}
+          onPress={declinar}
+        >
           <Text
             color="white"
             fontFamily="NotoSans-BoldItalic"
