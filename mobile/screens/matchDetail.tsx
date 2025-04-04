@@ -390,13 +390,6 @@ const MatchDetail: React.FC<Props> = ({
             <Field match={match.data} isAdmin={isAdmin} />
           </Div>
         )}
-        {/* Botones Eliminar / Guardar */}
-
-        {activeTab === "equipos" && (
-          <Div>
-            <Text>pendiente</Text>
-          </Div>
-        )}
 
         {/* Botones Eliminar / Guardar */}
         <Div
