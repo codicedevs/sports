@@ -186,10 +186,12 @@ export class MatchController {
   async getPetitionsByMatch(
     @Param("matchId", new ValidateObjectIdPipe("match")) matchId: string,
   ) {
-    const petitions = await this.petitionService.findByReference({
-      id: new Types.ObjectId(matchId),
-      type: PetitionModelType.match,
-    });
+    const petitions = (await this.petitionService.findAll({
+      where:{
+        "reference.id": new Types.ObjectId(matchId),
+        "reference.type": PetitionModelType.match,
+      }
+    })).results;
 
     const result = {
       pending: [] as any[],
