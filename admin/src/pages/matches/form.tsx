@@ -12,29 +12,30 @@ import {
   Switch,
 } from "antd";
 import { Controller, useForm } from "react-hook-form";
-import {
-  useGetUserQuery,
-  useGetUsersQuery,
-  useLazyGetUsersQuery,
-  useRegisterUserMutation,
-} from "../../store/features/users";
+import { useLazyGetUsersQuery } from "../../store/features/users";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useNavigate, useParams } from "react-router-dom";
-import { skipToken } from "@reduxjs/toolkit/query";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import dayjs from "dayjs";
-import { Option } from "antd/es/mentions";
 import { useCreateMatchMutation } from "../../store/features/matches";
-import { Location, SportMode, User } from "../../types/interfaces";
 import { useGetLocationsQuery } from "../../store/features/locations";
 import { useGetSportModeQuery } from "../../store/features/sportModes";
+import { SportMode } from "../../types/sportModes.type";
+import { Location } from "../../types/locations.type";
+import { User } from "../../types/users.types";
+import styled from "styled-components";
+
+const StyledDiv = styled.div`
+  display: "flex",
+  alignItems: "center",
+  gap: "10px",
+`;
 
 type FormValues = {
   name: string;
   open: boolean;
   date: string;
-  hour: string;
   userId: string;
   sportMode: string;
   playersLimit: number;
@@ -45,7 +46,6 @@ const schema = yup.object({
   name: yup.string().required("El nombre es requerido"),
   open: yup.boolean().required("El estado es requerido"),
   date: yup.string().required("La fecha es requerida"),
-  hour: yup.string().required("La hora es requerida"),
   userId: yup.string().required("El usuario es requerido"),
   sportMode: yup.string().required("El modo de deporte es requerido"),
   playersLimit: yup.number().required("El limite de jugadores es requerido"),
@@ -61,11 +61,7 @@ const MatchForm = () => {
     control,
     handleSubmit,
     formState: { errors },
-    setValue,
   } = useForm({
-    resolver: yupResolver(schema, {
-      context: { isEdit },
-    }),
     defaultValues: {
       name: "",
       open: false,
@@ -76,17 +72,13 @@ const MatchForm = () => {
       playersLimit: 10,
       location: "",
     },
-    mode: "onBlur",
   });
 
   const [filter, setFilter] = useState({});
   const [createMatch] = useCreateMatchMutation();
-
   const [triggerSearchUsers, { data: userData }] = useLazyGetUsersQuery(filter);
   const { data: sportModeData } = useGetSportModeQuery(filter);
-
   const { data: locationData } = useGetLocationsQuery({});
-
   const searchTimeoutRef = useRef<number | null>(null);
 
   const handleSearch = (value: string) => {
@@ -111,16 +103,13 @@ const MatchForm = () => {
     }
   };
 
-  const onSubmit = async (data: any) => {
-    try {
-      await createMatch(data);
-      message.success("Usuario creado correctamente");
-      navigate("/home/partidos");
-    } catch (error) {
-      console.error("Error al crear usuario:", error);
-      message.error("Error al crear el usuario");
-    }
+  const onSubmit = (data: FormValues) => {
+    data.date = JSON.stringify(data.date).slice(1, -1);
+    createMatch(data);
+    message.success("Partido creado correctamente");
+    navigate("/partidos");
   };
+
   return (
     <Card
       title={id ? "Editar Partido" : "Crear Nuevo Partido"}
@@ -156,17 +145,11 @@ const MatchForm = () => {
                 name="open"
                 control={control}
                 render={({ field }) => (
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "10px",
-                    }}
-                  >
+                  <StyledDiv>
                     <p>Cerrado</p>
                     <Switch checked={field.value} onChange={field.onChange} />
                     <p>Abierto</p>
-                  </div>
+                  </StyledDiv>
                 )}
               />
             </Form.Item>
@@ -175,7 +158,7 @@ const MatchForm = () => {
           <Col xs={24} md={12}>
             <Form.Item
               label="Fecha"
-              validateStatus={errors.date && "error"}
+              // validateStatus={errors.date && "error"}
               help={errors.date?.message}
             >
               <Controller
@@ -183,20 +166,10 @@ const MatchForm = () => {
                 control={control}
                 render={({ field }) => (
                   <DatePicker
+                    showTime
                     style={{ width: "100%" }}
-                    showTime={{
-                      format: "HH:mm",
-                      disabledMinutes: () =>
-                        Array.from({ length: 60 }, (_, i) => i).filter(
-                          (m) => m !== 0 && m !== 30
-                        ),
-                    }}
-                    format="YYYY-MM-DD HH:mm"
-                    minuteStep={30}
-                    value={field.value ? dayjs(field.value) : null}
-                    onChange={(date) =>
-                      field.onChange(date ? date.toISOString() : "")
-                    }
+                    value={field.value}
+                    onChange={(value) => field.onChange(value)}
                   />
                 )}
               />
@@ -296,7 +269,6 @@ const MatchForm = () => {
                     showSearch
                     labelInValue={false}
                     placeholder="Buscar Establecimiento"
-                    // onSearch={fetchLocations}
                     onChange={field.onChange}
                     value={field.value}
                     options={locationData?.results.map(
