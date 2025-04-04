@@ -128,18 +128,21 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
           mb={customTheme.spacing.small}
           mt={customTheme.spacing.small}
         >
-          <TouchableOpacity
-            onPress={() => setActiveTab("partido")}
-            style={{
-              backgroundColor:
-                activeTab === "partido"
-                  ? customTheme.colors.primary
-                  : "transparent",
-              padding: customTheme.spacing.small,
-            }}
-          >
-            <Text>Partido</Text>
-          </TouchableOpacity>
+          {
+            isParticipe &&
+            <TouchableOpacity
+              onPress={() => setActiveTab("partido")}
+              style={{
+                backgroundColor:
+                  activeTab === "partido"
+                    ? customTheme.colors.primary
+                    : "transparent",
+                padding: customTheme.spacing.small,
+              }}
+            >
+              <Text>Partido</Text>
+            </TouchableOpacity>
+          }
           {isParticipe && (
             <>
               <TouchableOpacity
@@ -191,8 +194,8 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
             >
               <Div flex={1}>
                 <Div>
-                  <Div  flexDir="column" justifyContent="space-between">
-                    <Div flexDir="row" justifyContent="space-between" w="100%"  p={customTheme.spacing.small}>
+                  <Div flexDir="column" justifyContent="space-between">
+                    <Div flexDir="row" justifyContent="space-between" w="100%" p={customTheme.spacing.small}>
                       <Div>
                         <Text
                           fontSize={customTheme.fontSize.large}
