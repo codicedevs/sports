@@ -27,7 +27,7 @@ const EventsCard: React.FC<eventsCardProps> = ({ name, date }) => {
       >
         <Image
           source={require("../../assets/CopaCardTorneo.png")}
-          style={{ margin: 15, width: 40, height: 40 }}
+          style={{ margin: 15, width: 40, height: 40, tintColor:"#f1e30a"}}
         />
 
         <Div py={customTheme.spacing.small} px={customTheme.spacing.medium}>

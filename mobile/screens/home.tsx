@@ -23,38 +23,60 @@ import UpcomingMatchesCardSK from "../components/cards/upcomingMatchesCardSK";
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
-  const { currentUser } = useSession()
-  const { data: matches, refetch, isFetching: isFetchingMatches } = useFetch(() => matchService.getAll({
-    where: {
-      "user._id": currentUser._id
-    }
-  }), [QUERY_KEYS.MATCHES, currentUser]);
+  const { currentUser } = useSession();
+  const {
+    data: matches,
+    refetch,
+    isFetching: isFetchingMatches,
+  } = useFetch(
+    () =>
+      matchService.getAll({
+        where: {
+          "user._id": currentUser._id,
+        },
+      }),
+    [QUERY_KEYS.MATCHES, currentUser]
+  );
   const now = new Date().toISOString();
-  const { data: publicMatches, refetch: refetchPublic, isFetching: isFetchingPublic } = useFetch(() => matchService.getAll({
-    where: {
-      "open": true,
-      "date": { $gte: now }
-    }
-  }), [QUERY_KEYS.PUBLIC_MATCHES]);
+  const {
+    data: publicMatches,
+    refetch: refetchPublic,
+    isFetching: isFetchingPublic,
+  } = useFetch(
+    () =>
+      matchService.getAll({
+        where: {
+          open: true,
+          date: { $gte: now },
+        },
+      }),
+    [QUERY_KEYS.PUBLIC_MATCHES]
+  );
 
-  const { data: petitions, refetch: refetchPetition } = useFetch<{ results: Petition[] }>(() => petitionService.getAll(
+  const { data: petitions, refetch: refetchPetition } = useFetch<{
+    results: Petition[];
+  }>(
+    () =>
+      petitionService.getAll({
+        populate: ["reference.id"],
+        where: {
+          status: ["pending"],
+          receiver: [currentUser._id],
+        },
+      }),
+    [QUERY_KEYS.PETITIONS, currentUser]
+  );
+  const { data: events } = useFetch(eventService.getAll, [QUERY_KEYS.EVENTS]);
 
-    {
-      populate: ["reference.id"],
-      where: {
-        status: ['pending'],
-        receiver: [currentUser._id]
-      }
-    }
-
-  ), [QUERY_KEYS.PETITIONS, currentUser]);
-  const { data: events } = useFetch(eventService.getAll, [QUERY_KEYS.EVENTS]); // pa hacer la llamada
+  const handleActionCompleted = () => {
+    refetchPetition();
+  };
 
   useFocusEffect(
     useCallback(() => {
       refetch();
       refetchPetition();
-      refetchPublic()
+      refetchPublic();
     }, [])
   );
 
@@ -68,13 +90,16 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
       <ScrollView>
         <Div p={customTheme.spacing.medium}>
           <Div mb={customTheme.spacing.medium}>
-            {
-              (currentUser && petitions) &&
-              (
-                petitions.totalCount !== 0 &&
-                <MatchInvitation date={petitions.results[0]?.reference?.id.date} time="10" title="Stalagol" matchType={petitions.results[0]?.reference.type} petition={petitions.results[0]} />
-              )
-            }
+            {currentUser && petitions && petitions.totalCount !== 0 && (
+              <MatchInvitation
+                date={petitions.results[0]?.reference?.id.date}
+                time="10"
+                title="Stalagol"
+                matchType={petitions.results[0]?.reference.type}
+                petition={petitions.results[0]}
+                onActionCompleted={handleActionCompleted}
+              />
+            )}
           </Div>
           <Div mb={customTheme.spacing.medium}>
             <EventsCard // hardcodeado cambiar, arreglar lo coso de event!!!!!!!!
@@ -91,25 +116,24 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
               Próximos partidos
             </Text>
           </Div>
-          {
-            isFetchingPublic ?
-              <UpcomingMatchesCardSK />
-              :
-              <ScrollView horizontal>
-                {publicMatches?.results?.map((u: any) => (
-                  <UpcomingMatchCard
-                    key={u._id}
-                    matchId={u._id}
-                    date={u.date}
-                    hour={u.hour}
-                    players={u.users}
-                    maxPlayers={u.playersLimit}
-                    location={u.location}
-                    sportMode={u.sportMode}
-                  />
-                ))}
-              </ScrollView>
-          }
+          {isFetchingPublic ? (
+            <UpcomingMatchesCardSK />
+          ) : (
+            <ScrollView horizontal>
+              {publicMatches?.results?.map((u: any) => (
+                <UpcomingMatchCard
+                  key={u._id}
+                  matchId={u._id}
+                  date={u.date}
+                  hour={u.hour}
+                  players={u.users}
+                  maxPlayers={u.playersLimit}
+                  location={u.location}
+                  sportMode={u.sportMode}
+                />
+              ))}
+            </ScrollView>
+          )}
         </Div>
         <Div mb={customTheme.spacing.medium} px={customTheme.spacing.medium}>
           <HandleMatchesButton />
@@ -122,26 +146,25 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
             >
               Mis partidos
             </Text>
-            {
-              isFetchingMatches ?
-                <MatchesCardSK />
-                :
-                <Div style={{ gap: scale(16) }}>
-                  {matches?.results?.map((m: any) => (
-                    <MatchesCards
-                      key={m._id}
-                      matchId={m._id}
-                      dayOfWeek={m.dayOfWeek}
-                      date={m.date} // string, ej: "2026-07-15T17:48:00.000Z"
-                      time={m.hour} // number, ej: 22
-                      location={m.location} // { name, address }
-                      players={m.users}
-                      maxPlayers={m.playersLimit}
-                      sportMode={m.sportMode}
-                    />
-                  ))}
-                </Div>
-            }
+            {isFetchingMatches ? (
+              <MatchesCardSK />
+            ) : (
+              <Div style={{ gap: scale(16) }}>
+                {matches?.results?.map((m: any) => (
+                  <MatchesCards
+                    key={m._id}
+                    matchId={m._id}
+                    dayOfWeek={m.dayOfWeek}
+                    date={m.date} // string, ej: "2026-07-15T17:48:00.000Z"
+                    time={m.hour} // number, ej: 22
+                    location={m.location} // { name, address }
+                    players={m.users}
+                    maxPlayers={m.playersLimit}
+                    sportMode={m.sportMode}
+                  />
+                ))}
+              </Div>
+            )}
           </Div>
         )}
         <Div minH={verticalScale(150)}></Div>

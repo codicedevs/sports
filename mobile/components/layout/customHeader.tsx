@@ -17,14 +17,14 @@ export const CustomHeader = () => {
   const currentRouteName = useNavigationState((state) => {
     const activeRoute = state.routes[state.index];
 
-    if (activeRoute.state && typeof activeRoute.state.index === 'number') {
-      const nestedActiveRoute = activeRoute.state.routes[activeRoute.state.index];
+    if (activeRoute.state && typeof activeRoute.state.index === "number") {
+      const nestedActiveRoute =
+        activeRoute.state.routes[activeRoute.state.index];
       console.log(nestedActiveRoute.name, "Pantalla dentro del Stack");
       return nestedActiveRoute.name;
     }
 
     return activeRoute.name;
-
   });
 
   const isHomeScreen = currentRouteName === AppScreens.HOME_SCREEN;
@@ -77,10 +77,10 @@ export const CustomHeader = () => {
             rounded={"circle"}
             alignItems="center"
             justifyContent="center"
-            bg="orange"
+            bg={customTheme.colors.primary}
             px={scale(3)}
           >
-            <Text fontSize={7}>2</Text> 
+            <Text fontSize={7}>2</Text>
           </Div>
         </Div>
       </Div>

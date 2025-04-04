@@ -208,7 +208,7 @@ export default function InviteModal({
             fontSize={customTheme.fontSize.medium}
             fontFamily="NotoSans-BoldItalic"
           >
-            Elegir
+           Enviar invitación
           </Text>
         </Button>
       </Div>

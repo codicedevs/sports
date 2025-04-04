@@ -88,7 +88,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
         >
           {/* Cont amarilla */}
           <Div
-            bg={customTheme.colors.primary}
+            bg={customTheme.colors.enabledPlayers}
             flex={2}
             justifyContent="center"
             rounded={customTheme.borderRadius.medium}

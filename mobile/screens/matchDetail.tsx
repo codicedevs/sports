@@ -204,7 +204,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                       <Div
                         flexDir="row"
                         justifyContent="center"
-                        bg={customTheme.colors.primary}
+                        bg={customTheme.colors.enabledPlayers}
                       >
                         <Image
                           source={require("../assets/iconUser.png")}
