@@ -201,17 +201,22 @@ const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, s
 };
 
 const MatchesList = ({ matches, fetchMore, hasMore }) => {
-  const renderItem = ({ item }) => (
-    <MatchesCards
-      key={item.id}
-      date={'F'}
-      day={item.dayOfWeek}
-      location={item.location?.address}
-      maxPlayers={item.playersLimit}
-      players={10}
-      time={'horario'}
-    />
-  );
+  const renderItem = ({ item }) => {
+    console.log(item)
+    return (
+      <MatchesCards
+        key={item._id}
+        matchId={item._id}
+        dayOfWeek={item.dayOfWeek}
+        date={item.date} 
+        time={item.hour} 
+        location={item.location} 
+        players={item.users}
+        maxPlayers={item.playersLimit}
+        sportMode={item.sportMode}
+      />
+    )
+  };
 
   const keyExtractor = (item) => item._id.toString();
 
@@ -270,15 +275,15 @@ const MatchesScreen = () => {
 
   const fetchMatches = async () => {
     try {
-      if (isFirstLoad) setIsLoading(true); 
+      if (isFirstLoad) setIsLoading(true);
       const mongoFilter = buildMongoFilter();
       const res = await matchService.getAll(mongoFilter);
       return res;
     } catch (e) {
       console.log(e);
     } finally {
-      if (isFirstLoad) setIsLoading(false); 
-      setIsFirstLoad(false); 
+      if (isFirstLoad) setIsLoading(false);
+      setIsFirstLoad(false);
     }
   };
 
@@ -319,7 +324,7 @@ const MatchesScreen = () => {
         schedules={schedules}
       />
       {
-        isLoading ?
+        isLoading || !matches ?
           <Div my={customTheme.spacing.medium} style={{ gap: verticalScale(20) }} >
             <MatchesCardSK />
             <MatchesCardSK />
