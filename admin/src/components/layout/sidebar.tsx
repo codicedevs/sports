@@ -7,7 +7,7 @@ import { Menu, MenuProps, Typography } from "antd";
 import Sider from "antd/es/layout/Sider";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "../../assets/logo.png";
+import logo from "../../assets/logoDeballOrange.jpg";
 import logoColap from "../../assets/Pelota logo.png";
 import { SetStateType } from "../../types/types";
 import { lightColors } from "../../theme/antdTheme";
