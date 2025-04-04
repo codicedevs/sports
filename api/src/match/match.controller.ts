@@ -35,7 +35,7 @@ export class MatchController {
     private readonly matchService: MatchService,
     private readonly zonesService: ZonesService,
     private readonly petitionService: PetitionService,
-  ) {}
+  ) { }
   @Post()
   async createMatch(@Body() createMatchDto: CreateMatchDto) {
     if (!Types.ObjectId.isValid(createMatchDto.userId)) {
@@ -184,12 +184,12 @@ export class MatchController {
 
   @Get(":matchId/petitions")
   async getPetitionsByMatch(
-    @Param("matchId", new ValidateObjectIdPipe("match")) matchId: string,
+    @Query() filter: Filter, @Param("matchId", new ValidateObjectIdPipe("match")) matchId: string,
   ) {
-    const petitions = await this.petitionService.findByReference({
-      id: new Types.ObjectId(matchId),
-      type: PetitionModelType.match,
-    });
+    if (!filter) filter = {}
+    if (filter?.where) filter.where = { ...filter.where, "reference.id": new Types.ObjectId(matchId), "reference.type": PetitionModelType.match }
+    else filter.where = { "reference.id": new Types.ObjectId(matchId), "reference.type": PetitionModelType.match }
+    const petitions = (await this.petitionService.findAll(filter)).results;
 
     const result = {
       pending: [] as any[],

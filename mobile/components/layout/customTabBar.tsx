@@ -39,7 +39,9 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
       p={customTheme.spacing.small}
       alignSelf="center"
     >
-      {state.routes.map((route, index) => {
+      {state.routes
+      .filter(route => route.name !== AppScreens.MATCH_DETAIL)
+      .map((route, index) => {
         const { options } = descriptors[route.key];
         const isFocused = state.index === index;
 

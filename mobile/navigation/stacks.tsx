@@ -7,7 +7,7 @@ import HomeScreen from "../screens/home";
 import SettingsScreen from "../screens/petitionsScreen";
 import Trialscreen from "../screens/trial";
 import Trialscreen2 from "../screens/trial2";
-import { AppScreens } from "./screens";
+import { AppScreens, AppScreensParamList } from "./screens";
 import MatchDetail from "../screens/matchDetail";
 import CustomTabBar from "../components/layout/customTabBar";
 import MatchesScreen from "../screens/matches";
@@ -16,8 +16,8 @@ import { CustomHeader } from "../components/layout/customHeader";
 import PetitionScreen from "../screens/petitionsScreen";
 
 const SettingsStack = createNativeStackNavigator();
-const AuthStack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
+const AuthStack = createNativeStackNavigator()
+const Tab = createBottomTabNavigator<AppScreensParamList>();
 const Drawer = createDrawerNavigator();
 const HomeStack = createNativeStackNavigator();
 
@@ -74,26 +74,22 @@ export function SettingsStackScreen() {
   );
 }
 
+//LOS OTROS ERRORES DE TIPADO LOS ARREGLARE CUANDO ESTEN TODAS LAS PANTALLAS
 export function TabStackScreen() {
   return (
-    <Tab.Navigator
-      tabBar={(props) => <CustomTabBar {...props} />}
-      screenOptions={{
-        header: () => <CustomHeader />,
-        headerShown: true,
-        animation: "fade",
-      }}
-    >
+    <Tab.Navigator tabBar={(props) => <CustomTabBar {...props} />} screenOptions={{
+      header: () => <CustomHeader />,
+      headerShown: true,
+      animation: "fade"
+    }}>
       <Tab.Screen name="HomeStack" component={HomeStackScreen} />
       <Tab.Screen name="SettingsStack" component={SettingsStackScreen} />
-      <Tab.Screen
-        name={AppScreens.MATCH_HANDLER}
-        component={MatchHandlerScreen}
-      />
+      <Tab.Screen name={AppScreens.MATCH_HANDLER} component={MatchHandlerScreen} />
       <Tab.Screen name={AppScreens.MATCH_SCREEN} component={MatchesScreen} />
       <Tab.Screen name="SettingsStack3" component={SettingsStackScreen} />
+      <Tab.Screen name={AppScreens.MATCH_DETAIL} component={MatchDetail} />
     </Tab.Navigator>
-  );
+  )
 }
 
 export function Principal() {

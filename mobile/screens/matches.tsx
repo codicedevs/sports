@@ -272,15 +272,15 @@ const MatchesScreen = () => {
 
   const fetchMatches = async () => {
     try {
-      if (isFirstLoad) setIsLoading(true); 
+      if (isFirstLoad) setIsLoading(true);
       const mongoFilter = buildMongoFilter();
       const res = await matchService.getAll(mongoFilter);
       return res;
     } catch (e) {
       console.log(e);
     } finally {
-      if (isFirstLoad) setIsLoading(false); 
-      setIsFirstLoad(false); 
+      if (isFirstLoad) setIsLoading(false);
+      setIsFirstLoad(false);
     }
   };
 
@@ -321,7 +321,7 @@ const MatchesScreen = () => {
         schedules={schedules}
       />
       {
-        isLoading ?
+        isLoading || !matches ?
           <Div my={customTheme.spacing.medium} style={{ gap: verticalScale(20) }} >
             <MatchesCardSK />
             <MatchesCardSK />

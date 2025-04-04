@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ScrollView, TouchableOpacity } from "react-native";
-import { AppScreenProps, AppScreens } from "../navigation/screens";
+import { AppScreenProps, AppScreens, AppScreensParamList } from "../navigation/screens";
 import { Button, Div, Image, Overlay, Text } from "react-native-magnus";
 import matchService from "../service/match.service";
 import useFetch from "../hooks/useGet";
@@ -17,11 +17,14 @@ import Field from "../components/matche/Detail/field";
 import PlayerStatusList from "../components/matche/Detail/playerStatusList";
 import InviteModal from "../components/modal/invitePlayer";
 import { ActivityScreen } from "./activityScreen";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 type TabKey = "partido" | "jugadores" | "actividad" | "equipos";
 
-const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
-  route,
+type Props = NativeStackScreenProps<AppScreensParamList, AppScreens.MATCH_DETAIL>;
+
+const MatchDetail: React.FC<Props> = ({
+  navigation, route
 }) => {
   const { id } = route.params;
   const { currentUser } = useSession();
@@ -128,18 +131,21 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
           mb={customTheme.spacing.small}
           mt={customTheme.spacing.small}
         >
-          <TouchableOpacity
-            onPress={() => setActiveTab("partido")}
-            style={{
-              backgroundColor:
-                activeTab === "partido"
-                  ? customTheme.colors.primary
-                  : "transparent",
-              padding: customTheme.spacing.small,
-            }}
-          >
-            <Text>Partido</Text>
-          </TouchableOpacity>
+          {
+            isParticipe &&
+            <TouchableOpacity
+              onPress={() => setActiveTab("partido")}
+              style={{
+                backgroundColor:
+                  activeTab === "partido"
+                    ? customTheme.colors.primary
+                    : "transparent",
+                padding: customTheme.spacing.small,
+              }}
+            >
+              <Text>Partido</Text>
+            </TouchableOpacity>
+          }
           {isParticipe && (
             <>
               <TouchableOpacity
@@ -191,8 +197,8 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
             >
               <Div flex={1}>
                 <Div>
-                  <Div  flexDir="column" justifyContent="space-between">
-                    <Div flexDir="row" justifyContent="space-between" w="100%"  p={customTheme.spacing.small}>
+                  <Div flexDir="column" justifyContent="space-between">
+                    <Div flexDir="row" justifyContent="space-between" w="100%" p={customTheme.spacing.small}>
                       <Div>
                         <Text
                           fontSize={customTheme.fontSize.large}

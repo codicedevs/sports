@@ -352,7 +352,7 @@ export class PetitionService {
   }
 
   async findAll(filter: Filter): Promise<FilterResponse<Petition>> {
-    const results = await this.petitionModel.find(filter).exec();
+    const results = await this.petitionModel.find(filter).populate("receiver").exec();
     return {
       results,
       totalCount: await this.petitionModel.countDocuments(filter).exec()
