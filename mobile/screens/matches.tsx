@@ -257,6 +257,7 @@ const MatchesScreen = () => {
   const [matches, setMatches] = useState([]);
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [isFirstLoad, setIsFirstLoad] = useState(true);
 
   const { data: zonas } = useFetch(zonesService.getZones, [QUERY_KEYS.ZONES]);
   const { data: allSportModes } = useFetch(sportmodeService.getAll, [QUERY_KEYS.SPORT_MODES]);
@@ -271,14 +272,15 @@ const MatchesScreen = () => {
 
   const fetchMatches = async () => {
     try {
-      setIsLoading(true)
+      if (isFirstLoad) setIsLoading(true); 
       const mongoFilter = buildMongoFilter();
       const res = await matchService.getAll(mongoFilter);
       return res;
     } catch (e) {
-      console.log(e)
+      console.log(e);
     } finally {
-      setIsLoading(false)
+      if (isFirstLoad) setIsLoading(false); 
+      setIsFirstLoad(false); 
     }
   };
 
