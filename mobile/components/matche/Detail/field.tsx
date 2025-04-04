@@ -6,6 +6,8 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import Match from "../../../types/match.type";
 import matchService from "../../../service/match.service";
 import { customTheme } from "../../../utils/theme";
+import useFetch from "../../../hooks/useGet";
+import { QUERY_KEYS } from "../../../types/query.types";
 
 
 // match id 66e482584509915a15968bd7
@@ -101,7 +103,7 @@ const TeamField = ({
         const assignedPersona = playersAssignments[playerId];
         const displayLabel = assignedPersona && assignedPersona.persona && assignedPersona.persona.name
           ? assignedPersona.persona.name.split(" ").map(word => word[0]).join("")
-          : isAdmin? "+": "";;
+          : isAdmin ? "+" : "";;
         const currentCircleNumber = circleNumber;
         players.push(
           <TouchableOpacity
@@ -163,6 +165,9 @@ const Field = ({ match, isAdmin }: FieldProps) => {
   const [selectedCircleNumber, setSelectedCircleNumber] = useState(null);
   const [playersAssignments, setPlayersAssignments] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
+  const { data: statusList } = useFetch(() => matchService.getPlayerInvitations(match._id), [QUERY_KEYS.PLAYERS_STATUS, match])
+ 
+  if(!statusList) return
 
   const totalPlayers = match.playersLimit;
   const teamPlayers = totalPlayers / 2;
@@ -182,14 +187,14 @@ const Field = ({ match, isAdmin }: FieldProps) => {
 
   const addToFormation = async (player: any) => {
     const team = (selectedPlayerId.split('-')[0] === "top" ? 1 : 2)
-    await matchService.addPlayerToFormation("676d8fc473a26a0de5f38bd1", player._id, {
+    await matchService.addPlayerToFormation(match._id, player._id, {
       team: team,
       position: selectedCircleNumber
     })
   }
 
   const removeFromFormation = async (player: any) => {
-    await matchService.removePlayerFromFormation("676d8fc473a26a0de5f38bd1", player._id)
+    await matchService.removePlayerFromFormation(match._id, player._id)
   }
 
   const handlePersonaSelect = (persona) => {
@@ -215,7 +220,7 @@ const Field = ({ match, isAdmin }: FieldProps) => {
   };
 
   const filteredPersonas = React.useMemo(() => {
-    return personas.filter((personaObj) =>
+    return statusList.accepted.filter((personaObj) =>
       personaObj.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [searchQuery]);
@@ -224,7 +229,7 @@ const Field = ({ match, isAdmin }: FieldProps) => {
     const entry = playersAssignments[playerId];
     return entry && entry.persona && entry.persona.name
       ? entry.persona.name.split(" ").map(word => word[0]).join("")
-      : isAdmin? "+": "";
+      : isAdmin ? "+" : "";
   };
 
   return (
