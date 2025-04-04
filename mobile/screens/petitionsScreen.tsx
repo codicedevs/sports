@@ -7,6 +7,7 @@ import Petition from "../types/petition.type";
 import { QUERY_KEYS } from "../types/query.types";
 import { customTheme } from "../utils/theme";
 import MatchInvitation from "../components/cards/invitationCard";
+import { ScrollView } from "react-native-gesture-handler";
 
 function PetitionScreen({
   navigation,
@@ -29,7 +30,7 @@ function PetitionScreen({
 
   return (
     <Div mb={customTheme.spacing.medium} p={customTheme.spacing.small}>
-       
+       <ScrollView>
       {petitions?.results?.length > 0 ? (
         petitions.results.map((p, index) => (
           <Div mb={customTheme.spacing.small}> <MatchInvitation
@@ -43,7 +44,7 @@ function PetitionScreen({
         ))
       ) : (
         <Text>No hay peticiones pendientes.</Text>
-      )}
+      )}</ScrollView>
     </Div>
   );
 }

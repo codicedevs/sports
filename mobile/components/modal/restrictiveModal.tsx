@@ -30,7 +30,7 @@ const RestrictiveModal = () => {
 
     const login = async () => {
         try {
-            const res = await authService.login("mtrovant@gmail.com", "123123123");
+            const res = await authService.login("puchoni@gmail.com", "12345678");
             setCurrentUser(res.user);
 
             if (res) {
