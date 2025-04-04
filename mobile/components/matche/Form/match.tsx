@@ -4,7 +4,7 @@ import { MatchDetails } from "../../../types/form.type";
 import Match from "../../../types/match.type";
 import matchService from "../../../service/match.service";
 import { Div, Text } from "react-native-magnus";
-import { Image, ScrollView, TouchableOpacity } from "react-native";
+import { ScrollView, TouchableOpacity } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
 import { customTheme } from "../../../utils/theme";
 import { Accordion } from "../../collapsibleView";
@@ -14,7 +14,6 @@ import MatchPrivacyToggleInput from "../Inputs/matchPrivacyToggle";
 import { formatDate } from "../../../utils/date";
 import MatchSchedulerInput from "../Inputs/matchScheduler";
 import SearchLocationInput from "../Inputs/searchLocation";
-import { QueryObserverResult } from "@tanstack/react-query";
 import { useSession } from "../../../context/authProvider";
 
 export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match, onRefetch?: () => void, onGoBack?: () => void }) {
@@ -138,7 +137,10 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
             openId={openId}
             setOpenId={setOpenId}
             title="Cupo"
-            rightText="Agrega participantes"
+            rightText={matchDetailsRef.current.playerLimit
+              ? matchDetailsRef.current.playerLimit.toString()
+            : "Agrega participantes"
+          }
             size={123}
           >
             <PlayersCounterInput matchDetailsRef={matchDetailsRef} />
