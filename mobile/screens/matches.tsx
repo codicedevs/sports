@@ -202,7 +202,6 @@ const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, s
 
 const MatchesList = ({ matches, fetchMore, hasMore }) => {
   const renderItem = ({ item }) => {
-    console.log(item)
     return (
       <MatchesCards
         key={item._id}
