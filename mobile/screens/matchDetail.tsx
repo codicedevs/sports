@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { ScrollView, TouchableOpacity } from "react-native";
-import { AppScreenProps, AppScreens, AppScreensParamList } from "../navigation/screens";
+import {
+  AppScreenProps,
+  AppScreens,
+  AppScreensParamList,
+} from "../navigation/screens";
 import { Button, Div, Image, Overlay, Text } from "react-native-magnus";
 import matchService from "../service/match.service";
 import useFetch from "../hooks/useGet";
@@ -18,14 +22,17 @@ import PlayerStatusList from "../components/matche/Detail/playerStatusList";
 import InviteModal from "../components/modal/invitePlayer";
 import { ActivityScreen } from "./activityScreen";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import * as Clipboard from "expo-clipboard";
+import { useGlobalUI } from "../context/globalUiContext";
 
 type TabKey = "partido" | "jugadores" | "actividad" | "equipos";
 
-type Props = NativeStackScreenProps<AppScreensParamList, AppScreens.MATCH_DETAIL>;
+type Props = NativeStackScreenProps<
+  AppScreensParamList,
+  AppScreens.MATCH_DETAIL
+>;
 
-const MatchDetail: React.FC<Props> = ({
-  navigation, route
-}) => {
+const MatchDetail: React.FC<Props> = ({ navigation, route }) => {
   const { id } = route.params;
   const { currentUser } = useSession();
   const [activeTab, setActiveTab] = useState<TabKey>("partido");
@@ -39,6 +46,7 @@ const MatchDetail: React.FC<Props> = ({
     refetch,
   } = useFetch(() => matchService.getById(id), [QUERY_KEYS.MATCH]);
   const [isParticipe, setIsParticipe] = useState(false);
+  const { showSnackBar } = useGlobalUI();
 
   function isPlayer() {
     if (!match) return;
@@ -79,6 +87,14 @@ const MatchDetail: React.FC<Props> = ({
   const playerCount = users?.length || 0;
   const dateObject = new Date(date);
   const isAdmin = user?._id === currentUser?._id; //SI el usuario que creo el partido dejo de existir genera conflictos
+
+  const matchUrl = "https://misitio.com/partido/123"; //ejemplo para el portapales
+
+  const handleShare = () => {
+    const url = `https://miapp.com/match/${id}`;
+    Clipboard.setStringAsync(url);
+    showSnackBar("success", "Copiado en el portapapeles!");
+  };
 
   return (
     <>
@@ -131,8 +147,7 @@ const MatchDetail: React.FC<Props> = ({
           mb={customTheme.spacing.small}
           mt={customTheme.spacing.small}
         >
-          {
-            isParticipe &&
+          {isParticipe && (
             <TouchableOpacity
               onPress={() => setActiveTab("partido")}
               style={{
@@ -145,7 +160,7 @@ const MatchDetail: React.FC<Props> = ({
             >
               <Text>Partido</Text>
             </TouchableOpacity>
-          }
+          )}
           {isParticipe && (
             <>
               <TouchableOpacity
@@ -198,7 +213,12 @@ const MatchDetail: React.FC<Props> = ({
               <Div flex={1}>
                 <Div>
                   <Div flexDir="column" justifyContent="space-between">
-                    <Div flexDir="row" justifyContent="space-between" w="100%" p={customTheme.spacing.small}>
+                    <Div
+                      flexDir="row"
+                      justifyContent="space-between"
+                      w="100%"
+                      p={customTheme.spacing.small}
+                    >
                       <Div>
                         <Text
                           fontSize={customTheme.fontSize.large}
@@ -272,7 +292,15 @@ const MatchDetail: React.FC<Props> = ({
                         </Text>
                       </Button>
                       <Div>
-                        <Button bg="black" block>
+                        <Button
+                          bg="black"
+                          block
+                          // onPress={() => {
+                          //   const url = `https://miapp.com/match/${id}`;
+                          //   Clipboard.setStringAsync(url);
+                          // }}
+                          onPress={handleShare}
+                        >
                           <Image
                             source={require("../assets/iconShare.png")}
                             style={{
