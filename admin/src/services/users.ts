@@ -1,4 +1,4 @@
-import { User } from "../types/interfaces";
+import { User } from "../types/users.types";
 import { CrudService } from "./crud";
 
 class UserService extends CrudService<User> {

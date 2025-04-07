@@ -10,6 +10,8 @@ import UserForm from "./pages/users/form";
 import UsersList from "./pages/users/list";
 import MatchForm from "./pages/matches/form";
 import MatchesList from "./pages/matches/list";
+import SportList from "./pages/sports/list";
+import SportForm from "./pages/sports/form";
 
 const router = createBrowserRouter([
   {
@@ -27,6 +29,9 @@ const router = createBrowserRouter([
       { path: "usuarios", element: <UsersList /> },
       { path: "usuarios/:id", element: <UserForm /> },
       { path: "usuarios/nuevo", element: <UserForm /> },
+      { path: "deportes", element: <SportList /> },
+      { path: "deportes/:id", element: <SportForm /> },
+      { path: "deportes/nuevo", element: <SportForm /> },
     ],
   },
 ]);

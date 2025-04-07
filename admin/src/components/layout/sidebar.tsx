@@ -82,6 +82,9 @@ const Sidebar = ({ collapsed }: SidebarProps) => {
         navigate("usuarios/nuevo")
       ),
     ]),
+    getItem("Deportes", "5", <PieChartOutlined />, null, () =>
+      navigate("deportes")
+    ),
   ];
 
   return (

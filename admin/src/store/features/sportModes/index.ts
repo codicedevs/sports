@@ -1,49 +1,27 @@
 // src/features/auth/authApi.ts
-import { BaseQueryFn, createApi } from "@reduxjs/toolkit/query/react";
-import { AxiosError, AxiosResponse } from "axios";
+import { createApi } from "@reduxjs/toolkit/query/react";
 import { sportModeService } from "../../../services/sportModes";
-import { SportMode } from "../../../types/sportModes.type";
+import { SportMode, SportModeDto } from "../../../types/sportModes.type";
+import { axiosBaseQuery } from "../../axiosBaseQuery";
+import { Filter, GetArgs, ServiceMethods } from "../../../types/store.type";
 
-interface ApiResponse<T> {
-  data: T;
+// interface ApiResponse<T> {
+//   data: T;
+// }
+interface SportModeResponse {
+  results: SportMode[];
+  totalCount: number;
 }
-
-const axiosBaseQuery =
-  <T>(
-    service: any
-  ): BaseQueryFn<
-    {
-      url: string;
-      method: string;
-      data?: any;
-      params?: Record<any, any> | string;
-    },
-    T,
-    unknown
-  > =>
-  async ({ method, data, params }) => {
-    try {
-      const result: AxiosResponse<T> = await service[method](data, params);
-
-      return { data: result.data };
-    } catch (error) {
-      const axiosError = error as AxiosError;
-      return {
-        error: {
-          status: axiosError.response?.status,
-          data: axiosError.response?.data || axiosError.message,
-        },
-      };
-    }
-  };
 
 export const sportModeApi = createApi({
   reducerPath: "sportModeApi",
-  baseQuery: axiosBaseQuery<any>(sportModeService),
+  baseQuery: axiosBaseQuery<SportModeResponse>(
+    sportModeService as unknown as ServiceMethods<SportModeResponse>
+  ),
   tagTypes: ["SportMode"],
   endpoints: (builder) => ({
-    getSportMode: builder.query<any, any>({
-      query: (filter: any) => {
+    getSportMode: builder.query<SportModeResponse, GetArgs>({
+      query: (filter: Filter) => {
         return {
           url: ``,
           method: "find",
@@ -52,8 +30,8 @@ export const sportModeApi = createApi({
       },
       providesTags: ["SportMode"],
     }),
-    createSportMode: builder.mutation<any, any>({
-      query: (data: any) => {
+    createSportMode: builder.mutation<SportMode, SportModeDto>({
+      query: (data: SportModeDto) => {
         return {
           url: ``,
           method: "create",
@@ -74,7 +52,7 @@ export const sportModeApi = createApi({
         const patchResult = dispatch(
           sportModeApi.util.updateQueryData(
             "getSportMode",
-            undefined,
+            {} as GetArgs,
             (draft) => {
               draft.results = draft.results.filter(
                 (sportMode: SportMode) => sportMode._id !== sportModeId

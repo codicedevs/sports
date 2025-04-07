@@ -1,4 +1,4 @@
-import { Match } from "../types/interfaces";
+import { Match } from "../types/matches.type";
 import { CrudService } from "./crud";
 
 class MatchService extends CrudService<Match> {
