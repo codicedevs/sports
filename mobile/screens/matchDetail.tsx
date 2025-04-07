@@ -183,7 +183,7 @@ const MatchDetail: React.FC<Props> = ({
                   padding: customTheme.spacing.small,
                 }}
               >
-                <Text>Equipos</Text>
+                <Text>Armar equipos</Text>
               </TouchableOpacity>
             </>
           )}

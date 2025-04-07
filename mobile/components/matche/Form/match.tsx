@@ -227,7 +227,7 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
               fontSize={customTheme.fontSize.medium}
               fontFamily="NotoSans-BoldItalic"
             >
-              {!match ? "Crear" : "Editar"}
+              {!match ? "Crear" : "Guardar cambios"}
             </Text>
           </Div>
         </TouchableOpacity>
