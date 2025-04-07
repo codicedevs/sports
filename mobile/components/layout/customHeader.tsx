@@ -122,18 +122,19 @@ export const CustomHeader = () => {
         </Div>
         <Div position="relative">
           <Image
-            style={{ height: scale(27), width: scale(22) }}
+            style={{ height: scale(30), width: scale(25) }}
             source={require("../../assets/match/bellInclinada.png")}
           />
           <Div
             position="absolute"
-            right={0}
-            top={4}
+            right={2}
+            top={6}
             rounded="circle"
             alignItems="center"
             justifyContent="center"
-            bg="orange"
-            px={scale(3)}
+            bg={customTheme.colors.primary}
+            px={scale(4)}
+            py={scale(1)}
           >
             <Text fontSize={7}>2</Text>
           </Div>
