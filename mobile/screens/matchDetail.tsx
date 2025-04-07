@@ -88,8 +88,6 @@ const MatchDetail: React.FC<Props> = ({ navigation, route }) => {
   const dateObject = new Date(date);
   const isAdmin = user?._id === currentUser?._id; //SI el usuario que creo el partido dejo de existir genera conflictos
 
-  const matchUrl = "https://misitio.com/partido/123"; //ejemplo para el portapales
-
   const handleShare = () => {
     const url = `https://miapp.com/match/${id}`;
     Clipboard.setStringAsync(url);
@@ -292,15 +290,7 @@ const MatchDetail: React.FC<Props> = ({ navigation, route }) => {
                         </Text>
                       </Button>
                       <Div>
-                        <Button
-                          bg="black"
-                          block
-                          // onPress={() => {
-                          //   const url = `https://miapp.com/match/${id}`;
-                          //   Clipboard.setStringAsync(url);
-                          // }}
-                          onPress={handleShare}
-                        >
+                        <Button bg="black" block onPress={handleShare}>
                           <Image
                             source={require("../assets/iconShare.png")}
                             style={{

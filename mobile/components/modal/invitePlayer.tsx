@@ -9,6 +9,7 @@ import petitionService from "../../service/petition.service";
 import useFetch from "../../hooks/useGet";
 import { QUERY_KEYS } from "../../types/query.types";
 import { useSession } from "../../context/authProvider";
+import { useGlobalUI } from "../../context/globalUiContext";
 
 interface InviteModalProps {
   open: boolean;
@@ -21,6 +22,7 @@ export default function InviteModal({
   setOpen,
   matchId,
 }: InviteModalProps) {
+  const { showSnackBar } = useGlobalUI();
   const [query, setQuery] = useState("");
   const [selectedPlayers, setSelectedPlayers] = useState<User[]>([]);
   const { currentUser } = useSession();
@@ -45,6 +47,13 @@ export default function InviteModal({
   };
 
   async function handleSendInvitations() {
+    if (selectedPlayers.length === 0) { // sino lo hago asi me muestra el snack recien cdo vuelvo a la pantalla anterior
+      setOpen(false); 
+      setTimeout(() => {
+        showSnackBar("error", "Debes seleccionar jugadores para invitar");
+      }, 300); 
+      return;
+    }
     try {
       for (const players of selectedPlayers) {
         const petitionload = {
@@ -58,6 +67,7 @@ export default function InviteModal({
         await petitionService.create(petitionload);
       }
       console.log("Invitaciones enviadas");
+      showSnackBar("success", "Invitaación enviada!");
 
       setSelectedPlayers([]);
       setOpen(false);
@@ -73,16 +83,21 @@ export default function InviteModal({
         p={customTheme.spacing.small}
         justifyContent="center"
         alignItems="center"
-      > <Div p={customTheme.spacing.small}
-       w="93%">
-          <Text fontSize={customTheme.fontSize.title} fontFamily="NotoSans-ExtraBoldItalic">Elegir jugador</Text>
+      >
+        {" "}
+        <Div p={customTheme.spacing.small} w="93%">
+          <Text
+            fontSize={customTheme.fontSize.title}
+            fontFamily="NotoSans-ExtraBoldItalic"
+          >
+            Elegir jugador
+          </Text>
         </Div>
         <Button bg="white" onPress={() => setOpen(false)}>
           <Text color="black" fontSize={customTheme.fontSize.title}>
             X
           </Text>
         </Button>
-       
       </Div>
 
       {/* autocomplete */}
@@ -145,9 +160,14 @@ export default function InviteModal({
 
         {/* jug selecc.*/}
         <Div mt={60} p={customTheme.spacing.medium}>
-          <Text textAlign="center" fontSize={customTheme.fontSize.medium} fontFamily="NotoSans-ExtraBoldItalic">
+          {selectedPlayers.length > 0 &&
+          <Text
+            textAlign="center"
+            fontSize={customTheme.fontSize.medium}
+            fontFamily="NotoSans-ExtraBoldItalic"
+          >
             Jugadores seleccionados:
-          </Text>
+          </Text>}
           {selectedPlayers.map((player, index) => (
             <Div
               key={index}
@@ -196,7 +216,7 @@ export default function InviteModal({
       >
         {/* Botón “Elegir” */}
         <Button
-          bg={customTheme.colors.secondaryBackground} 
+          bg={customTheme.colors.secondaryBackground}
           onPress={handleSendInvitations}
           w="100%"
           h={scale(45)}
@@ -208,7 +228,7 @@ export default function InviteModal({
             fontSize={customTheme.fontSize.medium}
             fontFamily="NotoSans-BoldItalic"
           >
-           Enviar invitación
+            Enviar invitación
           </Text>
         </Button>
       </Div>
