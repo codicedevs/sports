@@ -1,3 +1,4 @@
+import { SportMode } from "./form.type";
 import Location from "./location.type";
 import { User } from "./user.type";
 
@@ -11,6 +12,16 @@ import { User } from "./user.type";
 //   users: User[];
 // }
 
+export interface Player {
+  position: number;
+  userId: string | User; // Puede ser el ID o el objeto completo
+}
+
+export interface Formations {
+  team1: Player[];
+  team2: Player[];
+}
+
  interface Match {
   _id?: string;
   name?: string;
@@ -21,9 +32,9 @@ import { User } from "./user.type";
   playersLimit?: number;
   userId: string; // Referencia al usuario propietario
   users?: User[]; // Referencias a los usuarios participantes
-  sportMode: string;
+  sportMode: SportMode;
   open: boolean;
-  // formations?: Formations;
+   formations?: Formations;
 }
 export default Match;
 

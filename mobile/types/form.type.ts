@@ -1,3 +1,5 @@
+import Location from "./location.type";
+
 export interface Sport {
     name: string,
     _id: string
@@ -11,11 +13,6 @@ export interface SportMode {
 }
 
 export type PrivacyOption = 'public' | 'private';
-
-interface Location {
-    type: "Point";
-    coordinates: [number, number];
-}
 
 export interface Place {
     _id: string;
@@ -31,7 +28,7 @@ export interface MatchDetails {
     playerLimit: number;
     privacyOption: boolean;
     matchDate?: string | undefined;
-    location: Place | null;
+    location: Location | null;
     date?: string
 }
 
