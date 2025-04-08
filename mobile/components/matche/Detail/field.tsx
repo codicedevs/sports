@@ -8,26 +8,8 @@ import matchService from "../../../service/match.service";
 import { customTheme } from "../../../utils/theme";
 import useFetch from "../../../hooks/useGet";
 import { QUERY_KEYS } from "../../../types/query.types";
-
-
-// match id 66e482584509915a15968bd7
-
-const personas = [
-  { _id: "66e482584509915a15968bd7", name: "Diego" },
-  { _id: "671a838fa244aadecccd9904", name: "diego11" },
-  { _id: "671a84b9ba1c16df2574f220", name: "diego12" },
-  { _id: "671a84bfba1c16df2574f222", name: "diego14" },
-  { _id: "679b940c3dc4af55650b6049", name: "diego orefici" },
-  { _id: "66f7055a26fc7aa2eabb94ef", name: "diego+1" },
-  { _id: "66f7056226fc7aa2eabb94f1", name: "diego+2" },
-  { _id: "66f7057126fc7aa2eabb94f7", name: "diego+5" },
-  { _id: "679ba8a55768ea11f86cdf9e", name: "Administrator Administrador" },
-  { _id: "66f7056726fc7aa2eabb94f3", name: "diego+3" },
-  { _id: "671a8395a244aadecccd9906", name: "diego10" },
-  { _id: "671a839ba244aadecccd9908", name: "diego9" },
-  { _id: "66f7056c26fc7aa2eabb94f5", name: "diego+4" },
-  { _id: "66f7057526fc7aa2eabb94f9", name: "diego+6" }
-];
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useQueryClient } from "@tanstack/react-query";
 
 const MAX_CIRCLE_SIZE = scale(50);
 
@@ -53,11 +35,13 @@ const FPlayer = ({ size, style, initials }: FPlayerProps) => (
 interface TeamFieldProps {
   playersCount: number;
   mirror?: boolean;
-  onPlayerPress: (playerId: string, circleNumber: number) => void;
+  onPlayerPress: (playerId: string, circleNumber: number, team: number) => void;
   playersAssignments: Record<string, any>;
-  teamData?: { posicion: number, user: string }[];
+  teamData?: { position: number, userId: string }[];
   onAutoAssign?: (assignments: Record<string, { persona: any, circleNumber: number }>) => void;
-  isAdmin: boolean
+  isAdmin: boolean;
+  statusList: any;
+  teamNumber: number
 }
 
 const TeamField = ({
@@ -67,7 +51,9 @@ const TeamField = ({
   playersAssignments,
   teamData,
   onAutoAssign,
-  isAdmin
+  isAdmin,
+  statusList,
+  teamNumber
 }: TeamFieldProps) => {
   const fieldPlayers = playersCount - 1;
   const maxPerRow = playersCount === 5 ? 2 : 4;
@@ -109,7 +95,7 @@ const TeamField = ({
           <TouchableOpacity
             disabled={!isAdmin}
             key={playerId}
-            onPress={() => onPlayerPress(playerId, currentCircleNumber)}
+            onPress={() => onPlayerPress(playerId, currentCircleNumber, teamNumber)}
           >
             <FPlayer
               size={circleSize}
@@ -135,7 +121,13 @@ const TeamField = ({
           if (!playersAssignments[playerId]) {
             const teamPlayer = teamData.find(p => p.position === circleNum);
             if (teamPlayer && teamPlayer.userId) {
-              assignments[playerId] = { persona: teamPlayer.userId, circleNumber: circleNum };
+              const fullPersona = statusList?.find(p => p._id === teamPlayer.userId);
+              if (fullPersona) {
+                assignments[playerId] = {
+                  persona: fullPersona,
+                  circleNumber: circleNum
+                };
+              }
             }
           }
           circleNum++;
@@ -165,55 +157,97 @@ const Field = ({ match, isAdmin }: FieldProps) => {
   const [selectedCircleNumber, setSelectedCircleNumber] = useState(null);
   const [playersAssignments, setPlayersAssignments] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
-  const { data: statusList } = useFetch(() => matchService.getPlayerInvitations(match._id), [QUERY_KEYS.PLAYERS_STATUS, match])
- 
-
+  const [selectedTeam, setSelectedTeam] = useState<1 | 2 | null>(null);
+  const { data: statusList } = useFetch(() => matchService.getPlayerInvitations(match._id), [QUERY_KEYS.PLAYERS_STATUS,match])
+  const queryClient = useQueryClient();
 
   const totalPlayers = match.playersLimit;
   const teamPlayers = totalPlayers / 2;
-  useEffect(() => {
-    setPlayersAssignments(prev => ({
-      ...prev,
-      "Top-GK": { circleNumber: 1 },
-      "Bottom-GK": { circleNumber: 1 }
-    }));
-  }, []);
+  // useEffect(() => {
+  //   setPlayersAssignments(prev => ({
+  //     ...prev,
+  //     "Top-GK": { circleNumber: 1 },
+  //     "Bottom-GK": { circleNumber: 1 }
+  //   }));
+  // }, []);
 
-  const handlePlayerPress = (playerId, circleNumber) => {
+  const handlePlayerPress = (playerId, circleNumber, team) => {
     setSelectedPlayerId(playerId);
     setSelectedCircleNumber(circleNumber);
+    setSelectedTeam(team);
     setOpen(true);
   };
 
   const addToFormation = async (player: any) => {
-    const team = (selectedPlayerId.split('-')[0] === "top" ? 1 : 2)
+    // const formationsToSend = buildFormationsFromAssignments(playersAssignments);
+    // // console.log(player)
+    // queryClient.setQueryData([QUERY_KEYS.MATCH], (old: Match) => ({
+    //   ...old,
+    //   data: {
+    //     ...old.data,
+    //     formations: formationsToSend,
+    //   },
+    // }))
+
+
     await matchService.addPlayerToFormation(match._id, player._id, {
-      team: team,
+      team: selectedTeam,
       position: selectedCircleNumber
     })
+
+    await queryClient.invalidateQueries({queryKey:[QUERY_KEYS.MATCH]})
   }
 
+  //************************************************* */
+  const buildFormationsFromAssignments = (assignments: Record<string, { persona: any, circleNumber: number }>) => {
+    const newFormations = {
+      team1: [] as { position: number, userId: string }[],
+      team2: [] as { position: number, userId: string }[],
+    };
+
+    Object.entries(assignments).forEach(([playerId, { persona, circleNumber }]) => {
+      if (!persona || !persona._id || !circleNumber) return;
+
+      const isTeam1 = playerId.toLowerCase().includes("top");
+      const teamKey = isTeam1 ? "team1" : "team2";
+
+      newFormations[teamKey].push({
+        position: circleNumber,
+        userId: persona._id,
+      });
+    });
+
+    return newFormations;
+  };
+
+  //************************************************* */
   const removeFromFormation = async (player: any) => {
     await matchService.removePlayerFromFormation(match._id, player._id)
   }
-
+  // console.log(match.formations)
   const handlePersonaSelect = (persona) => {
     setPlayersAssignments(prev => {
       const newAssignments = { ...prev };
 
+      // Eliminar al jugador de donde ya esté asignado
       Object.keys(newAssignments).forEach(key => {
         if (
           newAssignments[key].persona &&
           newAssignments[key].persona._id === persona._id
         ) {
+          // Llama a removeFromFormation si estaba asignado antes
+          removeFromFormation(persona);
           delete newAssignments[key];
         }
       });
 
+      // Agregar al jugador en la nueva posición
       addToFormation(persona);
       newAssignments[selectedPlayerId] = { persona, circleNumber: selectedCircleNumber };
+
       return newAssignments;
     });
+
     setOpen(false);
     setSelectedPlayerId(null);
     setSelectedCircleNumber(null);
@@ -231,6 +265,8 @@ const Field = ({ match, isAdmin }: FieldProps) => {
       ? entry.persona.name.split(" ").map(word => word[0]).join("")
       : isAdmin ? "+" : "";
   };
+
+  if (!statusList) return
 
   return (
     <>
@@ -266,7 +302,7 @@ const Field = ({ match, isAdmin }: FieldProps) => {
                 mb={customTheme.spacing.medium}
               />
               <ScrollView style={{ maxHeight: verticalScale(300) }}>
-                {filteredPersonas.map((persona) => (
+                {(filteredPersonas?.length > 0 ? filteredPersonas : []).map((persona) => (
                   <TouchableOpacity key={persona._id} onPress={() => handlePersonaSelect(persona)}>
                     <Div p={customTheme.spacing.medium}>
                       <Text>{persona.name}</Text>
@@ -285,7 +321,7 @@ const Field = ({ match, isAdmin }: FieldProps) => {
         <Div p={20} h="100%">
           <Div id="first-half" flex={1}>
             <Div h="15%" alignItems="center" justifyContent="center">
-              <TouchableOpacity disabled={!isAdmin} id="Top-GK" onPress={() => handlePlayerPress("Top-GK", 1)}>
+              <TouchableOpacity disabled={!isAdmin} id="Top-GK" onPress={() => handlePlayerPress("Top-GK", 1, 2)}>
                 <FPlayer size={scale(50)} initials={iniciales("Top-GK")} />
               </TouchableOpacity>
             </Div>
@@ -299,6 +335,8 @@ const Field = ({ match, isAdmin }: FieldProps) => {
               }
               teamData={match.formations?.team2}
               isAdmin={isAdmin}
+              statusList={statusList.accepted}
+              teamNumber={2}
             />
           </Div>
 
@@ -313,9 +351,11 @@ const Field = ({ match, isAdmin }: FieldProps) => {
               }
               teamData={match.formations?.team1}
               isAdmin={isAdmin}
+              statusList={statusList.accepted}
+              teamNumber={1}
             />
             <Div h="15%" alignItems="center" justifyContent="center">
-              <TouchableOpacity disabled={!isAdmin} id="Bottom-GK" onPress={() => handlePlayerPress("Bottom-GK", 1)}>
+              <TouchableOpacity disabled={!isAdmin} id="Bottom-GK" onPress={() => handlePlayerPress("Bottom-GK", 1, 1)}>
                 <FPlayer size={scale(50)} initials={iniciales("Bottom-GK")} />
               </TouchableOpacity>
             </Div>
