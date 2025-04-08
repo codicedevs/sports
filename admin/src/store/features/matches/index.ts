@@ -1,44 +1,64 @@
 // src/features/auth/authApi.ts
-import { createApi } from "@reduxjs/toolkit/query/react";
+import { BaseQueryFn, createApi } from "@reduxjs/toolkit/query/react";
+import { AxiosError, AxiosResponse } from "axios";
 import { matchService } from "../../../services/matches";
 import { Match } from "../../../types/matches.type";
-import { axiosBaseQuery } from "../../axiosBaseQuery";
-import { ServiceMethods } from "../users";
-import { Filter, GetArgs } from "../../../types/store.type";
 
-// interface MatchFilter {
-//   _id: string;
-// }
-
-// interface LoginResponse {
-//   user: { id: string; name: string };
-//   access_token: string;
-//   refresh_token: string;
-// }
-
-// interface LoginRequest {
-//   email: string;
-//   password: string;
-// }
-
-// interface ApiResponse<T> {
-//   data: T;
-// }
-
-interface MatchesResponse {
-  results: Match[];
-  total: number;
+interface MatchFilter {
+  _id: string;
 }
+
+interface LoginResponse {
+  user: { id: string; name: string };
+  access_token: string;
+  refresh_token: string;
+}
+
+interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+interface ApiResponse<T> {
+  data: T;
+}
+
+const axiosBaseQuery =
+  <T>(
+    service: any
+  ): BaseQueryFn<
+    {
+      url: string;
+      method: string;
+      data?: any;
+      params?: Record<any, any> | string;
+    },
+    T,
+    unknown
+  > =>
+  async ({ method, data, params }) => {
+    try {
+      const result: AxiosResponse<T> = await service[method](data, params);
+
+      return { data: result.data };
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      return {
+        error: {
+          status: axiosError.response?.status,
+          data: axiosError.response?.data || axiosError.message,
+        },
+      };
+    }
+  };
 
 export const matchApi = createApi({
   reducerPath: "matchApi",
-  baseQuery: axiosBaseQuery<MatchesResponse>(
-    matchService as unknown as ServiceMethods<MatchesResponse>
-  ),
+  baseQuery: axiosBaseQuery<ApiResponse<any>>(matchService),
   tagTypes: ["Matches"],
   endpoints: (builder) => ({
-    getMatches: builder.query<MatchesResponse, Filter>({
-      query: (filter: Filter) => {
+    getMatches: builder.query<any, any>({
+      query: (filter: any) => {
         return {
           url: ``,
           method: "find",
@@ -47,8 +67,8 @@ export const matchApi = createApi({
       },
       providesTags: ["Matches"],
     }),
-    createMatch: builder.mutation<Match, Match>({
-      query: (data) => {
+    createMatch: builder.mutation<any, any>({
+      query: (data: any) => {
         return {
           url: ``,
           method: "create",
@@ -58,7 +78,7 @@ export const matchApi = createApi({
       invalidatesTags: ["Matches"],
     }),
     deleteMatch: builder.mutation<string, string>({
-      query: (matchId) => {
+      query: (matchId: any) => {
         return {
           url: ``,
           method: "remove",
@@ -67,19 +87,14 @@ export const matchApi = createApi({
       },
       async onQueryStarted(matchId, { dispatch, queryFulfilled }) {
         const patchResult = dispatch(
-          matchApi.util.updateQueryData(
-            "getMatches",
-            {} as GetArgs,
-            (draft) => {
-              draft.results = draft.results.filter(
-                (match: Match) => match._id !== matchId
-              );
-            }
-          )
+          matchApi.util.updateQueryData("getMatches", undefined, (draft) => {
+            draft.results = draft.results.filter(
+              (match: Match) => match._id !== matchId
+            );
+          })
         );
         try {
           await queryFulfilled;
-          console.log("Partido eliminado:", matchId);
         } catch {
           patchResult.undo();
         }

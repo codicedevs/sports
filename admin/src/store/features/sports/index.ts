@@ -1,7 +1,6 @@
+import { AxiosError, AxiosResponse } from "axios";
 import { sportService } from "../../../services/sports";
 import { NewSportDto, Sport } from "../../../types/sport.type";
-import { axiosBaseQuery } from "../../axiosBaseQuery";
-import { Filter, GetArgs, ServiceMethods } from "../../../types/store.type";
 import { createApi } from "@reduxjs/toolkit/query/react";
 
 interface SportResponse {
@@ -9,15 +8,41 @@ interface SportResponse {
   totalCount: number;
 }
 
+const axiosBaseQuery =
+  <T>(
+    service: any
+  ): BaseQueryFn<
+    {
+      url: string;
+      method: string;
+      data?: any;
+      params?: Record<any, any> | string;
+    },
+    T,
+    unknown
+  > =>
+  async ({ method, data, params }) => {
+    try {
+      const result: AxiosResponse<T> = await service[method](data, params);
+      return { data: result.data };
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      return {
+        error: {
+          status: axiosError.response?.status,
+          data: axiosError.response?.data || axiosError.message,
+        },
+      };
+    }
+  };
+
 export const sportApi = createApi({
   reducerPath: "sportApi",
-  baseQuery: axiosBaseQuery<SportResponse>(
-    sportService as unknown as ServiceMethods<SportResponse>
-  ),
+  baseQuery: axiosBaseQuery<SportResponse>(sportService),
   tagTypes: ["Sports"],
   endpoints: (builder) => ({
-    getSports: builder.query<SportResponse, Filter | void>({
-      query: (filter?: Filter) => {
+    getSports: builder.query<SportResponse, any | void>({
+      query: (filter?: any) => {
         return {
           url: ``,
           method: "find",
@@ -27,7 +52,7 @@ export const sportApi = createApi({
       providesTags: ["Sports"],
     }),
 
-    getSport: builder.query<Sport, GetArgs>({
+    getSport: builder.query<Sport, any>({
       query: ({ id, populate }) => {
         return {
           url: ``,

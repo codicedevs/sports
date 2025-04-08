@@ -1,46 +1,63 @@
-import { createApi } from "@reduxjs/toolkit/query/react";
-import { AxiosResponse } from "axios";
+import { BaseQueryFn, createApi } from "@reduxjs/toolkit/query/react";
+import { AxiosError, AxiosResponse } from "axios";
 import { userService } from "../../../services/users";
 import { NewUserDto, User } from "../../../types/users.types";
-import { axiosBaseQuery } from "../../axiosBaseQuery";
-import { Filter, GetArgs } from "../../../types/store.type";
 
 interface UserResponse {
   results: User[];
   totalCount: number;
 }
 
-export interface ServiceMethods<ResponseType> {
-  [key: string]: (
-    data?: unknown,
-    params?: unknown
-  ) => Promise<AxiosResponse<ResponseType>>;
+interface LoginResponse {
+  user: { id: string; name: string };
+  access_token: string;
+  refresh_token: string;
 }
 
-// interface LoginResponse {
-//   user: { id: string; name: string };
-//   access_token: string;
-//   refresh_token: string;
-// }
+interface LoginRequest {
+  email: string;
+  password: string;
+}
 
-// interface LoginRequest {
-//   email: string;
-//   password: string;
-// }
+interface ApiResponse<T> {
+  data: T;
+}
 
-// interface ApiResponse<T> {
-//   data: T;
-// }
+const axiosBaseQuery =
+  <T>(
+    service: any
+  ): BaseQueryFn<
+    {
+      url: string;
+      method: string;
+      data?: any;
+      params?: Record<any, any> | string;
+    },
+    T,
+    unknown
+  > =>
+  async ({ method, data, params }) => {
+    try {
+      const result: AxiosResponse<T> = await service[method](data, params);
+      return { data: result.data };
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      return {
+        error: {
+          status: axiosError.response?.status,
+          data: axiosError.response?.data || axiosError.message,
+        },
+      };
+    }
+  };
 
 export const userApi = createApi({
   reducerPath: "userApi",
-  baseQuery: axiosBaseQuery<UserResponse>(
-    userService as unknown as ServiceMethods<UserResponse>
-  ),
+  baseQuery: axiosBaseQuery<UserResponse>(userService),
   tagTypes: ["Users"],
   endpoints: (builder) => ({
-    getUsers: builder.query<UserResponse, Filter | void>({
-      query: (filter?: Filter) => {
+    getUsers: builder.query<UserResponse, any | void>({
+      query: (filter?: any) => {
         return {
           url: ``,
           method: "find",
@@ -49,8 +66,9 @@ export const userApi = createApi({
       },
       providesTags: ["Users"],
     }),
-    getUser: builder.query<User, GetArgs>({
+    getUser: builder.query<User, any>({
       query: ({ id, populate }) => {
+        console.log("getUser:", { id, populate });
         return {
           url: ``,
           method: "findById",
@@ -71,7 +89,7 @@ export const userApi = createApi({
       }),
       invalidatesTags: ["Users"],
     }),
-    updateUser: builder.mutation<User, { userId: string; user: User }>({
+    updateUser: builder.mutation<any, { userId: string; user: User }>({
       query: ({ userId, user }) => ({
         url: "",
         method: "update",

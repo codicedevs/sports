@@ -14,14 +14,14 @@ interface LoginRequest {
   password: string;
 }
 
-// interface ApiResponse<T> {
-//   data: T;
-// }
+interface ApiResponse<T> {
+  data: T;
+}
 
 const axiosBaseQuery =
   <T>(
     service: any
-  ): BaseQueryFn<{ url: string; method: string; data?: unknown }, T, unknown> =>
+  ): BaseQueryFn<{ url: string; method: string; data?: any }, T, unknown> =>
   async ({ method, data }) => {
     try {
       const result: AxiosResponse<T> = await service[method](data);
@@ -39,7 +39,7 @@ const axiosBaseQuery =
 
 export const authApi = createApi({
   reducerPath: "authApi",
-  baseQuery: axiosBaseQuery<LoginResponse>(authService),
+  baseQuery: axiosBaseQuery<ApiResponse<any>>(authService),
   endpoints: (builder) => ({
     login: builder.mutation<LoginResponse, LoginRequest>({
       query: (credentials) => ({

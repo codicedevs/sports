@@ -1,32 +1,53 @@
 // src/features/auth/authApi.ts
-import { createApi } from "@reduxjs/toolkit/query/react";
+import { BaseQueryFn, createApi } from "@reduxjs/toolkit/query/react";
+import { AxiosError, AxiosResponse } from "axios";
 import { locationService } from "../../../services/locations";
 import { Location } from "../../../types/locations.type";
-import { axiosBaseQuery } from "../../axiosBaseQuery";
-import { Filter, GetArgs, ServiceMethods } from "../../../types/store.type";
 
-// interface LocationFilter {
-//   _id: string;
-// }
-
-// interface ApiResponse<T> {
-//   data: T;
-// }
-
-interface LocationResponse {
-  results: Location[];
-  totalCount: number;
+interface LocationFilter {
+  _id: string;
 }
+
+interface ApiResponse<T> {
+  data: T;
+}
+
+const axiosBaseQuery =
+  <T>(
+    service: any
+  ): BaseQueryFn<
+    {
+      url: string;
+      method: string;
+      data?: any;
+      params?: Record<any, any> | string;
+    },
+    T,
+    unknown
+  > =>
+  async ({ method, data, params }) => {
+    try {
+      const result: AxiosResponse<T> = await service[method](data, params);
+
+      return { data: result.data };
+    } catch (error) {
+      const axiosError = error as AxiosError;
+      return {
+        error: {
+          status: axiosError.response?.status,
+          data: axiosError.response?.data || axiosError.message,
+        },
+      };
+    }
+  };
 
 export const locationApi = createApi({
   reducerPath: "locationApi",
-  baseQuery: axiosBaseQuery<LocationResponse>(
-    locationService as unknown as ServiceMethods<LocationResponse>
-  ),
+  baseQuery: axiosBaseQuery<any>(locationService),
   tagTypes: ["Locations"],
   endpoints: (builder) => ({
-    getLocations: builder.query<LocationResponse, Filter>({
-      query: (filter: Filter) => {
+    getLocations: builder.query<any, any>({
+      query: (filter: any) => {
         return {
           url: ``,
           method: "find",
@@ -35,8 +56,8 @@ export const locationApi = createApi({
       },
       providesTags: ["Locations"],
     }),
-    createLocations: builder.mutation<Location, Location>({
-      query: (data) => {
+    createLocations: builder.mutation<any, any>({
+      query: (data: any) => {
         return {
           url: ``,
           method: "create",
@@ -46,7 +67,7 @@ export const locationApi = createApi({
       invalidatesTags: ["Locations"],
     }),
     deleteLocations: builder.mutation<string, string>({
-      query: (locationId) => {
+      query: (locationId: any) => {
         return {
           url: ``,
           method: "remove",
@@ -57,7 +78,7 @@ export const locationApi = createApi({
         const patchResult = dispatch(
           locationApi.util.updateQueryData(
             "getLocations",
-            {} as GetArgs,
+            undefined,
             (draft) => {
               draft.results = draft.results.filter(
                 (location: Location) => location._id !== locationId
