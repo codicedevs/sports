@@ -47,13 +47,7 @@ export default function InviteModal({
   };
 
   async function handleSendInvitations() {
-    if (selectedPlayers.length === 0) { // sino lo hago asi me muestra el snack recien cdo vuelvo a la pantalla anterior
-      setOpen(false); 
-      setTimeout(() => {
-        showSnackBar("error", "Debes seleccionar jugadores para invitar");
-      }, 300); 
-      return;
-    }
+ 
     try {
       for (const players of selectedPlayers) {
         const petitionload = {
@@ -160,14 +154,15 @@ export default function InviteModal({
 
         {/* jug selecc.*/}
         <Div mt={60} p={customTheme.spacing.medium}>
-          {selectedPlayers.length > 0 &&
-          <Text
-            textAlign="center"
-            fontSize={customTheme.fontSize.medium}
-            fontFamily="NotoSans-ExtraBoldItalic"
-          >
-            Jugadores seleccionados:
-          </Text>}
+          {selectedPlayers.length > 0 && (
+            <Text
+              textAlign="center"
+              fontSize={customTheme.fontSize.medium}
+              fontFamily="NotoSans-ExtraBoldItalic"
+            >
+              Jugadores seleccionados:
+            </Text>
+          )}
           {selectedPlayers.map((player, index) => (
             <Div
               key={index}
@@ -215,22 +210,25 @@ export default function InviteModal({
         justifyContent="center"
       >
         {/* Botón “Elegir” */}
-        <Button
-          bg={customTheme.colors.secondaryBackground}
-          onPress={handleSendInvitations}
-          w="100%"
-          h={scale(45)}
-          rounded="md"
-        >
-          <Text
-            color="white"
-            textAlign="center"
-            fontSize={customTheme.fontSize.medium}
-            fontFamily="NotoSans-BoldItalic"
+
+        {selectedPlayers.length > 0 && (
+          <Button
+            bg={customTheme.colors.secondaryBackground}
+            onPress={handleSendInvitations}
+            w="100%"
+            h={scale(45)}
+            rounded="md"
           >
-            Enviar invitación
-          </Text>
-        </Button>
+            <Text
+              color="white"
+              textAlign="center"
+              fontSize={customTheme.fontSize.medium}
+              fontFamily="NotoSans-BoldItalic"
+            >
+              Enviar invitación
+            </Text>
+          </Button>
+        )}
       </Div>
     </Modal>
   );
