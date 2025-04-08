@@ -10,8 +10,8 @@ import { scale } from 'react-native-size-matters'
 
 const PlayerStatusList = ({ match }: { match: Match }) => {
 
-  const { data: statusList } = useFetch(() => matchService.getPlayerInvitations(match._id), [QUERY_KEYS.PLAYERS_STATUS])
-  if (!statusList) return
+  const { data: statusList } = useFetch(() => matchService.getPlayerInvitations(match._id), [QUERY_KEYS.PLAYERS_STATUS, match])
+   if (!statusList) return
   const acceptedPercentage = match.playersLimit
     ? (statusList.accepted.length / match.playersLimit) * 100
     : 0
