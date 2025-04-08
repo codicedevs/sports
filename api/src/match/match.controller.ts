@@ -10,6 +10,8 @@ import {
   UseGuards,
   BadRequestException,
   Query,
+  UseInterceptors,
+  UploadedFiles,
 } from "@nestjs/common";
 import { MatchService } from "./match.service";
 import { CreateMatchDto } from "./match.dto";
@@ -26,6 +28,10 @@ import { ZonesService } from "zones/zones.service";
 import { Zone } from "zones/zone.entity";
 import { PetitionService } from "petition/petition.service";
 import { PetitionModelType, PetitionStatus } from "petition/petition.enum";
+import { FilesInterceptor } from "@nestjs/platform-express";
+import { diskStorage } from "multer";
+import { extname, join } from "path";
+import { existsSync, mkdirSync } from "fs";
 
 @ApiBearerAuth()
 @ApiTags("matches")
@@ -49,6 +55,42 @@ export class MatchController {
     }
     const newMatch = await this.matchService.createMatch(createMatchDto);
     return newMatch;
+  }
+  @Public()
+  @Post(':matchId/upload-asset')
+  @UseInterceptors(
+    FilesInterceptor('files', 10, { // 'files' es el nombre del campo en form-data, y 10 es el máximo de archivos permitidos
+      storage: diskStorage({
+        destination: (req, file, callback) => {
+          // Extrae el matchId de los parámetros de la ruta
+          const matchId = req.params.matchId;
+          // Define la ruta donde se guardarán los archivos
+          const uploadPath = join(process.cwd(), 'public', matchId);
+          // Si la carpeta no existe, la crea de forma recursiva
+          if (!existsSync(uploadPath)) {
+            mkdirSync(uploadPath, { recursive: true });
+          }
+          callback(null, uploadPath);
+        },
+        filename: (req, file, callback) => {
+          // Genera un nombre único para el archivo
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const fileExtName = extname(file.originalname);
+          const filename = `${uniqueSuffix}${fileExtName}`;
+          callback(null, filename);
+        },
+      }),
+    }),
+  )
+  uploadMatchFiles(
+    @Param('matchId', new ValidateObjectIdPipe()) matchId: string,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    console.log(`Archivos recibidos para el match ${matchId}:`, files);
+    return {
+      matchId,
+      files,
+    };
   }
   @Public()
   @Get()
