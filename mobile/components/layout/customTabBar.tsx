@@ -11,13 +11,14 @@ import BellIcon from "@assets/tabIcons/Icons/Bell";
 import PlusIcon from "@assets/tabIcons/Icons/Plus";
 import FieldIcon from "@assets/tabIcons/Icons/Field";
 import ProfileIcon from "@assets/tabIcons/Icons/Profile";
+import PetitionScreen from "../../screens/petitionsScreen";
 
 const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
   const insets = useSafeAreaInsets();
 
   const iconMap: Record<string, JSX.Element> = {
     HomeStack: <HomeIcon width={scale(20)} height={scale(20)} />,
-    SettingsStack: <BellIcon width={scale(20)} height={scale(20)} />,
+    [AppScreens.PETITIONS_SCREEN]: <BellIcon width={scale(20)} height={scale(20)} />,
     [AppScreens.MATCH_HANDLER]: <PlusIcon width={scale(20)} height={scale(20)} />,
     [AppScreens.MATCH_SCREEN]: <FieldIcon width={scale(20)} height={scale(20)} />,
     SettingsStack3: <ProfileIcon width={scale(20)} height={scale(20)} />
