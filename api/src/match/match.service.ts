@@ -158,14 +158,14 @@ export class MatchService {
     if (match.users.some((u) => u.toString() === userId.toString())) {
       throw new BadRequestException("El usuario ya está agregado al match");
     }
-
+    const usersToSendPush = [...match.users]
     match.users.push(userId);
     this.activityService.create({
       matchId: matchId,
       description: `Se unió ${user.name} al partido`
     })
 
-    const tokens = await this.userService.getTokenUsersIdsList(match.users)
+    const tokens = await this.userService.getTokenUsersIdsList(usersToSendPush)
 
     await this.pushNotificationService.sendPushNotification(
       tokens,
