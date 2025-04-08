@@ -246,7 +246,10 @@ export class PetitionService {
       if (target.users.includes(petition.receiver._id)) {
         throw new BadRequestException(`El usuario ya se encuentra en el ${translate[modelType]}`)
       }
-      (target.users).push(petition.receiver._id);
+      // Actualización atómica: se agrega el emisor solo si no está presente
+      await handler.model
+        .findByIdAndUpdate(targetId, { $addToSet: { users: petition.receiver._id } })
+        .exec();
       if (modelType === PetitionModelType.match) {
         this.activityService.create({
           matchId: targetId,
@@ -277,8 +280,9 @@ export class PetitionService {
       if (target.users.includes(petition.emitter._id)) {
         throw new BadRequestException(`El usuario ya se encuentra en el ${translate[modelType]}`)
       }
-      // En caso contrario, agregar al emisor al partido
-      target.users.push(petition.emitter._id);
+      await handler.model
+        .findByIdAndUpdate(targetId, { $addToSet: { users: petition.emitter._id } })
+        .exec();
       if (modelType === PetitionModelType.match) {
         this.activityService.create({
           matchId: targetId,
@@ -306,8 +310,6 @@ export class PetitionService {
     }
     // Marcar la solicitud como aceptada
     petition.status = PetitionStatus.Accepted;
-
-    await target.save();
     await petition.save();
 
     // Enviar notificación al emisor (emitter) de que su petición ha sido aceptada
