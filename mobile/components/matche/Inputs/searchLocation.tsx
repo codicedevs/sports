@@ -50,7 +50,6 @@ export default function SearchLocationInput({
         loc.name.toLowerCase().includes(filter.toLowerCase())
       );
       setFilteredLocations(results);
-      
     }
   }, [filter, Locations]);
 
@@ -84,18 +83,19 @@ export default function SearchLocationInput({
               <Text fontFamily="NotoSans-BoldItalic">Sin coordenadas</Text>
             )}
             <Text fontFamily="NotoSans-BoldItalic">
-              {selectedLocation?.name ?? "A definir"}
+              {selectedLocation?.name ?? "A definir"}{" "}
+              {selectedLocation?.address ? `/ ${selectedLocation.address}` : ""}
             </Text>
           </Div>
 
-          {hasCoords && (
+          {/* {hasCoords && (
             <Div mt={customTheme.spacing.small}>
               <MapLocationDisplay
                 place={selectedLocation}
-                mapHeight={scale(250)}
+                mapHeight={scale(250)} MAPA DE UBICACION
               />
             </Div>
-          )}
+          )} */}
         </Div>
       </Div>
     );
@@ -187,6 +187,6 @@ export default function SearchLocationInput({
           )}
         </Div>
       </Div>
-    );
-  }
+    );
+  }
 }

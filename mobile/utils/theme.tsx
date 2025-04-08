@@ -15,6 +15,7 @@ export type CustomThemeType = ThemeType & {
     lightGray:string;
     grayBackground: string;
     secondaryBackground: string;
+    enabledPlayers: string;
    
   };
   fontFamily: {
@@ -58,7 +59,7 @@ declare module "styled-components/native" {
 
 export const customTheme: CustomThemeType = {
   colors: {
-    primary: "#D9FA53",
+    primary: "#f1e30a",
     secondary: "#1c1c1c",
     accent: "#e91e63",
     background: "#FEFFFA",
@@ -66,7 +67,8 @@ export const customTheme: CustomThemeType = {
     text: "#333333",
     gray: "#797977",
     grayBackground: "#f2f2f0",
-    lightGray: "#D9D9D9"
+    lightGray: "#D9D9D9",
+    enabledPlayers: "#D9FA53"
   
   },
   fontFamily: {

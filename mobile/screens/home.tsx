@@ -23,38 +23,60 @@ import UpcomingMatchesCardSK from "../components/cards/upcomingMatchesCardSK";
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
-  const { currentUser } = useSession()
-  const { data: matches, refetch, isFetching: isFetchingMatches } = useFetch(() => matchService.getAll({
-    where: {
-      "user._id": currentUser._id
-    }
-  }), [QUERY_KEYS.MATCHES, currentUser]);
+  const { currentUser } = useSession();
+  const {
+    data: matches,
+    refetch,
+    isFetching: isFetchingMatches,
+  } = useFetch(
+    () =>
+      matchService.getAll({
+        where: {
+          "user._id": currentUser._id,
+        },
+      }),
+    [QUERY_KEYS.MATCHES, currentUser]
+  );
   const now = new Date().toISOString();
-  const { data: publicMatches, refetch: refetchPublic, isFetching: isFetchingPublic } = useFetch(() => matchService.getAll({
-    where: {
-      "open": true,
-      "date": { $gte: now }
-    }
-  }), [QUERY_KEYS.PUBLIC_MATCHES]);
+  const {
+    data: publicMatches,
+    refetch: refetchPublic,
+    isFetching: isFetchingPublic,
+  } = useFetch(
+    () =>
+      matchService.getAll({
+        where: {
+          open: true,
+          date: { $gte: now },
+        },
+      }),
+    [QUERY_KEYS.PUBLIC_MATCHES]
+  );
 
-  const { data: petitions, refetch: refetchPetition } = useFetch<{ results: Petition[] }>(() => petitionService.getAll(
+  const { data: petitions, refetch: refetchPetition } = useFetch<{
+    results: Petition[];
+  }>(
+    () =>
+      petitionService.getAll({
+        populate: ["reference.id"],
+        where: {
+          status: ["pending"],
+          receiver: [currentUser._id],
+        },
+      }),
+    [QUERY_KEYS.PETITIONS, currentUser]
+  );
+  const { data: events } = useFetch(eventService.getAll, [QUERY_KEYS.EVENTS]);
 
-    {
-      populate: ["reference.id"],
-      where: {
-        status: ['pending'],
-        receiver: [currentUser._id]
-      }
-    }
-
-  ), [QUERY_KEYS.PETITIONS, currentUser]);
-  const { data: events } = useFetch(eventService.getAll, [QUERY_KEYS.EVENTS]); // pa hacer la llamada
+  const handleActionCompleted = () => {
+    refetchPetition();
+  };
 
   useFocusEffect(
     useCallback(() => {
       refetch();
       refetchPetition();
-      refetchPublic()
+      refetchPublic();
     }, [])
   );
 
@@ -68,13 +90,16 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
       <ScrollView>
         <Div p={customTheme.spacing.medium}>
           <Div mb={customTheme.spacing.medium}>
-            {
-              (currentUser && petitions) &&
-              (
-                petitions.totalCount !== 0 &&
-                <MatchInvitation date={petitions.results[0]?.reference?.id.date} time="10" title="Stalagol" matchType={petitions.results[0]?.reference.type} petition={petitions.results[0]} />
-              )
-            }
+            {currentUser && petitions && petitions.totalCount !== 0 && (
+              <MatchInvitation
+                date={petitions.results[0]?.reference?.id.date}
+                time="10"
+                title="Stalagol"
+                matchType={petitions.results[0]?.reference.type}
+                petition={petitions.results[0]}
+                onActionCompleted={handleActionCompleted}
+              />
+            )}
           </Div>
           <Div mb={customTheme.spacing.medium}>
             <EventsCard // hardcodeado cambiar, arreglar lo coso de event!!!!!!!!

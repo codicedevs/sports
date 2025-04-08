@@ -2,7 +2,6 @@
 import { BaseQueryFn, createApi } from "@reduxjs/toolkit/query/react";
 import { AxiosError, AxiosResponse } from "axios";
 import { locationService } from "../../../services/locations";
-import { isCompositeComponent } from "react-dom/test-utils";
 import { Location } from "../../../types/locations.type";
 
 interface LocationFilter {

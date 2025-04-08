@@ -9,6 +9,7 @@ import petitionService from "../../service/petition.service";
 import useFetch from "../../hooks/useGet";
 import { QUERY_KEYS } from "../../types/query.types";
 import { useSession } from "../../context/authProvider";
+import { useGlobalUI } from "../../context/globalUiContext";
 
 interface InviteModalProps {
   open: boolean;
@@ -21,6 +22,7 @@ export default function InviteModal({
   setOpen,
   matchId,
 }: InviteModalProps) {
+  const { showSnackBar } = useGlobalUI();
   const [query, setQuery] = useState("");
   const [selectedPlayers, setSelectedPlayers] = useState<User[]>([]);
   const { currentUser } = useSession();
@@ -45,6 +47,7 @@ export default function InviteModal({
   };
 
   async function handleSendInvitations() {
+ 
     try {
       for (const players of selectedPlayers) {
         const petitionload = {
@@ -58,6 +61,7 @@ export default function InviteModal({
         await petitionService.create(petitionload);
       }
       console.log("Invitaciones enviadas");
+      showSnackBar("success", "Invitaación enviada!");
 
       setSelectedPlayers([]);
       setOpen(false);
@@ -73,16 +77,21 @@ export default function InviteModal({
         p={customTheme.spacing.small}
         justifyContent="center"
         alignItems="center"
-      > <Div p={customTheme.spacing.small}
-       w="93%">
-          <Text fontSize={customTheme.fontSize.title} fontFamily="NotoSans-ExtraBoldItalic">Elegir jugador</Text>
+      >
+        {" "}
+        <Div p={customTheme.spacing.small} w="93%">
+          <Text
+            fontSize={customTheme.fontSize.title}
+            fontFamily="NotoSans-ExtraBoldItalic"
+          >
+            Elegir jugador
+          </Text>
         </Div>
         <Button bg="white" onPress={() => setOpen(false)}>
           <Text color="black" fontSize={customTheme.fontSize.title}>
             X
           </Text>
         </Button>
-       
       </Div>
 
       {/* autocomplete */}
@@ -145,9 +154,15 @@ export default function InviteModal({
 
         {/* jug selecc.*/}
         <Div mt={60} p={customTheme.spacing.medium}>
-          <Text textAlign="center" fontSize={customTheme.fontSize.medium} fontFamily="NotoSans-ExtraBoldItalic">
-            Jugadores seleccionados:
-          </Text>
+          {selectedPlayers.length > 0 && (
+            <Text
+              textAlign="center"
+              fontSize={customTheme.fontSize.medium}
+              fontFamily="NotoSans-ExtraBoldItalic"
+            >
+              Jugadores seleccionados:
+            </Text>
+          )}
           {selectedPlayers.map((player, index) => (
             <Div
               key={index}
@@ -195,22 +210,25 @@ export default function InviteModal({
         justifyContent="center"
       >
         {/* Botón “Elegir” */}
-        <Button
-          bg={customTheme.colors.secondaryBackground} 
-          onPress={handleSendInvitations}
-          w="100%"
-          h={scale(45)}
-          rounded="md"
-        >
-          <Text
-            color="white"
-            textAlign="center"
-            fontSize={customTheme.fontSize.medium}
-            fontFamily="NotoSans-BoldItalic"
+
+        {selectedPlayers.length > 0 && (
+          <Button
+            bg={customTheme.colors.secondaryBackground}
+            onPress={handleSendInvitations}
+            w="100%"
+            h={scale(45)}
+            rounded="md"
           >
-            Elegir
-          </Text>
-        </Button>
+            <Text
+              color="white"
+              textAlign="center"
+              fontSize={customTheme.fontSize.medium}
+              fontFamily="NotoSans-BoldItalic"
+            >
+              Enviar invitación
+            </Text>
+          </Button>
+        )}
       </Div>
     </Modal>
   );

@@ -1,4 +1,4 @@
-import { Location } from "../types/interfaces";
+import { Location } from "../types/locations.type";
 import { CrudService } from "./crud";
 
 class LocationService extends CrudService<Location> {

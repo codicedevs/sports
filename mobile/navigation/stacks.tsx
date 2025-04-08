@@ -83,7 +83,7 @@ export function TabStackScreen() {
       animation: "fade"
     }}>
       <Tab.Screen name="HomeStack" component={HomeStackScreen} />
-      <Tab.Screen name="SettingsStack" component={SettingsStackScreen} />
+      <Tab.Screen name={AppScreens.PETITIONS_SCREEN} component={PetitionScreen} />
       <Tab.Screen name={AppScreens.MATCH_HANDLER} component={MatchHandlerScreen} />
       <Tab.Screen name={AppScreens.MATCH_SCREEN} component={MatchesScreen} />
       <Tab.Screen name="SettingsStack3" component={SettingsStackScreen} />
