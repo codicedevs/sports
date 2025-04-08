@@ -5,7 +5,7 @@ import Match from "../../../types/match.type";
 import matchService from "../../../service/match.service";
 import { Div, Text } from "react-native-magnus";
 import { ScrollView, TouchableOpacity } from "react-native";
-import { scale, verticalScale } from "react-native-size-matters";
+import { verticalScale } from "react-native-size-matters";
 import { customTheme } from "../../../utils/theme";
 import { Accordion } from "../../collapsibleView";
 import SportInput from "../Inputs/sport";
@@ -34,23 +34,21 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
       fetchMatch();
     }
   }, [match]);
-
+  
   async function fetchMatch() {
-    try {
-      const res = await matchService.getById(match._id);
-      // Ajusta según la forma real de la respuesta
-      matchDetailsRef.current.selectedSport = res.data.sportMode?.sport || null;
-      matchDetailsRef.current.selectedSportMode = res.data.sportMode || null;
-      matchDetailsRef.current.playerLimit = res.data.playersLimit || 0;
-      matchDetailsRef.current.privacyOption = res.data.open || false;
-      matchDetailsRef.current.matchDate = res.data.date;
-      matchDetailsRef.current.location = res.data.location || null;
+    try {  
+      matchDetailsRef.current.selectedSport = match.sport || null;
+      matchDetailsRef.current.selectedSportMode = match.sportMode || null;
+      matchDetailsRef.current.playerLimit = match.playersLimit || 0;
+      matchDetailsRef.current.privacyOption = match.open || false;
+      matchDetailsRef.current.matchDate = match.date ? match.date.toISOString() : undefined;
+      matchDetailsRef.current.location = match.location || null;
     } catch (e) {
       console.error("Error al fetchMatch:", e);
       console.log(e);
     }
   }
-  console.log(currentUser)
+
   async function createMatch() {
     try {
       const res = await matchService.create({
@@ -68,7 +66,9 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
       //     onMatchCreated(createdMatchId);
       // }
       // closeModal();
-      onGoBack()
+      if (onGoBack) {
+        onGoBack();
+      }
       showSnackBar("success", "Partido creado con exito")
     } catch (e) {
       console.error("Error al crear el partido:", e);
@@ -91,24 +91,24 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
       // refetch();scale
       // closeModal();
       console.log("Partido editado:", res);
-      onRefetch()
+      if(onRefetch){
+        onRefetch()
+      }
       showSnackBar("success", "Partido editado con exito")
     } catch (e) {
-      scale
       console.error("Error al editar el partido:", e);
       showSnackBar("error", "Ocurrio un error")
     }
   };
-  scale
+
   const handleAction = () => {
     if (!match) {
       createMatch();
     } else {
-      scale
       editMatch();
     }
   };
-  scale
+
   return (
     <Div flex={1}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -124,9 +124,11 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
             setOpenId={setOpenId}
             title="Deporte"
             rightText={
-              matchDetailsRef.current.selectedSportMode
-                ? matchDetailsRef.current.selectedSportMode.name
-                : "A definir"
+              match?.sportMode?.name
+                ? match.sportMode.name
+                : matchDetailsRef.current.selectedSportMode?.name
+                  ? matchDetailsRef.current.selectedSportMode.name
+                  : "A definir"
             }
             size={342}
           >
@@ -137,10 +139,13 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
             openId={openId}
             setOpenId={setOpenId}
             title="Cupo"
-            rightText={matchDetailsRef.current.playerLimit
-              ? matchDetailsRef.current.playerLimit.toString()
-            : "Agrega participantes"
-          }
+            rightText={
+              match?.playersLimit
+                ? match.playersLimit.toString()
+                : matchDetailsRef.current.playerLimit
+                  ? matchDetailsRef.current.playerLimit.toString()
+                  : "Agrega participantes"
+            }
             size={123}
           >
             <PlayersCounterInput matchDetailsRef={matchDetailsRef} />
@@ -151,7 +156,13 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
             setOpenId={setOpenId}
             title="Privacidad"
             rightText={
-              matchDetailsRef.current.privacyOption ? "Publico" : "Privado"
+              match
+                ? match.open
+                  ? "Publico"
+                  : "Privado"
+                : matchDetailsRef.current.privacyOption
+                  ? "Publico"
+                  : "Privado"
             }
             size={134}
           >
@@ -174,9 +185,11 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
             setOpenId={setOpenId}
             title="Horario"
             rightText={
-              matchDetailsRef.current.matchDate
-                ? formatDate(matchDetailsRef.current.matchDate)
-                : "A definir"
+              match && match.date
+                ? formatDate(match.date)
+                : matchDetailsRef.current.matchDate
+                  ? formatDate(matchDetailsRef.current.matchDate)
+                  : "A definir"
             }
             size={802}
           >
@@ -188,9 +201,11 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
             setOpenId={setOpenId}
             title="¿Donde juegan?"
             rightText={
-              matchDetailsRef.current.location
-                ? matchDetailsRef.current.location.name
-                : "A definir"
+              match && match.location
+                ? match.location.name
+                : matchDetailsRef.current.location
+                  ? matchDetailsRef.current.location.name
+                  : "A definir"
             }
             size={300}
           >
