@@ -27,6 +27,7 @@ export default function SearchLocationInput({
   const [selectedLocation, setSelectedLocation] = useState<Place | null>(
     matchDetailsRef?.current.location ?? null
   );
+  const [showMap,setShowMap] = useState(false)
 
   const [userHasSelected, setUserHasSelected] = useState(false);
 
@@ -58,6 +59,7 @@ export default function SearchLocationInput({
   function handleSelectLocation(loc: Place) {
     setSelectedLocation(loc);
     setUserHasSelected(true);
+    setShowMap(true)
     if (matchDetailsRef) {
       matchDetailsRef.current.location = loc;
     }
@@ -176,13 +178,61 @@ export default function SearchLocationInput({
               {selectedLocation?.name ?? "A definir"}
             </Text>
           </Div>
-
-          {hasCoords && (
+  
+          {(hasCoords && showMap) ? (
             <Div mt={customTheme.spacing.small}>
-              <MapLocationDisplay
-                place={selectedLocation}
-                mapHeight={scale(270)}
-              />
+              <TouchableOpacity onPress={() => setShowMap(false)}>
+                <MapLocationDisplay
+                  place={selectedLocation}
+                  mapHeight={scale(270)}
+                />
+              </TouchableOpacity>
+            </Div>
+          ) : (
+            <Div mt={customTheme.spacing.small}>
+              <Text mt="md">¿Querés cambiar la ubicación?</Text>
+              <ScrollView
+                nestedScrollEnabled
+                contentContainerStyle={{
+                  paddingVertical: customTheme.spacing.medium,
+                  flexGrow: 1,
+                }}
+                showsVerticalScrollIndicator={false}
+              >
+                {Locations.results.map((loc: Place, index: number) => (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => handleSelectLocation(loc)}
+                  >
+                    <Div
+                      h={verticalScale(48)}
+                      mb={
+                        index !== Locations.results.length - 1
+                          ? customTheme.spacing.small
+                          : 0
+                      }
+                      bg={
+                        selectedLocation?._id === loc._id
+                          ? customTheme.colors.secondaryBackground
+                          : "white"
+                      }
+                      justifyContent="center"
+                      borderWidth={1}
+                    >
+                      <Text
+                        textAlign="center"
+                        color={
+                          selectedLocation?._id === loc._id
+                            ? "white"
+                            : customTheme.colors.secondaryBackground
+                        }
+                      >
+                        {loc.name}
+                      </Text>
+                    </Div>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
             </Div>
           )}
         </Div>
