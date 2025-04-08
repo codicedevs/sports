@@ -79,9 +79,7 @@ export default function SearchLocationInput({
         >
           <Div flexDir="row" alignItems="center" justifyContent="space-between">
             <Text fontFamily="NotoSans-Variable">Lugar</Text>
-            {!hasCoords && (
-              <Text fontFamily="NotoSans-BoldItalic">Sin coordenadas</Text>
-            )}
+           
             <Text fontFamily="NotoSans-BoldItalic">
               {selectedLocation?.name ?? "A definir"}{" "}
               {selectedLocation?.address ? `/ ${selectedLocation.address}` : ""}
