@@ -29,7 +29,7 @@ export class Formations {
 }
 export const FormationsSchema = SchemaFactory.createForClass(Formations);
 
-@Schema()
+@Schema({timestamps: true})
 export class Match extends Document {
   @Prop()
   name?: string;

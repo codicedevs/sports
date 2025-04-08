@@ -4,6 +4,7 @@ import { Div, Text } from "react-native-magnus";
 import { customTheme } from "../../../utils/theme";
 import { ScrollView, TouchableOpacity, View } from "react-native";
 import { scale, verticalScale } from "react-native-size-matters";
+import { formatDate } from "../../../utils/date";
 
 LocaleConfig.locales["es"] = {
   monthNames: [
@@ -153,7 +154,7 @@ export default function MatchSchedulerInput({
         <Div borderWidth={1} rounded="md" p={customTheme.spacing.small}>
           <Div h={scale(25)} flexDir="row" justifyContent="space-between" alignItems="center">
             <Text fontFamily="NotoSans-Variable">Horario</Text>
-            <Text fontFamily="NotoSans-BoldItalic">A definir</Text>
+            <Text fontFamily="NotoSans-BoldItalic">{date? formatDate((date).toString()) :"A definir"}</Text>
           </Div>
         </Div>
       </Div>

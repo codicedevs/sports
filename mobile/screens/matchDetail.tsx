@@ -196,7 +196,7 @@ const MatchDetail: React.FC<Props> = ({ navigation, route }) => {
                   padding: customTheme.spacing.small,
                 }}
               >
-                <Text>Equipos</Text>
+                <Text>Armar equipos</Text>
               </TouchableOpacity>
             </>
           )}
@@ -406,13 +406,6 @@ const MatchDetail: React.FC<Props> = ({ navigation, route }) => {
         {activeTab === "equipos" && (
           <Div h={"90%"}>
             <Field match={match.data} isAdmin={isAdmin} />
-          </Div>
-        )}
-        {/* Botones Eliminar / Guardar */}
-
-        {activeTab === "equipos" && (
-          <Div>
-            <Text>pendiente</Text>
           </Div>
         )}
 
