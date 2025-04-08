@@ -20,3 +20,10 @@ export const StyledSearchHeader = styled.div`
   margin-bottom: 20px;
   gap: 10px;
 `;
+
+export const StyledSearchContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+`;

@@ -1,24 +1,24 @@
-import { Button, Input, Segmented, Select, Space, Table } from "antd";
+import { Button, Input, Space, Table } from "antd";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  useDeleteUserMutation,
-  useGetUsersQuery,
-} from "../../store/features/users";
 import { ColumnType } from "antd/es/table";
 import Delete from "../../components/actions/delete";
-import { User } from "../../types/users.types";
 import { NavigateFunction } from "react-router-dom";
 import {
   StyledSearchContainer,
   StyledSearchHeader,
 } from "../../styled/globalStyled";
+import {
+  useDeleteSportMutation,
+  useGetSportsQuery,
+} from "../../store/features/sports";
+import { Sport } from "../../types/sport.type";
 const { Search } = Input;
 
 const getColumns = (
   handleDeleteUser: (id: string) => void,
   navigate: NavigateFunction
-): ColumnType<User>[] => {
+): ColumnType<Sport>[] => {
   return [
     {
       title: "Nombre",
@@ -26,35 +26,11 @@ const getColumns = (
       key: "name",
     },
     {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-    },
-    {
-      title: "Telefono",
-      dataIndex: "phone",
-      key: "phone",
-    },
-    {
-      title: "Rol",
-      dataIndex: "roles",
-      key: "roles",
-      render: (roles: string[]) => {
-        return roles.map((r) => (r === "user" ? "Jugador" : "Usuario"));
-      },
-    },
-    {
-      title: "Calificacion",
-      dataIndex: "calificacion",
-      key: "calificacion",
-      render: () => "5 estrellas",
-    },
-    {
       title: "Acción",
       key: "action",
       width: "25%",
       align: "right" as const,
-      render: (record: User) => (
+      render: (record: Sport) => (
         <Space
           size="middle"
           style={{
@@ -63,15 +39,7 @@ const getColumns = (
             justifyContent: "right",
           }}
         >
-          {record.phone ? (
-            <a href={`https://wa.me/${record.phone}`} target="_blank">
-              Enviar mensaje
-            </a>
-          ) : (
-            <p>No hay telefono</p>
-          )}
-
-          <Button onClick={() => navigate(`../usuarios/${record._id}`)}>
+          <Button onClick={() => navigate(`../deportes/${record._id}`)}>
             Editar
           </Button>
 
@@ -83,13 +51,13 @@ const getColumns = (
 };
 
 const likeInputs = ["name", "location", "user"];
-const UsersList = () => {
+const SportList = () => {
   const navigate = useNavigate();
-  const [deleteUser] = useDeleteUserMutation();
+  const [deleteSport] = useDeleteSportMutation();
   const [filter, setFilter] = useState<{}>();
-  const { data } = useGetUsersQuery(filter);
-  const handleDeleteUser = (id: string) => {
-    deleteUser(id);
+  const { data } = useGetSportsQuery(filter);
+  const handleDeleteSport = (id: string) => {
+    deleteSport(id).unwrap();
   };
 
   const handleSearch = (filterName: string, value: string | boolean) => {
@@ -106,11 +74,11 @@ const UsersList = () => {
     }
   };
 
-  const columns = getColumns(handleDeleteUser, navigate);
+  const columns = getColumns(handleDeleteSport, navigate);
 
   return (
     <div>
-      <h2>Usuarios</h2>
+      <h2>Deportes</h2>
 
       <StyledSearchHeader id="searchHeader">
         <StyledSearchContainer>
@@ -124,7 +92,7 @@ const UsersList = () => {
           <Button
             type="primary"
             onClick={() => {
-              navigate("/usuarios/nuevo");
+              navigate("/deportes/nuevo");
             }}
           >
             Nuevo
@@ -136,4 +104,4 @@ const UsersList = () => {
   );
 };
 
-export default UsersList;
+export default SportList;
