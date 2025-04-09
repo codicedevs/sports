@@ -37,25 +37,22 @@ export default function InviteModal({
   const { data: playersData } = useFetch(userService.getAll, [
     QUERY_KEYS.USERS,
   ]);
-  if (!playersData) return null;
-  console.log("PLAYERDATA", playersData);
+  if (!playersData) return null; console.log("PLAYERDATA",playersData)
 
-  const playersWithPetitions = playersData.results.map(
-    (pwp: any) => pwp.receiver
-  );
+  // const playersWithPetitions = playersData.map((pwp: any)=>pwp.receiver);
 
-  const filteredPlayers = playersData.results.filter(
-    (p: User) =>
-      p.name.toLowerCase().includes(query.toLowerCase()) &&
-      !selectedPlayers.some((sp: User) => sp._id === p._id) &&
-      p._id !== currentUser._id &&
-      playersWithPetitions.includes(p._id)
+  const filteredPlayers = playersData.results.filter((p: User) =>
+    p.name.toLowerCase().includes(query.toLowerCase()) &&
+    !selectedPlayers.some((sp: User) => sp._id === p._id) &&
+    p._id !== currentUser._id 
+    // &&  playersWithPetitions.includes(p._id)
   );
   const handleRemovePlayer = (id: string) => {
     setSelectedPlayers((prev) => prev.filter((p) => p._id !== id));
   };
 
   async function handleSendInvitations() {
+ 
     try {
       for (const players of selectedPlayers) {
         const petitionload = {
