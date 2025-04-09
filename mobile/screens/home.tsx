@@ -194,7 +194,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
             {currentUser && petitions && petitions.totalCount !== 0 && (
               <MatchInvitation
                 date={petitions.results[0]?.reference?.id.date}
-                time={petitions.results[0]?.reference.id.hour.toString()}
+                time={petitions.results[0]?.reference.id.hour?.toString()  }
                 title={petitions.results[0]?.reference.id.name}
                 matchType={petitions.results[0]?.reference.type}
                 petition={petitions.results[0]}
