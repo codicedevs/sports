@@ -4,7 +4,7 @@ import { MatchDetails } from "../../../types/form.type";
 import Match from "../../../types/match.type";
 import matchService from "../../../service/match.service";
 import { Div, Text } from "react-native-magnus";
-import { ScrollView, TouchableOpacity } from "react-native";
+import { ActivityIndicator, ScrollView, TouchableOpacity } from "react-native";
 import { verticalScale } from "react-native-size-matters";
 import { customTheme } from "../../../utils/theme";
 import { Accordion } from "../../collapsibleView";
@@ -20,6 +20,7 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
   const [openId, setOpenId] = useState<null | string>(null);
   const { showSnackBar } = useGlobalUI();
   const { currentUser } = useSession()
+  const [loading, setLoading] = useState(false)
   const matchDetailsRef = useRef<MatchDetails>({
     selectedSport: null,
     selectedSportMode: null,
@@ -50,6 +51,7 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
   }
 
   async function createMatch() {
+    setLoading(true)
     try {
       const res = await matchService.create({
         name: "Prueba3",
@@ -69,15 +71,19 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
       if (onGoBack) {
         onGoBack();
       }
+      setLoading(false)
       showSnackBar("success", "Partido creado con exito")
     } catch (e) {
       console.error("Error al crear el partido:", e);
       showSnackBar("error", "Ocurrio un error")
+    } finally {
+      setLoading(false)
     }
   }
 
   const editMatch = async () => {
     if (!match) return
+    setLoading(true)
     try {
       const res = await matchService.update(match._id, {
         name: "Prueba3",
@@ -94,10 +100,13 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
       if(onRefetch){
         onRefetch()
       }
+      setLoading(false)
       showSnackBar("success", "Partido editado con exito")
     } catch (e) {
       console.error("Error al editar el partido:", e);
       showSnackBar("error", "Ocurrio un error")
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -221,7 +230,7 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
         borderTopColor="rgb(223, 223, 220)"
         borderTopWidth={1}
       >
-        <TouchableOpacity onPress={handleAction}>
+        <TouchableOpacity onPress={handleAction} disabled={loading}>
           <Div
             h={verticalScale(45)}
             justifyContent="center"
@@ -229,21 +238,19 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
             bg={customTheme.colors.secondaryBackground}
             flexDir="row"
           >
-            {/* <Image
-              source={require("../../../assets/+.png")}
-              resizeMode="contain"
-              w={scale(15)}
-              h={scale(15)}
-              mr={customTheme.spacing.small}
-            /> */}
-            <Text
+            {
+              loading?
+              <ActivityIndicator size={"large"} />
+              :
+              <Text
               textAlign="center"
               color={customTheme.colors.background}
               fontSize={customTheme.fontSize.medium}
               fontFamily="NotoSans-BoldItalic"
-            >
+              >
               {!match ? "Crear" : "Guardar cambios"}
             </Text>
+            }
           </Div>
         </TouchableOpacity>
       </Div>
