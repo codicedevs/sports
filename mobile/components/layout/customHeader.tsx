@@ -14,18 +14,20 @@ export const CustomHeader = () => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  const currentRouteName = useNavigationState((state) => {
-    const activeRoute = state.routes[state.index];
+const currentRouteName = useNavigationState((state) => {
+  const route = state.routes[state.index];
 
-    if (activeRoute.state && typeof activeRoute.state.index === "number") {
-      const nestedActiveRoute =
-        activeRoute.state.routes[activeRoute.state.index];
-      console.log(nestedActiveRoute.name, "Pantalla dentro del Stack");
-      return nestedActiveRoute.name;
-    }
+  if (route.name === "HomeStack" && !route.state) {
+    return AppScreens.HOME_SCREEN;
+  }
 
-    return activeRoute.name;
-  });
+  let nestedRoute = route;
+  while (nestedRoute.state && nestedRoute.state.index != null) {
+    nestedRoute = nestedRoute.state.routes[nestedRoute.state.index];
+  }
+
+  return nestedRoute.name;
+});
 
   const isHomeScreen = currentRouteName === AppScreens.HOME_SCREEN;
   const handleBackPress = () => {
