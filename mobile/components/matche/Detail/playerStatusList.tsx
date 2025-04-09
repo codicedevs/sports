@@ -1,5 +1,5 @@
 import React from 'react'
-import { Image, ScrollView, View } from 'react-native'
+import { ActivityIndicator, Image, ScrollView, View } from 'react-native'
 import useFetch from '../../../hooks/useGet'
 import matchService from '../../../service/match.service'
 import { QUERY_KEYS } from '../../../types/query.types'
@@ -11,7 +11,11 @@ import { scale } from 'react-native-size-matters'
 const PlayerStatusList = ({ match }: { match: Match }) => {
 
   const { data: statusList } = useFetch(() => matchService.getPlayerInvitations(match._id), [QUERY_KEYS.PLAYERS_STATUS, match])
-   if (!statusList) return
+  if (!statusList) return (
+    <Div alignItems='center' justifyContent='center' h={"100%"}>
+      <ActivityIndicator size={'large'} color={'black'} />
+    </Div>
+  )
   const acceptedPercentage = match.playersLimit
     ? (statusList.accepted.length / match.playersLimit) * 100
     : 0
