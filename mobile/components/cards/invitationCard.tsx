@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState } from "react";
 import { Div, Text, Button } from "react-native-magnus";
 import { scale } from "react-native-size-matters";
-import { Image } from "react-native";
+import { ActivityIndicator, Image } from "react-native";
 import { customTheme } from "../../utils/theme";
 import petitionService from "../../service/petition.service";
 import Petition from "../../types/petition.type";
+import { formatDate } from "../../utils/date";
 
 interface MatchInvitationProps {
   title: string;
@@ -23,24 +24,32 @@ const MatchInvitation: React.FC<MatchInvitationProps> = ({
   petition,
   onActionCompleted,
 }) => {
+  const [isLoading, setIsLoading] = useState(false)
+
   const aceptar = async () => {
+    setIsLoading(true)
     try {
       await petitionService.acceptPetition(petition._id);
       onActionCompleted(); 
     } catch (e) {
       console.log(e);
+    } finally {
+    setIsLoading(false)
     }
   };
 
   const declinar = async () => {
+    setIsLoading(true)
     try {
       await petitionService.declinePetition(petition._id);
       onActionCompleted(); 
     } catch (e) {
       console.log(e);
+    } finally {
+      setIsLoading(false)
     }
   };
-
+  
   return (
     <Div
       bg="black"
@@ -82,10 +91,15 @@ const MatchInvitation: React.FC<MatchInvitationProps> = ({
           ml={customTheme.spacing.small}
           fontSize={customTheme.fontSize.medium}
         >
-          {date}
+          {
+          date?
+          formatDate(date)
+          :
+          "A definir"
+          }
         </Text>
 
-        <Div>
+        {/* <Div>
           <Text
             color="white"
             fontSize={customTheme.fontSize.medium}
@@ -93,7 +107,7 @@ const MatchInvitation: React.FC<MatchInvitationProps> = ({
           >
             {time}
           </Text>
-        </Div>
+        </Div> */}
       </Div>
 
       <Div flexDir="row" mt={customTheme.fontSize.medium} style={{ gap: 20 }}>
@@ -103,22 +117,33 @@ const MatchInvitation: React.FC<MatchInvitationProps> = ({
           borderColor="white"
           borderWidth={1}
           onPress={declinar}
+          disabled={isLoading}
         >
-          <Text
+          {
+            isLoading?
+            <ActivityIndicator size={"small"} color={'white'} />
+            :
+            <Text
             color="white"
             fontFamily="NotoSans-BoldItalic"
             fontSize={customTheme.fontSize.medium}
-          >
+            >
             Rechazar
           </Text>
+          }
         </Button>
-        <Button flex={1} bg={customTheme.colors.primary} onPress={aceptar}>
+        <Button flex={1} bg={customTheme.colors.primary} onPress={aceptar} disabled={isLoading}>
+          {
+            isLoading?
+          <ActivityIndicator size={"small"} color={"black"} />
+          :
           <Text
             fontFamily="NotoSans-BoldItalic"
             fontSize={customTheme.fontSize.medium}
           >
             Aceptar
           </Text>
+          }
         </Button>
       </Div>
     </Div>
