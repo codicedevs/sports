@@ -290,20 +290,27 @@ const MatchDetail: React.FC<Props> = ({ navigation, route }) => {
                         </Text>
                       </Button>
                       <Div>
-                        <Button bg="black" block onPress={handleShare}>
+                        <Button
+                          bg="white"
+                          block
+                          borderColor="black"
+                          borderWidth={1}
+                          onPress={handleShare}
+                        >
                           <Image
                             source={require("../assets/iconShare.png")}
                             style={{
                               width: 18,
                               height: 18,
                               resizeMode: "contain",
+                              tintColor: "black",
                             }}
                           />
                           <Text
                             fontSize={customTheme.fontSize.medium}
                             fontFamily="NotoSans-BoldItalic"
                             ml={customTheme.spacing.small}
-                            color="white"
+                            color="black"
                           >
                             Compartir
                           </Text>
