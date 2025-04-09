@@ -10,6 +10,7 @@ import useFetch from "../../hooks/useGet";
 import { QUERY_KEYS } from "../../types/query.types";
 import { useSession } from "../../context/authProvider";
 import { useGlobalUI } from "../../context/globalUiContext";
+import Petition from "../../types/petition.type";
 
 interface InviteModalProps {
   open: boolean;
@@ -36,12 +37,15 @@ export default function InviteModal({
   const { data: playersData } = useFetch(userService.getAll, [
     QUERY_KEYS.USERS,
   ]);
-  if (!playersData) return null;
+  if (!playersData) return null; console.log("PLAYERDATA",playersData)
+
+  const playersWithPetitions = playersData.results.map((pwp: any)=>pwp.receiver);
 
   const filteredPlayers = playersData.results.filter((p: User) =>
     p.name.toLowerCase().includes(query.toLowerCase()) &&
     !selectedPlayers.some((sp: User) => sp._id === p._id) &&
     p._id !== currentUser._id 
+    &&  playersWithPetitions.includes(p._id)
   );
   const handleRemovePlayer = (id: string) => {
     setSelectedPlayers((prev) => prev.filter((p) => p._id !== id));
