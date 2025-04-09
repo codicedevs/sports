@@ -47,7 +47,7 @@ const PlayerStatusList = ({ match }: { match: Match }) => {
             statusList?.accepted.map((person) => (
               <Div flexDir='row'>
                 <Image style={{ width: scale(18), height: scale(18), marginRight: customTheme.spacing.small }} source={require("../../../assets/match/profileIcon.png")} />
-                {/* <Text>{person.name}</Text> */}
+                <Text>{person.name}</Text>
               </Div>
             ))
           }
@@ -70,7 +70,7 @@ const PlayerStatusList = ({ match }: { match: Match }) => {
             statusList?.pending.map((person) => (
               <Div flexDir='row'>
                 <Image style={{ width: scale(18), height: scale(18), marginRight: customTheme.spacing.small }} source={require("../../../assets/match/profileIcon.png")} />
-                {/* <Text>{person.name}</Text> */}
+                <Text>{person.name}</Text>
               </Div>
             ))
           }
@@ -92,7 +92,7 @@ const PlayerStatusList = ({ match }: { match: Match }) => {
             statusList?.declined.map((person) => (
               <Div flexDir='row'>
                 <Image style={{ width: scale(18), height: scale(18), marginRight: customTheme.spacing.small }} source={require("../../../assets/match/profileIcon.png")} />
-                {/* <Text>{person.name}</Text> */}
+                <Text>{person.name}</Text>
               </Div>
             ))
           }
