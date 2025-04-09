@@ -27,7 +27,7 @@ export default function SearchLocationInput({
   const [selectedLocation, setSelectedLocation] = useState<Place | null>(
     matchDetailsRef?.current.location ?? null
   );
-  const [showMap,setShowMap] = useState(false)
+  const [showMap, setShowMap] = useState(false)
 
   const [userHasSelected, setUserHasSelected] = useState(false);
 
@@ -81,7 +81,7 @@ export default function SearchLocationInput({
         >
           <Div flexDir="row" alignItems="center" justifyContent="space-between">
             <Text fontFamily="NotoSans-Variable">Lugar</Text>
-           
+
             <Text fontFamily="NotoSans-BoldItalic">
               {selectedLocation?.name ?? "A definir"}{" "}
               {selectedLocation?.address ? `/ ${selectedLocation.address}` : ""}
@@ -176,10 +176,10 @@ export default function SearchLocationInput({
               {selectedLocation?.name ?? "A definir"}
             </Text>
           </Div>
-  
+
           {(hasCoords && showMap) ? (
-            <Div mt={customTheme.spacing.small}>
-              <TouchableOpacity onPress={() => setShowMap(false)}>
+            <Div mt={customTheme.spacing.small} bg="white">
+              <TouchableOpacity onPress={() => setShowMap(false)} activeOpacity={1}>
                 <MapLocationDisplay
                   place={selectedLocation}
                   mapHeight={scale(270)}
