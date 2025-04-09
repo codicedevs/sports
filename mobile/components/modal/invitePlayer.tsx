@@ -39,9 +39,10 @@ export default function InviteModal({
   if (!playersData) return null;
 
   const filteredPlayers = playersData.results.filter((p: User) =>
-    p.name.toLowerCase().includes(query.toLowerCase())
+    p.name.toLowerCase().includes(query.toLowerCase()) &&
+    !selectedPlayers.some((sp: User) => sp._id === p._id) &&
+    p._id !== currentUser._id 
   );
-
   const handleRemovePlayer = (id: string) => {
     setSelectedPlayers((prev) => prev.filter((p) => p._id !== id));
   };
