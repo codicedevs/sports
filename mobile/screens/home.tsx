@@ -77,6 +77,107 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
       refetch();
       refetchPetition();
       refetchPublic();
+  // const { currentUser } = useSession()
+  // const queryClient = useQueryClient()
+  // const lastUpdatedAtRef = useRef<string | null>(null)
+  // const { data: matches, refetch } = useFetch(() => matchService.getAll({
+  //   where: {
+  //     "user._id": currentUser._id
+  //   }
+  // }), [QUERY_KEYS.MATCHES, currentUser]);
+  // const now = new Date().toISOString();
+  // //Busco todas las matches LA PRIMERA VEZ
+  // const { data: publicMatches, refetch: refetchPublic } = useFetch(() => matchService.getAll({
+  //   where: {
+  //     "open": true,
+  //     "date": { $gte: now }
+  //   }
+  // }), [QUERY_KEYS.PUBLIC_MATCHES],
+  //   () => {
+  //     lastUpdatedAtRef.current = new Date().toISOString()
+  //   }
+  //   ,
+  //   {
+  //     options: {
+  //       staleTime: "infinity"
+  //     }
+  //   }
+  // );
+
+  // FUNCION UPDATE QUE CHEQUEA SI HAY CAMBIOS EN LA INFORMACION SI HAY LOS AGREGA Y SI NO NADA
+  // const { data } = useFetch(
+  //   async () => {
+  //     if (!lastUpdatedAtRef.current) {
+  //       return Promise.resolve([]);
+  //     } else {
+  //       return matchService.getAll({
+  //         where: {date: { $gt: lastUpdatedAtRef.current }}
+  //       });
+  //     }
+  //   },
+  //   [QUERY_KEYS.PUBLIC_MATCHES, "UPDATES"],
+  //   (newItems) => {
+  //     if (newItems.length > 0) {
+  //       queryClient.setQueryData(['items'], (oldItems: any[] = []) => {
+  //         const merged = [...newItems, ...oldItems].filter(
+  //           (item, index, self) =>
+  //             index === self.findIndex((i) => i.id === item.id)
+  //         )
+  //         return merged
+  //       })
+  //     }
+  //     lastUpdatedAtRef.current = new Date().toISOString()
+  //   },
+  //   {
+  //     options: { enabled: false }
+  //   }
+  // );
+
+//   const updateQuery = useQuery({
+//     queryKey: [QUERY_KEYS.PUBLIC_MATCHES, 'updates'],
+//     queryFn: async () => {
+//       if (!lastUpdatedAtRef.current) return []
+  
+//       return await matchService.getAll({
+//         where: { date: { $gt: lastUpdatedAtRef.current } }
+//       })
+//     },
+//     enabled: false, // run manually
+//     meta: {
+//       onSuccess: (newItems) => {
+//         if (newItems.length > 0) {
+//           queryClient.setQueryData([QUERY_KEYS.PUBLIC_MATCHES], (oldItems: any[] = []) => {
+//             const merged = [...newItems, ...oldItems].filter(
+//               (item, index, self) =>
+//                 index === self.findIndex((i) => i.id === item.id) // remove duplicates
+//             )
+//             return merged
+//           })
+//           lastUpdatedAtRef.current = new Date().toISOString()
+//         }
+//       }
+//     }
+//   })
+//   const { data: petitions, refetch: refetchPetition } = useFetch<{ results: Petition[] }>(() => petitionService.getAll(
+// 123,
+//     {
+//       populate: ["reference.id"],
+//       where: {
+//         status: ['pending'],
+//         receiver: [currentUser._id]
+//       }
+//     }
+
+//   ), [QUERY_KEYS.PETITIONS, currentUser]);
+//   const { data: events } = useFetch(eventService.getAll, [QUERY_KEYS.EVENTS]); // pa hacer la llamada
+
+//   useFocusEffect(
+//     useCallback(() => {
+//       // refetch();
+//       // refetchPetition();
+//       // refetchPublic()
+      
+//       updateQuery.refetch()
     }, [])
   );
 
@@ -84,17 +185,17 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     name: "TORNEO DE VERANO FUTBOL VETERANO", // pa hardcodear
     date: "12/3",
   };
-
+  
   return (
-    <Div bg="white" mt={scale(-12)}>
+    <Div bg="white">
       <ScrollView>
-        <Div p={customTheme.spacing.medium}>
+        <Div pb={customTheme.spacing.medium} px={customTheme.spacing.medium}>
           <Div mb={customTheme.spacing.medium}>
             {currentUser && petitions && petitions.totalCount !== 0 && (
               <MatchInvitation
                 date={petitions.results[0]?.reference?.id.date}
-                time="10"
-                title="Stalagol"
+                time={petitions.results[0]?.reference.id.hour.toString()}
+                title={petitions.results[0]?.reference.id.name}
                 matchType={petitions.results[0]?.reference.type}
                 petition={petitions.results[0]}
                 onActionCompleted={handleActionCompleted}
@@ -117,7 +218,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
             </Text>
           </Div>
           {
-            isFetchingPublic ? (
+            false ?(
               <UpcomingMatchesCardSK />
             ) : (
               <ScrollView horizontal>
@@ -152,7 +253,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
               Mis partidos
             </Text>
             {
-              isFetchingMatches ?
+              false ?
                 <MatchesCardSK />
                 :
                 <Div style={{ gap: scale(16) }}>
