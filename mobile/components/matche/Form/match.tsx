@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useGlobalUI } from "../../../context/globalUiContext";
 import { MatchDetails } from "../../../types/form.type";
 import Match from "../../../types/match.type";
@@ -15,6 +15,7 @@ import { formatDate } from "../../../utils/date";
 import MatchSchedulerInput from "../Inputs/matchScheduler";
 import SearchLocationInput from "../Inputs/searchLocation";
 import { useSession } from "../../../context/authProvider";
+import { useFocusEffect } from "@react-navigation/native";
 
 export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match, onRefetch?: () => void, onGoBack?: () => void }) {
   const [openId, setOpenId] = useState<null | string>(null);
@@ -29,15 +30,16 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
     matchDate: undefined,
     location: null,
   });
+  const [formKey, setFormKey] = useState(0);
 
   useEffect(() => {
     if (match) {
       fetchMatch();
     }
   }, [match]);
-  
+
   async function fetchMatch() {
-    try {  
+    try {
       matchDetailsRef.current.selectedSport = match.sport || null;
       matchDetailsRef.current.selectedSportMode = match.sportMode || null;
       matchDetailsRef.current.playerLimit = match.playersLimit || 0;
@@ -97,7 +99,7 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
       // refetch();scale
       // closeModal();
       console.log("Partido editado:", res);
-      if(onRefetch){
+      if (onRefetch) {
         onRefetch()
       }
       setLoading(false)
@@ -118,8 +120,25 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
     }
   };
 
+  useFocusEffect(
+    useCallback(() => {
+      if (!match) {
+        matchDetailsRef.current = {
+          selectedSport: null,
+          selectedSportMode: null,
+          playerLimit: 0,
+          privacyOption: false,
+          matchDate: undefined,
+          location: null,
+        };
+        // Incrementa el key para forzar una re-renderización del formulario
+        setFormKey(prevKey => prevKey + 1);
+      }
+    }, [match])
+  );
+
   return (
-    <Div flex={1}>
+    <Div flex={1} key={formKey}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <Div
           flex={1}
@@ -239,17 +258,17 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
             flexDir="row"
           >
             {
-              loading?
-              <ActivityIndicator size={"large"} />
-              :
-              <Text
-              textAlign="center"
-              color={customTheme.colors.background}
-              fontSize={customTheme.fontSize.medium}
-              fontFamily="NotoSans-BoldItalic"
-              >
-              {!match ? "Crear" : "Guardar cambios"}
-            </Text>
+              loading ?
+                <ActivityIndicator size={"large"} />
+                :
+                <Text
+                  textAlign="center"
+                  color={customTheme.colors.background}
+                  fontSize={customTheme.fontSize.medium}
+                  fontFamily="NotoSans-BoldItalic"
+                >
+                  {!match ? "Crear" : "Guardar cambios"}
+                </Text>
             }
           </Div>
         </TouchableOpacity>
