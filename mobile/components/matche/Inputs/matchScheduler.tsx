@@ -145,7 +145,7 @@ export default function MatchSchedulerInput({
       displayDate = matchDetailsRef.current.matchDate;
     }
   }
-
+  const isValidDate = date instanceof Date && !isNaN(date.getTime());
   // SOLO LECTURA PA MOSTRAR EN PANTALLA DE CREADO
   // =======================
   if (readOnly) {
@@ -154,7 +154,7 @@ export default function MatchSchedulerInput({
         <Div borderWidth={1} rounded="md" p={customTheme.spacing.small}>
           <Div h={scale(25)} flexDir="row" justifyContent="space-between" alignItems="center">
             <Text fontFamily="NotoSans-Variable">Horario</Text>
-            <Text fontFamily="NotoSans-BoldItalic">{date? formatDate((date).toString()) :"A definir"}</Text>
+            <Text fontFamily="NotoSans-BoldItalic">{isValidDate? formatDate((date).toString()) :"A definir"}</Text>
           </Div>
         </Div>
       </Div>
