@@ -45,17 +45,16 @@ export default function InviteModal({ open, setOpen, matchId }: InviteModalProps
     [QUERY_KEYS.PETITIONS, matchId]
   );
 
-  if (!playersData) return null;
+  if (!playersData || !petitionsData) return null;
 
   const playersWithPetitionIds = petitionsData?.results.map((pWP) => pWP.receiver._id) ?? [];
   
   const filteredPlayers = playersData.results.filter((p: User) =>
     p.name.toLowerCase().includes(query.toLowerCase()) &&
     !selectedPlayers.some((sp: User) => sp._id === p._id) &&
-    p._id !== currentUser._id &&
+    p._id !== currentUser?._id &&
     !playersWithPetitionIds.includes(p._id)
   );
-  console.log(petitionsData.results, "PETITIONS DATA");
 
   const handleRemovePlayer = (id: string) => {
     setSelectedPlayers((prev) => prev.filter((p) => p._id !== id));
