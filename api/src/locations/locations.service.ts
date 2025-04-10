@@ -10,7 +10,7 @@ import { Filter, FilterResponse } from "types/types";
 export class LocationsService {
   constructor(
     @InjectModel(Location.name) private locationModel: Model<Location>,
-  ) { }
+  ) {}
 
   async create(createLocationDto: CreateLocationDto): Promise<Location> {
     const { name, address, coordinates } = createLocationDto;
@@ -48,8 +48,8 @@ export class LocationsService {
     const results = await this.locationModel.find(filter).exec();
     return {
       results,
-      totalCount: await this.locationModel.countDocuments(filter).exec()
-    }
+      totalCount: await this.locationModel.countDocuments(filter).exec(),
+    };
   }
 
   async findOne(id: Types.ObjectId): Promise<Location> {
@@ -69,6 +69,7 @@ export class LocationsService {
         id,
         {
           name: updateLocationDto.name,
+          address: updateLocationDto.address,
           location: {
             type: "Point",
             coordinates: updateLocationDto.coordinates,

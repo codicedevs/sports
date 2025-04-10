@@ -13,3 +13,10 @@ export interface Location {
   __v: number;
   matches: Match[]; // Nota: esto crea una relación circular con Match.
 }
+
+export interface NewLocationDto {
+  name: string;
+  address: string;
+  latitude: string;
+  longitude: string;
+}
