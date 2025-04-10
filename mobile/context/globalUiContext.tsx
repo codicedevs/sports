@@ -7,6 +7,7 @@ import React, {
   } from "react";
   import { Snackbar } from "react-native-magnus";
   import ResponseModal from "../components/modal/responseModal";
+import { scale } from "react-native-size-matters";
   
   type StatusType = "success" | "error";
   
@@ -48,7 +49,7 @@ import React, {
     return (
       <GlobalUIContext.Provider value={{ showSnackBar, showModal }}>
         {children}
-        <Snackbar ref={snackbarRef} duration={5000} placement="top" />
+        <Snackbar ref={snackbarRef} duration={5000} placement="top" mt={scale(45)} />
         <ResponseModal
           isVisible={modalVisible}
           setIsVisible={setModalVisible}
