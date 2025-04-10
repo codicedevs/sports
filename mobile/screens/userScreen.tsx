@@ -7,24 +7,33 @@ import { useState } from "react";
 
 const UserScreen = () => {
     const { currentUser } = useSession();
-    const [open, setOpen] = useState(false)
+    const [open, setOpen] = useState(false);
 
     const getInitials = (name: string): string => {
         return name
             .trim()
-            .split(/\s+/) // separa por espacios
-            .map(word => word.slice(0, 1)) // toma las 2 primeras letras de cada palabra
+            .split(/\s+/)
+            .map(word => word.slice(0, 1))
             .join('')
-            .toUpperCase(); // opcional, si querés que siempre esté en mayúsculas
+            .toUpperCase();
     };
 
     function handleModal() {
-        setOpen(!open)
-    };
+        setOpen(!open);
+    }
+
+    if (!currentUser) {
+        return (
+            <Div flex={1} justifyContent="center" alignItems="center" bg="white">
+                <Text fontSize={customTheme.fontSize.medium}>No hay usuario logueado.</Text>
+            </Div>
+        );
+    }
 
     return (
         <Div flex={1} bg="white" alignItems="center" p={20}>
-            <MatchPreferencesModal open={open} setOpen={handleModal}/>
+            <MatchPreferencesModal open={open} setOpen={handleModal} />
+
             <Div
                 w={scale(70)}
                 h={scale(70)}
@@ -34,32 +43,30 @@ const UserScreen = () => {
                 justifyContent="center"
                 mb={40}
             >
-                <Text fontSize={customTheme.fontSize.xl} fontFamily={customTheme.fontFamily.bold}>{getInitials(currentUser.name)}</Text>
+                <Text fontSize={customTheme.fontSize.xl} fontFamily={customTheme.fontFamily.bold}>
+                    {getInitials(currentUser.name)}
+                </Text>
             </Div>
+
             <Div flexDir="row" justifyContent="space-between" w={'100%'} p={10}>
-                <Div>
-                    <Text fontSize={customTheme.fontSize.medium}>Nombre:</Text>
-                </Div>
-                <Div>
-                    <Text fontSize={customTheme.fontSize.medium} fontFamily={customTheme.fontFamily.bold}>{currentUser.name}</Text>
-                </Div>
+                <Text fontSize={customTheme.fontSize.medium} fontFamily={customTheme.fontFamily.normal}>Nombre:</Text>
+                <Text fontSize={customTheme.fontSize.medium} fontFamily={customTheme.fontFamily.bold}>
+                    {currentUser.name}
+                </Text>
             </Div>
+
             <Div flexDir="row" justifyContent="space-between" w={'100%'} p={10}>
-                <Div>
-                    <Text fontSize={customTheme.fontSize.medium}>Edad:</Text>
-                </Div>
-                <Div>
-                    <Text fontSize={customTheme.fontSize.medium} fontFamily={customTheme.fontFamily.bold}>30</Text>
-                </Div>
+                <Text fontSize={customTheme.fontSize.medium} fontFamily={customTheme.fontFamily.normal}>Edad:</Text>
+                <Text fontSize={customTheme.fontSize.medium} fontFamily={customTheme.fontFamily.bold}>30</Text>
             </Div>
+
             <Div flexDir="row" justifyContent="space-between" w={'100%'} p={10}>
-                <Div>
-                    <Text fontSize={customTheme.fontSize.medium}>Email:</Text>
-                </Div>
-                <Div>
-                    <Text fontSize={customTheme.fontSize.medium} fontFamily={customTheme.fontFamily.bold}>{currentUser.email}</Text>
-                </Div>
+                <Text fontSize={customTheme.fontSize.medium} fontFamily={customTheme.fontFamily.normal}>Email:</Text>
+                <Text fontSize={customTheme.fontSize.medium} fontFamily={customTheme.fontFamily.bold}>
+                    {currentUser.email}
+                </Text>
             </Div>
+
             <Div mt={scale(35)}>
                 <Button
                     bg="white"
