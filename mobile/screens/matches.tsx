@@ -11,6 +11,33 @@ import sportmodeService from '../service/sportmode.service';
 import SportModeButton from '../components/matche/Form/sportModeButton';
 import MatchesCards from '../components/cards/matchesCards';
 import MatchesCardSK from '../components/cards/matchesCardSK';
+import ConfirmPreferencesModal from '../components/modal/confirmPreferences';
+
+type FiltersProps = {
+  filter: {
+    sportModes: { _id: string; label: string }[];
+    zones: { _id: string; name: string }[];
+    hours: { id: number; time: string; value: { startHour: string; endHour: string } }[];
+    modeFilterModal: boolean;
+    hourFilterModal: boolean;
+    zoneFilterModal: boolean;
+  };
+  setFilter: React.Dispatch<React.SetStateAction<FiltersProps['filter']>>;
+  toggleFilterModal: (filterType: 'mode' | 'hour' | 'zone') => void;
+  zonas: {
+    data: {
+      results: { _id: string; name: string }[];
+    };
+  };
+  allSportModes: {
+    results: { _id: string; label: string }[];
+  };
+  schedules: {
+    id: number;
+    time: string;
+    value: { startHour: string; endHour: string };
+  }[];
+};
 
 const schedules = [
   { id: 1, time: '00:00', value: { startHour: '08:00', endHour: '14:00' } },
@@ -22,7 +49,7 @@ const schedules = [
   { id: 7, time: '13:00', value: { startHour: '13:00', endHour: '14:00' } }
 ]
 
-const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, schedules }) => {
+const Filters: React.FC<FiltersProps> = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, schedules }) => {
   const toggleZoneSelection = (zone) => {
     setFilter((prev) => ({
       ...prev,
@@ -311,6 +338,8 @@ const MatchesScreen = () => {
   );
 
   return (
+    <>
+    {/* <ConfirmPreferencesModal /> */}
     <Div bg='white' p={customTheme.spacing.medium} h={'100%'}>
       <Filters
         filter={filter}
@@ -330,6 +359,7 @@ const MatchesScreen = () => {
           <MatchesList matches={matches} fetchMore={fetchMore} hasMore={hasMore} />
       }
     </Div>
+    </>
   );
 };
 

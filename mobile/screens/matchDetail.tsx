@@ -24,6 +24,8 @@ import { ActivityScreen } from "./activityScreen";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import * as Clipboard from "expo-clipboard";
 import { useGlobalUI } from "../context/globalUiContext";
+import petitionService from "../service/petition.service";
+import { PetitionModelType, PetitionStatus } from "../types/petition.type";
 
 type TabKey = "partido" | "jugadores" | "actividad" | "equipos";
 
@@ -93,6 +95,18 @@ const MatchDetail: React.FC<Props> = ({ navigation, route }) => {
     Clipboard.setStringAsync(url);
     showSnackBar("success", "Copiado en el portapapeles!");
   };
+
+  const sendRequest = async () => {
+    await petitionService.create({
+      emitter: currentUser._id,
+      receiver: match.data.userId,
+      reference: {
+        type: PetitionModelType.Match,
+        id: _id
+      }
+    }
+    )
+  }
 
   return (
     <>
@@ -323,7 +337,7 @@ const MatchDetail: React.FC<Props> = ({ navigation, route }) => {
                       justifyContent="center"
                       alignItems="center"
                     >
-                      <Button mb={customTheme.spacing.small} bg="black" block>
+                      <Button mb={customTheme.spacing.small} bg="black" onPress={sendRequest}>
                         <Image
                           source={require("../assets/iconUserAdd.png")}
                           style={{
