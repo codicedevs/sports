@@ -45,7 +45,7 @@ export default function InviteModal({ open, setOpen, matchId }: InviteModalProps
     [QUERY_KEYS.PETITIONS, matchId]
   );
 
-  if (!playersData) return null;
+  if (!playersData || !petitionsData) return null;
 
   const playersWithPetitionIds = petitionsData?.results.map((pWP) => pWP.receiver._id) ?? [];
   
