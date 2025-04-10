@@ -218,8 +218,11 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
             </Text>
           </Div>
           {
-            false ?(
+            !publicMatches ?(
+              <Div flexDir="row">
               <UpcomingMatchesCardSK />
+              <UpcomingMatchesCardSK />
+              </Div>
             ) : (
               <ScrollView horizontal>
                 {publicMatches?.results
@@ -253,7 +256,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
               Mis partidos
             </Text>
             {
-              false ?
+              !matches ?
                 <MatchesCardSK />
                 :
                 <Div style={{ gap: scale(16) }}>
