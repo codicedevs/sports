@@ -15,17 +15,7 @@ export default function MatchHandlerScreen({
   onMatchCreated,
 }: MatchHandlerScreenProps) {
   const navigation = useNavigation();
-  const { showSnackBar } = useGlobalUI();
-
-  // Objeto con la info del partido a crear/editar
-  const matchDetailsRef = useRef<MatchDetails>({
-    selectedSport: null,
-    selectedSportMode: null,
-    playerLimit: 0,
-    privacyOption: false,
-    matchDate: undefined,
-    location: null,
-  });
+ 
 
   function closeScreen() {
     navigation.goBack();
