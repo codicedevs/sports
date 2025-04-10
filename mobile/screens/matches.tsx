@@ -77,6 +77,9 @@ const Filters: React.FC<FiltersProps> = ({ filter, setFilter, toggleFilterModal,
     }));
   };
 
+  const truncate = (text: string, maxLength = 10) =>
+    text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
+
   return (
     <>
       <Overlay onBackdropPress={() => toggleFilterModal('mode')} visible={filter.modeFilterModal} py="lg" w={'90%'}>
@@ -126,7 +129,7 @@ const Filters: React.FC<FiltersProps> = ({ filter, setFilter, toggleFilterModal,
           <Image style={{ width: scale(25), height: scale(25), alignSelf: 'flex-end' }} source={require("@assets/closeIcon.png")} />
         </TouchableOpacity>
         <Text textAlign='center' p={customTheme.spacing.small} mb={customTheme.spacing.medium} fontSize={customTheme.fontSize.large}>Zonas</Text>
-        {zonas.data.results.map((zona) => (
+        {zonas.results.map((zona) => (
           <TouchableOpacity key={zona._id} onPress={() => toggleZoneSelection(zona)}>
             <Div
               h={verticalScale(48)}
@@ -192,7 +195,9 @@ const Filters: React.FC<FiltersProps> = ({ filter, setFilter, toggleFilterModal,
           <TouchableOpacity onPress={() => toggleFilterModal('zone')}>
             <Text textAlign='center' fontFamily="NotoSans-ExtraBold">Zona</Text>
             <Div justifyContent='center' flexDir='row'>
-              <Text>{filter.zones.length > 0 ? filter.zones[0].name : "Todas"}</Text>
+              <Text>
+                {truncate(filter.zones.length > 0 ? filter.zones[0].name : "Todas")}
+              </Text>
               {
                 filter.zones.length > 1 &&
                 <Div ml={customTheme.spacing.small} px={customTheme.spacing.xxs} borderWidth={1} rounded={customTheme.borderRadius.circle}>
@@ -230,22 +235,21 @@ const Filters: React.FC<FiltersProps> = ({ filter, setFilter, toggleFilterModal,
 const MatchesList = ({ matches, fetchMore, hasMore }) => {
   const renderItem = ({ item }) => (
     <MatchesCards
-    key={item._id}
-    matchId={item._id}
-    dayOfWeek={item.dayOfWeek}
-    date={item.date} 
-    time={item.hour} 
-    location={item.location} 
-    players={item.users}
-    maxPlayers={item.playersLimit}
-    sportMode={item.sportMode}
+      key={item._id}
+      matchId={item._id}
+      dayOfWeek={item.dayOfWeek}
+      date={item.date}
+      time={item.hour}
+      location={item.location}
+      players={item.users}
+      maxPlayers={item.playersLimit}
+      sportMode={item.sportMode}
     />
   );
 
   const keyExtractor = (item) => item._id.toString();
 
   const renderFooter = () => (hasMore ? <ActivityIndicator size="large" /> : null);
-  console.log(matches.length)
   if (matches.length < 1) {
     return (
       <Div h={'80%'} justifyContent='center'>
@@ -286,7 +290,7 @@ const MatchesScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
 
-  const { data: zonas } = useFetch(zonesService.getZones, [QUERY_KEYS.ZONES]);
+  const { data: zonas } = useFetch(zonesService.getAll, [QUERY_KEYS.ZONES]);
   const { data: allSportModes } = useFetch(sportmodeService.getAll, [QUERY_KEYS.SPORT_MODES]);
 
   const buildMongoFilter = useCallback(() => {
@@ -339,26 +343,26 @@ const MatchesScreen = () => {
 
   return (
     <>
-    {/* <ConfirmPreferencesModal /> */}
-    <Div bg='white' p={customTheme.spacing.medium} h={'100%'}>
-      <Filters
-        filter={filter}
-        setFilter={setFilter}
-        toggleFilterModal={toggleFilterModal}
-        zonas={zonas}
-        allSportModes={allSportModes}
-        schedules={schedules}
-      />
-      {
-        isLoading || !matches ?
-          <Div my={customTheme.spacing.medium} style={{ gap: verticalScale(20) }} >
-            <MatchesCardSK />
-            <MatchesCardSK />
-          </Div>
-          :
-          <MatchesList matches={matches} fetchMore={fetchMore} hasMore={hasMore} />
-      }
-    </Div>
+      <ConfirmPreferencesModal />
+      <Div bg='white' p={customTheme.spacing.medium} h={'100%'}>
+        <Filters
+          filter={filter}
+          setFilter={setFilter}
+          toggleFilterModal={toggleFilterModal}
+          zonas={zonas}
+          allSportModes={allSportModes}
+          schedules={schedules}
+        />
+        {
+          isLoading || !matches ?
+            <Div my={customTheme.spacing.medium} style={{ gap: verticalScale(20) }} >
+              <MatchesCardSK />
+              <MatchesCardSK />
+            </Div>
+            :
+            <MatchesList matches={matches} fetchMore={fetchMore} hasMore={hasMore} />
+        }
+      </Div>
     </>
   );
 };
