@@ -13,7 +13,7 @@ const AppNavigator = () => {
     <NavigationContainer ref={navigationRef}>
       <VersionModal />
       <RestrictiveModal />
-      <SplashScreen />
+      {/* <SplashScreen /> */}
       <Principal />
     </NavigationContainer>
   );

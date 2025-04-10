@@ -228,32 +228,7 @@ export class MatchController {
   async getPetitionsByMatch(
     @Query() filter: Filter, @Param("matchId", new ValidateObjectIdPipe("match")) matchId: string,
   ) {
-    if (!filter) filter = {}
-    if (filter?.where) filter.where = { ...filter.where, "reference.id": new Types.ObjectId(matchId), "reference.type": PetitionModelType.match }
-    else filter.where = { "reference.id": new Types.ObjectId(matchId), "reference.type": PetitionModelType.match }
-    const petitions = (await this.petitionService.findAll(filter)).results;
-
-    const result = {
-      pending: [] as any[],
-      accepted: [] as any[],
-      declined: [] as any[],
-    };
-
-    petitions.forEach((petition) => {
-      switch (petition.status) {
-        case PetitionStatus.Pending:
-          result.pending.push(petition.receiver);
-          break;
-        case PetitionStatus.Accepted:
-          result.accepted.push(petition.receiver);
-          break;
-        case PetitionStatus.Declined:
-          result.declined.push(petition.receiver);
-          break;
-      }
-    });
-
-    return result;
+    return this.matchService.getPetitionsByMatch(new Types.ObjectId(matchId), filter)
   }
 
   @Put(":id")

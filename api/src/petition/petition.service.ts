@@ -270,7 +270,7 @@ export class PetitionService {
 
 
       // Agregar el partido al array de partidos o grupos del receiver si no es el dueño
-      if (!(target.userId as Types.ObjectId).equals(petition.receiver._id)) {
+      if (!(target.userId as Types.ObjectId).equals(petition.receiver._id as Types.ObjectId)) {
         if (!receiver[plural[modelType]].includes(target.id)) {
           receiver[plural[modelType]].push(target.id); // Agregar el partido al array de `matches` o `groups` del receiver
           await receiver.save(); // Guardar los cambios en el receptor
@@ -374,7 +374,7 @@ export class PetitionService {
   }
 
   async findAll(filter: Filter): Promise<FilterResponse<Petition>> {
-    const results = await this.petitionModel.find(filter).populate("receiver").exec();
+    const results = await this.petitionModel.find(filter).populate("receiver emitter").exec();
     return {
       results,
       totalCount: await this.petitionModel.countDocuments(filter).exec()

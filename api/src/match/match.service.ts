@@ -878,4 +878,42 @@ export class MatchService {
     return days[index]
   }
 
+
+  async getPetitionsByMatch(matchId: Types.ObjectId, filter: Filter): Promise<{
+    pending: User[];
+    accepted: User[];
+    declined: User[];
+  }> {
+    const matchExists = await this.matchModel.findById(matchId).exec()
+    if (!matchExists) {
+      throw new NotFoundException(`Match #${matchId} not found`)
+    }
+    if (!filter) filter = {}
+    if (filter?.where) filter.where = { ...filter.where, "reference.id": new Types.ObjectId(matchId), "reference.type": PetitionModelType.match }
+    else filter.where = { "reference.id": new Types.ObjectId(matchId), "reference.type": PetitionModelType.match }
+    const petitions = (await this.petitionService.findAll(filter)).results;
+    const adminId: Types.ObjectId = matchExists.userId
+    const result = {
+      pending: [] as User[],
+      accepted: [] as User[],
+      declined: [] as User[],
+    };
+    petitions.forEach((petition) => {
+      const emitterIsAdmin = (petition.emitter._id as Types.ObjectId).equals(adminId)
+      const userToPush = emitterIsAdmin ? petition.receiver as User : petition.emitter as User
+      switch (petition.status) {
+        case PetitionStatus.Pending:
+          result.pending.push(userToPush);
+          break;
+        case PetitionStatus.Accepted:
+          result.accepted.push(userToPush);
+          break;
+        case PetitionStatus.Declined:
+          result.declined.push(userToPush);
+          break;
+      }
+    });
+
+    return result;
+  }
 }  
