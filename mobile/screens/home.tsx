@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
 import { Div, Text } from "react-native-magnus";
 import useFetch from "../hooks/useGet";
@@ -19,11 +19,12 @@ import Petition from "../types/petition.type";
 import MatchInvitation from "../components/cards/invitationCard";
 import MatchesCardSK from "../components/cards/matchesCardSK";
 import UpcomingMatchesCardSK from "../components/cards/upcomingMatchesCardSK";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
-  const { currentUser } = useSession();
+  const { currentUser, setCurrentUser } = useSession();
   const {
     data: matches,
     refetch,
@@ -77,6 +78,8 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
       refetch();
       refetchPetition();
       refetchPublic();
+    }, [])
+  );
   // const { currentUser } = useSession()
   // const queryClient = useQueryClient()
   // const lastUpdatedAtRef = useRef<string | null>(null)
@@ -133,59 +136,75 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   //   }
   // );
 
-//   const updateQuery = useQuery({
-//     queryKey: [QUERY_KEYS.PUBLIC_MATCHES, 'updates'],
-//     queryFn: async () => {
-//       if (!lastUpdatedAtRef.current) return []
-  
-//       return await matchService.getAll({
-//         where: { date: { $gt: lastUpdatedAtRef.current } }
-//       })
-//     },
-//     enabled: false, // run manually
-//     meta: {
-//       onSuccess: (newItems) => {
-//         if (newItems.length > 0) {
-//           queryClient.setQueryData([QUERY_KEYS.PUBLIC_MATCHES], (oldItems: any[] = []) => {
-//             const merged = [...newItems, ...oldItems].filter(
-//               (item, index, self) =>
-//                 index === self.findIndex((i) => i.id === item.id) // remove duplicates
-//             )
-//             return merged
-//           })
-//           lastUpdatedAtRef.current = new Date().toISOString()
-//         }
-//       }
-//     }
-//   })
-//   const { data: petitions, refetch: refetchPetition } = useFetch<{ results: Petition[] }>(() => petitionService.getAll(
-// 123,
-//     {
-//       populate: ["reference.id"],
-//       where: {
-//         status: ['pending'],
-//         receiver: [currentUser._id]
-//       }
-//     }
+  //   const updateQuery = useQuery({
+  //     queryKey: [QUERY_KEYS.PUBLIC_MATCHES, 'updates'],
+  //     queryFn: async () => {
+  //       if (!lastUpdatedAtRef.current) return []
 
-//   ), [QUERY_KEYS.PETITIONS, currentUser]);
-//   const { data: events } = useFetch(eventService.getAll, [QUERY_KEYS.EVENTS]); // pa hacer la llamada
+  //       return await matchService.getAll({
+  //         where: { date: { $gt: lastUpdatedAtRef.current } }
+  //       })
+  //     },
+  //     enabled: false, // run manually
+  //     meta: {
+  //       onSuccess: (newItems) => {
+  //         if (newItems.length > 0) {
+  //           queryClient.setQueryData([QUERY_KEYS.PUBLIC_MATCHES], (oldItems: any[] = []) => {
+  //             const merged = [...newItems, ...oldItems].filter(
+  //               (item, index, self) =>
+  //                 index === self.findIndex((i) => i.id === item.id) // remove duplicates
+  //             )
+  //             return merged
+  //           })
+  //           lastUpdatedAtRef.current = new Date().toISOString()
+  //         }
+  //       }
+  //     }
+  //   })
+  //   const { data: petitions, refetch: refetchPetition } = useFetch<{ results: Petition[] }>(() => petitionService.getAll(
+  // 123,
+  //     {
+  //       populate: ["reference.id"],
+  //       where: {
+  //         status: ['pending'],
+  //         receiver: [currentUser._id]
+  //       }
+  //     }
 
-//   useFocusEffect(
-//     useCallback(() => {
-//       // refetch();
-//       // refetchPetition();
-//       // refetchPublic()
-      
-//       updateQuery.refetch()
-    }, [])
-  );
+  //   ), [QUERY_KEYS.PETITIONS, currentUser]);
+  //   const { data: events } = useFetch(eventService.getAll, [QUERY_KEYS.EVENTS]); // pa hacer la llamada
+
+  //   useFocusEffect(
+  //     useCallback(() => {
+  //       // refetch();
+  //       // refetchPetition();
+  //       // refetchPublic()
+
+  //       updateQuery.refetch()
+
+  const loadSession = async () => {
+    const [accessToken, refreshToken, userJson] = await AsyncStorage.multiGet([
+      '@access_token',
+      '@refresh_token',
+      '@user',
+    ]);
+
+    if (accessToken[1] && userJson[1]) {
+      const user = JSON.parse(userJson[1]);
+      setCurrentUser(user);
+      // Podés también setear los tokens a algún contexto si los usás globalmente
+    }
+  };
+
+  useEffect(() => {
+    loadSession()
+  }, [])
 
   const fallbackEvent = {
     name: "TORNEO DE VERANO FUTBOL VETERANO", // pa hardcodear
     date: "12/3",
   };
-  
+
   return (
     <Div bg="white">
       <ScrollView>
@@ -194,7 +213,7 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
             {currentUser && petitions && petitions.totalCount !== 0 && (
               <MatchInvitation
                 date={petitions.results[0]?.reference?.id.date}
-                time={petitions.results[0]?.reference.id.hour?.toString()  }
+                time={petitions.results[0]?.reference.id.hour?.toString()}
                 title={petitions.results[0]?.reference.id.name}
                 matchType={petitions.results[0]?.reference.type}
                 petition={petitions.results[0]}
@@ -218,10 +237,10 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
             </Text>
           </Div>
           {
-            !publicMatches ?(
+            !publicMatches ? (
               <Div flexDir="row">
-              <UpcomingMatchesCardSK />
-              <UpcomingMatchesCardSK />
+                <UpcomingMatchesCardSK />
+                <UpcomingMatchesCardSK />
               </Div>
             ) : (
               <ScrollView horizontal>
