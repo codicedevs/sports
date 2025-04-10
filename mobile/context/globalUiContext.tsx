@@ -48,7 +48,7 @@ import React, {
     return (
       <GlobalUIContext.Provider value={{ showSnackBar, showModal }}>
         {children}
-        <Snackbar ref={snackbarRef} duration={5000} />
+        <Snackbar ref={snackbarRef} duration={5000} placement="top" />
         <ResponseModal
           isVisible={modalVisible}
           setIsVisible={setModalVisible}

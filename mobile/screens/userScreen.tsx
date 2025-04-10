@@ -25,7 +25,7 @@ const UserScreen = () => {
     if (!currentUser) {
         return (
             <Div flex={1} justifyContent="center" alignItems="center" bg="white">
-                <Text fontSize={customTheme.fontSize.medium}>No hay usuario logueado.</Text>
+                <Text fontSize={customTheme.fontSize.medium} fontFamily={customTheme.fontFamily.normal}>No hay usuario logueado.</Text>
             </Div>
         );
     }
