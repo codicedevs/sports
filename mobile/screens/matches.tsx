@@ -249,8 +249,8 @@ const MatchesList = ({ matches, fetchMore, hasMore }) => {
   if (matches.length < 1) {
     return (
       <Div h={'80%'} justifyContent='center'>
-        <Icon color={customTheme.colors.gray} fontFamily='AntDesign' name='search1' fontSize={customTheme.fontSize.Fourxl} />
-        <Text mt={customTheme.spacing.medium} fontSize={customTheme.fontSize.medium} textAlign='center'>No se encontraron partidos{'\n'}con este filtro</Text>
+         <Image style={{ width: scale(79), height: verticalScale(75), alignSelf:"center" }} resizeMode="contain" source={require("../assets/search-no-result.png")} />
+        <Text mt={customTheme.spacing.medium} fontSize={customTheme.fontSize.medium} color={customTheme.colors.gray} textAlign='center'>No se encontraron partidos{'\n'}con este filtro</Text>
       </Div>
     )
   }
