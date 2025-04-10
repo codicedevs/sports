@@ -9,43 +9,19 @@ import DateTimePreferenceInput from '../matche/Inputs/dateTimePreference';
 import userService from '../../service/user.service';
 import SelectZoneInput from '../matche/Inputs/selectZone';
 import SportArrayInput from '../matche/Inputs/sportsArray';
-
-const USERID = "6720ef213a78ebc10564e97d"
-
-const USERPROFILE = {
-    "profile": {
-        "availability": [
-            {
-                "day": "Sunday",
-                "intervals": [
-                    {
-                        "startHour": 8,
-                        "endHour": 9
-                    },
-                    {
-                        "startHour": 9,
-                        "endHour": 10
-                    }
-                ]
-            }
-        ],
-        "preferredZones": ['67b74cbd3fa5740f3fc3947d'],
-        "preferredSports": [
-            "676d900973a26a0de5f38bd7"
-        ],
-        "preferredSportModes": [
-            "676d903173a26a0de5f38bda"
-        ]
-    }
-}
+import { useSession } from '../../context/authProvider';
+import { useGlobalUI } from '../../context/globalUiContext';
 
 const MatchPreferencesModal = ({ open, setOpen }: { open: boolean; setOpen: React.Dispatch<React.SetStateAction<boolean>> }) => {
     const [openId, setOpenId] = useState<null | string>(null);
+    const {currentUser} = useSession()
+     const { showSnackBar } = useGlobalUI();
+    console.log(currentUser,'USUARIO')
     const matchDetailsRef = useRef<Profile>({
-        availability: USERPROFILE?.profile.availability  ?? null,
-        preferredSportModes: USERPROFILE?.profile.preferredSportModes ?? null,
-        preferredSports: USERPROFILE?.profile.preferredSports ?? null,
-        preferredZones: USERPROFILE?.profile.preferredZones ?? null,
+        availability: currentUser?.profile?.availability  ?? null,
+        preferredSportModes: currentUser?.profile?.preferredSportModes ?? null,
+        preferredSports: currentUser?.profile?.preferredSports ?? null,
+        preferredZones: currentUser?.profile?.preferredZones ?? null,
       });
 
     const closeModal = () => {
@@ -55,7 +31,7 @@ const MatchPreferencesModal = ({ open, setOpen }: { open: boolean; setOpen: Reac
 
     const createPreference = async () => {
         try {
-            const res = await userService.put(USERID, {
+            const res = await userService.put(currentUser._id, {
                 profile: {
                     preferredSports: matchDetailsRef.current.preferredSports,
                     preferredSportModes: matchDetailsRef.current.preferredSportModes,
@@ -63,9 +39,13 @@ const MatchPreferencesModal = ({ open, setOpen }: { open: boolean; setOpen: Reac
                     preferredZones: matchDetailsRef.current.preferredZones
                 }
             })
+            showSnackBar("success", "Preferencia creada con exito")
             console.log(res.data)
         } catch (e) { 
             console.log(e,'ERROR FATAL')
+            showSnackBar("error", "Preferencia creada con exito")
+        } finally {
+            setOpen(false)
         }
     }
 

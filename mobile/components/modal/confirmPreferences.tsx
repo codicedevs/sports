@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Modal,
   View,
@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import MatchPreferencesModal from "./matchPreferences";
+import { useFocusEffect } from "@react-navigation/native";
 
 const ConfirmPreferencesModal = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -36,6 +37,12 @@ const ConfirmPreferencesModal = () => {
     setOpen(true)
     // redirigir o algo extra
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      setIsVisible(true)
+    }, [])
+  )
 
   return (
     <>
