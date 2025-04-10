@@ -15,7 +15,8 @@ import { formatDate } from "../../../utils/date";
 import MatchSchedulerInput from "../Inputs/matchScheduler";
 import SearchLocationInput from "../Inputs/searchLocation";
 import { useSession } from "../../../context/authProvider";
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { AppScreens } from "../../../navigation/screens";
 
 export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match, onRefetch?: () => void, onGoBack?: () => void }) {
   const [openId, setOpenId] = useState<null | string>(null);
@@ -31,6 +32,7 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
     location: null,
   });
   const [formKey, setFormKey] = useState(0);
+  const navigation = useNavigation();
 
   useEffect(() => {
     if (match) {
@@ -70,9 +72,10 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
       //     onMatchCreated(createdMatchId);
       // }
       // closeModal();
-      if (onGoBack) {
-        onGoBack();
-      }
+      // if (onGoBack) {
+      //   onGoBack();
+      // }
+      navigation.navigate(AppScreens.MATCH_DETAIL, { id: res._id })
       setLoading(false)
       showSnackBar("success", "Partido creado con exito")
     } catch (e) {

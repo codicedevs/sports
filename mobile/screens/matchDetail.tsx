@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, TouchableOpacity } from "react-native";
+import { ScrollView, Share, TouchableOpacity } from "react-native";
 import {
   AppScreenProps,
   AppScreens,
@@ -49,6 +49,8 @@ const MatchDetail: React.FC<Props> = ({ navigation, route }) => {
   } = useFetch(() => matchService.getById(id), [QUERY_KEYS.MATCH]);
   const [isParticipe, setIsParticipe] = useState(false);
   const { showSnackBar } = useGlobalUI();
+  const [isLoading, setIsLoading] = useState(false)
+
 
   function isPlayer() {
     if (!match) return;
@@ -90,22 +92,44 @@ const MatchDetail: React.FC<Props> = ({ navigation, route }) => {
   const dateObject = new Date(date);
   const isAdmin = user?._id === currentUser?._id; //SI el usuario que creo el partido dejo de existir genera conflictos
 
-  const handleShare = () => {
-    const url = `https://miapp.com/match/${id}`;
-    Clipboard.setStringAsync(url);
-    showSnackBar("success", "Copiado en el portapapeles!");
+  const handleShare = async () => {
+
+    try {
+      const result = await Share.share({
+        message: 'Sumate a este partido en Loyal Chacabuco a las 20:00. ' + `https://dreamy-souffle-80d9a2.netlify.app/${_id}`,
+        url: `https://dreamy-souffle-80d9a2.netlify.app/${_id}`, // works better for iOS
+        title: 'Awesome link',
+      });
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          console.log('Shared with activity type:', result.activityType);
+        } else {
+          console.log('Shared');
+        }
+      } else if (result.action === Share.dismissedAction) {
+        console.log('Dismissed');
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   const sendRequest = async () => {
-    await petitionService.create({
-      emitter: currentUser._id,
-      receiver: match.data.userId,
-      reference: {
-        type: PetitionModelType.Match,
-        id: _id
-      }
+    setIsLoading(true)
+    try {
+      await petitionService.create({
+        emitter: currentUser._id,
+        receiver: match.data.userId,
+        reference: {
+          type: PetitionModelType.Match,
+          id: _id
+        }
+      })
+    } catch (e) {
+      console.log('error al enviar petition', e)
     }
-    )
+    setIsLoading(false)
   }
 
   return (
@@ -332,28 +356,37 @@ const MatchDetail: React.FC<Props> = ({ navigation, route }) => {
                       </Div>
                     </Div>
                   ) : (
+
                     <Div
                       p={customTheme.spacing.small}
                       justifyContent="center"
                       alignItems="center"
                     >
-                      <Button mb={customTheme.spacing.small} bg="black" onPress={sendRequest}>
-                        <Image
-                          source={require("../assets/iconUserAdd.png")}
-                          style={{
-                            width: 20,
-                            height: 20,
-                            resizeMode: "contain",
-                          }}
-                        />
-                        <Text
-                          fontSize={customTheme.fontSize.medium}
-                          fontFamily="NotoSans-BoldItalic"
-                          ml={customTheme.spacing.small}
-                          color="white"
-                        >
-                          Solicitar unirse al partido
-                        </Text>
+                      <Button
+                        mb={customTheme.spacing.small}
+                        bg="black"
+                        block
+                        onPress={() => sendRequest()}
+                        h={scale(42)}
+                      >
+                        {
+                          !isLoading ?
+                            <><Image
+                              source={require("../assets/iconUserAdd.png")}
+                              style={{
+                                width: 20,
+                                height: 20,
+                                resizeMode: "contain",
+                              }} /><Text
+                                fontSize={customTheme.fontSize.medium}
+                                fontFamily="NotoSans-BoldItalic"
+                                ml={customTheme.spacing.small}
+                                color="white"
+                              >
+                                Solicitar unirse a partido
+                              </Text></>
+                            : <ActivityIndicator size={"small"} color={'white'} />
+                        }
                       </Button>
                     </Div>
                   )}
