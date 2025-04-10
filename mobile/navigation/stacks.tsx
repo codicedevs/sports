@@ -14,6 +14,7 @@ import MatchesScreen from "../screens/matches";
 import MatchHandlerScreen from "../screens/matchHandler";
 import { CustomHeader } from "../components/layout/customHeader";
 import PetitionScreen from "../screens/petitionsScreen";
+import UserScreen from "../screens/userScreen";
 
 const SettingsStack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator()
@@ -86,7 +87,7 @@ export function TabStackScreen() {
       <Tab.Screen name={AppScreens.PETITIONS_SCREEN} component={PetitionScreen} />
       <Tab.Screen name={AppScreens.MATCH_HANDLER} component={MatchHandlerScreen} />
       <Tab.Screen name={AppScreens.MATCH_SCREEN} component={MatchesScreen} />
-      <Tab.Screen name="SettingsStack3" component={SettingsStackScreen} />
+      <Tab.Screen name="SettingsStack3" component={UserScreen} />
       <Tab.Screen name={AppScreens.MATCH_DETAIL} component={MatchDetail} />
     </Tab.Navigator>
   )
