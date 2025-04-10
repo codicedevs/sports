@@ -43,6 +43,8 @@ const DateTimePreferenceInput = ({ matchDetailsRef }: SportInputProps) => {
         }));
       });
       setSelectedUserDays(preSelectedDays);
+    } else {
+      setSelectedUserDays({});
     }
   }, []);
 
