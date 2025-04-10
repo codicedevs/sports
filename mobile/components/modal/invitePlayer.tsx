@@ -124,7 +124,7 @@ export default function InviteModal({ open, setOpen, matchId }: InviteModalProps
             style: { borderWidth: 0 },
             renderItem: ({ item }) => (
               <Div ml={customTheme.spacing.small} flexDir="row" alignItems="center">
-                <Image source={require("../../assets/beardman.png")} resizeMode="contain" w={28} h={28} />
+                <Image source={require("../../assets/iconUser.png")} resizeMode="contain" w={23} h={23} />
                 <Text
                   style={{ padding: 5, borderWidth: 0, marginLeft: scale(5) }}
                   fontFamily="NotoSans-Variable"
@@ -163,12 +163,12 @@ export default function InviteModal({ open, setOpen, matchId }: InviteModalProps
               alignItems="center"
               justifyContent="space-between"
             >
-              <Div flexDir="row">
+              <Div flexDir="row" justifyContent="center" alignItems="center">
                 <Image
-                  source={require("../../assets/icon.png")}
+                  source={require("../../assets/Ellipse2.png")}
                   resizeMode="contain"
-                  w={scale(28)}
-                  h={scale(28)}
+                  w={scale(10)}
+                  h={scale(10)}
                 />
                 <Text
                   fontFamily="NotoSans-Variable"

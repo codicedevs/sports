@@ -27,11 +27,11 @@ const MatchPrivacyToggleInput = ({ matchDetailsRef }: PrivacyToggleProps) => {
 
   useEffect(() => {
     setPrivacyOption(matchDetailsRef.current.privacyOption ? "public" : "private")
-  },[matchDetailsRef.current.privacyOption])
+  }, [matchDetailsRef.current.privacyOption])
 
   const isPrivate = privacyOption === 'private';
   const isPublic = privacyOption === 'public';
-    
+
   return (
     <Div p={customTheme.spacing.medium} style={{ gap: 8 }}>
       <Div h={verticalScale(40)} flexDir="row">
@@ -62,9 +62,10 @@ const MatchPrivacyToggleInput = ({ matchDetailsRef }: PrivacyToggleProps) => {
           </TouchableOpacity>
         </Div>
       </Div>
-      <Text fontFamily="NotoSans-Variable" textAlign="auto">
-        Lorem ipsum odor amet, consectetuer adipiscing elit. Consequat vestibulum felis dis dis
-        consectetur. Ornare etiam class ligula.
+      <Text fontFamily="NotoSans-Variable" textAlign="justify">
+        Los partidos públicos permiten que cualquier persona pueda enviar una invitación para sumarse.
+        Son ideales para cuando faltan jugadores.
+        Los partidos privados solo pueden ser accedidos a través de invitaciones personales.
       </Text>
     </Div>
   );
