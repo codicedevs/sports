@@ -1,13 +1,12 @@
 import React from "react";
 import { Text } from "react-native";
-import { Overlay, Button, Div } from "react-native-magnus";
+import { Button, Div } from "react-native-magnus";
 import { useSession } from "../../context/authProvider";
 import { customTheme } from "../../utils/theme";
 import authService from "../../service/auth.service";
 import { useMutate } from "../../hooks/useMutate";
-import Constants from "expo-constants";
-import registerForPushNotificationsAsync from "../../notifications/pushNotifications";
 import userService from "../../service/user.service";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 //En useSession agregue un showModal, en los lugares que no debe poder accederse sin usuario se debe preguntar si hay un currentUser y si no hay se hace un showModal() 
 const RestrictiveModal = () => {
     const { isModalVisible, hideModal, setCurrentUser, pushToken } = useSession();
@@ -30,24 +29,33 @@ const RestrictiveModal = () => {
 
     const login = async () => {
         try {
-            const res = await authService.login("puchoni@gmail.com", "12345678");
-            setCurrentUser(res.user);
-
-            if (res) {
-                // Si ya tenemos el pushToken almacenado en el contexto, lo usamos
-                if (pushToken) {
-                    await userService.updatePushToken(res.user._id, pushToken);
-                    res.user.pushToken = pushToken;
-                }
-                setCurrentUser(res.user);
-                hideModal();
+          const res = await authService.login("stala@gmail.com", "12345678");
+      
+          if (res) {
+            // Guardar pushToken si existe
+            if (pushToken) {
+              await userService.updatePushToken(res.user._id, pushToken);
+              res.user.pushToken = pushToken;
             }
-            return res;
+      
+            // Guardar tokens y usuario en AsyncStorage
+            await AsyncStorage.multiSet([
+              ['@access_token', res.access_token],
+              ['@refresh_token', res.refreshToken],
+              ['@user', JSON.stringify(res.user)],
+            ]);
+      
+            setCurrentUser(res.user);
+            hideModal();
+          }
+      
+          return res;
         } catch (e) {
-            console.log("Ocurrió un error en el login");
-            console.log(e);
+          console.log("Ocurrió un error en el login");
+          console.log(e);
         }
-    };
+      };
+
     const loginQuery = useMutate(login, (res) => { setCurrentUser(res.user) }, (err) => { console.error(err) })
 
     if (!isModalVisible) return

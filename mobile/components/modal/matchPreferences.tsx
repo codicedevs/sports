@@ -16,7 +16,7 @@ const MatchPreferencesModal = ({ open, setOpen }: { open: boolean; setOpen: Reac
     const [openId, setOpenId] = useState<null | string>(null);
     const {currentUser} = useSession()
      const { showSnackBar } = useGlobalUI();
-    console.log(currentUser,'USUARIO')
+
     const matchDetailsRef = useRef<Profile>({
         availability: currentUser?.profile?.availability  ?? null,
         preferredSportModes: currentUser?.profile?.preferredSportModes ?? null,
