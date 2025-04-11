@@ -66,7 +66,7 @@ const MatchPreferencesModal = ({ open, setOpen }: { open: boolean; setOpen: Reac
                     </Accordion>
                 </Div>
             </ScrollView>
-            <Div justifyContent='center' bg='#151515E5' h={verticalScale(80)} p={customTheme.spacing.medium}>
+            <Div justifyContent='center' bg='white' h={verticalScale(80)} p={customTheme.spacing.medium}  borderTopWidth={1}>
                 <TouchableOpacity onPress={createPreference}>
                     <Div h={verticalScale(45)} justifyContent='center' bg={customTheme.colors.primary}>
                         <Text textAlign='center'>Crear</Text>
