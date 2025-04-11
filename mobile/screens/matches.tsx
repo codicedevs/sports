@@ -163,7 +163,8 @@ const Filters: React.FC<FiltersProps> = ({ filter, setFilter, toggleFilterModal,
               <Text>{filter.hours.length > 0 ? filter.hours[0].time : "Todas"}</Text>
               {
                 filter.hours.length > 1 &&
-                <Div ml={customTheme.spacing.small} px={customTheme.spacing.xxs} borderWidth={1} rounded={customTheme.borderRadius.circle}>
+                // DEFINIR EL COLORK
+                <Div ml={customTheme.spacing.small} bg={'lightgray'} px={customTheme.spacing.xxs} borderWidth={1} rounded={customTheme.borderRadius.circle}>
                   <Text textAlign='center'>+1</Text>
                 </Div>
               }
