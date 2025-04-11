@@ -68,7 +68,6 @@ export const userApi = createApi({
     }),
     getUser: builder.query<User, any>({
       query: ({ id, populate }) => {
-        console.log("getUser:", { id, populate });
         return {
           url: ``,
           method: "findById",
@@ -76,10 +75,7 @@ export const userApi = createApi({
           params: populate ? { populate } : {},
         };
       },
-      // transformResponse: (response: UserResponse) => {
-      //   console.log("response", response);
-      //   return response.results[0];
-      // },
+      providesTags: ["Users"],
     }),
     registerUser: builder.mutation<User, NewUserDto>({
       query: (newUser: NewUserDto) => ({
@@ -89,13 +85,16 @@ export const userApi = createApi({
       }),
       invalidatesTags: ["Users"],
     }),
-    updateUser: builder.mutation<any, { userId: string; user: User }>({
-      query: ({ userId, user }) => ({
-        url: "",
-        method: "update",
-        data: userId,
-        params: user,
-      }),
+    updateUser: builder.mutation<any, any>({
+      query: ({ id: userId, user }) => {
+        console.log("aca", userId, user);
+        return {
+          url: "",
+          method: "update",
+          data: userId,
+          params: user,
+        };
+      },
       invalidatesTags: ["Users"],
     }),
     deleteUser: builder.mutation<string, string>({
