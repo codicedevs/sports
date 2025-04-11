@@ -15,9 +15,11 @@ import { Skeleton } from 'moti/skeleton';
 
 interface SportInputProps {
   matchDetailsRef: React.MutableRefObject<MatchDetails>;
+  sports: any;
+  allSportMode:any
 }
 
-const SportInput = ({ matchDetailsRef }: SportInputProps) => {
+const SportInput = ({ matchDetailsRef, sports, allSportModes }: SportInputProps) => {
   const [selectedSport, setSelectedSport] = useState<Sport | null>(
     matchDetailsRef.current.selectedSport || null
   );
@@ -25,8 +27,8 @@ const SportInput = ({ matchDetailsRef }: SportInputProps) => {
     matchDetailsRef.current.selectedSportMode || null
   );
 
-  const { data: sports } = useFetch(sportService.getAll, [QUERY_KEYS.SPORTS]);
-  const { data: allSportModes } = useFetch(sportmodeService.getAll, [QUERY_KEYS.SPORT_MODES]);
+  // const { data: sports } = useFetch(sportService.getAll, [QUERY_KEYS.SPORTS]);
+  // const { data: allSportModes } = useFetch(sportmodeService.getAll, [QUERY_KEYS.SPORT_MODES]);
 
   useEffect(() => {
     if (sports?.results) {

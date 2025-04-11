@@ -14,12 +14,14 @@ interface SearchLocationInputProps {
   matchDetailsRef?: React.MutableRefObject<{ location: Place | null }>;
   location?: Place | null;
   readOnly?: boolean;
+  Locations: any;
 }
 
 export default function SearchLocationInput({
   matchDetailsRef,
   location,
   readOnly = false,
+  Locations
 }: SearchLocationInputProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [filter, setFilter] = useState("");
@@ -31,9 +33,9 @@ export default function SearchLocationInput({
 
   const [userHasSelected, setUserHasSelected] = useState(false);
 
-  const { data: Locations } = useFetch(locationService.getAll, [
-    QUERY_KEYS.LOCATIONS,
-  ]);
+  // const { data: Locations } = useFetch(locationService.getAll, [
+  //   QUERY_KEYS.LOCATIONS,
+  // ]);
 
   useEffect(() => {
     if (readOnly && location) {

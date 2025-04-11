@@ -17,6 +17,11 @@ import SearchLocationInput from "../Inputs/searchLocation";
 import { useSession } from "../../../context/authProvider";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { AppScreens } from "../../../navigation/screens";
+import useFetch from "../../../hooks/useGet";
+import sportService from "../../../service/sport.service";
+import sportmodeService from "../../../service/sportmode.service";
+import { QUERY_KEYS } from "../../../types/query.types";
+import locationService from "../../../service/location.service";
 
 export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match, onRefetch?: () => void, onGoBack?: () => void }) {
   const [openId, setOpenId] = useState<null | string>(null);
@@ -39,6 +44,12 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
       fetchMatch();
     }
   }, [match]);
+
+    const { data: sports } = useFetch(sportService.getAll, [QUERY_KEYS.SPORTS]);
+    const { data: allSportModes } = useFetch(sportmodeService.getAll, [QUERY_KEYS.SPORT_MODES]);
+   const { data: Locations } = useFetch(locationService.getAll, [
+      QUERY_KEYS.LOCATIONS,
+    ]);
 
   async function fetchMatch() {
     try {
@@ -76,6 +87,10 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
       //   onGoBack();
       // }
       navigation.navigate(AppScreens.MATCH_DETAIL, { id: res._id })
+      
+      if (onGoBack) {
+        onGoBack();
+      }
       setLoading(false)
       showSnackBar("success", "Partido creado con exito")
     } catch (e) {
@@ -140,6 +155,8 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
     }, [match])
   );
 
+  if (!sports || !allSportModes || !Locations) return (<Div flex={1} alignItems="center" justifyContent="center"><ActivityIndicator size={"large"} /></Div>)
+
   return (
     <Div flex={1} key={formKey}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -149,7 +166,7 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
           bg={"white"}
           p={customTheme.spacing.medium}
         >
-          <Accordion
+          <Accordion 
             id="Deportes"
             openId={openId}
             setOpenId={setOpenId}
@@ -163,7 +180,7 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
             }
             size={342}
           >
-            <SportInput matchDetailsRef={matchDetailsRef} />
+            <SportInput matchDetailsRef={matchDetailsRef} sports={sports} allSportMode={allSportModes} />
           </Accordion>
           <Accordion
             id="PlayerInput"
@@ -210,7 +227,7 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
           >
             Campos no obligatorios para crear
           </Text>
-          <Accordion
+          <Accordion 
             id="Horario"
             openId={openId}
             setOpenId={setOpenId}
@@ -240,7 +257,7 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
             }
             size={300}
           >
-            <SearchLocationInput matchDetailsRef={matchDetailsRef} />
+            <SearchLocationInput matchDetailsRef={matchDetailsRef} Locations={Locations} />
           </Accordion>
         </Div>
       </ScrollView>
