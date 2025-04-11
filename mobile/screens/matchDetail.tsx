@@ -127,6 +127,7 @@ const MatchDetail: React.FC<Props> = ({ navigation, route }) => {
           id: _id
         }
       })
+      showSnackBar('success', 'Has enviado la solicitud con exito!')
     } catch (e) {
       showSnackBar('error', 'Ya has enviado una petición para este partido.')
       console.log('error al enviar petition', e)
