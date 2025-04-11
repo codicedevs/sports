@@ -45,9 +45,9 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
     }
   }, [match]);
 
-    const { data: sports } = useFetch(sportService.getAll, [QUERY_KEYS.SPORTS]);
-    const { data: allSportModes } = useFetch(sportmodeService.getAll, [QUERY_KEYS.SPORT_MODES]);
-   const { data: Locations } = useFetch(locationService.getAll, [
+    const { data: sports, isFetching: isFetchingSport } = useFetch(sportService.getAll, [QUERY_KEYS.SPORTS]);
+    const { data: allSportModes, isFetching: isFetchingSportModes } = useFetch(sportmodeService.getAll, [QUERY_KEYS.SPORT_MODES]);
+   const { data: Locations, isFetching: isFetchingLocations } = useFetch(locationService.getAll, [
       QUERY_KEYS.LOCATIONS,
     ]);
 
@@ -155,7 +155,7 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
     }, [match])
   );
 
-  if (!sports || !allSportModes || !Locations) return (<Div flex={1} alignItems="center" justifyContent="center"><ActivityIndicator size={"large"} /></Div>)
+  if (isFetchingSport || isFetchingSportModes || isFetchingLocations) return (<Div flex={1} alignItems="center" justifyContent="center"><ActivityIndicator size={"large"} /></Div>)
 
   return (
     <Div flex={1} key={formKey}>
