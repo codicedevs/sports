@@ -106,6 +106,7 @@ const Filters: React.FC<FiltersProps> = ({ filter, setFilter, toggleFilterModal,
           <Image style={{ width: scale(25), height: scale(25), alignSelf: 'flex-end' }} source={require("@assets/closeIcon.png")} />
         </TouchableOpacity>
         <Text textAlign='center' p={customTheme.spacing.small} mb={customTheme.spacing.medium} fontSize={customTheme.fontSize.large}>Horarios</Text>
+     <Div style={{gap:verticalScale(5)}}>
         {schedules.map((schedule) => (
           <TouchableOpacity key={schedule.id} onPress={() => handleSelectHour(schedule)}>
             <Div
@@ -123,12 +124,14 @@ const Filters: React.FC<FiltersProps> = ({ filter, setFilter, toggleFilterModal,
             </Div>
           </TouchableOpacity>
         ))}
+     </Div>
       </Overlay>
       <Overlay onBackdropPress={() => toggleFilterModal('zone')} visible={filter.zoneFilterModal} p="lg">
         <TouchableOpacity onPress={() => toggleFilterModal('zone')}>
           <Image style={{ width: scale(25), height: scale(25), alignSelf: 'flex-end' }} source={require("@assets/closeIcon.png")} />
         </TouchableOpacity>
         <Text textAlign='center' p={customTheme.spacing.small} mb={customTheme.spacing.medium} fontSize={customTheme.fontSize.large}>Zonas</Text>
+        <Div style={{gap:verticalScale(5)}}>
         {zonas.results.map((zona) => (
           <TouchableOpacity key={zona._id} onPress={() => toggleZoneSelection(zona)}>
             <Div
@@ -143,6 +146,7 @@ const Filters: React.FC<FiltersProps> = ({ filter, setFilter, toggleFilterModal,
             </Div>
           </TouchableOpacity>
         ))}
+        </Div>
       </Overlay>
       <Div w={'100%'} flexDir='row' borderWidth={1} borderColor={customTheme.colors.gray} rounded={customTheme.borderRadius.medium}>
         <Div
