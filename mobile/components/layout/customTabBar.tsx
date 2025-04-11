@@ -11,6 +11,7 @@ import BellIcon from "@assets/tabIcons/Icons/Bell";
 import PlusIcon from "@assets/tabIcons/Icons/Plus";
 import FieldIcon from "@assets/tabIcons/Icons/Field";
 import ProfileIcon from "@assets/tabIcons/Icons/Profile";
+import { useSession } from "../../context/authProvider";
 
 const CustomTabBar: React.FC<BottomTabBarProps> = ({
   state,
@@ -18,6 +19,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
   navigation,
 }) => {
   const insets = useSafeAreaInsets();
+  const { currentUser, showModal } = useSession();
 
   const iconMap: Record<string, JSX.Element> = {
     HomeStack: <HomeIcon width={scale(20)} height={scale(20)} />,
@@ -30,13 +32,30 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
     [AppScreens.MATCH_SCREEN]: (
       <FieldIcon width={scale(20)} height={scale(20)} />
     ),
-    SettingsStack3: <ProfileIcon width={scale(20)} height={scale(20)} />,
+    [AppScreens.USER_SCREEN] : (<ProfileIcon width={scale(20)} height={scale(20)} />),
   };
 
   const screen = getFocusedRouteNameFromRoute(state.routes[state.index]);
   if (screen === AppScreens.MATCH_DETAIL) return null;
   if (state.routes[state.index].name === AppScreens.MATCH_HANDLER) return null;
+console.log(state.routes[state.index].name);
 
+  const checkIfLogged = (route) => {
+    if (
+      !currentUser &&
+      route.name === AppScreens.MATCH_HANDLER
+    ) {
+      showModal();
+      return;
+    } else if (
+      !currentUser &&
+      route.name === AppScreens.USER_SCREEN
+    ) {
+      showModal();
+      return;
+    }
+    navigation.navigate(route.name);
+  };
   return (
     <Div
       flexDir="row"
@@ -61,7 +80,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
               bg={customTheme.colors.secondaryBackground}
               rounded="circle"
               p={scale(13)}
-              onPress={() => navigation.navigate(route.name)}
+              onPress={() => checkIfLogged(route)}
               alignSelf="center"
             >
               {React.cloneElement(

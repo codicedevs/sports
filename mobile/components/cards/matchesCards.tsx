@@ -9,6 +9,7 @@ import { User } from "../../types/user.type";
 import { SportMode } from "../../types/form.type";
 import { AppScreens, AppScreensParamList } from "../../navigation/screens";
 import { customTheme } from "../../utils/theme";
+import { useSession } from "../../context/authProvider"; 
 
 export function getDayName(dayNum?: number) {
   if (dayNum == null) return "";
@@ -60,6 +61,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
   matchId,
 }) => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
+ const { currentUser, showModal } = useSession()
 
   // verificamos hora fecha etc
   const hasDateTime = !!date && time != null;
@@ -74,8 +76,8 @@ const MatchCard: React.FC<MatchCardProps> = ({
 
   return (
     <TouchableOpacity
-      onPress={() =>
-        navigation.navigate(AppScreens.MATCH_DETAIL, { id: matchId })
+      onPress={() => currentUser?
+        navigation.navigate(AppScreens.MATCH_DETAIL, { id: matchId }) : showModal()
       }
     >
       <Div alignItems="center" >
