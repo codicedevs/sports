@@ -4,7 +4,7 @@ export interface Location {
     address: string;
     hour: string | number;
     location: {
-      type: string;
+      type: "Point";
       coordinates: number[];
     };
     matches?: string[];

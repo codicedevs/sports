@@ -12,20 +12,30 @@ import PlusIcon from "@assets/tabIcons/Icons/Plus";
 import FieldIcon from "@assets/tabIcons/Icons/Field";
 import ProfileIcon from "@assets/tabIcons/Icons/Profile";
 
-const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
+const CustomTabBar: React.FC<BottomTabBarProps> = ({
+  state,
+  descriptors,
+  navigation,
+}) => {
   const insets = useSafeAreaInsets();
 
   const iconMap: Record<string, JSX.Element> = {
     HomeStack: <HomeIcon width={scale(20)} height={scale(20)} />,
-    SettingsStack: <BellIcon width={scale(20)} height={scale(20)} />,
-    [AppScreens.MATCH_HANDLER]: <PlusIcon width={scale(20)} height={scale(20)} />,
-    [AppScreens.MATCH_SCREEN]: <FieldIcon width={scale(20)} height={scale(20)} />,
-    SettingsStack3: <ProfileIcon width={scale(20)} height={scale(20)} />
+    [AppScreens.PETITIONS_SCREEN]: (
+      <BellIcon width={scale(20)} height={scale(20)} />
+    ),
+    [AppScreens.MATCH_HANDLER]: (
+      <PlusIcon width={scale(20)} height={scale(20)} />
+    ),
+    [AppScreens.MATCH_SCREEN]: (
+      <FieldIcon width={scale(20)} height={scale(20)} />
+    ),
+    SettingsStack3: <ProfileIcon width={scale(20)} height={scale(20)} />,
   };
 
   const screen = getFocusedRouteNameFromRoute(state.routes[state.index]);
   if (screen === AppScreens.MATCH_DETAIL) return null;
-  if(state.routes[state.index].name === AppScreens.MATCH_HANDLER) return null;
+  if (state.routes[state.index].name === AppScreens.MATCH_HANDLER) return null;
 
   return (
     <Div
@@ -39,25 +49,30 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
       p={customTheme.spacing.small}
       alignSelf="center"
     >
-      {state.routes.map((route, index) => {
-        const { options } = descriptors[route.key];
-        const isFocused = state.index === index;
+      {state.routes
+        .filter((route) => route.name !== AppScreens.MATCH_DETAIL)
+        .map((route, index) => {
+          const { options } = descriptors[route.key];
+          const isFocused = state.index === index;
 
-        return (
-          <Button
-            key={route.key}
-            bg={customTheme.colors.secondaryBackground}
-            rounded="circle"
-            p={scale(13)}
-            onPress={() => navigation.navigate(route.name)}
-            alignSelf="center"
-          >
-            {React.cloneElement(iconMap[route.name] || <Icon name="circle" fontSize={24} />, {
-              fill: isFocused ? customTheme.colors.primary : "white",
-            })}
-          </Button>
-        );
-      })}
+          return (
+            <Button
+              key={route.key}
+              bg={customTheme.colors.secondaryBackground}
+              rounded="circle"
+              p={scale(13)}
+              onPress={() => navigation.navigate(route.name)}
+              alignSelf="center"
+            >
+              {React.cloneElement(
+                iconMap[route.name] || <Icon name="circle" fontSize={24} />,
+                {
+                  fill: isFocused ? customTheme.colors.primary : "white",
+                }
+              )}
+            </Button>
+          );
+        })}
     </Div>
   );
 };

@@ -2,7 +2,7 @@
 import React from "react";
 import { Div, Text } from "react-native-magnus";
 import { customTheme } from "../../../utils/theme";
-import { verticalScale } from "react-native-size-matters";
+import { scale, verticalScale } from "react-native-size-matters";
 import { TouchableOpacity } from "react-native";
 
 type MatchPrivacyDisplayProps = {
@@ -46,8 +46,10 @@ export default function MatchPrivacyDisplay({
         </Div>
       </Div>
 
-      <Text fontFamily="NotoSans-Variable" textAlign="auto">
-        Lorem ipsum odor amet, consectetuer adipiscing elit...
+      <Text fontFamily="NotoSans-Variable" textAlign="auto" mt={scale(15)}>
+        Los partidos públicos permiten que cualquier persona pueda enviar una invitación para sumarse.
+        Son ideales para cuando faltan jugadores.
+        Los partidos privados solo pueden ser accedidos a través de invitaciones personales.
       </Text>
     </Div>
   );

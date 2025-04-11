@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { ScrollView, TouchableOpacity } from "react-native";
-import { AppScreenProps, AppScreens } from "../navigation/screens";
+import { ScrollView, Share, TouchableOpacity } from "react-native";
+import {
+  AppScreenProps,
+  AppScreens,
+  AppScreensParamList,
+} from "../navigation/screens";
 import { Button, Div, Image, Overlay, Text } from "react-native-magnus";
 import matchService from "../service/match.service";
 import useFetch from "../hooks/useGet";
@@ -17,12 +21,20 @@ import Field from "../components/matche/Detail/field";
 import PlayerStatusList from "../components/matche/Detail/playerStatusList";
 import InviteModal from "../components/modal/invitePlayer";
 import { ActivityScreen } from "./activityScreen";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import * as Clipboard from "expo-clipboard";
+import { useGlobalUI } from "../context/globalUiContext";
+import petitionService from "../service/petition.service";
+import { PetitionModelType, PetitionStatus } from "../types/petition.type";
 
 type TabKey = "partido" | "jugadores" | "actividad" | "equipos";
 
-const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
-  route,
-}) => {
+type Props = NativeStackScreenProps<
+  AppScreensParamList,
+  AppScreens.MATCH_DETAIL
+>;
+
+const MatchDetail: React.FC<Props> = ({ navigation, route }) => {
   const { id } = route.params;
   const { currentUser } = useSession();
   const [activeTab, setActiveTab] = useState<TabKey>("partido");
@@ -36,6 +48,9 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
     refetch,
   } = useFetch(() => matchService.getById(id), [QUERY_KEYS.MATCH]);
   const [isParticipe, setIsParticipe] = useState(false);
+  const { showSnackBar } = useGlobalUI();
+  const [isLoading, setIsLoading] = useState(false)
+
 
   function isPlayer() {
     if (!match) return;
@@ -76,6 +91,46 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
   const playerCount = users?.length || 0;
   const dateObject = new Date(date);
   const isAdmin = user?._id === currentUser?._id; //SI el usuario que creo el partido dejo de existir genera conflictos
+
+  const handleShare = async () => {
+
+    try {
+      const result = await Share.share({
+        message: 'Sumate a este partido en Loyal Chacabuco a las 20:00. ' + `https://dreamy-souffle-80d9a2.netlify.app/${_id}`,
+        url: `https://dreamy-souffle-80d9a2.netlify.app/${_id}`, // works better for iOS
+        title: 'Awesome link',
+      });
+
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          console.log('Shared with activity type:', result.activityType);
+        } else {
+          console.log('Shared');
+        }
+      } else if (result.action === Share.dismissedAction) {
+        console.log('Dismissed');
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+
+  const sendRequest = async () => {
+    setIsLoading(true)
+    try {
+      await petitionService.create({
+        emitter: currentUser._id,
+        receiver: match.data.userId,
+        reference: {
+          type: PetitionModelType.Match,
+          id: _id
+        }
+      })
+    } catch (e) {
+      console.log('error al enviar petition', e)
+    }
+    setIsLoading(false)
+  }
 
   return (
     <>
@@ -128,18 +183,20 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
           mb={customTheme.spacing.small}
           mt={customTheme.spacing.small}
         >
-          <TouchableOpacity
-            onPress={() => setActiveTab("partido")}
-            style={{
-              backgroundColor:
-                activeTab === "partido"
-                  ? customTheme.colors.primary
-                  : "transparent",
-              padding: customTheme.spacing.small,
-            }}
-          >
-            <Text>Partido</Text>
-          </TouchableOpacity>
+          {isParticipe && (
+            <TouchableOpacity
+              onPress={() => setActiveTab("partido")}
+              style={{
+                backgroundColor:
+                  activeTab === "partido"
+                    ? customTheme.colors.primary
+                    : "transparent",
+                padding: customTheme.spacing.small,
+              }}
+            >
+              <Text>Partido</Text>
+            </TouchableOpacity>
+          )}
           {isParticipe && (
             <>
               <TouchableOpacity
@@ -177,7 +234,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                   padding: customTheme.spacing.small,
                 }}
               >
-                <Text>Equipos</Text>
+                <Text>Armar equipos</Text>
               </TouchableOpacity>
             </>
           )}
@@ -191,8 +248,13 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
             >
               <Div flex={1}>
                 <Div>
-                  <Div  flexDir="column" justifyContent="space-between">
-                    <Div flexDir="row" justifyContent="space-between" w="100%"  p={customTheme.spacing.small}>
+                  <Div flexDir="column" justifyContent="space-between">
+                    <Div
+                      flexDir="row"
+                      justifyContent="space-between"
+                      w="100%"
+                      p={customTheme.spacing.small}
+                    >
                       <Div>
                         <Text
                           fontSize={customTheme.fontSize.large}
@@ -204,7 +266,7 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                       <Div
                         flexDir="row"
                         justifyContent="center"
-                        bg={customTheme.colors.primary}
+                        bg={customTheme.colors.enabledPlayers}
                       >
                         <Image
                           source={require("../assets/iconUser.png")}
@@ -266,20 +328,27 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                         </Text>
                       </Button>
                       <Div>
-                        <Button bg="black" block>
+                        <Button
+                          bg="white"
+                          block
+                          borderColor="black"
+                          borderWidth={1}
+                          onPress={handleShare}
+                        >
                           <Image
                             source={require("../assets/iconShare.png")}
                             style={{
                               width: 18,
                               height: 18,
                               resizeMode: "contain",
+                              tintColor: "black",
                             }}
                           />
                           <Text
                             fontSize={customTheme.fontSize.medium}
                             fontFamily="NotoSans-BoldItalic"
                             ml={customTheme.spacing.small}
-                            color="white"
+                            color="black"
                           >
                             Compartir
                           </Text>
@@ -287,28 +356,37 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
                       </Div>
                     </Div>
                   ) : (
+
                     <Div
                       p={customTheme.spacing.small}
                       justifyContent="center"
                       alignItems="center"
                     >
-                      <Button mb={customTheme.spacing.small} bg="black" block>
-                        <Image
-                          source={require("../assets/iconUserAdd.png")}
-                          style={{
-                            width: 20,
-                            height: 20,
-                            resizeMode: "contain",
-                          }}
-                        />
-                        <Text
-                          fontSize={customTheme.fontSize.medium}
-                          fontFamily="NotoSans-BoldItalic"
-                          ml={customTheme.spacing.small}
-                          color="white"
-                        >
-                          Solicitar unirse al partido
-                        </Text>
+                      <Button
+                        mb={customTheme.spacing.small}
+                        bg="black"
+                        block
+                        onPress={() => sendRequest()}
+                        h={scale(42)}
+                      >
+                        {
+                          !isLoading ?
+                            <><Image
+                              source={require("../assets/iconUserAdd.png")}
+                              style={{
+                                width: 20,
+                                height: 20,
+                                resizeMode: "contain",
+                              }} /><Text
+                                fontSize={customTheme.fontSize.medium}
+                                fontFamily="NotoSans-BoldItalic"
+                                ml={customTheme.spacing.small}
+                                color="white"
+                              >
+                                Solicitar unirse a partido
+                              </Text></>
+                            : <ActivityIndicator size={"small"} color={'white'} />
+                        }
                       </Button>
                     </Div>
                   )}
@@ -382,13 +460,6 @@ const MatchDetail: React.FC<AppScreenProps<AppScreens.MATCH_DETAIL>> = ({
         {activeTab === "equipos" && (
           <Div h={"90%"}>
             <Field match={match.data} isAdmin={isAdmin} />
-          </Div>
-        )}
-        {/* Botones Eliminar / Guardar */}
-
-        {activeTab === "equipos" && (
-          <Div>
-            <Text>pendiente</Text>
           </Div>
         )}
 

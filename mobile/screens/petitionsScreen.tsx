@@ -1,3 +1,4 @@
+import React from "react";
 import { Div, Text } from "react-native-magnus";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
 import petitionService from "../service/petition.service";
@@ -28,23 +29,41 @@ function PetitionScreen({
     [QUERY_KEYS.PETITIONS, currentUser]
   );
 
+  const handleActionCompleted = () => {
+    refetchPetition();
+  };
+
   return (
     <Div mb={customTheme.spacing.medium} p={customTheme.spacing.small}>
-       <ScrollView>
-      {petitions?.results?.length > 0 ? (
-        petitions.results.map((p, index) => (
-          <Div mb={customTheme.spacing.small}> <MatchInvitation
-            key={p.reference.id._id || index}
-            date={p.reference.id.date}
-            time={p.reference.id.hour}
-            title={p.reference.id.name}
-            matchType={p.reference.type}
-            petition={p}
-          /></Div>
-        ))
-      ) : (
-        <Text>No hay peticiones pendientes.</Text>
-      )}</ScrollView>
+      <Div p={customTheme.spacing.small}>
+        <Text
+          fontSize={customTheme.fontSize.large}
+          fontFamily="NotoSans-BoldItalic"
+        >
+          Invitaciones
+        </Text>
+      </Div>
+      <ScrollView>
+        {petitions?.results?.length > 0 ? (
+          petitions.results.map((p, index) => (
+            <Div
+              mb={customTheme.spacing.small}
+              key={p.reference.id._id || index}
+            >
+              <MatchInvitation
+                date={p.reference.id.date}
+                time={p.reference.id.hour}
+                title={p.reference.id.name}
+                matchType={p.reference.type}
+                petition={p}
+                onActionCompleted={handleActionCompleted}
+              />
+            </Div>
+          ))
+        ) : (
+          <Text>No hay peticiones pendientes.</Text>
+        )}
+      </ScrollView>
     </Div>
   );
 }

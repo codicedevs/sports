@@ -1,6 +1,5 @@
 import { API_URL } from "../config";
 import { Filter } from "../types/filters.type";
-import { Match } from "../types/matches.type";
 import objectToQueryString from "../utils/string";
 import { HttpBase } from "./http";
 

@@ -88,7 +88,7 @@ const MatchCard: React.FC<MatchCardProps> = ({
         >
           {/* Cont amarilla */}
           <Div
-            bg={customTheme.colors.primary}
+            bg={customTheme.colors.enabledPlayers}
             flex={2}
             justifyContent="center"
             rounded={customTheme.borderRadius.medium}
@@ -162,7 +162,8 @@ const MatchCard: React.FC<MatchCardProps> = ({
           >
             {hasLocation ? (
               <Div>
-                <Text fontSize={customTheme.fontSize.title}>
+                <Text fontFamily="NotoSans-ExtraBoldItalic"
+              fontSize={customTheme.fontSize.title}>
                   {location?.name} {location?.address}
                 </Text>
               </Div>

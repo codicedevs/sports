@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import { AppScreenProps, AppScreens } from "../navigation/screens";
 import { Div, Text } from "react-native-magnus";
 import useFetch from "../hooks/useGet";
@@ -19,44 +19,186 @@ import Petition from "../types/petition.type";
 import MatchInvitation from "../components/cards/invitationCard";
 import MatchesCardSK from "../components/cards/matchesCardSK";
 import UpcomingMatchesCardSK from "../components/cards/upcomingMatchesCardSK";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
 }) => {
-  const { currentUser } = useSession()
-  const { data: matches, refetch, isFetching: isFetchingMatches } = useFetch(() => matchService.getAll({
-    where: {
-      "user._id": currentUser._id
-    }
-  }), [QUERY_KEYS.MATCHES, currentUser]);
+  const { currentUser, setCurrentUser } = useSession();
+  const {
+    data: matches,
+    refetch,
+    isFetching: isFetchingMatches,
+  } = useFetch(
+    () =>
+      matchService.getAll({
+        where: {
+          "user._id": currentUser._id,
+        },
+      }),
+    [QUERY_KEYS.MATCHES, currentUser]
+  );
   const now = new Date().toISOString();
-  const { data: publicMatches, refetch: refetchPublic, isFetching: isFetchingPublic } = useFetch(() => matchService.getAll({
-    where: {
-      "open": true,
-      "date": { $gte: now }
-    }
-  }), [QUERY_KEYS.PUBLIC_MATCHES]);
+  const {
+    data: publicMatches,
+    refetch: refetchPublic,
+    isFetching: isFetchingPublic,
+  } = useFetch(
+    () =>
+      matchService.getAll({
+        where: {
+          open: true,
+          date: { $gte: now },
+        },
+      }),
+    [QUERY_KEYS.PUBLIC_MATCHES]
+  );
 
-  const { data: petitions, refetch: refetchPetition } = useFetch<{ results: Petition[] }>(() => petitionService.getAll(
+  const { data: petitions, refetch: refetchPetition } = useFetch<{
+    results: Petition[];
+  }>(
+    () =>
+      petitionService.getAll({
+        populate: ["reference.id"],
+        where: {
+          status: ["pending"],
+          receiver: [currentUser._id],
+        },
+      }),
+    [QUERY_KEYS.PETITIONS, currentUser]
+  );
+  const { data: events } = useFetch(eventService.getAll, [QUERY_KEYS.EVENTS]);
 
-    {
-      populate: ["reference.id"],
-      where: {
-        status: ['pending'],
-        receiver: [currentUser._id]
-      }
-    }
-
-  ), [QUERY_KEYS.PETITIONS, currentUser]);
-  const { data: events } = useFetch(eventService.getAll, [QUERY_KEYS.EVENTS]); // pa hacer la llamada
+  const handleActionCompleted = () => {
+    refetchPetition();
+  };
 
   useFocusEffect(
     useCallback(() => {
       refetch();
       refetchPetition();
-      refetchPublic()
+      refetchPublic();
     }, [])
   );
+  // const { currentUser } = useSession()
+  // const queryClient = useQueryClient()
+  // const lastUpdatedAtRef = useRef<string | null>(null)
+  // const { data: matches, refetch } = useFetch(() => matchService.getAll({
+  //   where: {
+  //     "user._id": currentUser._id
+  //   }
+  // }), [QUERY_KEYS.MATCHES, currentUser]);
+  // const now = new Date().toISOString();
+  // //Busco todas las matches LA PRIMERA VEZ
+  // const { data: publicMatches, refetch: refetchPublic } = useFetch(() => matchService.getAll({
+  //   where: {
+  //     "open": true,
+  //     "date": { $gte: now }
+  //   }
+  // }), [QUERY_KEYS.PUBLIC_MATCHES],
+  //   () => {
+  //     lastUpdatedAtRef.current = new Date().toISOString()
+  //   }
+  //   ,
+  //   {
+  //     options: {
+  //       staleTime: "infinity"
+  //     }
+  //   }
+  // );
+
+  // FUNCION UPDATE QUE CHEQUEA SI HAY CAMBIOS EN LA INFORMACION SI HAY LOS AGREGA Y SI NO NADA
+  // const { data } = useFetch(
+  //   async () => {
+  //     if (!lastUpdatedAtRef.current) {
+  //       return Promise.resolve([]);
+  //     } else {
+  //       return matchService.getAll({
+  //         where: {date: { $gt: lastUpdatedAtRef.current }}
+  //       });
+  //     }
+  //   },
+  //   [QUERY_KEYS.PUBLIC_MATCHES, "UPDATES"],
+  //   (newItems) => {
+  //     if (newItems.length > 0) {
+  //       queryClient.setQueryData(['items'], (oldItems: any[] = []) => {
+  //         const merged = [...newItems, ...oldItems].filter(
+  //           (item, index, self) =>
+  //             index === self.findIndex((i) => i.id === item.id)
+  //         )
+  //         return merged
+  //       })
+  //     }
+  //     lastUpdatedAtRef.current = new Date().toISOString()
+  //   },
+  //   {
+  //     options: { enabled: false }
+  //   }
+  // );
+
+  //   const updateQuery = useQuery({
+  //     queryKey: [QUERY_KEYS.PUBLIC_MATCHES, 'updates'],
+  //     queryFn: async () => {
+  //       if (!lastUpdatedAtRef.current) return []
+
+  //       return await matchService.getAll({
+  //         where: { date: { $gt: lastUpdatedAtRef.current } }
+  //       })
+  //     },
+  //     enabled: false, // run manually
+  //     meta: {
+  //       onSuccess: (newItems) => {
+  //         if (newItems.length > 0) {
+  //           queryClient.setQueryData([QUERY_KEYS.PUBLIC_MATCHES], (oldItems: any[] = []) => {
+  //             const merged = [...newItems, ...oldItems].filter(
+  //               (item, index, self) =>
+  //                 index === self.findIndex((i) => i.id === item.id) // remove duplicates
+  //             )
+  //             return merged
+  //           })
+  //           lastUpdatedAtRef.current = new Date().toISOString()
+  //         }
+  //       }
+  //     }
+  //   })
+  //   const { data: petitions, refetch: refetchPetition } = useFetch<{ results: Petition[] }>(() => petitionService.getAll(
+  // 123,
+  //     {
+  //       populate: ["reference.id"],
+  //       where: {
+  //         status: ['pending'],
+  //         receiver: [currentUser._id]
+  //       }
+  //     }
+
+  //   ), [QUERY_KEYS.PETITIONS, currentUser]);
+  //   const { data: events } = useFetch(eventService.getAll, [QUERY_KEYS.EVENTS]); // pa hacer la llamada
+
+  //   useFocusEffect(
+  //     useCallback(() => {
+  //       // refetch();
+  //       // refetchPetition();
+  //       // refetchPublic()
+
+  //       updateQuery.refetch()
+
+  const loadSession = async () => {
+    const [accessToken, refreshToken, userJson] = await AsyncStorage.multiGet([
+      '@access_token',
+      '@refresh_token',
+      '@user',
+    ]);
+
+    if (accessToken[1] && userJson[1]) {
+      const user = JSON.parse(userJson[1]);
+      setCurrentUser(user);
+      // Podés también setear los tokens a algún contexto si los usás globalmente
+    }
+  };
+
+  useEffect(() => {
+    loadSession()
+  }, [])
 
   const fallbackEvent = {
     name: "TORNEO DE VERANO FUTBOL VETERANO", // pa hardcodear
@@ -64,17 +206,20 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   };
 
   return (
-    <Div bg="white" mt={scale(-12)}>
+    <Div bg="white">
       <ScrollView>
-        <Div p={customTheme.spacing.medium}>
+        <Div pb={customTheme.spacing.medium} px={customTheme.spacing.medium}>
           <Div mb={customTheme.spacing.medium}>
-            {
-              (currentUser && petitions) &&
-              (
-                petitions.totalCount !== 0 &&
-                <MatchInvitation date={petitions.results[0]?.reference?.id.date} time="10" title="Stalagol" matchType={petitions.results[0]?.reference.type} petition={petitions.results[0]} />
-              )
-            }
+            {currentUser && petitions && petitions.totalCount !== 0 && (
+              <MatchInvitation
+                date={petitions.results[0]?.reference?.id.date}
+                time={petitions.results[0]?.reference.id.hour?.toString()}
+                title={petitions.results[0]?.reference.id.name}
+                matchType={petitions.results[0]?.reference.type}
+                petition={petitions.results[0]}
+                onActionCompleted={handleActionCompleted}
+              />
+            )}
           </Div>
           <Div mb={customTheme.spacing.medium}>
             <EventsCard // hardcodeado cambiar, arreglar lo coso de event!!!!!!!!
@@ -92,24 +237,31 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
             </Text>
           </Div>
           {
-            isFetchingPublic ?
-              <UpcomingMatchesCardSK />
-              :
+            !publicMatches ? (
+              <Div flexDir="row">
+                <UpcomingMatchesCardSK />
+                <UpcomingMatchesCardSK />
+              </Div>
+            ) : (
               <ScrollView horizontal>
-                {publicMatches?.results?.map((u: any) => (
-                  <UpcomingMatchCard
-                    key={u._id}
-                    matchId={u._id}
-                    date={u.date}
-                    hour={u.hour}
-                    players={u.users}
-                    maxPlayers={u.playersLimit}
-                    location={u.location}
-                    sportMode={u.sportMode}
-                  />
-                ))}
+                {publicMatches?.results
+                  ?.sort((a, b) => new Date(a.date) - new Date(b.date))
+                  .map((u: any) => (
+                    <UpcomingMatchCard
+                      key={u._id}
+                      matchId={u._id}
+                      date={u.date}
+                      hour={u.hour}
+                      players={u.users}
+                      maxPlayers={u.playersLimit}
+                      location={u.location}
+                      sportMode={u.sportMode}
+                    />
+                  ))}
               </ScrollView>
+            )
           }
+
         </Div>
         <Div mb={customTheme.spacing.medium} px={customTheme.spacing.medium}>
           <HandleMatchesButton />
@@ -123,23 +275,25 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
               Mis partidos
             </Text>
             {
-              isFetchingMatches ?
+              !matches ?
                 <MatchesCardSK />
                 :
                 <Div style={{ gap: scale(16) }}>
-                  {matches?.results?.map((m: any) => (
-                    <MatchesCards
-                      key={m._id}
-                      matchId={m._id}
-                      dayOfWeek={m.dayOfWeek}
-                      date={m.date} // string, ej: "2026-07-15T17:48:00.000Z"
-                      time={m.hour} // number, ej: 22
-                      location={m.location} // { name, address }
-                      players={m.users}
-                      maxPlayers={m.playersLimit}
-                      sportMode={m.sportMode}
-                    />
-                  ))}
+                  {matches?.results
+                    ?.sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())
+                    .map((m: any) => (
+                      <MatchesCards
+                        key={m._id}
+                        matchId={m._id}
+                        dayOfWeek={m.dayOfWeek}
+                        date={m.date}
+                        time={m.hour}
+                        location={m.location}
+                        players={m.users}
+                        maxPlayers={m.playersLimit}
+                        sportMode={m.sportMode}
+                      />
+                    ))}
                 </Div>
             }
           </Div>

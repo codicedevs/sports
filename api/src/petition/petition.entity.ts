@@ -19,10 +19,10 @@ export const referenceSchema = SchemaFactory.createForClass(Reference)
 @Schema()
 export class Petition extends Document {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "User", required: true })
-  emitter: Types.ObjectId;
+  emitter: Types.ObjectId | User;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "User", required: true })
-  receiver: Types.ObjectId;
+  receiver: Types.ObjectId | User;
 
   @Prop({ type: referenceSchema })
   reference: Reference;

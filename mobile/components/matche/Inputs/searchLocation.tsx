@@ -27,6 +27,7 @@ export default function SearchLocationInput({
   const [selectedLocation, setSelectedLocation] = useState<Place | null>(
     matchDetailsRef?.current.location ?? null
   );
+  const [showMap, setShowMap] = useState(false)
 
   const [userHasSelected, setUserHasSelected] = useState(false);
 
@@ -50,7 +51,6 @@ export default function SearchLocationInput({
         loc.name.toLowerCase().includes(filter.toLowerCase())
       );
       setFilteredLocations(results);
-      
     }
   }, [filter, Locations]);
 
@@ -59,6 +59,7 @@ export default function SearchLocationInput({
   function handleSelectLocation(loc: Place) {
     setSelectedLocation(loc);
     setUserHasSelected(true);
+    setShowMap(true)
     if (matchDetailsRef) {
       matchDetailsRef.current.location = loc;
     }
@@ -80,22 +81,21 @@ export default function SearchLocationInput({
         >
           <Div flexDir="row" alignItems="center" justifyContent="space-between">
             <Text fontFamily="NotoSans-Variable">Lugar</Text>
-            {!hasCoords && (
-              <Text fontFamily="NotoSans-BoldItalic">Sin coordenadas</Text>
-            )}
+
             <Text fontFamily="NotoSans-BoldItalic">
-              {selectedLocation?.name ?? "A definir"}
+              {selectedLocation?.name ?? "A definir"}{" "}
+              {selectedLocation?.address ? `/ ${selectedLocation.address}` : ""}
             </Text>
           </Div>
 
-          {hasCoords && (
+          {/* {hasCoords && (
             <Div mt={customTheme.spacing.small}>
               <MapLocationDisplay
                 place={selectedLocation}
-                mapHeight={scale(250)}
+                mapHeight={scale(250)} MAPA DE UBICACION
               />
             </Div>
-          )}
+          )} */}
         </Div>
       </Div>
     );
@@ -177,16 +177,64 @@ export default function SearchLocationInput({
             </Text>
           </Div>
 
-          {hasCoords && (
+          {(hasCoords && showMap) ? (
+            <Div mt={customTheme.spacing.small} bg="white">
+              <TouchableOpacity onPress={() => setShowMap(false)} activeOpacity={1}>
+                <MapLocationDisplay
+                  place={selectedLocation}
+                  mapHeight={scale(270)}
+                />
+              </TouchableOpacity>
+            </Div>
+          ) : (
             <Div mt={customTheme.spacing.small}>
-              <MapLocationDisplay
-                place={selectedLocation}
-                mapHeight={scale(270)}
-              />
+              <Text mt="md">¿Querés cambiar la ubicación?</Text>
+              <ScrollView
+                nestedScrollEnabled
+                contentContainerStyle={{
+                  paddingVertical: customTheme.spacing.medium,
+                  flexGrow: 1,
+                }}
+                showsVerticalScrollIndicator={false}
+              >
+                {Locations.results.map((loc: Place, index: number) => (
+                  <TouchableOpacity
+                    key={index}
+                    onPress={() => handleSelectLocation(loc)}
+                  >
+                    <Div
+                      h={verticalScale(48)}
+                      mb={
+                        index !== Locations.results.length - 1
+                          ? customTheme.spacing.small
+                          : 0
+                      }
+                      bg={
+                        selectedLocation?._id === loc._id
+                          ? customTheme.colors.secondaryBackground
+                          : "white"
+                      }
+                      justifyContent="center"
+                      borderWidth={1}
+                    >
+                      <Text
+                        textAlign="center"
+                        color={
+                          selectedLocation?._id === loc._id
+                            ? "white"
+                            : customTheme.colors.secondaryBackground
+                        }
+                      >
+                        {loc.name}
+                      </Text>
+                    </Div>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
             </Div>
           )}
         </Div>
       </Div>
-    );
-  }
+    );
+  }
 }

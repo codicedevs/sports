@@ -8,6 +8,8 @@ import { JwtService } from "@nestjs/jwt";
 import { RolesGuard } from "authorization/roles.guard";
 import { getProtocolConfig } from "utilities/getProtocolConfig";
 import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
+import { join } from "path";
+import { NestExpressApplication } from "@nestjs/platform-express";
 
 const { key, cert, protocol } = getProtocolConfig();
 
@@ -15,7 +17,7 @@ const { key, cert, protocol } = getProtocolConfig();
 
 async function bootstrap() {
   process.env.TZ = "America/Argentina/Buenos_Aires";
-  const app = await NestFactory.create(
+  const app = await NestFactory.create<NestExpressApplication>(
       AppModule,
     //   protocol == "https" ? { httpsOptions: { key, cert } } : undefined
   );
@@ -39,6 +41,7 @@ async function bootstrap() {
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup("explorer", app, documentFactory);
+  app.useStaticAssets(join(process.cwd(), 'public'));
   //app.useGlobalFilters(new GlobalExceptionFilter()); // maneja errores de request//pero pisa los dto
   await app.listen(serverSetting.PORT);
   //console.log(`la app esta corriendo en el puerto ${protocol}${serverSetting.PORT}`);

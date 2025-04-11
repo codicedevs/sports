@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useGlobalUI } from "../../../context/globalUiContext";
 import { MatchDetails } from "../../../types/form.type";
 import Match from "../../../types/match.type";
 import matchService from "../../../service/match.service";
 import { Div, Text } from "react-native-magnus";
-import { Image, ScrollView, TouchableOpacity } from "react-native";
-import { scale, verticalScale } from "react-native-size-matters";
+import { ActivityIndicator, ScrollView, TouchableOpacity } from "react-native";
+import { verticalScale } from "react-native-size-matters";
 import { customTheme } from "../../../utils/theme";
 import { Accordion } from "../../collapsibleView";
 import SportInput from "../Inputs/sport";
@@ -14,13 +14,15 @@ import MatchPrivacyToggleInput from "../Inputs/matchPrivacyToggle";
 import { formatDate } from "../../../utils/date";
 import MatchSchedulerInput from "../Inputs/matchScheduler";
 import SearchLocationInput from "../Inputs/searchLocation";
-import { QueryObserverResult } from "@tanstack/react-query";
 import { useSession } from "../../../context/authProvider";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { AppScreens } from "../../../navigation/screens";
 
 export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match, onRefetch?: () => void, onGoBack?: () => void }) {
   const [openId, setOpenId] = useState<null | string>(null);
   const { showSnackBar } = useGlobalUI();
   const { currentUser } = useSession()
+  const [loading, setLoading] = useState(false)
   const matchDetailsRef = useRef<MatchDetails>({
     selectedSport: null,
     selectedSportMode: null,
@@ -29,6 +31,8 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
     matchDate: undefined,
     location: null,
   });
+  const [formKey, setFormKey] = useState(0);
+  const navigation = useNavigation();
 
   useEffect(() => {
     if (match) {
@@ -38,21 +42,20 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
 
   async function fetchMatch() {
     try {
-      const res = await matchService.getById(match._id);
-      // Ajusta según la forma real de la respuesta
-      matchDetailsRef.current.selectedSport = res.data.sportMode?.sport || null;
-      matchDetailsRef.current.selectedSportMode = res.data.sportMode || null;
-      matchDetailsRef.current.playerLimit = res.data.playersLimit || 0;
-      matchDetailsRef.current.privacyOption = res.data.open || false;
-      matchDetailsRef.current.matchDate = res.data.date;
-      matchDetailsRef.current.location = res.data.location || null;
+      matchDetailsRef.current.selectedSport = match.sport || null;
+      matchDetailsRef.current.selectedSportMode = match.sportMode || null;
+      matchDetailsRef.current.playerLimit = match.playersLimit || 0;
+      matchDetailsRef.current.privacyOption = match.open || false;
+      matchDetailsRef.current.matchDate = match.date ? match.date.toISOString() : undefined;
+      matchDetailsRef.current.location = match.location || null;
     } catch (e) {
       console.error("Error al fetchMatch:", e);
       console.log(e);
     }
   }
-  console.log(currentUser)
+
   async function createMatch() {
+    setLoading(true)
     try {
       const res = await matchService.create({
         name: "Prueba3",
@@ -69,16 +72,23 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
       //     onMatchCreated(createdMatchId);
       // }
       // closeModal();
-      onGoBack()
+      // if (onGoBack) {
+      //   onGoBack();
+      // }
+      navigation.navigate(AppScreens.MATCH_DETAIL, { id: res._id })
+      setLoading(false)
       showSnackBar("success", "Partido creado con exito")
     } catch (e) {
       console.error("Error al crear el partido:", e);
       showSnackBar("error", "Ocurrio un error")
+    } finally {
+      setLoading(false)
     }
   }
 
   const editMatch = async () => {
     if (!match) return
+    setLoading(true)
     try {
       const res = await matchService.update(match._id, {
         name: "Prueba3",
@@ -92,26 +102,46 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
       // refetch();scale
       // closeModal();
       console.log("Partido editado:", res);
-      onRefetch()
+      if (onRefetch) {
+        onRefetch()
+      }
+      setLoading(false)
       showSnackBar("success", "Partido editado con exito")
     } catch (e) {
-      scale
       console.error("Error al editar el partido:", e);
       showSnackBar("error", "Ocurrio un error")
+    } finally {
+      setLoading(false)
     }
   };
-  scale
+
   const handleAction = () => {
     if (!match) {
       createMatch();
     } else {
-      scale
       editMatch();
     }
   };
-  scale
+
+  useFocusEffect(
+    useCallback(() => {
+      if (!match) {
+        matchDetailsRef.current = {
+          selectedSport: null,
+          selectedSportMode: null,
+          playerLimit: 0,
+          privacyOption: false,
+          matchDate: undefined,
+          location: null,
+        };
+        // Incrementa el key para forzar una re-renderización del formulario
+        setFormKey(prevKey => prevKey + 1);
+      }
+    }, [match])
+  );
+
   return (
-    <Div flex={1}>
+    <Div flex={1} key={formKey}>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <Div
           flex={1}
@@ -125,9 +155,11 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
             setOpenId={setOpenId}
             title="Deporte"
             rightText={
-              matchDetailsRef.current.selectedSportMode
-                ? matchDetailsRef.current.selectedSportMode.name
-                : "A definir"
+              match?.sportMode?.name
+                ? match.sportMode.name
+                : matchDetailsRef.current.selectedSportMode?.name
+                  ? matchDetailsRef.current.selectedSportMode.name
+                  : "A definir"
             }
             size={342}
           >
@@ -138,7 +170,13 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
             openId={openId}
             setOpenId={setOpenId}
             title="Cupo"
-            rightText="Agrega participantes"
+            rightText={
+              match?.playersLimit
+                ? match.playersLimit.toString()
+                : matchDetailsRef.current.playerLimit
+                  ? matchDetailsRef.current.playerLimit.toString()
+                  : "Agrega participantes"
+            }
             size={123}
           >
             <PlayersCounterInput matchDetailsRef={matchDetailsRef} />
@@ -149,7 +187,13 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
             setOpenId={setOpenId}
             title="Privacidad"
             rightText={
-              matchDetailsRef.current.privacyOption ? "Publico" : "Privado"
+              match
+                ? match.open
+                  ? "Publico"
+                  : "Privado"
+                : matchDetailsRef.current.privacyOption
+                  ? "Publico"
+                  : "Privado"
             }
             size={134}
           >
@@ -172,9 +216,11 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
             setOpenId={setOpenId}
             title="Horario"
             rightText={
-              matchDetailsRef.current.matchDate
-                ? formatDate(matchDetailsRef.current.matchDate)
-                : "A definir"
+              match && match.date
+                ? formatDate(match.date)
+                : matchDetailsRef.current.matchDate
+                  ? formatDate(matchDetailsRef.current.matchDate)
+                  : "A definir"
             }
             size={802}
           >
@@ -186,9 +232,11 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
             setOpenId={setOpenId}
             title="¿Donde juegan?"
             rightText={
-              matchDetailsRef.current.location
-                ? matchDetailsRef.current.location.name
-                : "A definir"
+              match && match.location
+                ? match.location.name
+                : matchDetailsRef.current.location
+                  ? matchDetailsRef.current.location.name
+                  : "A definir"
             }
             size={300}
           >
@@ -204,7 +252,7 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
         borderTopColor="rgb(223, 223, 220)"
         borderTopWidth={1}
       >
-        <TouchableOpacity onPress={handleAction}>
+        <TouchableOpacity onPress={handleAction} disabled={loading}>
           <Div
             h={verticalScale(45)}
             justifyContent="center"
@@ -212,21 +260,19 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
             bg={customTheme.colors.secondaryBackground}
             flexDir="row"
           >
-            {/* <Image
-              source={require("../../../assets/+.png")}
-              resizeMode="contain"
-              w={scale(15)}
-              h={scale(15)}
-              mr={customTheme.spacing.small}
-            /> */}
-            <Text
-              textAlign="center"
-              color={customTheme.colors.background}
-              fontSize={customTheme.fontSize.medium}
-              fontFamily="NotoSans-BoldItalic"
-            >
-              {!match ? "Crear" : "Editar"}
-            </Text>
+            {
+              loading ?
+                <ActivityIndicator size={"large"} />
+                :
+                <Text
+                  textAlign="center"
+                  color={customTheme.colors.background}
+                  fontSize={customTheme.fontSize.medium}
+                  fontFamily="NotoSans-BoldItalic"
+                >
+                  {!match ? "Crear" : "Guardar cambios"}
+                </Text>
+            }
           </Div>
         </TouchableOpacity>
       </Div>

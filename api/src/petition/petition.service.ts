@@ -100,7 +100,7 @@ export class PetitionService {
     );
 
     // Verificar si ya existe una petición con el mismo emitter y match
-    const existingPetition = await this.petitionModel
+    const existingPetitionEmitter = await this.petitionModel
       .findOne({
         emitter: new Types.ObjectId(emitter),
         reference: {
@@ -111,16 +111,35 @@ export class PetitionService {
       .exec();
 
     if (
-      existingPetition &&
-      existingPetition.status == PetitionStatus.Declined
+      existingPetitionEmitter &&
+      existingPetitionEmitter.status == PetitionStatus.Declined
     ) {
       throw new BadRequestException("Petición previamente rechazada");
-    } else if (existingPetition && !isEmitterCreator) {
+    } else if (existingPetitionEmitter && !isEmitterCreator) {
       // Si no es el creador y ya existe una solicitud, se lanza la excepción
       throw new BadRequestException(
         `Ya existe una petición de este usuario para este ${translate[modelType]}`,
       );
     }
+    const existingPetitionReceiver = await this.petitionModel
+      .findOne({
+        receiver: new Types.ObjectId(receiver),
+        reference: {
+          id: new Types.ObjectId(targetId),
+          type: modelType
+        }
+      })
+      .exec();
+
+    if (existingPetitionReceiver && isEmitterCreator && existingPetitionReceiver.status == PetitionStatus.Declined) {
+      throw new BadRequestException("Invitación previamente rechazada");
+    }
+    else if (existingPetitionReceiver && isEmitterCreator) {
+      throw new BadRequestException(
+        `Ya existe una invitación a este usuario para este ${translate[modelType]}`,
+      );
+    }
+
 
     // Verificar si el partido ya ha alcanzado el límite de jugadores, si ya tiene el cupo lleno no podemos enviar solicitud para jugar
     if (target.playersLimit && target.users.length >= target.playersLimit) {
@@ -221,12 +240,16 @@ export class PetitionService {
 
     let match: Match = null
     let tokens: string[] = null
+    const usersToSendPush: Types.ObjectId[] = [...(target.users as Types.ObjectId[])];
     // Si el emisor es el creador del partido, agregar al receptor en lugar del emisor
     if ((target.userId as Types.ObjectId).equals(petition.emitter._id as Types.ObjectId)) {
       if (target.users.includes(petition.receiver._id)) {
         throw new BadRequestException(`El usuario ya se encuentra en el ${translate[modelType]}`)
       }
-      (target.users).push(petition.receiver._id);
+      // Actualización atómica: se agrega el emisor solo si no está presente
+      await handler.model
+        .findByIdAndUpdate(targetId, { $addToSet: { users: petition.receiver._id } })
+        .exec();
       if (modelType === PetitionModelType.match) {
         this.activityService.create({
           matchId: targetId,
@@ -235,7 +258,7 @@ export class PetitionService {
 
         match = await this.matchModel.findById(targetId).exec()
 
-        tokens = await this.userService.getTokenUsersIdsList(match.users)
+        tokens = await this.userService.getTokenUsersIdsList(usersToSendPush)
         await this.notificationService.sendPushNotification(
           tokens,
           `Partido ${match.name}`,
@@ -247,7 +270,7 @@ export class PetitionService {
 
 
       // Agregar el partido al array de partidos o grupos del receiver si no es el dueño
-      if (!(target.userId as Types.ObjectId).equals(petition.receiver._id)) {
+      if (!(target.userId as Types.ObjectId).equals(petition.receiver._id as Types.ObjectId)) {
         if (!receiver[plural[modelType]].includes(target.id)) {
           receiver[plural[modelType]].push(target.id); // Agregar el partido al array de `matches` o `groups` del receiver
           await receiver.save(); // Guardar los cambios en el receptor
@@ -257,8 +280,9 @@ export class PetitionService {
       if (target.users.includes(petition.emitter._id)) {
         throw new BadRequestException(`El usuario ya se encuentra en el ${translate[modelType]}`)
       }
-      // En caso contrario, agregar al emisor al partido
-      target.users.push(petition.emitter._id);
+      await handler.model
+        .findByIdAndUpdate(targetId, { $addToSet: { users: petition.emitter._id } })
+        .exec();
       if (modelType === PetitionModelType.match) {
         this.activityService.create({
           matchId: targetId,
@@ -267,7 +291,7 @@ export class PetitionService {
 
         if (!match) match = await this.matchModel.findById(targetId).exec()
 
-        if (!tokens) tokens = await this.userService.getTokenUsersIdsList(match.users)
+        if (!tokens) tokens = await this.userService.getTokenUsersIdsList(usersToSendPush)
 
         await this.notificationService.sendPushNotification(
           tokens,
@@ -286,8 +310,6 @@ export class PetitionService {
     }
     // Marcar la solicitud como aceptada
     petition.status = PetitionStatus.Accepted;
-
-    await target.save();
     await petition.save();
 
     // Enviar notificación al emisor (emitter) de que su petición ha sido aceptada
@@ -352,7 +374,7 @@ export class PetitionService {
   }
 
   async findAll(filter: Filter): Promise<FilterResponse<Petition>> {
-    const results = await this.petitionModel.find(filter).exec();
+    const results = await this.petitionModel.find(filter).populate("receiver emitter").exec();
     return {
       results,
       totalCount: await this.petitionModel.countDocuments(filter).exec()
@@ -376,11 +398,9 @@ export class PetitionService {
       'reference.type': PetitionModelType.match,
       'reference.id': matchId,
     });
-  
     if (result.deletedCount === 0) {
       throw new NotFoundException('No se encontró ninguna petición para eliminar.');
     }
-  
     return { message: `Se eliminaron ${result.deletedCount} peticiones correctamente.` };
   }
 }

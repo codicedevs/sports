@@ -1,5 +1,5 @@
 import React, { act } from 'react';
-import { FlatList } from 'react-native';
+import { ActivityIndicator, FlatList } from 'react-native';
 import { Div, Text } from 'react-native-magnus';
 import Match from '../types/match.type';
 import useFetch from '../hooks/useGet';
@@ -26,7 +26,7 @@ const formatDateTime = (isoString: string) => {
 
 export const ActivityScreen = ({ match }: { match: Match }) => {
 
-  const { data: activity } = useFetch<Activity[]>(() => activityService.bringMatchActivity(match._id), [QUERY_KEYS.ACTIVITY])
+  const { data: activity, isFetching } = useFetch<Activity[]>(() => activityService.bringMatchActivity(match._id), [QUERY_KEYS.ACTIVITY])
 
   const renderItem = ({ item, index }: { item: Activity, index: number }) => {
     const { date, time } = formatDateTime(item.date);
@@ -40,7 +40,7 @@ export const ActivityScreen = ({ match }: { match: Match }) => {
 
         {/* Columna del Medio - Línea de tiempo */}
         <Div alignItems="center">
-          {index !== 0 && <Div style={{flexGrow:1}} bg="gray300" w={2} h={30} />}
+          {index !== 0 && <Div style={{ flexGrow: 1 }} bg="gray300" w={2} h={30} />}
           <Div bg="gray300" w={10} h={10} rounded="circle" />
           {index !== activity.results.length - 1 && <Div bg="gray300" w={2} h={30} />}
         </Div>
@@ -52,7 +52,11 @@ export const ActivityScreen = ({ match }: { match: Match }) => {
       </Div>
     )
   };
-  if (!activity) return
+  if (isFetching) return (
+    <Div alignItems='center' justifyContent='center' h={"100%"}>
+      <ActivityIndicator size={'large'} color={'black'} />
+    </Div>
+  )
   return (
     <Div p={20}>
       <FlatList

@@ -1,6 +1,10 @@
 // petition.type.ts
 
-import Location from "./location.type";
+
+export enum PetitionModelType {
+  Match = "Match",
+  Group = "Group",
+}
 
 interface Emitter {
   name: string;
@@ -29,8 +33,10 @@ interface Petition {
 export interface PetitionDto {
   emitter: string;
   receiver: string;
-  match: string;
-  status: string;
+  reference: {
+    type: PetitionModelType;
+    id: string;
+  }
 }
 
 export interface CreatePetitionDto {

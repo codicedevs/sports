@@ -16,6 +16,7 @@ const SelectZoneInput = ({ matchDetailsRef }: SportInputProps) => {
     const [selectedZone, setSelectedZone] = useState<Zone[]>([])
 
     const { data: zonas } = useFetch(zonesService.getAll, [QUERY_KEYS.ZONES])
+
     useEffect(() => {
         if (zonas && matchDetailsRef.current.preferredZones) {
             const updatedZone = (matchDetailsRef.current.preferredZones as (string | Zone)[]).map(item =>
@@ -53,7 +54,8 @@ const SelectZoneInput = ({ matchDetailsRef }: SportInputProps) => {
         matchDetailsRef.current.preferredZones = newSelected;
       };
 
-    if (!zonas) return null
+    if (!zonas?.results) return null
+    
     return (
         <Div p={customTheme.spacing.medium}>
             <Text my={customTheme.spacing.medium}>Elegir zona</Text>
@@ -61,12 +63,10 @@ const SelectZoneInput = ({ matchDetailsRef }: SportInputProps) => {
                 <TouchableOpacity onPress={toggleSelectAll}>
                     <Div
                         h={verticalScale(48)}
-                        bg={selectedZone.length === zonas.results.length ? 'black' : 'white'}
                         justifyContent="center"
                         borderWidth={1}
                     >
                         <Text
-                            color={selectedZone.length === zonas.results.length ? 'white' : 'black'}
                             textAlign="center"
                         >
                             Todos
@@ -74,7 +74,7 @@ const SelectZoneInput = ({ matchDetailsRef }: SportInputProps) => {
                     </Div>
                 </TouchableOpacity>
                 {zonas.results.map((zona, index) => {
-                    const isSelected = selectedZone.some(z => z._id === zona._id)
+                    const isSelected = selectedZone?.some(z => z._id === zona._id)
                     return (
                         <TouchableOpacity key={index} onPress={() => toggleZoneSelection(zona)}>
                             <Div

@@ -1,4 +1,4 @@
-import { SportMode } from "../types/interfaces";
+import { SportMode } from "../types/sportModes.type";
 import { CrudService } from "./crud";
 
 class SportModeService extends CrudService<SportMode> {

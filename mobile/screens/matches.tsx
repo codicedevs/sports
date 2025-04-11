@@ -11,6 +11,33 @@ import sportmodeService from '../service/sportmode.service';
 import SportModeButton from '../components/matche/Form/sportModeButton';
 import MatchesCards from '../components/cards/matchesCards';
 import MatchesCardSK from '../components/cards/matchesCardSK';
+import ConfirmPreferencesModal from '../components/modal/confirmPreferences';
+
+type FiltersProps = {
+  filter: {
+    sportModes: { _id: string; label: string }[];
+    zones: { _id: string; name: string }[];
+    hours: { id: number; time: string; value: { startHour: string; endHour: string } }[];
+    modeFilterModal: boolean;
+    hourFilterModal: boolean;
+    zoneFilterModal: boolean;
+  };
+  setFilter: React.Dispatch<React.SetStateAction<FiltersProps['filter']>>;
+  toggleFilterModal: (filterType: 'mode' | 'hour' | 'zone') => void;
+  zonas: {
+    data: {
+      results: { _id: string; name: string }[];
+    };
+  };
+  allSportModes: {
+    results: { _id: string; label: string }[];
+  };
+  schedules: {
+    id: number;
+    time: string;
+    value: { startHour: string; endHour: string };
+  }[];
+};
 
 const schedules = [
   { id: 1, time: '00:00', value: { startHour: '08:00', endHour: '14:00' } },
@@ -22,7 +49,7 @@ const schedules = [
   { id: 7, time: '13:00', value: { startHour: '13:00', endHour: '14:00' } }
 ]
 
-const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, schedules }) => {
+const Filters: React.FC<FiltersProps> = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, schedules }) => {
   const toggleZoneSelection = (zone) => {
     setFilter((prev) => ({
       ...prev,
@@ -49,6 +76,9 @@ const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, s
         : [...prev.hours, schedule],
     }));
   };
+
+  const truncate = (text: string, maxLength = 10) =>
+    text.length > maxLength ? `${text.slice(0, maxLength)}...` : text;
 
   return (
     <>
@@ -99,7 +129,7 @@ const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, s
           <Image style={{ width: scale(25), height: scale(25), alignSelf: 'flex-end' }} source={require("@assets/closeIcon.png")} />
         </TouchableOpacity>
         <Text textAlign='center' p={customTheme.spacing.small} mb={customTheme.spacing.medium} fontSize={customTheme.fontSize.large}>Zonas</Text>
-        {zonas.data.results.map((zona) => (
+        {zonas.results.map((zona) => (
           <TouchableOpacity key={zona._id} onPress={() => toggleZoneSelection(zona)}>
             <Div
               h={verticalScale(48)}
@@ -165,7 +195,9 @@ const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, s
           <TouchableOpacity onPress={() => toggleFilterModal('zone')}>
             <Text textAlign='center' fontFamily="NotoSans-ExtraBold">Zona</Text>
             <Div justifyContent='center' flexDir='row'>
-              <Text>{filter.zones.length > 0 ? filter.zones[0].name : "Todas"}</Text>
+              <Text>
+                {truncate(filter.zones.length > 0 ? filter.zones[0].name : "Todas")}
+              </Text>
               {
                 filter.zones.length > 1 &&
                 <Div ml={customTheme.spacing.small} px={customTheme.spacing.xxs} borderWidth={1} rounded={customTheme.borderRadius.circle}>
@@ -203,27 +235,26 @@ const Filters = ({ filter, setFilter, toggleFilterModal, zonas, allSportModes, s
 const MatchesList = ({ matches, fetchMore, hasMore }) => {
   const renderItem = ({ item }) => (
     <MatchesCards
-    key={item._id}
-    matchId={item._id}
-    dayOfWeek={item.dayOfWeek}
-    date={item.date} 
-    time={item.hour} 
-    location={item.location} 
-    players={item.users}
-    maxPlayers={item.playersLimit}
-    sportMode={item.sportMode}
+      key={item._id}
+      matchId={item._id}
+      dayOfWeek={item.dayOfWeek}
+      date={item.date}
+      time={item.hour}
+      location={item.location}
+      players={item.users}
+      maxPlayers={item.playersLimit}
+      sportMode={item.sportMode}
     />
   );
 
   const keyExtractor = (item) => item._id.toString();
 
   const renderFooter = () => (hasMore ? <ActivityIndicator size="large" /> : null);
-  console.log(matches.length)
   if (matches.length < 1) {
     return (
       <Div h={'80%'} justifyContent='center'>
-        <Icon color={customTheme.colors.gray} fontFamily='AntDesign' name='search1' fontSize={customTheme.fontSize.Fourxl} />
-        <Text mt={customTheme.spacing.medium} fontSize={customTheme.fontSize.medium} textAlign='center'>No se encontraron partidos{'\n'}con este filtro</Text>
+         <Image style={{ width: scale(79), height: verticalScale(75), alignSelf:"center" }} resizeMode="contain" source={require("../assets/search-no-result.png")} />
+        <Text mt={customTheme.spacing.medium} fontSize={customTheme.fontSize.medium} color={customTheme.colors.gray} textAlign='center'>No se encontraron partidos{'\n'}con este filtro</Text>
       </Div>
     )
   }
@@ -259,7 +290,7 @@ const MatchesScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isFirstLoad, setIsFirstLoad] = useState(true);
 
-  const { data: zonas } = useFetch(zonesService.getZones, [QUERY_KEYS.ZONES]);
+  const { data: zonas } = useFetch(zonesService.getAll, [QUERY_KEYS.ZONES]);
   const { data: allSportModes } = useFetch(sportmodeService.getAll, [QUERY_KEYS.SPORT_MODES]);
 
   const buildMongoFilter = useCallback(() => {
@@ -272,15 +303,15 @@ const MatchesScreen = () => {
 
   const fetchMatches = async () => {
     try {
-      if (isFirstLoad) setIsLoading(true); 
+      if (isFirstLoad) setIsLoading(true);
       const mongoFilter = buildMongoFilter();
       const res = await matchService.getAll(mongoFilter);
       return res;
     } catch (e) {
       console.log(e);
     } finally {
-      if (isFirstLoad) setIsLoading(false); 
-      setIsFirstLoad(false); 
+      if (isFirstLoad) setIsLoading(false);
+      setIsFirstLoad(false);
     }
   };
 
@@ -311,25 +342,28 @@ const MatchesScreen = () => {
   );
 
   return (
-    <Div bg='white' p={customTheme.spacing.medium} h={'100%'}>
-      <Filters
-        filter={filter}
-        setFilter={setFilter}
-        toggleFilterModal={toggleFilterModal}
-        zonas={zonas}
-        allSportModes={allSportModes}
-        schedules={schedules}
-      />
-      {
-        isLoading ?
-          <Div my={customTheme.spacing.medium} style={{ gap: verticalScale(20) }} >
-            <MatchesCardSK />
-            <MatchesCardSK />
-          </Div>
-          :
-          <MatchesList matches={matches} fetchMore={fetchMore} hasMore={hasMore} />
-      }
-    </Div>
+    <>
+      <ConfirmPreferencesModal />
+      <Div bg='white' p={customTheme.spacing.medium} h={'100%'}>
+        <Filters
+          filter={filter}
+          setFilter={setFilter}
+          toggleFilterModal={toggleFilterModal}
+          zonas={zonas}
+          allSportModes={allSportModes}
+          schedules={schedules}
+        />
+        {
+          isLoading || !matches ?
+            <Div my={customTheme.spacing.medium} style={{ gap: verticalScale(20) }} >
+              <MatchesCardSK />
+              <MatchesCardSK />
+            </Div>
+            :
+            <MatchesList matches={matches} fetchMore={fetchMore} hasMore={hasMore} />
+        }
+      </Div>
+    </>
   );
 };
 
