@@ -69,7 +69,7 @@ const UserScreen = () => {
 
             <Div mt={scale(35)}>
                 <Button
-                    bg="white"
+                    bg="black"
                     block
                     borderColor="black"
                     borderWidth={1}
@@ -81,14 +81,14 @@ const UserScreen = () => {
                             width: scale(25),
                             height: scale(25),
                             resizeMode: "contain",
-                            tintColor: "black",
+                            tintColor: "white",
                         }}
                     />
                     <Text
                         fontSize={customTheme.fontSize.medium}
                         fontFamily="NotoSans-BoldItalic"
                         ml={customTheme.spacing.small}
-                        color="black"
+                        color="white"
                     >
                         Preferencias de partidos.
                     </Text>
