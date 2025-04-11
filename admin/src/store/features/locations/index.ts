@@ -65,6 +65,7 @@ export const locationApi = createApi({
           params: populate ? { populate } : {},
         };
       },
+      providesTags: (result, error, { id }) => [{ type: "Locations", id }],
     }),
     createLocations: builder.mutation<any, any>({
       query: (data: any) => {
@@ -86,7 +87,10 @@ export const locationApi = createApi({
         data: locationId,
         params: location,
       }),
-      invalidatesTags: ["Locations"],
+      invalidatesTags: (result, error, { locationId }) => [
+        "Locations",
+        { type: "Locations", locationId },
+      ],
     }),
 
     deleteLocations: builder.mutation<string, string>({

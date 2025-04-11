@@ -64,12 +64,6 @@ const LocationForm = () => {
     refetch,
   } = useGetLocationQuery(id ? { id } : skipToken);
 
-  useEffect(() => {
-    if (id) {
-      refetch(); // fuerza a volver a pedir los datos
-    }
-  }, [id, refetch]);
-
   const {
     control,
     handleSubmit,
