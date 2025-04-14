@@ -20,6 +20,7 @@ import MatchInvitation from "../components/cards/invitationCard";
 import MatchesCardSK from "../components/cards/matchesCardSK";
 import UpcomingMatchesCardSK from "../components/cards/upcomingMatchesCardSK";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Image } from "react-native";
 
 const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   navigation,
@@ -184,9 +185,9 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
 
   const loadSession = async () => {
     const [accessToken, refreshToken, userJson] = await AsyncStorage.multiGet([
-      '@access_token',
-      '@refresh_token',
-      '@user',
+      "@access_token",
+      "@refresh_token",
+      "@user",
     ]);
 
     if (accessToken[1] && userJson[1]) {
@@ -197,13 +198,29 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
   };
 
   useEffect(() => {
-    loadSession()
-  }, [])
+    loadSession();
+  }, []);
 
   const fallbackEvent = {
     name: "TORNEO DE VERANO FUTBOL VETERANO", // pa hardcodear
     date: "12/3",
   };
+
+  const NoMatchesMessage = (
+    { message }: { message: string } // si no hay partidos
+  ) => (
+    <Div alignItems="center" mt={customTheme.spacing.medium}>
+     
+      <Text
+        fontSize={customTheme.fontSize.medium}
+        color={customTheme.colors.gray}
+        textAlign="center"
+        mt={customTheme.spacing.small}
+      >
+        {message}
+      </Text>
+    </Div>
+  );
 
   return (
     <Div bg="white">
@@ -236,32 +253,31 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
               Próximos partidos
             </Text>
           </Div>
-          {
-            !publicMatches ? (
-              <Div flexDir="row">
-                <UpcomingMatchesCardSK />
-                <UpcomingMatchesCardSK />
-              </Div>
-            ) : (
-              <ScrollView horizontal>
-                {publicMatches?.results
-                  ?.sort((a, b) => new Date(a.date) - new Date(b.date))
-                  .map((u: any) => (
-                    <UpcomingMatchCard
-                      key={u._id}
-                      matchId={u._id}
-                      date={u.date}
-                      hour={u.hour}
-                      players={u.users}
-                      maxPlayers={u.playersLimit}
-                      location={u.location}
-                      sportMode={u.sportMode}
-                    />
-                  ))}
-              </ScrollView>
-            )
-          }
-
+          {!publicMatches ? (
+            <Div flexDir="row">
+              <UpcomingMatchesCardSK />
+              <UpcomingMatchesCardSK />
+            </Div>
+          ) : publicMatches?.results?.length === 0 ? (
+            <NoMatchesMessage message="No hay próximos partidos públicos." />
+          ) : (
+            <ScrollView horizontal>
+              {publicMatches?.results
+                ?.sort((a, b) => new Date(a.date) - new Date(b.date))
+                .map((u: any) => (
+                  <UpcomingMatchCard
+                    key={u._id}
+                    matchId={u._id}
+                    date={u.date}
+                    hour={u.hour}
+                    players={u.users}
+                    maxPlayers={u.playersLimit}
+                    location={u.location}
+                    sportMode={u.sportMode}
+                  />
+                ))}
+            </ScrollView>
+          )}
         </Div>
         <Div mb={customTheme.spacing.medium} px={customTheme.spacing.medium}>
           <HandleMatchesButton />
@@ -274,28 +290,32 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
             >
               Mis partidos
             </Text>
-            {
-              !matches ?
-                <MatchesCardSK />
-                :
-                <Div style={{ gap: scale(16) }}>
-                  {matches?.results
-                    ?.sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())
-                    .map((m: any) => (
-                      <MatchesCards
-                        key={m._id}
-                        matchId={m._id}
-                        dayOfWeek={m.dayOfWeek}
-                        date={m.date}
-                        time={m.hour}
-                        location={m.location}
-                        players={m.users}
-                        maxPlayers={m.playersLimit}
-                        sportMode={m.sportMode}
-                      />
-                    ))}
-                </Div>
-            }
+            {!matches ? (
+              <MatchesCardSK />
+            ) : matches?.results?.length === 0 ? (
+              <NoMatchesMessage message="No tienes partidos creados." />
+            ) : (
+              <Div style={{ gap: scale(16) }}>
+                {matches?.results
+                  ?.sort(
+                    (a: any, b: any) =>
+                      new Date(a.date).getTime() - new Date(b.date).getTime()
+                  )
+                  .map((m: any) => (
+                    <MatchesCards
+                      key={m._id}
+                      matchId={m._id}
+                      dayOfWeek={m.dayOfWeek}
+                      date={m.date}
+                      time={m.hour}
+                      location={m.location}
+                      players={m.users}
+                      maxPlayers={m.playersLimit}
+                      sportMode={m.sportMode}
+                    />
+                  ))}
+              </Div>
+            )}
           </Div>
         )}
         <Div minH={verticalScale(150)}></Div>

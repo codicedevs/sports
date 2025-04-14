@@ -9,6 +9,8 @@ import { QUERY_KEYS } from "../types/query.types";
 import { customTheme } from "../utils/theme";
 import MatchInvitation from "../components/cards/invitationCard";
 import { ScrollView } from "react-native-gesture-handler";
+import { scale, verticalScale } from "react-native-size-matters";
+import { Image } from "react-native";
 
 function PetitionScreen({
   navigation,
@@ -61,7 +63,10 @@ function PetitionScreen({
             </Div>
           ))
         ) : (
-          <Text>No hay peticiones pendientes.</Text>
+          <Div h={scale(285)} justifyContent="flex-end" alignItems="center">
+            <Image style={{ width: scale(79), height: verticalScale(75), alignSelf:"center" }} resizeMode="contain" source={require("../assets/search-no-result.png")} />
+          <Text fontSize={customTheme.fontSize.medium} color={customTheme.colors.gray} textAlign='center'>No hay peticiones pendientes.</Text>
+          </Div>
         )}
       </ScrollView>
     </Div>
