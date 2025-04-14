@@ -34,7 +34,7 @@ function PetitionScreen({
   };
 
   return (
-    <Div mb={customTheme.spacing.medium} p={customTheme.spacing.small}>
+    <Div flex={1} mb={customTheme.spacing.medium} p={customTheme.spacing.small} bg="white">
       <Div p={customTheme.spacing.small}>
         <Text
           fontSize={customTheme.fontSize.large}
