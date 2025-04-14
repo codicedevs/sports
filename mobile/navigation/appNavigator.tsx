@@ -4,12 +4,9 @@ import VersionModal from "../components/modal/versionModal";
 import { AuthStackScreen, Principal } from "./stacks";
 import RestrictiveModal from "../components/modal/restrictiveModal";
 import { navigationRef } from "../utils/navigation";
-
-import * as SplashScreen from "expo-splash-screen";
 import { useIsFetching } from "@tanstack/react-query";
 import { Image, View } from "react-native";
 import { Div } from "react-native-magnus";
- SplashScreen.preventAutoHideAsync();
 
 const AppNavigator = () => {
   const isFetching = useIsFetching();
@@ -29,7 +26,6 @@ const AppNavigator = () => {
     );
   }
 
-  SplashScreen.hideAsync()
   return (
     <NavigationContainer ref={navigationRef}>
       <VersionModal />
