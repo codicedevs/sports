@@ -19,18 +19,8 @@ const dayNames = [
   { id: 'Saturday', label: 'Sa' }
 ]
 
-// const schedules = [
-//   { id: 1, time: '00:00', value: { startHour: '08:00', endHour: '14:00' } },
-//   { id: 2, time: '08:00', value: { startHour: '08:00', endHour: '09:00' } },
-//   { id: 3, time: '09:00', value: { startHour: '09:00', endHour: '10:00' } },
-//   { id: 4, time: '10:00', value: { startHour: '10:00', endHour: '11:00' } },
-//   { id: 5, time: '11:00', value: { startHour: '11:00', endHour: '12:00' } },
-//   { id: 6, time: '12:00', value: { startHour: '12:00', endHour: '13:00' } },
-//   { id: 7, time: '13:00', value: { startHour: '13:00', endHour: '14:00' } }
-// ];
-
 const schedules = [
-  { id: 7, time: "00:00", value: { startHour: '00:00', endHour: '23:59' } }, 
+  { id: 7, time: "00:00", value: { startHour: '00:00', endHour: '23:59' } },
   { id: 8, time: "07:00", value: { startHour: '07:00', endHour: '08:00' } },
   { id: 9, time: "08:00", value: { startHour: '08:00', endHour: '09:00' } },
   { id: 10, time: "09:00", value: { startHour: '09:00', endHour: '10:00' } },
@@ -47,7 +37,7 @@ const schedules = [
   { id: 21, time: "20:00", value: { startHour: '20:00', endHour: '21:00' } },
   { id: 22, time: "21:00", value: { startHour: '21:00', endHour: '22:00' } },
   { id: 23, time: "22:00", value: { startHour: '22:00', endHour: '23:00' } },
-  { id: 24, time: "23:00", value: { startHour: '23:00', endHour: '23:59' } }, 
+  { id: 24, time: "23:00", value: { startHour: '23:00', endHour: '23:59' } },
 ];
 
 const DateTimePreferenceInput = ({ matchDetailsRef }: SportInputProps) => {
@@ -94,38 +84,45 @@ const DateTimePreferenceInput = ({ matchDetailsRef }: SportInputProps) => {
 
   const toggleSchedule = (schedule: typeof schedules[0]) => {
     setSelectedUserDays(prev => {
-      const currentSchedules = prev[currentDay] || []
-      const exists = currentSchedules.some(
+      const currentSchedules = prev[currentDay] || [];
+      const isFullDay = schedule.time === '00:00';
+      const isSelected = currentSchedules.some(
         s => s.startHour === schedule.value.startHour && s.endHour === schedule.value.endHour
-      )
+      );
   
-      let updatedSchedules: { startHour: string; endHour: string }[]
+      let updatedSchedules: { startHour: string; endHour: string }[];
   
-      if (exists) {
-        updatedSchedules = currentSchedules.filter(
-          s =>
-            s.startHour !== schedule.value.startHour ||
-            s.endHour !== schedule.value.endHour
-        )
-      } else {
-        if (schedule.id === 1) {
-          updatedSchedules = [schedule.value]
+      if (isFullDay) {
+        if (isSelected) {
+          updatedSchedules = [];
         } else {
-          updatedSchedules = currentSchedules.filter(
+          updatedSchedules = [schedule.value];
+        }
+      } else {
+        const withoutFullDay = currentSchedules.filter(
+          s =>
+            s.startHour !== schedules[0].value.startHour ||
+            s.endHour !== schedules[0].value.endHour
+        );
+  
+        if (isSelected) {
+          updatedSchedules = withoutFullDay.filter(
             s =>
-              s.startHour !== schedules[0].value.startHour ||
-              s.endHour !== schedules[0].value.endHour
-          )
-          updatedSchedules.push(schedule.value)
+              s.startHour !== schedule.value.startHour ||
+              s.endHour !== schedule.value.endHour
+          );
+        } else {
+          updatedSchedules = [...withoutFullDay, schedule.value];
         }
       }
   
       return {
         ...prev,
         [currentDay]: updatedSchedules,
-      }
-    })
-  }
+      };
+    });
+  };
+  
 
   return (
     <Div flex={1} p={customTheme.spacing.medium}>
@@ -156,11 +153,11 @@ const DateTimePreferenceInput = ({ matchDetailsRef }: SportInputProps) => {
       <Text>¿A Qué hora juegan?</Text>
       <Div flex={1} mt={customTheme.spacing.medium} style={{ gap: verticalScale(8) }}>
         <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled={true} contentContainerStyle={{ flexGrow: 1 }}>
-        {schedules.map((schedule, index) => {
-          const currentSchedules = selectedUserDays[currentDay] || []
-          const isSelected = currentSchedules.some(
-            s => s.startHour === schedule.value.startHour && s.endHour === schedule.value.endHour
-          )
+          {schedules.map((schedule, index) => {
+            const currentSchedules = selectedUserDays[currentDay] || []
+            const isSelected = currentSchedules.some(
+              s => s.startHour === schedule.value.startHour && s.endHour === schedule.value.endHour
+            )
 
             return (
               <TouchableOpacity key={index} onPress={() => toggleSchedule(schedule)}>
