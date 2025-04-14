@@ -16,7 +16,7 @@ import { Skeleton } from 'moti/skeleton';
 interface SportInputProps {
   matchDetailsRef: React.MutableRefObject<MatchDetails>;
   sports: any;
-  allSportMode:any
+  allSportModes:any
 }
 
 const SportInput = ({ matchDetailsRef, sports, allSportModes }: SportInputProps) => {

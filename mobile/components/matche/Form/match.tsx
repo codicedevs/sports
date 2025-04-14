@@ -180,7 +180,7 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
             }
             size={342}
           >
-            <SportInput matchDetailsRef={matchDetailsRef} sports={sports} allSportMode={allSportModes} />
+            <SportInput matchDetailsRef={matchDetailsRef} sports={sports} allSportModes={allSportModes} />
           </Accordion>
           <Accordion
             id="PlayerInput"
