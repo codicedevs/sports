@@ -63,7 +63,6 @@ const SportArrayInput = ({ matchDetailsRef }: SportInputProps) => {
         }
       }, [allSportModes]);
       
-
     const handleSelectSport = (sport: Sport, index: number) => {
         const isSelected = selectedSports.some(s => s._id === sport._id);
         let newSelectedSports: Sport[];
@@ -127,7 +126,7 @@ const SportArrayInput = ({ matchDetailsRef }: SportInputProps) => {
             selectedSports.some(s => s._id === mode.sport)
         )
         : [];
-
+        
     return (
         <Div py={customTheme.spacing.medium}>
             <Div pb={customTheme.spacing.medium} style={{ gap: verticalScale(8) }}>
@@ -176,7 +175,12 @@ const SportArrayInput = ({ matchDetailsRef }: SportInputProps) => {
                             mode={mode}
                             index={index}
                             onPress={handleSelectMode}
-                            selected={selectedSportModes.some(m => m._id === mode._id)}
+                            selected={
+                                sportModesForSelectedSports.length === selectedSportModes.length?
+                                false
+                                :
+                                selectedSportModes.some(m => m._id === mode._id)
+                            }
                             length={sportModesForSelectedSports.length}
                             hasAll={true}
                         />
