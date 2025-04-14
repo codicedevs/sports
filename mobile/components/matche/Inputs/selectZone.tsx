@@ -65,16 +65,18 @@ const SelectZoneInput = ({ matchDetailsRef }: SportInputProps) => {
                         h={verticalScale(48)}
                         justifyContent="center"
                         borderWidth={1}
+                        bg={selectedZone.length === zonas.results.length? "black" : "white"}
                     >
                         <Text
                             textAlign="center"
+                            color={selectedZone.length === zonas.results.length? "white" : "black"}
                         >
                             Todos
                         </Text>
                     </Div>
                 </TouchableOpacity>
                 {zonas.results.map((zona, index) => {
-                    const isSelected = selectedZone?.some(z => z._id === zona._id)
+                    const isSelected = selectedZone.length === zonas.results.length? false : selectedZone?.some(z => z._id === zona._id)
                     return (
                         <TouchableOpacity key={index} onPress={() => toggleZoneSelection(zona)}>
                             <Div
