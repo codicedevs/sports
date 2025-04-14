@@ -4,7 +4,6 @@ import { createDrawerNavigator } from "@react-navigation/drawer";
 import { FadeWrapper } from "../components/fadeView";
 import LoginScreen from "../screens/auth/login";
 import HomeScreen from "../screens/home";
-import SettingsScreen from "../screens/petitionsScreen";
 import Trialscreen from "../screens/trial";
 import Trialscreen2 from "../screens/trial2";
 import { AppScreens, AppScreensParamList } from "./screens";
@@ -31,6 +30,7 @@ export function HomeStackScreen() {
     >
       <HomeStack.Screen
         name={AppScreens.HOME_SCREEN}
+        options={{ contentStyle: { backgroundColor: 'white' } }}
         component={(props) => (
           <FadeWrapper>
             <HomeScreen {...props} />
@@ -38,7 +38,7 @@ export function HomeStackScreen() {
         )}
       />
       <HomeStack.Screen
-        options={{ tabBarStyle: { display: "none" } }}
+        options={{ tabBarStyle: { display: "none" },contentStyle: { backgroundColor: 'white' } }}
         name={AppScreens.MATCH_DETAIL}
         component={(props) => (
           //CUANDO HAGA EL CUSTOM TAB PUEDO HACER Q NO APAREZCA EN ESTA TAB EN ESPECIFICO
@@ -83,12 +83,12 @@ export function TabStackScreen() {
       headerShown: true,
       animation: "fade"
     }}>
-      <Tab.Screen name="HomeStack" component={HomeStackScreen} />
-      <Tab.Screen name={AppScreens.PETITIONS_SCREEN} component={PetitionScreen} />
-      <Tab.Screen name={AppScreens.MATCH_HANDLER} component={MatchHandlerScreen} />
-      <Tab.Screen name={AppScreens.MATCH_SCREEN} component={MatchesScreen} />
-      <Tab.Screen name={AppScreens.USER_SCREEN} component={UserScreen} />
-      <Tab.Screen name={AppScreens.MATCH_DETAIL} component={MatchDetail} />
+      <Tab.Screen options={{ tabBarStyle: { backgroundColor: 'white' } }} name="HomeStack" component={HomeStackScreen} />
+      <Tab.Screen options={{ tabBarStyle: { backgroundColor: 'white' } }} name={AppScreens.PETITIONS_SCREEN} component={PetitionScreen} />
+      <Tab.Screen options={{ tabBarStyle: { backgroundColor: 'white' } }} name={AppScreens.MATCH_HANDLER} component={MatchHandlerScreen} />
+      <Tab.Screen options={{ tabBarStyle: { backgroundColor: 'white' } }} name={AppScreens.MATCH_SCREEN} component={MatchesScreen} />
+      <Tab.Screen options={{ tabBarStyle: { backgroundColor: 'white' } }} name={AppScreens.USER_SCREEN} component={UserScreen} />
+      <Tab.Screen options={{ tabBarStyle: { backgroundColor: 'white' } }} name={AppScreens.MATCH_DETAIL} component={MatchDetail} />
     </Tab.Navigator>
   )
 }

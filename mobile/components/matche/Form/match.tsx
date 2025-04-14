@@ -155,7 +155,7 @@ export default function MatchForm({ match, onRefetch, onGoBack }: { match: Match
     }, [match])
   );
 
-  if (isFetchingSport || isFetchingSportModes || isFetchingLocations) return (<Div flex={1} alignItems="center" justifyContent="center"><ActivityIndicator size={"large"} /></Div>)
+  if (isFetchingSport || isFetchingSportModes || isFetchingLocations) return (<Div flex={1} alignItems="center" justifyContent="center" bg="white"><ActivityIndicator size={"large"} /></Div>)
 
   return (
     <Div flex={1} key={formKey}>

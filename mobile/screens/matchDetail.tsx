@@ -74,7 +74,7 @@ const MatchDetail: React.FC<Props> = ({ navigation, route }) => {
 
   if (isFetching) {
     return (
-      <Div justifyContent="center" alignItems="center" flex={1}>
+      <Div justifyContent="center" alignItems="center" flex={1} bg="white">
         <ActivityIndicator size="large" color={customTheme.colors.black} />
       </Div>
     );

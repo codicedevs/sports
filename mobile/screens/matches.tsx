@@ -341,7 +341,7 @@ const MatchesScreen = () => {
   }, []);
 
   if (!zonas || !allSportModes) return (
-    <Div flex={1} alignItems='center' justifyContent='center'>
+    <Div flex={1} alignItems='center' justifyContent='center' bg='white'>
       <ActivityIndicator size="large" />
     </Div>
   );
