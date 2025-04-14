@@ -36,9 +36,9 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
   };
 
   const screen = getFocusedRouteNameFromRoute(state.routes[state.index]);
-  if (screen === AppScreens.MATCH_DETAIL) return null;
-  if (state.routes[state.index].name === AppScreens.MATCH_HANDLER) return null;
-console.log(state.routes[state.index].name);
+  const shouldHideTabBar =
+  screen === AppScreens.MATCH_DETAIL ||
+  state.routes[state.index].name === AppScreens.MATCH_HANDLER;
 
   const checkIfLogged = (route) => {
     if (
@@ -58,16 +58,18 @@ console.log(state.routes[state.index].name);
   };
   return (
     <Div
-      flexDir="row"
-      justifyContent="space-between"
-      bg={"rgb(54, 54, 54)"}
-      position="absolute"
-      bottom={10}
-      w="97%"
-      rounded="circle"
-      p={customTheme.spacing.small}
-      alignSelf="center"
-    >
+    flexDir="row"
+    justifyContent="space-between"
+    bg={"rgb(54, 54, 54)"}
+    position="absolute"
+    bottom={shouldHideTabBar ? -100 : 10} // 👈 escondélo fuera de la pantalla
+    opacity={shouldHideTabBar ? 0 : 1}    // 👈 y opcionalmente lo hacés invisible
+    pointerEvents={shouldHideTabBar ? "none" : "auto"} // 👈 para que no reciba eventos
+    w="97%"
+    rounded="circle"
+    p={customTheme.spacing.small}
+    alignSelf="center"
+  >
       {state.routes
         .filter((route) => route.name !== AppScreens.MATCH_DETAIL)
         .map((route, index) => {
