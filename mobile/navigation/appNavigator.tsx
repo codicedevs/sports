@@ -5,9 +5,9 @@ import { Principal } from "./stacks";
 import RestrictiveModal from "../components/modal/restrictiveModal";
 import { navigationRef } from "../utils/navigation";
 import { useIsFetching } from "@tanstack/react-query";
-import { Image } from "react-native";
-import { Div } from "react-native-magnus";
+import * as SplashScreen from 'expo-splash-screen';
 
+SplashScreen.preventAutoHideAsync();
 const AppNavigator = () => {
   const isFetching = useIsFetching();
   const [appReady, setAppReady] = useState(false);
@@ -15,22 +15,20 @@ const AppNavigator = () => {
   useEffect(() => {
     if (!appReady && isFetching === 0) {
       setAppReady(true);
+
     }
   }, [isFetching, appReady]);
 
-  if (!appReady) {
-    return (
-      <Div flex={1} alignItems="center" justifyContent="center">
-        <Image style={{width:"60%", height:"20%", resizeMode:"contain"}} source={require("../assets/logoDeballComplete.png")} />
-      </Div>
-    );
-  }
+  useEffect(() => {
+    if (appReady) {
+      SplashScreen.hideAsync();
+    }
+  }, [appReady]);
 
   return (
     <NavigationContainer ref={navigationRef}>
       <VersionModal />
       <RestrictiveModal />
-      {/* <SplashScreen /> */}
       <Principal />
     </NavigationContainer>
   );

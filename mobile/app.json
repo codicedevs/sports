@@ -28,7 +28,7 @@
     
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "",
+      "image": "./assets/logoDeballComplete.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
