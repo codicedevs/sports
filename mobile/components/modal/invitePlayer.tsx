@@ -146,7 +146,7 @@ export default function InviteModal({
           flatListProps={{
             keyExtractor: (item: User) => item._id,
             keyboardShouldPersistTaps: "always",
-            style: { borderWidth: 0, marginLeft: scale(3) },
+            style: { borderWidth: 0, marginLeft: scale(5) },
             renderItem: ({ item }) => (
               <Div
                 ml={customTheme.spacing.small}
@@ -161,8 +161,8 @@ export default function InviteModal({
                   <Image
                     source={require("../../assets/user1.png")}
                     resizeMode="contain"
-                    w={scale(20)}
-                    h={scale(20)}
+                    w={scale(22)}
+                    h={scale(22)}
                   />
                 </Text>
 
