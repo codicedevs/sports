@@ -9,7 +9,7 @@
             "./assets/fonts/NotoSans-VariableFont_wdth,wght.ttf",
             "./assets/fonts/NotoSans_ExtraCondensed-BoldItalic.ttf",
             "./assets/fonts/NotoSans-BoldItalic.ttf",
-            "./assets/fonts/NotoSans_Condensed-Blac.ttf",
+            "./assets/fonts/NotoSans_Condensed-Black.ttf",
             "./assets/fonts/NotoSans_Condensed-BlackItalic.ttf",
             "./assets/fonts/NotoSans_Condensed-ExtraBoldItalic.ttf",
             "./assets/fonts/NotoSans-Regular.ttf",
@@ -25,15 +25,16 @@
     "slug": "mobile",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/logoDeballComplete.png",
+    
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./assets/icon.png",
+      "image": "",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.admincodice.mobile"
     },
     "android": {
       "adaptiveIcon": {
