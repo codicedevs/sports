@@ -18,11 +18,24 @@ interface InviteModalProps {
   matchId: string;
 }
 
-export default function InviteModal({ open, setOpen, matchId }: InviteModalProps) {
+export default function InviteModal({
+  open,
+  setOpen,
+  matchId,
+}: InviteModalProps) {
   const { showSnackBar } = useGlobalUI();
   const [query, setQuery] = useState("");
   const [selectedPlayers, setSelectedPlayers] = useState<User[]>([]);
   const { currentUser } = useSession();
+
+  const getInitials = (name: string): string => {
+    return name
+      .trim()
+      .split(/\s+/)
+      .map((word) => word.slice(0, 1))
+      .join("")
+      .toUpperCase();
+  };
 
   const handlePlayersSelected = (player: User) => {
     if (!selectedPlayers.some((p) => p._id === player._id)) {
@@ -31,7 +44,9 @@ export default function InviteModal({ open, setOpen, matchId }: InviteModalProps
     }
   };
 
-  const { data: playersData } = useFetch(userService.getAll, [QUERY_KEYS.USERS]);
+  const { data: playersData } = useFetch(userService.getAll, [
+    QUERY_KEYS.USERS,
+  ]);
 
   const { data: petitionsData } = useFetch<{ results: Petition[] }>(
     () =>
@@ -39,7 +54,7 @@ export default function InviteModal({ open, setOpen, matchId }: InviteModalProps
         where: {
           "reference.type": "Match",
           "reference.id": matchId,
-          status: ["pending","accepted","declined"],
+          status: ["pending", "accepted", "declined"],
         },
       }),
     [QUERY_KEYS.PETITIONS, matchId]
@@ -47,13 +62,15 @@ export default function InviteModal({ open, setOpen, matchId }: InviteModalProps
 
   if (!playersData || !petitionsData) return null;
 
-  const playersWithPetitionIds = petitionsData?.results.map((pWP) => pWP.receiver._id) ?? [];
-  
-  const filteredPlayers = playersData.results.filter((p: User) =>
-    p.name.toLowerCase().includes(query.toLowerCase()) &&
-    !selectedPlayers.some((sp: User) => sp._id === p._id) &&
-    p._id !== currentUser?._id &&
-    !playersWithPetitionIds.includes(p._id)
+  const playersWithPetitionIds =
+    petitionsData?.results.map((pWP) => pWP.receiver._id) ?? [];
+
+  const filteredPlayers = playersData.results.filter(
+    (p: User) =>
+      p.name.toLowerCase().includes(query.toLowerCase()) &&
+      !selectedPlayers.some((sp: User) => sp._id === p._id) &&
+      p._id !== currentUser?._id &&
+      !playersWithPetitionIds.includes(p._id)
   );
 
   const handleRemovePlayer = (id: string) => {
@@ -83,9 +100,17 @@ export default function InviteModal({ open, setOpen, matchId }: InviteModalProps
 
   return (
     <Modal isVisible={open} onBackButtonPress={() => setOpen(false)}>
-      <Div flexDir="row" p={customTheme.spacing.small} justifyContent="center" alignItems="center">
+      <Div
+        flexDir="row"
+        p={customTheme.spacing.small}
+        justifyContent="center"
+        alignItems="center"
+      >
         <Div p={customTheme.spacing.small} w="93%">
-          <Text fontSize={customTheme.fontSize.title} fontFamily="NotoSans-ExtraBoldItalic">
+          <Text
+            fontSize={customTheme.fontSize.title}
+            fontFamily="NotoSans-ExtraBoldItalic"
+          >
             Elegir jugador
           </Text>
         </Div>
@@ -121,10 +146,26 @@ export default function InviteModal({ open, setOpen, matchId }: InviteModalProps
           flatListProps={{
             keyExtractor: (item: User) => item._id,
             keyboardShouldPersistTaps: "always",
-            style: { borderWidth: 0 },
+            style: { borderWidth: 0, marginLeft: scale(3) },
             renderItem: ({ item }) => (
-              <Div ml={customTheme.spacing.small} flexDir="row" alignItems="center">
-                <Image source={require("../../assets/iconUser.png")} resizeMode="contain" w={23} h={23} />
+              <Div
+                ml={customTheme.spacing.small}
+                flexDir="row"
+                alignItems="center"
+              >
+                <Text
+                  fontSize={customTheme.fontSize.small}
+                  fontFamily={customTheme.fontFamily.bold}
+                  color="white"
+                >
+                  <Image
+                    source={require("../../assets/user1.png")}
+                    resizeMode="contain"
+                    w={scale(20)}
+                    h={scale(20)}
+                  />
+                </Text>
+
                 <Text
                   style={{ padding: 5, borderWidth: 0, marginLeft: scale(5) }}
                   fontFamily="NotoSans-Variable"
@@ -178,7 +219,11 @@ export default function InviteModal({ open, setOpen, matchId }: InviteModalProps
                   {player.name}
                 </Text>
               </Div>
-              <Button bg="white" color="black" onPress={() => handleRemovePlayer(player._id)}>
+              <Button
+                bg="white"
+                color="black"
+                onPress={() => handleRemovePlayer(player._id)}
+              >
                 X
               </Button>
             </Div>

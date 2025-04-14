@@ -3,6 +3,7 @@ import { Controller, useForm } from "react-hook-form";
 import {
   useGetUserQuery,
   useRegisterUserMutation,
+  useUpdateUserMutation,
 } from "../../store/features/users";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -49,7 +50,7 @@ const UserForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [registerUser, { isLoading }] = useRegisterUserMutation();
-  const [updateUser] = useRegisterUserMutation();
+  const [updateUser] = useUpdateUserMutation();
   const { data: userData, isLoading: isFetching } = useGetUserQuery(
     id ? { id } : skipToken
   );
@@ -60,14 +61,13 @@ const UserForm = () => {
     formState: { errors },
     setValue,
   } = useForm({
-    resolver: yupResolver(isEdit ? schemaNew : schemaEdit, {
+    resolver: yupResolver(isEdit ? schemaEdit : schemaNew, {
       context: { isEdit },
     }),
     defaultValues: {
       name: "",
       email: "",
       phone: "",
-      password: "",
     },
     mode: "onBlur",
   });
@@ -78,7 +78,7 @@ const UserForm = () => {
         name: userData.name,
         email: userData.email,
         phone: userData.phone,
-        password: "",
+        password: userData.password,
       };
 
       Object.entries(values).forEach(([key, value]) => {
@@ -87,9 +87,11 @@ const UserForm = () => {
     }
   }, [userData]);
 
-  const onSubmit = async (data: NewUserDto) => {
+  const onSubmit = async (data: any) => {
     if (isEdit) {
-      // updateUser({ data: id, params: userData });
+      updateUser({ id, user: data });
+      message.success("Usuario editado correctamente");
+      navigate("/usuarios");
     } else {
       try {
         await registerUser(data);

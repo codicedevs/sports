@@ -48,8 +48,9 @@ const MatchDetail: React.FC<Props> = ({ navigation, route }) => {
     refetch,
   } = useFetch(() => matchService.getById(id), [QUERY_KEYS.MATCH]);
   const [isParticipe, setIsParticipe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { showSnackBar } = useGlobalUI();
-  const [isLoading, setIsLoading] = useState(false)
+
 
 
   function isPlayer() {
@@ -126,7 +127,9 @@ const MatchDetail: React.FC<Props> = ({ navigation, route }) => {
           id: _id
         }
       })
+      showSnackBar('success', 'Has enviado la solicitud con exito!')
     } catch (e) {
+      showSnackBar('error', 'Ya has enviado una petición para este partido.')
       console.log('error al enviar petition', e)
     }
     setIsLoading(false)

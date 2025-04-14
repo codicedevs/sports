@@ -3,7 +3,7 @@ import { Div, Text } from 'react-native-magnus'
 import { Profile } from '../../../types/form.type'
 import { customTheme } from '../../../utils/theme'
 import { scale, verticalScale } from 'react-native-size-matters'
-import { TouchableOpacity } from 'react-native'
+import { ScrollView, TouchableOpacity } from 'react-native'
 
 interface SportInputProps {
   matchDetailsRef: React.MutableRefObject<Profile>
@@ -19,15 +19,36 @@ const dayNames = [
   { id: 'Saturday', label: 'Sa' }
 ]
 
+// const schedules = [
+//   { id: 1, time: '00:00', value: { startHour: '08:00', endHour: '14:00' } },
+//   { id: 2, time: '08:00', value: { startHour: '08:00', endHour: '09:00' } },
+//   { id: 3, time: '09:00', value: { startHour: '09:00', endHour: '10:00' } },
+//   { id: 4, time: '10:00', value: { startHour: '10:00', endHour: '11:00' } },
+//   { id: 5, time: '11:00', value: { startHour: '11:00', endHour: '12:00' } },
+//   { id: 6, time: '12:00', value: { startHour: '12:00', endHour: '13:00' } },
+//   { id: 7, time: '13:00', value: { startHour: '13:00', endHour: '14:00' } }
+// ];
+
 const schedules = [
-  { id: 1, time: '00:00', value: { startHour: '08:00', endHour: '14:00' } },
-  { id: 2, time: '08:00', value: { startHour: '08:00', endHour: '09:00' } },
-  { id: 3, time: '09:00', value: { startHour: '09:00', endHour: '10:00' } },
-  { id: 4, time: '10:00', value: { startHour: '10:00', endHour: '11:00' } },
-  { id: 5, time: '11:00', value: { startHour: '11:00', endHour: '12:00' } },
-  { id: 6, time: '12:00', value: { startHour: '12:00', endHour: '13:00' } },
-  { id: 7, time: '13:00', value: { startHour: '13:00', endHour: '14:00' } }
-]
+  { id: 7, time: "00:00", value: { startHour: '08:00', endHour: '14:00' } },
+  { id: 8, time: "07:00", value: { startHour: '08:00', endHour: '14:00' } },
+  { id: 9, time: "08:00", value: { startHour: '08:00', endHour: '14:00' } },
+  { id: 10, time: "09:00", value: { startHour: '08:00', endHour: '14:00' } },
+  { id: 11, time: "10:00", value: { startHour: '08:00', endHour: '14:00' } },
+  { id: 12, time: "11:00", value: { startHour: '08:00', endHour: '14:00' } },
+  { id: 13, time: "12:00", value: { startHour: '08:00', endHour: '14:00' } },
+  { id: 14, time: "13:00", value: { startHour: '08:00', endHour: '14:00' } },
+  { id: 15, time: "14:00", value: { startHour: '08:00', endHour: '14:00' } },
+  { id: 16, time: "15:00", value: { startHour: '08:00', endHour: '14:00' } },
+  { id: 17, time: "16:00", value: { startHour: '08:00', endHour: '14:00' } },
+  { id: 18, time: "17:00", value: { startHour: '08:00', endHour: '14:00' } },
+  { id: 19, time: "18:00", value: { startHour: '08:00', endHour: '14:00' } },
+  { id: 20, time: "19:00", value: { startHour: '08:00', endHour: '14:00' } },
+  { id: 21, time: "20:00", value: { startHour: '08:00', endHour: '14:00' } },
+  { id: 22, time: "21:00", value: { startHour: '08:00', endHour: '14:00' } },
+  { id: 23, time: "22:00", value: { startHour: '08:00', endHour: '14:00' } },
+  { id: 24, time: "23:00", value: { startHour: '08:00', endHour: '14:00' } },
+];
 
 const DateTimePreferenceInput = ({ matchDetailsRef }: SportInputProps) => {
   const [currentDay, setCurrentDay] = useState('Sunday')
@@ -107,7 +128,7 @@ const DateTimePreferenceInput = ({ matchDetailsRef }: SportInputProps) => {
   }
 
   return (
-    <Div p={customTheme.spacing.medium}>
+    <Div flex={1} p={customTheme.spacing.medium}>
       <Text>¿Qué día juegan?</Text>
       <Div mt={customTheme.spacing.medium} flexDir="row" style={{ gap: verticalScale(6) }}>
         {dayNames.map(day => {
@@ -133,31 +154,33 @@ const DateTimePreferenceInput = ({ matchDetailsRef }: SportInputProps) => {
       </Div>
       <Div borderBottomWidth={1} my={customTheme.spacing.medium} borderBottomColor={customTheme.colors.gray} />
       <Text>¿A Qué hora juegan?</Text>
-      <Div mt={customTheme.spacing.medium} style={{ gap: verticalScale(8) }}>
-        {schedules.map((schedule, index) => {
-          const currentSchedules = selectedUserDays[currentDay] || []
-          const isSelected = currentSchedules.some(
-            s => s.startHour === schedule.value.startHour && s.endHour === schedule.value.endHour
-          )
+      <Div flex={1} mt={customTheme.spacing.medium} style={{ gap: verticalScale(8) }}>
+        <ScrollView showsVerticalScrollIndicator={false} nestedScrollEnabled={true} contentContainerStyle={{ flexGrow: 1 }}>
+          {schedules.map((schedule, index) => {
+            const currentSchedules = selectedUserDays[currentDay] || []
+            const isSelected = currentSchedules.some(
+              s => s.startHour === schedule.value.startHour && s.endHour === schedule.value.endHour
+            )
 
-          return (
-            <TouchableOpacity key={index} onPress={() => toggleSchedule(schedule)}>
-              <Div
-                h={verticalScale(48)}
-                bg={isSelected ? customTheme.colors.secondaryBackground : 'white'}
-                justifyContent="center"
-                borderWidth={1}
-              >
-                <Text
-                  color={isSelected ? 'white' : customTheme.colors.secondaryBackground}
-                  textAlign="center"
+            return (
+              <TouchableOpacity key={index} onPress={() => toggleSchedule(schedule)}>
+                <Div
+                  h={verticalScale(scale(40))}
+                  bg={isSelected ? customTheme.colors.secondaryBackground : 'white'}
+                  justifyContent="center"
+                  borderWidth={1}
                 >
-                  {schedule.time === '00:00' ? 'Todos los horarios' : schedule.time}
-                </Text>
-              </Div>
-            </TouchableOpacity>
-          )
-        })}
+                  <Text
+                    color={isSelected ? 'white' : customTheme.colors.secondaryBackground}
+                    textAlign="center"
+                  >
+                    {schedule.time === '00:00' ? 'Todos los horarios' : schedule.time}
+                  </Text>
+                </Div>
+              </TouchableOpacity>
+            )
+          })}
+        </ScrollView>
       </Div>
     </Div>
   )

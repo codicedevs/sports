@@ -87,7 +87,7 @@ export function TabStackScreen() {
       <Tab.Screen name={AppScreens.PETITIONS_SCREEN} component={PetitionScreen} />
       <Tab.Screen name={AppScreens.MATCH_HANDLER} component={MatchHandlerScreen} />
       <Tab.Screen name={AppScreens.MATCH_SCREEN} component={MatchesScreen} />
-      <Tab.Screen name="SettingsStack3" component={UserScreen} />
+      <Tab.Screen name={AppScreens.USER_SCREEN} component={UserScreen} />
       <Tab.Screen name={AppScreens.MATCH_DETAIL} component={MatchDetail} />
     </Tab.Navigator>
   )
