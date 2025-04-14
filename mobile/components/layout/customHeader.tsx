@@ -9,25 +9,32 @@ import {
   useNavigationState,
 } from "@react-navigation/native";
 import { AppScreens } from "../../navigation/screens";
+import useFetch from "../../hooks/useGet";
+import Petition from "../../types/petition.type";
+import petitionService from "../../service/petition.service";
+import { useSession } from "../../context/authProvider";
+import { QUERY_KEYS } from "../../types/query.types";
 
 export const CustomHeader = () => {
   const navigation = useNavigation();
   const route = useRoute();
+  const { currentUser } = useSession();
 
-const currentRouteName = useNavigationState((state) => {
-  const route = state.routes[state.index];
 
-  if (route.name === "HomeStack" && !route.state) {
-    return AppScreens.HOME_SCREEN;
-  }
+  const currentRouteName = useNavigationState((state) => {
+    const route = state.routes[state.index];
 
-  let nestedRoute = route;
-  while (nestedRoute.state && nestedRoute.state.index != null) {
-    nestedRoute = nestedRoute.state.routes[nestedRoute.state.index];
-  }
+    if (route.name === "HomeStack" && !route.state) {
+      return AppScreens.HOME_SCREEN;
+    }
 
-  return nestedRoute.name;
-});
+    let nestedRoute = route;
+    while (nestedRoute.state && nestedRoute.state.index != null) {
+      nestedRoute = nestedRoute.state.routes[nestedRoute.state.index];
+    }
+
+    return nestedRoute.name;
+  });
 
   const isHomeScreen = currentRouteName === AppScreens.HOME_SCREEN;
   const handleBackPress = () => {
@@ -45,6 +52,20 @@ const currentRouteName = useNavigationState((state) => {
       });
     }
   };
+
+  const { data: petitions, refetch: refetchPetition } = useFetch<{
+    results: Petition[];
+  }>(
+    () =>
+      petitionService.getAll({
+        populate: ["reference.id"],
+        where: {
+          status: ["pending"],
+          receiver: [currentUser._id],
+        },
+      }),
+    [QUERY_KEYS.PETITIONS]
+  );  
 
   if (isHomeScreen) {
     return (
@@ -82,7 +103,7 @@ const currentRouteName = useNavigationState((state) => {
             bg={customTheme.colors.primary}
             px={scale(3)}
           >
-            <Text fontSize={7}>2</Text>
+            <Text fontSize={7}>{petitions?.results.length}</Text>
           </Div>
         </Div>
       </Div>
@@ -138,7 +159,7 @@ const currentRouteName = useNavigationState((state) => {
             px={scale(4)}
             py={scale(1)}
           >
-            <Text fontSize={7}>2</Text>
+            <Text fontSize={7}>{petitions?.results.length}</Text>
           </Div>
         </Div>
       </Div>
