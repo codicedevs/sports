@@ -257,7 +257,7 @@ const MatchesList = ({ matches, fetchMore, hasMore }) => {
   const renderFooter = () => (hasMore ? <ActivityIndicator size="large" /> : null);
   if (matches.length < 1) {
     return (
-      <Div h={'80%'} justifyContent='center'>
+      <Div h={'70%'} justifyContent='center' alignItems='center'>
          <Image style={{ width: scale(79), height: verticalScale(75), alignSelf:"center" }} resizeMode="contain" source={require("../assets/search-no-result.png")} />
         <Text mt={customTheme.spacing.medium} fontSize={customTheme.fontSize.medium} color={customTheme.colors.gray} textAlign='center'>No hay datos</Text>
       </Div>
