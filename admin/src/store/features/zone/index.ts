@@ -1,10 +1,12 @@
 // src/features/auth/authApi.ts
 import { BaseQueryFn, createApi } from "@reduxjs/toolkit/query/react";
 import { AxiosError, AxiosResponse } from "axios";
-import { locationService } from "../../../services/locations";
-import { Location, NewLocationDto } from "../../../types/locations.type";
+import { zoneService } from "../../../services/zone";
+import { Zone } from "../../../types/zone.type";
 
-interface LocationFilter {
+
+
+interface ZoneFilter {
   _id: string;
 }
 
@@ -41,12 +43,12 @@ const axiosBaseQuery =
     }
   };
 
-export const locationApi = createApi({
-  reducerPath: "locationApi",
-  baseQuery: axiosBaseQuery<any>(locationService),
-  tagTypes: ["Locations"],
+export const zoneApi = createApi({
+  reducerPath: "zoneApi",
+  baseQuery: axiosBaseQuery<any>(zoneService),
+  tagTypes: ["Zones"],
   endpoints: (builder) => ({
-    getLocations: builder.query<any, any>({
+    getZones: builder.query<any, any>({
       query: (filter: any) => {
         return {
           url: ``,
@@ -54,9 +56,9 @@ export const locationApi = createApi({
           params: filter,
         };
       },
-      providesTags: ["Locations"],
+      providesTags: ["Zones"],
     }),
-    getLocation: builder.query<Location, any>({
+    getZone: builder.query<Zone, any>({
       query: ({ id, populate }) => {
         return {
           url: ``,
@@ -65,9 +67,9 @@ export const locationApi = createApi({
           params: populate ? { populate } : {},
         };
       },
-      providesTags: (result, error, { id }) => [{ type: "Locations", id }],
+      providesTags: (result, error, { id }) => [{ type: "Zones", id }],
     }),
-    createLocations: builder.mutation<any, any>({
+    createZones: builder.mutation<any, any>({
       query: (data: any) => {
         return {
           url: ``,
@@ -75,40 +77,37 @@ export const locationApi = createApi({
           data,
         };
       },
-      invalidatesTags: ["Locations"],
+      invalidatesTags: ["Zones"],
     }),
-    updateLocations: builder.mutation<
-      Location,
-      { locationId: any; location: any }
-    >({
-      query: ({ locationId, location }) => ({
+    updateZones: builder.mutation<Zone,{zoneId: any; zone: any }>({
+      query: ({ zoneId, zone }) => ({
         url: "",
         method: "update",
-        data: locationId,
-        params: location,
+        data: zoneId,
+        params: zone,
       }),
-      invalidatesTags: (result, error, { locationId }) => [
-        "Locations",
-        { type: "Locations", locationId },
+      invalidatesTags: (result, error, { zoneId }) => [
+        "Zones",
+        { type: "Zones", zoneId },
       ],
     }),
 
-    deleteLocations: builder.mutation<string, string>({
-      query: (locationId: any) => {
+    deleteZones: builder.mutation<string, string>({
+      query: (zoneId: any) => {
         return {
           url: ``,
           method: "remove",
-          data: locationId,
+          data: zoneId,
         };
       },
-      async onQueryStarted(locationId, { dispatch, queryFulfilled }) {
+      async onQueryStarted(zoneId, { dispatch, queryFulfilled }) {
         const patchResult = dispatch(
-          locationApi.util.updateQueryData(
-            "getLocations",
+          zoneApi.util.updateQueryData(
+            "getZones",
             undefined,
             (draft) => {
               draft.results = draft.results.filter(
-                (location: Location) => location._id !== locationId
+                (zone: Zone) => zone._id !== zoneId
               );
             }
           )
@@ -124,10 +123,10 @@ export const locationApi = createApi({
 });
 
 export const {
-  useGetLocationsQuery,
-  useGetLocationQuery,
-  useCreateLocationsMutation,
-  useUpdateLocationsMutation,
-  useDeleteLocationsMutation,
-  useLazyGetLocationsQuery,
-} = locationApi;
+  useGetZonesQuery,
+  useGetZoneQuery,
+  useCreateZonesMutation,
+  useUpdateZonesMutation,
+  useDeleteZonesMutation,
+  useLazyGetZonesQuery,
+} = zoneApi;

@@ -13,6 +13,12 @@ import MatchesList from "./pages/matches/list";
 import SportList from "./pages/sports/list";
 import SportForm from "./pages/sports/form";
 
+import LocationForm from "./pages/location/form";
+import ZoneList from "./pages/zone/list";
+import LocationList from "./pages/location/list";
+import ZoneForm from "./pages/zone/form";
+
+
 const router = createBrowserRouter([
   {
     path: "/login",
@@ -32,6 +38,12 @@ const router = createBrowserRouter([
       { path: "deportes", element: <SportList /> },
       { path: "deportes/:id", element: <SportForm /> },
       { path: "deportes/nuevo", element: <SportForm /> },
+      { path: "establecimiento", element: <LocationList /> },
+      { path: "establecimiento/:id", element: <LocationForm /> },
+      { path: "establecimiento/nuevo", element: <LocationForm /> },
+      { path: "zona", element: <ZoneList /> },
+      { path: "zona/:id", element: <ZoneForm /> },
+      { path: "zona/nuevo", element: <ZoneForm /> },
     ],
   },
 ]);

@@ -7,6 +7,7 @@ import { userApi } from "./features/users";
 import { locationApi } from "./features/locations";
 import { sportModeApi } from "./features/sportModes";
 import { sportApi } from "./features/sports";
+import { zoneApi } from "./features/zone";
 
 const store = configureStore({
   reducer: {
@@ -17,6 +18,7 @@ const store = configureStore({
     [locationApi.reducerPath]: locationApi.reducer,
     [sportModeApi.reducerPath]: sportModeApi.reducer,
     [sportApi.reducerPath]: sportApi.reducer,
+    [zoneApi.reducerPath] : zoneApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -25,7 +27,8 @@ const store = configureStore({
       userApi.middleware,
       locationApi.middleware,
       sportModeApi.middleware,
-      sportApi.middleware
+      sportApi.middleware,
+      zoneApi.middleware
     ),
 });
 

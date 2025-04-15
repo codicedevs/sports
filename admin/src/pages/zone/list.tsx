@@ -8,29 +8,32 @@ import {
   StyledSearchContainer,
   StyledSearchHeader,
 } from "../../styled/globalStyled";
-import {
-  useDeleteSportMutation,
-  useGetSportsQuery,
-} from "../../store/features/sports";
-import { Sport } from "../../types/sport.type";
+import { Zone } from "../../types/zone.type";
+import { useDeleteZonesMutation, useGetZonesQuery } from "../../store/features/zone";
 const { Search } = Input;
 
 const getColumns = (
-  handleDeleteSport: (id: string) => void,
+  handleDeleteZone: (id: string) => void,
   navigate: NavigateFunction
-): ColumnType<Sport>[] => {
+): ColumnType<Zone>[] => {
   return [
+    {
+      title: "ID",
+      dataIndex: "_id",
+      key: "_id",
+    },
     {
       title: "Nombre",
       dataIndex: "name",
       key: "name",
     },
+  
     {
       title: "Acción",
       key: "action",
       width: "25%",
       align: "right" as const,
-      render: (record: Sport) => (
+      render: (record: Zone) => (
         <Space
           size="middle"
           style={{
@@ -39,11 +42,11 @@ const getColumns = (
             justifyContent: "right",
           }}
         >
-          <Button onClick={() => navigate(`../deportes/${record._id}`)}>
+          <Button onClick={() => navigate(`../zona/${record._id}`)}>
             Editar
           </Button>
 
-          <Delete handleDelete={handleDeleteSport} id={record._id} />
+          <Delete handleDelete={handleDeleteZone} id={record._id} />
         </Space>
       ),
     },
@@ -51,13 +54,14 @@ const getColumns = (
 };
 
 const likeInputs = ["name", "location", "user"];
-const SportList = () => {
+const ZoneList = () => {
   const navigate = useNavigate();
-  const [deleteSport] = useDeleteSportMutation();
+  const [deleteZone] = useDeleteZonesMutation();
   const [filter, setFilter] = useState<{}>();
-  const { data } = useGetSportsQuery(filter);
-  const handleDeleteSport = (id: string) => {
-    deleteSport(id).unwrap();
+  const { data } = useGetZonesQuery(filter);
+ 
+  const handleDeleteZone= (id: string) => {
+    deleteZone(id).unwrap();
   };
 
   const handleSearch = (filterName: string, value: string | boolean) => {
@@ -73,12 +77,11 @@ const SportList = () => {
       }));
     }
   };
-
-  const columns = getColumns(handleDeleteSport, navigate);
+  const columns = getColumns(handleDeleteZone, navigate);
 
   return (
     <div>
-      <h2>Deportes</h2>
+      <h2>Zonas</h2>
 
       <StyledSearchHeader id="searchHeader">
         <StyledSearchContainer>
@@ -92,7 +95,7 @@ const SportList = () => {
           <Button
             type="primary"
             onClick={() => {
-              navigate("/deportes/nuevo");
+              navigate("/zona/nuevo");
             }}
           >
             Nuevo
@@ -104,4 +107,4 @@ const SportList = () => {
   );
 };
 
-export default SportList;
+export default ZoneList;

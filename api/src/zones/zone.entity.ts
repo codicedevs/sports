@@ -5,16 +5,16 @@ import mongoose, { Document, Types } from "mongoose";
 export class Zone extends Document {
   @Prop({ required: true })
   name: string; // Nombre de la zona (e.g., "Centro", "Sur")
-
+ // puse los requiere en false para poder crear zona
   @Prop({
     type: {
       type: String,
       enum: ["Polygon"],
-      required: true,
+      required: false,
     },
     coordinates: {
       type: [[[Number]]], // Coordenadas del polígono (array de [lng, lat])
-      required: true,
+      required: false,
     },
   })
   location: {

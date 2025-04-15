@@ -5,10 +5,10 @@ import { PartialType } from '@nestjs/swagger';
 
 class ZoneLocationDto {
   @IsIn(["Polygon"])
-  type: "Polygon";
+  type?: "Polygon";
 
   @IsArray()
-  coordinates: [number, number][][];
+  coordinates?: [number, number][][];
 }
 export class CreateZoneDto {
   @IsString()
@@ -16,7 +16,7 @@ export class CreateZoneDto {
 
   @ValidateNested()
   @Type(() => ZoneLocationDto)
-  location: ZoneLocationDto;
+  location?: ZoneLocationDto;
 }
 
 
