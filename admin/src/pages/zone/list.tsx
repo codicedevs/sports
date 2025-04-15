@@ -8,49 +8,32 @@ import {
   StyledSearchContainer,
   StyledSearchHeader,
 } from "../../styled/globalStyled";
-import {
-  useDeleteLocationsMutation,
-  useGetLocationsQuery,
-} from "../../store/features/locations";
-import { Location } from "../../types/locations.type";
-
+import { Zone } from "../../types/zone.type";
+import { useDeleteZonesMutation, useGetZonesQuery } from "../../store/features/zone";
 const { Search } = Input;
 
 const getColumns = (
-  handleDeleteLocation: (id: string) => void,
+  handleDeleteZone: (id: string) => void,
   navigate: NavigateFunction
-): ColumnType<Location>[] => {
+): ColumnType<Zone>[] => {
   return [
+    {
+      title: "ID",
+      dataIndex: "_id",
+      key: "_id",
+    },
     {
       title: "Nombre",
       dataIndex: "name",
       key: "name",
     },
-    {
-      title: "Dirección",
-      dataIndex: "address",
-      key: "address",
-    },
-    {
-      title: "Latitud",
-      key: "latitude",
-      dataIndex: "location",
-      render: (location: Location["location"]) =>
-        location?.coordinates?.[0] ?? "No disponible",
-    },
-    {
-      title: "Longitud",
-      key: "longitude",
-      dataIndex: "location",
-      render: (location: Location["location"]) =>
-        location?.coordinates?.[1] ?? "No disponible",
-    },
+  
     {
       title: "Acción",
       key: "action",
       width: "25%",
       align: "right" as const,
-      render: (record: Location) => (
+      render: (record: Zone) => (
         <Space
           size="middle"
           style={{
@@ -59,11 +42,11 @@ const getColumns = (
             justifyContent: "right",
           }}
         >
-          <Button onClick={() => navigate(`../establecimiento/${record._id}`)}>
+          <Button onClick={() => navigate(`../zona/${record._id}`)}>
             Editar
           </Button>
 
-          <Delete handleDelete={handleDeleteLocation} id={record._id} />
+          <Delete handleDelete={handleDeleteZone} id={record._id} />
         </Space>
       ),
     },
@@ -71,14 +54,15 @@ const getColumns = (
 };
 
 const likeInputs = ["name", "location", "user"];
-const LocationList = () => {
+const ZoneList = () => {
   const navigate = useNavigate();
-  const [deleteLocation] = useDeleteLocationsMutation();
+  const [deleteZone] = useDeleteZonesMutation();
   const [filter, setFilter] = useState<{}>();
-  const { data } = useGetLocationsQuery(filter);
+  const { data } = useGetZonesQuery(filter);
+  console.log("DATAAA",data)
   
-  const handleDeleteLocation = (id: string) => {
-    deleteLocation(id).unwrap();
+  const handleDeleteZone= (id: string) => {
+    deleteZone(id).unwrap();
   };
 
   const handleSearch = (filterName: string, value: string | boolean) => {
@@ -94,11 +78,11 @@ const LocationList = () => {
       }));
     }
   };
-  const columns = getColumns(handleDeleteLocation, navigate);
+  const columns = getColumns(handleDeleteZone, navigate);
 
   return (
     <div>
-      <h2>Establecimientos</h2>
+      <h2>Zonas</h2>
 
       <StyledSearchHeader id="searchHeader">
         <StyledSearchContainer>
@@ -112,7 +96,7 @@ const LocationList = () => {
           <Button
             type="primary"
             onClick={() => {
-              navigate("/establecimiento/nuevo");
+              navigate("/zona/nuevo");
             }}
           >
             Nuevo
@@ -124,4 +108,4 @@ const LocationList = () => {
   );
 };
 
-export default LocationList;
+export default ZoneList;

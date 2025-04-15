@@ -1,6 +1,8 @@
 import {
+  EnvironmentOutlined,
   PieChartOutlined,
   TableOutlined,
+  TrophyOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { Menu, MenuProps } from "antd";
@@ -76,18 +78,18 @@ const Sidebar = ({ collapsed }: SidebarProps) => {
     getItem("Partidos", "2", <TableOutlined />, null, () =>
       navigate("partidos")
     ),
-    getItem("Menu Usuarios", "sub2", <UserOutlined />, [
-      getItem("Lista de usuarios", "3", null, null, () => navigate("usuarios")),
-      getItem("Nuevo Usuario", "4", null, null, () =>
-        navigate("usuarios/nuevo")
-      ),
-    ]),
-    getItem("Deportes", "5", <PieChartOutlined />, null, () =>
+     
+      getItem("Usuarios", "3", <UserOutlined/>, null, () => navigate("usuarios"))
+     
+    ,
+    getItem("Deportes", "4", <TrophyOutlined />, null, () =>
       navigate("deportes")
     ),
-    getItem("Establecimiento", "6", <PieChartOutlined />, null, () =>
+    getItem("Establecimientos", "5", <PieChartOutlined />, null, () =>
       navigate("establecimiento")
     ),
+    getItem("Zonas", "6", <EnvironmentOutlined />, null, () =>
+      navigate("zona") )
   ];
 
   return (
