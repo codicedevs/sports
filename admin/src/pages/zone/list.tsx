@@ -59,8 +59,7 @@ const ZoneList = () => {
   const [deleteZone] = useDeleteZonesMutation();
   const [filter, setFilter] = useState<{}>();
   const { data } = useGetZonesQuery(filter);
-  console.log("DATAAA",data)
-  
+ 
   const handleDeleteZone= (id: string) => {
     deleteZone(id).unwrap();
   };

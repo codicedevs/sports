@@ -16,6 +16,7 @@ import SportForm from "./pages/sports/form";
 import LocationForm from "./pages/location/form";
 import ZoneList from "./pages/zone/list";
 import LocationList from "./pages/location/list";
+import ZoneForm from "./pages/zone/form";
 
 
 const router = createBrowserRouter([
@@ -41,6 +42,8 @@ const router = createBrowserRouter([
       { path: "establecimiento/:id", element: <LocationForm /> },
       { path: "establecimiento/nuevo", element: <LocationForm /> },
       { path: "zona", element: <ZoneList /> },
+      { path: "zona/:id", element: <ZoneForm /> },
+      { path: "zona/nuevo", element: <ZoneForm /> },
     ],
   },
 ]);

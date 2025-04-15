@@ -97,8 +97,6 @@ const LocationForm = () => {
       //coordinates va a estar hardcodeado
       const newData = {
         name: data.name,
-        address: data.address,
-        coordinates: [-32.96262764365664, -60.62611040288317],
       };
 
       console.log("Establecimiento a guardar:", newData);
