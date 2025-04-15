@@ -9,16 +9,16 @@ import {
   StyledSearchHeader,
 } from "../../styled/globalStyled";
 import {
-  useDeleteSportMutation,
-  useGetSportsQuery,
-} from "../../store/features/sports";
-import { Sport } from "../../types/sport.type";
+  useDeleteLocationsMutation,
+  useGetLocationsQuery,
+} from "../../store/features/locations";
+import { Location } from "../../types/locations.type";
 const { Search } = Input;
 
 const getColumns = (
-  handleDeleteSport: (id: string) => void,
+  handleDeleteLocation: (id: string) => void,
   navigate: NavigateFunction
-): ColumnType<Sport>[] => {
+): ColumnType<Location>[] => {
   return [
     {
       title: "Nombre",
@@ -26,11 +26,30 @@ const getColumns = (
       key: "name",
     },
     {
+      title: "Dirección",
+      dataIndex: "address",
+      key: "address",
+    },
+    {
+      title: "Latitud",
+      key: "latitude",
+      dataIndex: "location",
+      render: (location: Location["location"]) =>
+        location?.coordinates?.[0] ?? "No disponible",
+    },
+    {
+      title: "Longitud",
+      key: "longitude",
+      dataIndex: "location",
+      render: (location: Location["location"]) =>
+        location?.coordinates?.[1] ?? "No disponible",
+    },
+    {
       title: "Acción",
       key: "action",
       width: "25%",
       align: "right" as const,
-      render: (record: Sport) => (
+      render: (record: Location) => (
         <Space
           size="middle"
           style={{
@@ -39,11 +58,11 @@ const getColumns = (
             justifyContent: "right",
           }}
         >
-          <Button onClick={() => navigate(`../deportes/${record._id}`)}>
+          <Button onClick={() => navigate(`../establecimiento/${record._id}`)}>
             Editar
           </Button>
 
-          <Delete handleDelete={handleDeleteSport} id={record._id} />
+          <Delete handleDelete={handleDeleteLocation} id={record._id} />
         </Space>
       ),
     },
@@ -51,13 +70,13 @@ const getColumns = (
 };
 
 const likeInputs = ["name", "location", "user"];
-const SportList = () => {
+const LocationList = () => {
   const navigate = useNavigate();
-  const [deleteSport] = useDeleteSportMutation();
+  const [deleteLocation] = useDeleteLocationsMutation();
   const [filter, setFilter] = useState<{}>();
-  const { data } = useGetSportsQuery(filter);
-  const handleDeleteSport = (id: string) => {
-    deleteSport(id).unwrap();
+  const { data } = useGetLocationsQuery(filter);
+  const handleDeleteLocation = (id: string) => {
+    deleteLocation(id).unwrap();
   };
 
   const handleSearch = (filterName: string, value: string | boolean) => {
@@ -73,8 +92,7 @@ const SportList = () => {
       }));
     }
   };
-
-  const columns = getColumns(handleDeleteSport, navigate);
+  const columns = getColumns(handleDeleteLocation, navigate);
 
   return (
     <div>
@@ -92,7 +110,7 @@ const SportList = () => {
           <Button
             type="primary"
             onClick={() => {
-              navigate("/deportes/nuevo");
+              navigate("/establecimiento/nuevo");
             }}
           >
             Nuevo
@@ -104,4 +122,4 @@ const SportList = () => {
   );
 };
 
-export default SportList;
+export default LocationList;

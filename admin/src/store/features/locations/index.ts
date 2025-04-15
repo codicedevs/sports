@@ -2,7 +2,7 @@
 import { BaseQueryFn, createApi } from "@reduxjs/toolkit/query/react";
 import { AxiosError, AxiosResponse } from "axios";
 import { locationService } from "../../../services/locations";
-import { Location } from "../../../types/locations.type";
+import { Location, NewLocationDto } from "../../../types/locations.type";
 
 interface LocationFilter {
   _id: string;
@@ -56,6 +56,17 @@ export const locationApi = createApi({
       },
       providesTags: ["Locations"],
     }),
+    getLocation: builder.query<Location, any>({
+      query: ({ id, populate }) => {
+        return {
+          url: ``,
+          method: "findById",
+          data: id,
+          params: populate ? { populate } : {},
+        };
+      },
+      providesTags: (result, error, { id }) => [{ type: "Locations", id }],
+    }),
     createLocations: builder.mutation<any, any>({
       query: (data: any) => {
         return {
@@ -66,6 +77,22 @@ export const locationApi = createApi({
       },
       invalidatesTags: ["Locations"],
     }),
+    updateLocations: builder.mutation<
+      Location,
+      { locationId: any; location: any }
+    >({
+      query: ({ locationId, location }) => ({
+        url: "",
+        method: "update",
+        data: locationId,
+        params: location,
+      }),
+      invalidatesTags: (result, error, { locationId }) => [
+        "Locations",
+        { type: "Locations", locationId },
+      ],
+    }),
+
     deleteLocations: builder.mutation<string, string>({
       query: (locationId: any) => {
         return {
@@ -98,7 +125,9 @@ export const locationApi = createApi({
 
 export const {
   useGetLocationsQuery,
+  useGetLocationQuery,
   useCreateLocationsMutation,
+  useUpdateLocationsMutation,
   useDeleteLocationsMutation,
   useLazyGetLocationsQuery,
 } = locationApi;
