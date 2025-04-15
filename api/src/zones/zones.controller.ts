@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Put } from '@nestjs/common';
 import { ZonesService } from './zones.service';
 import { CreateZoneDto, UpdateZoneDto } from './zone.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -30,7 +30,7 @@ export class ZonesController {
     return this.zonesService.findOne(new Types.ObjectId(id));
   }
 
-  @Patch(':id')
+  @Put(':id')
   update(@Param('id') id: string, @Body() updateZoneDto: UpdateZoneDto) {
     return this.zonesService.update(+id, updateZoneDto);
   }
