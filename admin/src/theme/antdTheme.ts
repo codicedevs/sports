@@ -48,7 +48,7 @@ export const darkTheme: ThemeConfig = {
   token: {
     colorBgBase: "#1a1a1a", 
     colorText: "#f0f0f0",   
-    colorBgContainer: "#1a1a1a",
+    colorBgContainer: "#403e3e",
 
     
   },
