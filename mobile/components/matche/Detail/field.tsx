@@ -8,8 +8,6 @@ import matchService from "../../../service/match.service";
 import { customTheme } from "../../../utils/theme";
 import useFetch from "../../../hooks/useGet";
 import { QUERY_KEYS } from "../../../types/query.types";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useQueryClient } from "@tanstack/react-query";
 
 const MAX_CIRCLE_SIZE = scale(50);
 
@@ -158,18 +156,10 @@ const Field = ({ match, isAdmin }: FieldProps) => {
   const [playersAssignments, setPlayersAssignments] = useState({});
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTeam, setSelectedTeam] = useState<1 | 2 | null>(null);
-  const { data: statusList } = useFetch(() => matchService.getPlayerInvitations(match._id), [QUERY_KEYS.PLAYERS_STATUS,match])
-  const queryClient = useQueryClient();
-
+  const { data: statusList } = useFetch(() => matchService.getPlayerInvitations(match._id), [QUERY_KEYS.PLAYERS_STATUS, match])
+  const [hasInitialized, setHasInitialized] = useState(false);
   const totalPlayers = match.playersLimit;
   const teamPlayers = totalPlayers / 2;
-  // useEffect(() => {
-  //   setPlayersAssignments(prev => ({
-  //     ...prev,
-  //     "Top-GK": { circleNumber: 1 },
-  //     "Bottom-GK": { circleNumber: 1 }
-  //   }));
-  // }, []);
 
   const handlePlayerPress = (playerId, circleNumber, team) => {
     setSelectedPlayerId(playerId);
@@ -179,42 +169,34 @@ const Field = ({ match, isAdmin }: FieldProps) => {
   };
 
   const addToFormation = async (player: any) => {
-    // const formationsToSend = buildFormationsFromAssignments(playersAssignments);
-    // // console.log(player)
-    // queryClient.setQueryData([QUERY_KEYS.MATCH], (old: Match) => ({
-    //   ...old,
-    //   data: {
-    //     ...old.data,
-    //     formations: formationsToSend,
-    //   },
-    // }))
-
-
     await matchService.addPlayerToFormation(match._id, player._id, {
       team: selectedTeam,
       position: selectedCircleNumber
     })
-
-    await queryClient.invalidateQueries({queryKey:[QUERY_KEYS.MATCH]})
   }
 
   //************************************************* */
-  const buildFormationsFromAssignments = (assignments: Record<string, { persona: any, circleNumber: number }>) => {
+  const buildFormationsFromAssignments = (
+    assignments: Record<string, { persona: any, circleNumber: number }>
+  ) => {
     const newFormations = {
       team1: [] as { position: number, userId: string }[],
       team2: [] as { position: number, userId: string }[],
     };
 
-    Object.entries(assignments).forEach(([playerId, { persona, circleNumber }]) => {
+    Object.entries(assignments).forEach(([_, { persona, circleNumber }]) => {
       if (!persona || !persona._id || !circleNumber) return;
 
-      const isTeam1 = playerId.toLowerCase().includes("top");
-      const teamKey = isTeam1 ? "team1" : "team2";
+      const isTeam1 = match.formations?.team1.some((p) => p.userId === persona._id);
+      const isTeam2 = match.formations?.team2.some((p) => p.userId === persona._id);
 
-      newFormations[teamKey].push({
-        position: circleNumber,
-        userId: persona._id,
-      });
+      if (isTeam1) {
+        newFormations.team1.push({ position: circleNumber, userId: persona._id });
+      } else if (isTeam2) {
+        newFormations.team2.push({ position: circleNumber, userId: persona._id });
+      } else {
+        console.warn("Persona no encontrada en formaciones:", persona);
+      }
     });
 
     return newFormations;
@@ -224,24 +206,20 @@ const Field = ({ match, isAdmin }: FieldProps) => {
   const removeFromFormation = async (player: any) => {
     await matchService.removePlayerFromFormation(match._id, player._id)
   }
-  // console.log(match.formations)
   const handlePersonaSelect = (persona) => {
     setPlayersAssignments(prev => {
       const newAssignments = { ...prev };
 
-      // Eliminar al jugador de donde ya esté asignado
       Object.keys(newAssignments).forEach(key => {
         if (
           newAssignments[key].persona &&
           newAssignments[key].persona._id === persona._id
         ) {
-          // Llama a removeFromFormation si estaba asignado antes
           removeFromFormation(persona);
           delete newAssignments[key];
         }
       });
 
-      // Agregar al jugador en la nueva posición
       addToFormation(persona);
       newAssignments[selectedPlayerId] = { persona, circleNumber: selectedCircleNumber };
 
@@ -253,11 +231,80 @@ const Field = ({ match, isAdmin }: FieldProps) => {
     setSelectedCircleNumber(null);
   };
 
+  useEffect(() => {
+    // 1) Salir si ya inicializamos
+    if (hasInitialized) return;
+  
+    // 2) Salir si todavía no tenemos las formaciones o la lista de jugadores
+    if (
+      !match?.formations ||
+      !Array.isArray(match.formations.team1) ||
+      !Array.isArray(match.formations.team2) ||
+      !statusList?.accepted ||
+      statusList.accepted.length === 0
+    ) {
+      return;
+    }
+  
+    // 3) Preparamos los valores que usa TeamField
+    const totalPlayers = match.playersLimit;
+    const teamPlayers = totalPlayers / 2;
+    const maxPerRow = teamPlayers === 5 ? 2 : 4;
+    // (TeamField usa circleNumber empezando en 2)
+    
+    const initialAssignments: Record<string, { persona: any; circleNumber: number }> = {};
+  
+    // ——— Top = team2 ——————————————————————————————————————————
+    match.formations.team2.forEach(({ userId, position }) => {
+      // calcular índice 0-based de circleNumber→posición en grid
+      const idx = position - 2;                    
+      const row = Math.floor(idx / maxPerRow);    
+      const col = idx % maxPerRow;                
+      const key = `top-${row}-${col}`;            
+  
+      const persona = statusList.accepted.find(p => p._id === userId);
+      if (persona) {
+        initialAssignments[key] = {
+          persona,
+          circleNumber: position
+        };
+      }
+    });
+  
+    // ——— Bottom = team1 ————————————————————————————————————————
+    match.formations.team1.forEach(({ userId, position }) => {
+      const idx = position - 2;
+      const row = Math.floor(idx / maxPerRow);
+      const col = idx % maxPerRow;
+      const key = `bottom-${row}-${col}`;
+  
+      const persona = statusList.accepted.find(p => p._id === userId);
+      if (persona) {
+        initialAssignments[key] = {
+          persona,
+          circleNumber: position
+        };
+      }
+    });
+  
+    setPlayersAssignments(initialAssignments);
+    setHasInitialized(true);
+  }, [
+    hasInitialized,
+    match.formations,
+    statusList?.accepted,
+    match.playersLimit
+  ]);
+  
+
+  console.log(playersAssignments,'123123s')
+
+
   const filteredPersonas = React.useMemo(() => {
     return statusList?.accepted.filter((personaObj) =>
       personaObj.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [searchQuery]);
+  }, [searchQuery, statusList?.accepted]);
 
   const iniciales = (playerId) => {
     const entry = playersAssignments[playerId];
@@ -266,8 +313,8 @@ const Field = ({ match, isAdmin }: FieldProps) => {
       : isAdmin ? "+" : "";
   };
 
-  if (!statusList) return
-
+  if (!statusList?.accepted || !match.formations) return
+  
   return (
     <>
       {open && (
@@ -330,10 +377,22 @@ const Field = ({ match, isAdmin }: FieldProps) => {
               mirror={false}
               onPlayerPress={handlePlayerPress}
               playersAssignments={playersAssignments}
-              onAutoAssign={(assignments) =>
-                setPlayersAssignments(prev => ({ ...prev, ...assignments }))
-              }
-              teamData={match.formations?.team2}
+              onAutoAssign={(newAssignments) => {
+                setPlayersAssignments((prev) => {
+                  const updated = { ...prev };
+
+                  const newPlayerIds = Object.values(newAssignments).map((a: any) => a.persona._id);
+
+                  for (const key in updated) {
+                    if (newPlayerIds.includes(updated[key].persona._id)) {
+                      delete updated[key];
+                    }
+                  }
+
+                  return { ...updated, ...newAssignments };
+                });
+              }}
+              teamData={buildFormationsFromAssignments(playersAssignments).team2}
               isAdmin={isAdmin}
               statusList={statusList.accepted}
               teamNumber={2}
@@ -346,10 +405,24 @@ const Field = ({ match, isAdmin }: FieldProps) => {
               mirror={true}
               onPlayerPress={handlePlayerPress}
               playersAssignments={playersAssignments}
-              onAutoAssign={(assignments) =>
-                setPlayersAssignments(prev => ({ ...prev, ...assignments }))
-              }
-              teamData={match.formations?.team1}
+              onAutoAssign={(newAssignments) => {
+                setPlayersAssignments((prev) => {
+                  const updated = { ...prev };
+
+                  // Sacar jugadores que ya están en los nuevos assignments
+                  const newPlayerIds = Object.values(newAssignments).map((a: any) => a.persona._id);
+
+                  for (const key in updated) {
+                    if (newPlayerIds.includes(updated[key].persona._id)) {
+                      delete updated[key];
+                    }
+                  }
+
+                  // Agregar los nuevos assignments
+                  return { ...updated, ...newAssignments };
+                });
+              }}
+              teamData={buildFormationsFromAssignments(playersAssignments).team1}
               isAdmin={isAdmin}
               statusList={statusList.accepted}
               teamNumber={1}

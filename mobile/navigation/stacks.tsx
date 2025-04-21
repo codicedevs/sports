@@ -83,12 +83,12 @@ export function TabStackScreen() {
       headerShown: true,
       animation: "fade"
     }}>
-      <Tab.Screen options={{ tabBarStyle: { backgroundColor: 'white' } }} name="HomeStack" component={HomeStackScreen} />
-      <Tab.Screen options={{ tabBarStyle: { backgroundColor: 'white' } }} name={AppScreens.PETITIONS_SCREEN} component={PetitionScreen} />
-      <Tab.Screen options={{ tabBarStyle: { backgroundColor: 'white' } }} name={AppScreens.MATCH_HANDLER} component={MatchHandlerScreen} />
-      <Tab.Screen options={{ tabBarStyle: { backgroundColor: 'white' } }} name={AppScreens.MATCH_SCREEN} component={MatchesScreen} />
-      <Tab.Screen options={{ tabBarStyle: { backgroundColor: 'white' } }} name={AppScreens.USER_SCREEN} component={UserScreen} />
-      <Tab.Screen options={{ tabBarStyle: { backgroundColor: 'white' } }} name={AppScreens.MATCH_DETAIL} component={MatchDetail} />
+      <Tab.Screen name="HomeStack" component={HomeStackScreen} />
+      <Tab.Screen name={AppScreens.PETITIONS_SCREEN} component={PetitionScreen} />
+      <Tab.Screen options={{ tabBarStyle:{display:"none"}}} name={AppScreens.MATCH_HANDLER} component={MatchHandlerScreen} />
+      <Tab.Screen name={AppScreens.MATCH_SCREEN} component={MatchesScreen} />
+      <Tab.Screen name={AppScreens.USER_SCREEN} component={UserScreen} />
+      <Tab.Screen name={AppScreens.MATCH_DETAIL} component={MatchDetail} />
     </Tab.Navigator>
   )
 }
