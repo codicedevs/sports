@@ -220,6 +220,11 @@ const MatchesList = () => {
           <label htmlFor="switchBordered">Turno</label>
           <Button
             type="primary"
+            style={{
+              boxShadow: "none",
+              color: "#ffffff",
+              background:"#1a1a1a"
+            }}
             onClick={() => {
               navigate("/partidos/nuevo");
             }}

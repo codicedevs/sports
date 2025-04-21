@@ -55,12 +55,14 @@ const InnerApp = () => {
 
   return (
     <ConfigProvider theme={currentTheme}>
-      <div style={{ position: "fixed", top: 10, right: 10, zIndex: 9999 }}>
+      <div style={{ position: "fixed", top: 80, right: 12, zIndex: 9999 }}>
         <Button onClick={toggleTheme}>
           {isDark ? "Modo Claro " : "Modo Oscuro "}
         </Button>
       </div>
+      <div style={{ minHeight: "100vh", backgroundColor: isDark ? "#403e3e" : "#fefefe" }}>
       <RouterProvider router={router} />
+    </div>
     </ConfigProvider>
   );
 };

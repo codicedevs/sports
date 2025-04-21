@@ -123,6 +123,11 @@ const UsersList = () => {
           />
           <Button
             type="primary"
+            style={{
+              boxShadow: "none",
+              color: "#ffffff",
+              background:"#1a1a1a"
+            }}
             onClick={() => {
               navigate("/usuarios/nuevo");
             }}

@@ -25,7 +25,14 @@ const Delete = ({ handleDelete, id }: DeleteProps) => {
         okText="Si"
         cancelText="No"
       >
-        <Button danger>Borrar</Button>
+        <Button
+          style={{
+            boxShadow: "none",
+          }}
+          danger
+        >
+          Borrar
+        </Button>
       </Popconfirm>
     </div>
   );
