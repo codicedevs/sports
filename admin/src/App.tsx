@@ -17,7 +17,9 @@ import LocationForm from "./pages/location/form";
 import ZoneList from "./pages/zone/list";
 import LocationList from "./pages/location/list";
 import ZoneForm from "./pages/zone/form";
-
+import { useState } from "react";
+import { Button } from "antd/es/radio";
+import { ThemeProvider, useTheme } from "./context/ThemeContext";
 
 const router = createBrowserRouter([
   {
@@ -48,11 +50,26 @@ const router = createBrowserRouter([
   },
 ]);
 
-const App = () => (
-  <Provider store={store}>
-    <ConfigProvider theme={lightTheme}>
+const InnerApp = () => {
+  const { isDark, toggleTheme, currentTheme } = useTheme();
+
+  return (
+    <ConfigProvider theme={currentTheme}>
+      <div style={{ position: "fixed", top: 10, right: 10, zIndex: 9999 }}>
+        <Button onClick={toggleTheme}>
+          {isDark ? "Modo Claro " : "Modo Oscuro "}
+        </Button>
+      </div>
       <RouterProvider router={router} />
     </ConfigProvider>
+  );
+};
+
+const App = () => (
+  <Provider store={store}>
+    <ThemeProvider>
+      <InnerApp />
+    </ThemeProvider>
   </Provider>
 );
 
