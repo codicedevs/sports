@@ -4,7 +4,7 @@ if (__DEV__) {
   require("./ReactotronConfig");
 }
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { ThemeProvider as MagnusThemeProvider } from "react-native-magnus";
 import { ThemeProvider } from "styled-components/native";
 import AppProvider, { useSession } from "./context/authProvider";
@@ -17,6 +17,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import registerForPushNotificationsAsync from "./notifications/pushNotifications";
 import { GlobalUIProvider } from "./context/globalUiContext";
+import { createNavigationContainerRef, NavigationContainerRef } from "@react-navigation/native";
+import * as Notifications from "expo-notifications";
+import { navigate } from "./utils/navigation";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +38,20 @@ export default function App() {
     "NotoSans-ExtraBold": require("./assets/fonts/NotoSans-ExtraBold.ttf"),
     "NotoSans-ExtraBoldItalic": require("./assets/fonts/NotoSans-ExtraBoldItalic.ttf")
   });
+  const navigationRef = createNavigationContainerRef();
+
+  useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+      const data = response.notification.request.content.data;
+      console.log("Notificación tocada:", data);
+  
+      if (data?.screen) {
+        navigate(data.screen, data.params ?? {});
+      }
+    });
+  
+    return () => subscription.remove();
+  }, []);
 
   if (!fontsLoaded) {
     return null;
