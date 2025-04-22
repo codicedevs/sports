@@ -70,10 +70,10 @@ export const darkTheme: ThemeConfig = {
       itemSelectedBg: darkColors.cleary,
       itemSelectedColor: darkColors.primary,
       subMenuItemSelectedColor: darkColors.primary,
-      itemHoverBg: darkColors.cleary,
+      itemHoverBg:"#1a1a1a",
     },
     Table: {
-      headerBg: "#2a2a2a",
+      headerBg: "#1a1a1a",
       headerColor: "#ffffff",
     },
     Input: {
