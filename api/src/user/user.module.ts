@@ -7,6 +7,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { jwtSetting } from "settings";
 import { Petition, PetitionSchema } from "petition/petition.entity";
 import { Match, MatchSchema } from "match/match.entity";
+import { PushNotificationService } from "services/pushNotificationservice";
 
 @Module({
     imports: [
@@ -21,7 +22,7 @@ import { Match, MatchSchema } from "match/match.entity";
         }),
     ],
     controllers: [UserController],
-    providers: [UserService],
+    providers: [UserService,PushNotificationService],
     exports: [UserService, MongooseModule],
 })
 export class UserModule { }

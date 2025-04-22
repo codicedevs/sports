@@ -24,6 +24,7 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { Types } from "mongoose";
 import { ValidateObjectIdPipe } from "pipes/validate-object-id.pipe";
 import { Filter } from "types/types";
+import { PushNotificationService } from "services/pushNotificationservice";
 
 // All these endpoints are globally protected by the auth guard that requires a token
 
@@ -31,7 +32,10 @@ import { Filter } from "types/types";
 @ApiTags('users')
 @Controller("users")
 export class UserController {
-    constructor(private userService: UserService) { }
+    constructor(private userService: UserService,
+        private pushNotificationService: PushNotificationService,
+
+    ) { }
 
     /**
      * @returns
@@ -50,11 +54,36 @@ export class UserController {
      * @param id
      * @returns
      */
+    @Public()
     @Get(":id")
     async getById(@Param("id", new ValidateObjectIdPipe()) id: string) {
         const objectId = new Types.ObjectId(id);
         const user = await this.userService.findByIdOrFail(objectId);
         return user;
+    }
+    @Public()
+
+    // PROBNADO
+    @Post("test-notification")
+    async testPushNotification() {
+        const testToken = "ExponentPushToken[meGdHEPmpA6xtNwNKaNvhA]";
+
+        const tickets = await this.pushNotificationService.sendPushNotification(
+            [testToken],
+            "🔔 Notificación de prueba",
+            "Este es un mensaje automático para probar push notifications.",
+            {
+                screen: "MatchDetail", // 👈 redirige a esta screen
+                params: {
+                    id: "67eae8d21dba94ee264d5aab", // opcional: podés pasar lo que quieras
+                },
+            },
+        );
+
+        return {
+            success: true,
+            tickets,
+        };
     }
 
     @Get("search/find")
