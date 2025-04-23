@@ -5,15 +5,15 @@ import { FadeWrapper } from "../components/fadeView";
 import LoginScreen from "../screens/auth/login";
 import HomeScreen from "../screens/home";
 import Trialscreen from "../screens/trial";
-import Trialscreen2 from "../screens/trial2";
+import Trialscreen2 from "../screens/Trial2";
 import { AppScreens, AppScreensParamList } from "./screens";
-import MatchDetail from "../screens/matchDetail";
+import MatchDetail from "../screens/MatchDetail";
 import CustomTabBar from "../components/layout/customTabBar";
-import MatchesScreen from "../screens/matches";
-import MatchHandlerScreen from "../screens/matchHandler";
+import MatchesScreen from "../screens/Matches";
+import MatchHandlerScreen from "../screens/MatchHandler";
 import { CustomHeader } from "../components/layout/customHeader";
-import PetitionScreen from "../screens/petitionsScreen";
-import UserScreen from "../screens/userScreen";
+import PetitionScreen from "../screens/PetitionsScreen";
+import UserScreen from "../screens/UserScreen";
 
 const SettingsStack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator()

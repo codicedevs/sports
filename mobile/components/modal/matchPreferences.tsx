@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react'
 import { ScrollView, TouchableOpacity } from 'react-native';
 import { Div, Modal, Text } from 'react-native-magnus';
-import { Accordion } from '../collapsibleView';
+import { Accordion } from '../CollapsibleView';
 import { Profile } from '../../types/form.type';
 import { verticalScale } from 'react-native-size-matters';
 import { customTheme } from '../../utils/theme';

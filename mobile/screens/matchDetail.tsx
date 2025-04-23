@@ -20,7 +20,7 @@ import MatchModalHandler from "../components/modal/matchModalHandler";
 import Field from "../components/matche/Detail/field";
 import PlayerStatusList from "../components/matche/Detail/playerStatusList";
 import InviteModal from "../components/modal/invitePlayer";
-import { ActivityScreen } from "./activityScreen";
+import { ActivityScreen } from "./ActivityScreen";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import * as Clipboard from "expo-clipboard";
 import { useGlobalUI } from "../context/globalUiContext";

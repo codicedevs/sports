@@ -1,7 +1,7 @@
 import React from "react";
 import { Div, Image, Text } from "react-native-magnus";
 import { scale, verticalScale } from "react-native-size-matters";
-import { formatMatchDate } from "./matchesCards";
+import { formatMatchDate } from "./MatchesCards";
 import { TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import Location from "../../types/location.type";
