@@ -68,7 +68,6 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
       }),
     [QUERY_KEYS.PETITIONS, currentUser]
   );
-  const { data: events } = useFetch(eventService.getAll, [QUERY_KEYS.EVENTS]);
 
   const handleActionCompleted = () => {
     refetchPetition();
@@ -201,16 +200,26 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
     loadSession();
   }, []);
 
-  const fallbackEvent = {
-    name: "TORNEO DE VERANO FUTBOL VETERANO", // pa hardcodear
-    date: "12/3",
-  };
+  const {
+    data: eventsResponse,
+    isFetching: isFetchingEvents,
+    error: errorEvents,
+    refetch: refetchEvents,
+  } = useFetch(() => eventService.getAll(), [QUERY_KEYS.EVENTS]);
+
+  useEffect(() => {
+    if (errorEvents) console.log("Error fetching events:", errorEvents);
+    else console.log("EVENTOS", eventsResponse);
+  }, [eventsResponse, errorEvents]);
+
+  console.log("EVENTOS", eventsResponse);
+
+  const firstEvent = eventsResponse?.results?.[0];
 
   const NoMatchesMessage = (
     { message }: { message: string } // si no hay partidos
   ) => (
     <Div alignItems="center" mt={customTheme.spacing.medium}>
-     
       <Text
         fontSize={customTheme.fontSize.medium}
         color={customTheme.colors.gray}
@@ -239,10 +248,15 @@ const HomeScreen: React.FC<AppScreenProps<AppScreens.HOME_SCREEN>> = ({
             )}
           </Div>
           <Div mb={customTheme.spacing.medium}>
-            <EventsCard // hardcodeado cambiar, arreglar lo coso de event!!!!!!!!
-              name={fallbackEvent.name}
-              date={fallbackEvent.date}
-            />
+            <Div>
+              {!isFetchingEvents && firstEvent && (
+                <EventsCard
+                  key={firstEvent._id}
+                  name={firstEvent.name}
+                  date={firstEvent.date}
+                />
+              )}
+            </Div>
           </Div>
           <Div>
             <Text
