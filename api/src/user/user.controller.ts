@@ -66,7 +66,7 @@ export class UserController {
     // PROBNADO
     @Post("test-notification")
     async testPushNotification() {
-        const testToken = "ExponentPushToken[meGdHEPmpA6xtNwNKaNvhA]";
+        const testToken = "ExponentPushToken[fVM0X8Gq_L0ik2lPf8UW6D]";
 
         const tickets = await this.pushNotificationService.sendPushNotification(
             [testToken],
