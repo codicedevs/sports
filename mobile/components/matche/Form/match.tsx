@@ -7,7 +7,7 @@ import { Div, Text } from "react-native-magnus";
 import { ActivityIndicator, ScrollView, TouchableOpacity } from "react-native";
 import { verticalScale } from "react-native-size-matters";
 import { customTheme } from "../../../utils/theme";
-import { Accordion } from "../../collapsibleView";
+import { Accordion } from "../../CollapsibleView";
 import SportInput from "../Inputs/sport";
 import PlayersCounterInput from "../Inputs/playersCounter";
 import MatchPrivacyToggleInput from "../Inputs/matchPrivacyToggle";

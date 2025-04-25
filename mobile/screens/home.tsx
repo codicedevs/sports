@@ -10,7 +10,7 @@ import { customTheme } from "../utils/theme";
 import UpcomingMatchCard from "../components/cards/UpcomingMatchesCard";
 import EventsCard from "../components/cards/EventsCard";
 import eventService from "../service/event.service";
-import MatchesCards from "../components/cards/matchesCards";
+import MatchesCards from "../components/cards/MatchesCards";
 import { scale, verticalScale } from "react-native-size-matters";
 import HandleMatchesButton from "../components/HandleMatchesButton";
 import { useFocusEffect } from "@react-navigation/native";

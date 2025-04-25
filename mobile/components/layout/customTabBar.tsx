@@ -32,13 +32,14 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
     [AppScreens.MATCH_SCREEN]: (
       <FieldIcon width={scale(20)} height={scale(20)} />
     ),
-    [AppScreens.USER_SCREEN] : (<ProfileIcon width={scale(20)} height={scale(20)} />),
+    [AppScreens.FRIEND_SCREEN] : (<ProfileIcon width={scale(20)} height={scale(20)} />),
   };
 
   const screen = getFocusedRouteNameFromRoute(state.routes[state.index]);
   const shouldHideTabBar =
   screen === AppScreens.MATCH_DETAIL ||
-  state.routes[state.index].name === AppScreens.MATCH_HANDLER;
+  state.routes[state.index].name === AppScreens.MATCH_HANDLER ||
+  state.routes[state.index].name === AppScreens.FRIEND_SCREEN;
 
   const checkIfLogged = (route) => {
     if (
@@ -49,7 +50,7 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({
       return;
     } else if (
       !currentUser &&
-      route.name === AppScreens.USER_SCREEN
+      route.name === AppScreens.FRIEND_SCREEN
     ) {
       showModal();
       return;

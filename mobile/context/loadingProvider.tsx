@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import SpinnerScreen from "../components/spinnerScreen";
+import SpinnerScreen from "../components/SpinnerScreen";
 
 type LoadingContextType = {
     isLoading: boolean;
