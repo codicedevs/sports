@@ -63,18 +63,37 @@ export class PetitionService {
     },
   };
 
+  /**
+   * Crea una nueva petición (o invitación) asociada a un partido o a un grupo.
+   *
+   * ### Regla de negocio básica
+   * - **Petición**: el *emitter* NO es administrador del recurso ⇒ solicita unirse.
+   * - **Invitación**: el *emitter* SÍ es administrador ⇒ invita a otro usuario.
+   *
+   * Para cada (usuario, recurso) solo puede existir:
+   * 1. Una petición *emitida*     (user ➜ recurso)
+   * 2. Una invitación *recibida*  (recurso ➜ user)
+   * Una vez aceptada/rechazada no se puede volver a enviar otra.
+   *
+   * @param createPetitionDto – `{ emitter, receiver, reference: { id, type } }`
+   * @returns La petición recién persistida.
+   *
+   * @throws NotFoundException    Si el emisor, receptor o recurso no existen.
+   * @throws BadRequestException  – Petición/Invitación duplicada
+   *                              – Petición/invitación antes rechazada
+   *                              – Cupo del recurso completo
+   *                              – Tipo de referencia no soportado
+   *                              - Emisor y receptor son el mimso usuario
+   */
   async create(createPetitionDto: CreatePetitionDto): Promise<Petition> {
     const { emitter, receiver, reference } = createPetitionDto;
     const targetId = reference.id
     const modelType = reference.type
 
-    // Verificar que el usuario solicitante, destinatario, y partido existan
-
+    // ───────────────────────────────────────── Validaciones básicas ──
+    // TODO: mover a pipes/guards genéricos ('shouldExistGuard')
     const emitterExist = await this.userModel.findById(emitter).exec();
     const receiverExist = await this.userModel.findById(receiver).exec();
-
-    //TODO: Abstract logic onto guards, should exist guard
-
 
     if (!emitterExist) {
       throw new NotFoundException("EMISOR de la peticion no encontrado");
@@ -82,6 +101,10 @@ export class PetitionService {
 
     if (!receiverExist) {
       throw new NotFoundException("RECEPTOR de la peticion no encontrado");
+    }
+
+    if ((receiver).equals(emitter)) {
+      throw new BadRequestException("El emisor y receptor no pueden ser el mismo usuario");
     }
 
     // Obtener el modelo y la función de validación correspondiente
@@ -160,6 +183,7 @@ export class PetitionService {
     });
     await newPetition.save();
 
+    // ─────────────────────────────── Push‑notification (best‑effort)
     if (receiverExist.pushToken) {
       const message = isEmitterCreator
         ? `${emitterExist.name} ha solicitado que te unas a su ${translate[modelType]}.`
@@ -185,6 +209,26 @@ export class PetitionService {
       .exec();
   }
 
+  /**
+ * Acepta un nueva petición (o invitación) asociada a un partido o a un grupo.
+ *
+ * ### Regla de negocio básica
+ * - **Petición**: el *emitter* NO es administrador del recurso ⇒ solicita unirse.
+ * - **Invitación**: el *emitter* SÍ es administrador ⇒ invita a otro usuario.
+ *
+ * Si es una petición agrega al emisor al recurso, si es una invitación agrega al receptor al recurso
+ *
+ * @param petitionId – `Types.ObjectId`
+ * @returns El recurso de la petición
+ *
+ * @throws NotFoundException    Si petición, recurso, emisor o receptor no es encontrado
+ * @throws BadRequestException  – Petición/Invitación ya procesada
+ *                              – Petición/invitación antes rechazada
+ *                              - El usuario ya se encuentra en el partido
+ *                              – Cupo del recurso completo
+ *                              – Tipo de referencia no soportado
+ *                              - Emisor y receptor son el mismo usuairo
+ */
   async acceptPetition(petitionId: Types.ObjectId): Promise<Match | Group> {
     // Buscar la petición por su ID
 
@@ -229,6 +273,9 @@ export class PetitionService {
     if (petition.status !== PetitionStatus.Pending) {
       throw new BadRequestException("La solicitud ya ha sido procesada");
     }
+    if ((petition.receiver._id as Types.ObjectId).equals(petition.emitter._id as Types.ObjectId)) {
+      throw new BadRequestException("no pueden ser el emisor y el receptor el mismo usuario");
+    }
 
     // Verificar si el partido ya ha alcanzado el límite de jugadores
     if (target.playersLimit && target.users.length >= target.playersLimit) {
@@ -236,17 +283,18 @@ export class PetitionService {
         "No se puede aceptar la solicitud porque el partido ya ha alcanzado el límite de jugadores",
       );
     }
-
+    const isEmitterOwner = (target.userId as Types.ObjectId).equals(petition.emitter._id as Types.ObjectId)
 
     let match: Match = null
     let tokens: string[] = null
     const usersToSendPush: Types.ObjectId[] = [...(target.users as Types.ObjectId[])];
+    // ─────────────────────────────── Si el emisor es el admin del partido 
     // Si el emisor es el creador del partido, agregar al receptor en lugar del emisor
-    if ((target.userId as Types.ObjectId).equals(petition.emitter._id as Types.ObjectId)) {
+    if (isEmitterOwner) {
       if (target.users.includes(petition.receiver._id)) {
         throw new BadRequestException(`El usuario ya se encuentra en el ${translate[modelType]}`)
       }
-      // Actualización atómica: se agrega el emisor solo si no está presente
+      // Actualización atómica: se agrega el receptor solo si no está presente
       await handler.model
         .findByIdAndUpdate(targetId, { $addToSet: { users: petition.receiver._id } })
         .exec();
@@ -268,18 +316,19 @@ export class PetitionService {
       }
 
 
-
       // Agregar el partido al array de partidos o grupos del receiver si no es el dueño
-      if (!(target.userId as Types.ObjectId).equals(petition.receiver._id as Types.ObjectId)) {
-        if (!receiver[plural[modelType]].includes(target.id)) {
-          receiver[plural[modelType]].push(target.id); // Agregar el partido al array de `matches` o `groups` del receiver
-          await receiver.save(); // Guardar los cambios en el receptor
-        }
+      if (!receiver[plural[modelType]].includes(target.id)) {
+        receiver[plural[modelType]].push(target.id); // Agregar el partido al array de `matches` o `groups` del receiver
+        await receiver.save(); // Guardar los cambios en el receptor
       }
-    } else {
+
+    }
+    // ─────────────────────────────── Si el receptor es el admin del partido
+    else {
       if (target.users.includes(petition.emitter._id)) {
         throw new BadRequestException(`El usuario ya se encuentra en el ${translate[modelType]}`)
       }
+      // Actualización atómica: se agrega el emisor solo si no está presente
       await handler.model
         .findByIdAndUpdate(targetId, { $addToSet: { users: petition.emitter._id } })
         .exec();
@@ -313,8 +362,18 @@ export class PetitionService {
     await petition.save();
 
     // Enviar notificación al emisor (emitter) de que su petición ha sido aceptada
+
     if (emitter.pushToken) {
-      const notificationMessage = `Tu solicitud para unirte al ${translate[modelType]} ha sido aceptada.`
+      let notificationMessage: string
+      // Si el emisor es el admin del partido
+      if (isEmitterOwner) {
+        notificationMessage = `Tu invitación  al ${translate[modelType]} ha sido aceptada.`
+      }
+      // Si el receptor es el admin del partido
+      else {
+        notificationMessage = `Tu solicitud para unirte al ${translate[modelType]} ha sido aceptada.`
+      }
+
       await this.notificationService.sendPushNotification(
         [emitter.pushToken],
         "Solicitud Aceptada",
@@ -325,29 +384,87 @@ export class PetitionService {
     return target;
   }
 
+  /**
+* Rechaza un nueva petición (o invitación) asociada a un partido o a un grupo.
+*
+* ### Regla de negocio básica
+* - **Petición**: el *emitter* NO es administrador del recurso ⇒ solicita unirse.
+* - **Invitación**: el *emitter* SÍ es administrador ⇒ invita a otro usuario.
+*
+*
+* @param petitionId -Types.ObjectID
+* @returns La petición
+*
+* @throws NotFoundException    Si petición, recurso, emisor o receptor no es encontrado
+* @throws BadRequestException  – Petición/Invitación ya procesada
+*                              – Petición/invitación antes rechazada
+*                              - El usuario ya se encuentra en el partido
+*                              – Cupo del recurso completo
+*                              – Tipo de referencia no soportado
+*                              - Emisor y receptor son el mimso usuario
+*/
   async declinePetition(petitionId: Types.ObjectId): Promise<Petition> {
     const petition = await this.petitionModel.findById(petitionId).exec();
 
     if (!petition) {
       throw new NotFoundException("Solicitud no encontrada");
     }
+    const modelType = petition?.reference?.type
+    const targetId = petition?.reference?.id
+    const handler = this.modelHandlers[modelType];
+    if (!handler) {
+      throw new BadRequestException("Petición corrupta");
+    }
+    const target = await handler.model.findById(targetId).exec();
+    const emitter: User = await this.userModel.findById(petition.emitter._id).exec();
+    const receiver: User = await this.userModel
+      .findById(petition.receiver._id)
+      .exec();
+
+    
+    if (!target) {
+      throw new NotFoundException("Recurso no encontrado");
+    }
+
+    if (!emitter) {
+      throw new NotFoundException("Emisor no encontrado");
+    }
+
+    if (!receiver) {
+      throw new NotFoundException("Receptor no encontrado");
+    }
+  
 
     if (petition.status !== PetitionStatus.Pending) {
       throw new BadRequestException("La solicitud ya ha sido procesada");
     }
+    if ((petition.receiver._id as Types.ObjectId).equals(petition.emitter._id as Types.ObjectId)) {
+      throw new BadRequestException("No pueden ser el emisor y el receptor el mismo usuario");
+    }
+
 
     // Marcar la solicitud como rechazada
     petition.status = PetitionStatus.Declined;
 
     await petition.save();
 
+
+
     // Enviar notificación al emisor (emitter) de que su petición ha sido rechazada
-    const emitter = await this.userModel.findById(petition.emitter).exec();
+  
+    const isEmitterOwner = (target.userId as Types.ObjectId).equals(petition.emitter._id as Types.ObjectId)
     if (emitter?.pushToken) {
+      let message: string = ""
+      if (isEmitterOwner) {
+        message = `Han rechazado tu invitación`
+      }
+      else {
+        message = `Tu solicitud para unirte ha sido rechazada.`
+      }
       await this.notificationService.sendPushNotification(
         [emitter.pushToken],
         "Solicitud Rechazada",
-        `Tu solicitud para unirte ha sido rechazada.`,
+        message,
         { petitionId: petition._id.toString() },
       );
     }
