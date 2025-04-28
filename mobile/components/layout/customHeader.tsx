@@ -20,14 +20,15 @@ export const CustomHeader = () => {
   const route = useRoute();
   const { currentUser } = useSession();
 
-
   const currentRouteName = useNavigationState((state) => {
     const route = state.routes[state.index];
 
+    // Si estamos en HomeStack sin estado anidado, devolvemos HOME_SCREEN
     if (route.name === "HomeStack" && !route.state) {
       return AppScreens.HOME_SCREEN;
     }
 
+    // Si hay estado anidado, recorremos hasta la ruta hija activa
     let nestedRoute = route;
     while (nestedRoute.state && nestedRoute.state.index != null) {
       nestedRoute = nestedRoute.state.routes[nestedRoute.state.index];
@@ -37,6 +38,7 @@ export const CustomHeader = () => {
   });
 
   const isHomeScreen = currentRouteName === AppScreens.HOME_SCREEN;
+
   const handleBackPress = () => {
     if (navigation.canGoBack()) {
       navigation.goBack();
@@ -53,9 +55,7 @@ export const CustomHeader = () => {
     }
   };
 
-  const { data: petitions, refetch: refetchPetition } = useFetch<{
-    results: Petition[];
-  }>(
+  const { data: petitions, refetch: refetchPetition } = useFetch<{ results: Petition[] }>(
     () =>
       petitionService.getAll({
         populate: ["reference.id"],
@@ -76,95 +76,95 @@ export const CustomHeader = () => {
         p={customTheme.spacing.medium}
         justifyContent="space-between"
       >
+        {/* Logo y back */}
         <Div flexDir="row" alignItems="flex-start" style={{ gap: scale(20) }}>
           <TouchableOpacity onPress={handleBackPress}>
             <Image
-              style={{
-                height: scale(28),
-                width: scale(28),
-                resizeMode: "contain",
-              }}
+              style={{ height: scale(28), width: scale(28), resizeMode: "contain" }}
               source={require("../../assets/logoDeball.png")}
             />
           </TouchableOpacity>
         </Div>
+
+        {/* Campanita con TouchableOpacity */}
         <Div position="relative">
-          <Image
-            style={{ height: scale(27), width: scale(22) }}
-            source={require("../../assets/match/bellInclinada.png")}
-          />
-          <Div
-            position="absolute"
-            right={0}
-            top={4}
-            rounded={"circle"}
-            alignItems="center"
-            justifyContent="center"
-            bg={customTheme.colors.primary}
-            px={scale(3)}
+          <TouchableOpacity
+            onPress={() => navigation.navigate(AppScreens.USER_SCREEN)}
           >
-            <Text fontSize={7}>{petitions?.results.length}</Text>
-          </Div>
+            <Image
+              style={{ height: scale(27), width: scale(22) }}
+              source={require("../../assets/match/bellInclinada.png")}
+            />
+            <Div
+              position="absolute"
+              right={0}
+              top={4}
+              rounded="circle"
+              alignItems="center"
+              justifyContent="center"
+              bg={customTheme.colors.primary}
+              px={scale(3)}
+            >
+              <Text fontSize={7}>{petitions?.results.length}</Text>
+            </Div>
+          </TouchableOpacity>
         </Div>
       </Div>
     );
-  } else {
-    return (
+  }
+
+  return (
+    <Div
+      flexDir="row"
+      alignItems="center"
+      p={customTheme.spacing.medium}
+      justifyContent="space-between"
+      bg="white"
+    >
+      {/* Back + logo */}
       <Div
         flexDir="row"
         alignItems="center"
-        p={customTheme.spacing.medium}
-        justifyContent="space-between"
-        bg="white"
+        justifyContent="flex-start"
+        style={{ gap: scale(20) }}
+        w="55%"
       >
-        <Div
-          flexDir="row"
-          alignItems="center"
-          justifyContent="flex-start"
-          style={{ gap: scale(20) }}
-          w="55%"
-        >
-          <TouchableOpacity onPress={handleBackPress}>
-            <Image
-              style={{
-                height: scale(20),
-                width: scale(15),
-                padding: customTheme.spacing.small,
-              }}
-              source={require("../../assets/match/backIcon.png")}
-            />
-          </TouchableOpacity>
+        <TouchableOpacity onPress={handleBackPress}>
           <Image
-            style={{
-              height: scale(28),
-              width: scale(28),
-              resizeMode: "contain",
-            }}
-            source={require("../../assets/logoDeball.png")}
+            style={{ height: scale(20), width: scale(15) }}
+            source={require("../../assets/match/backIcon.png")}
           />
-        </Div>
-        <Div position="relative">
-        <TouchableOpacity onPress={() => navigation.navigate(AppScreens.USER_SCREEN)}>
+        </TouchableOpacity>
+        <Image
+          style={{ height: scale(28), width: scale(28), resizeMode: "contain" }}
+          source={require("../../assets/logoDeball.png")}
+        />
+      </Div>
+
+      {/* Campanita con TouchableOpacity */}
+      <Div position="relative">
+        <TouchableOpacity
+          onPress={() => navigation.navigate(AppScreens.USER_SCREEN)}
+        >
           <Image
             style={{ height: scale(30), width: scale(25) }}
             source={require("../../assets/match/bellInclinada.png")}
           />
           <Div
             position="absolute"
-            right={isHomeScreen ? 0 : 2}
-            top={isHomeScreen ? 4 : 6}
+            right={2}
+            top={6}
             rounded="circle"
             alignItems="center"
             justifyContent="center"
             bg={customTheme.colors.primary}
-            px={scale(isHomeScreen ? 3 : 4)}
-            py={isHomeScreen ? undefined : scale(1)}
+            px={scale(4)}
+            py={scale(1)}
           >
             <Text fontSize={7}>{petitions?.results.length}</Text>
           </Div>
         </TouchableOpacity>
-        </Div>
       </Div>
-    );
-  }
+    </Div>
+  );
 };

@@ -109,7 +109,7 @@ export function TabStackScreen() {
         component={UserScreen}
         options={{
           tabBarButton: () => null,
-          tabBarStyle: { display: "none" },
+          tabBar: () => null,
         }}
       />
     </Tab.Navigator>
