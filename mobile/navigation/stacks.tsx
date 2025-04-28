@@ -102,8 +102,16 @@ export function TabStackScreen() {
       <Tab.Screen name={AppScreens.MATCH_SCREEN} component={MatchesScreen} />
 
       <Tab.Screen name={AppScreens.MATCH_DETAIL} component={MatchDetail} />
-      {/* <Tab.Screen name={AppScreens.USER_SCREEN} component={UserScreen} /> IRA EN HEADER*/} 
+      {/* <Tab.Screen name={AppScreens.USER_SCREEN} component={UserScreen} />  */}
       <Tab.Screen name={AppScreens.FRIEND_SCREEN} component={FriendsScreen} options={{ tabBarStyle: { display: "none" } }}/>
+      <Tab.Screen
+        name={AppScreens.USER_SCREEN}
+        component={UserScreen}
+        options={{
+          tabBarButton: () => null,
+          tabBarStyle: { display: "none" },
+        }}
+      />
     </Tab.Navigator>
   );
 }

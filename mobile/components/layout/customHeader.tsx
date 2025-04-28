@@ -144,23 +144,25 @@ export const CustomHeader = () => {
           />
         </Div>
         <Div position="relative">
+        <TouchableOpacity onPress={() => navigation.navigate(AppScreens.USER_SCREEN)}>
           <Image
             style={{ height: scale(30), width: scale(25) }}
             source={require("../../assets/match/bellInclinada.png")}
           />
           <Div
             position="absolute"
-            right={2}
-            top={6}
+            right={isHomeScreen ? 0 : 2}
+            top={isHomeScreen ? 4 : 6}
             rounded="circle"
             alignItems="center"
             justifyContent="center"
             bg={customTheme.colors.primary}
-            px={scale(4)}
-            py={scale(1)}
+            px={scale(isHomeScreen ? 3 : 4)}
+            py={isHomeScreen ? undefined : scale(1)}
           >
             <Text fontSize={7}>{petitions?.results.length}</Text>
           </Div>
+        </TouchableOpacity>
         </Div>
       </Div>
     );
