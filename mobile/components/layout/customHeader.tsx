@@ -86,7 +86,7 @@ export const CustomHeader = () => {
           </TouchableOpacity>
         </Div>
 
-        {/* Campanita con TouchableOpacity */}
+        
         <Div position="relative">
           <TouchableOpacity
             onPress={() => navigation.navigate(AppScreens.USER_SCREEN)}

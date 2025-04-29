@@ -3,8 +3,14 @@ import { FlatList, TouchableOpacity, Image } from "react-native";
 import { Div, Text } from "react-native-magnus";
 import { scale, verticalScale } from "react-native-size-matters";
 import { customTheme } from "../utils/theme";
+import { useSession } from "../context/authProvider";
+
+
+const API_BASE = "http://192.168.1.150:4002";
 
 const FriendsScreen = () => {
+  const { currentUser } = useSession();
+
   const [friends, setFriends] = useState([
     { id: "1", name: "Abel Pintos" },
     { id: "2", name: "Carlos Alberto Troncoso" },
@@ -13,48 +19,108 @@ const FriendsScreen = () => {
     { id: "5", name: "Abel Pintos" },
     { id: "6", name: "Abel Pintos" },
   ]);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [loadingIds, setLoadingIds] = useState<string[]>([]);
+  const [sentRequests, setSentRequests] = useState<string[]>([]);
+  const [errorMap, setErrorMap] = useState<Record<string, string>>({});
 
-  const handleRemove = (id: string) => {
-    setFriends((prev) => prev.filter((f) => f.id !== id));
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
+    );
   };
 
-  const renderFriend = ({ item }: { item: { id: string; name: string } }) => (
-    <Div
-      row
-      alignItems="center"
-      py={customTheme.spacing.small}
-      px={customTheme.spacing.large}
-      justifyContent="space-between"
-      mb={customTheme.spacing.small}
-    >
-      <Div row alignItems="center">
-        <Image
-          style={{ width: scale(22), height: scale(22) }}
-          resizeMode="cover"
-          source={require("../assets/user1.png")}
-        />
-        <Text
-          ml={customTheme.spacing.medium}
-          fontSize={customTheme.fontSize.small}
+  const handleRemove = (id: string) => {
+    setFriends(prev => prev.filter(f => f.id !== id));
+    setSelectedIds(prev => prev.filter(s => s !== id));
+    setErrorMap(prev => {
+      const copy = { ...prev };
+      delete copy[id];
+      return copy;
+    });
+  };
+
+  const handleSendInvites = async () => {
+    
+    const toInvite = selectedIds.filter(id => !sentRequests.includes(id));
+    if (!toInvite.length) return;
+
+    setLoadingIds(prev => [...prev, ...toInvite]);
+    const newErrors = { ...errorMap };
+
+    for (const friendId of toInvite) {
+      try {
+        const res = await fetch(
+          `${API_BASE}/users/${currentUser._id}/friends/${friendId}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+        if (!res.ok) throw new Error(`Error ${res.status}`);
+
+        setSentRequests(prev => [...prev, friendId]);
+        delete newErrors[friendId];
+      } catch (err: any) {
+        newErrors[friendId] = err.message || "Ocurrió un error";
+      }
+    }
+
+    setErrorMap(newErrors);
+    setLoadingIds(prev => prev.filter(id => !toInvite.includes(id)));
+  };
+
+  const renderFriend = ({ item }: { item: { id: string; name: string } }) => {
+    const isSelected = selectedIds.includes(item.id);
+    const isLoading = loadingIds.includes(item.id);
+    const isSent = sentRequests.includes(item.id);
+    const error = errorMap[item.id];
+
+    return (
+      <TouchableOpacity onPress={() => toggleSelect(item.id)}>
+        <Div
+          row
+          alignItems="center"
+          justifyContent="space-between"
+          py={customTheme.spacing.small}
+          px={customTheme.spacing.large}
+          mb={customTheme.spacing.small}
+          bg={isSelected ? customTheme.colors.secondaryBackground : undefined}
+          rounded="md"
         >
-          {" "}
-          {item.name}
-        </Text>
-      </Div>
-      <TouchableOpacity onPress={() => handleRemove(item.id)}>
-        <Text fontFamily="bold" fontSize={customTheme.fontSize.small}>
-          X
-        </Text>
+          <Div row alignItems="center">
+            <Image
+              style={{ width: scale(22), height: scale(22) }}
+              resizeMode="cover"
+              source={require("../assets/user1.png")}
+            />
+            <Text ml={customTheme.spacing.medium} fontSize={customTheme.fontSize.small}>
+              {item.name}
+            </Text>
+          </Div>
+
+          <Div row alignItems="center">
+            {isSent && <Text color="green">✅</Text>}
+            {isLoading && <Text ml="sm">Enviando...</Text>}
+            <TouchableOpacity onPress={() => handleRemove(item.id)} style={{ marginLeft: 10 }}>
+              <Text fontFamily="bold" fontSize={customTheme.fontSize.small}>
+                X
+              </Text>
+            </TouchableOpacity>
+          </Div>
+        </Div>
+
+        {error && (
+          <Text color="red" fontSize={customTheme.fontSize.tiny} ml="lg">
+            {error}
+          </Text>
+        )}
       </TouchableOpacity>
-    </Div>
-  );
+    );
+  };
 
   return (
-    <Div
-      flex={1}
-      bg={customTheme.colors.background}
-      p={customTheme.spacing.small}
-    >
+    <Div flex={1} bg={customTheme.colors.background} p={customTheme.spacing.small}>
       <Text
         mb={customTheme.spacing.large}
         ml={customTheme.spacing.small}
@@ -67,21 +133,15 @@ const FriendsScreen = () => {
       {friends.length === 0 ? (
         <Div h={scale(285)} justifyContent="flex-end" alignItems="center">
           <Image
-            style={{
-              width: scale(79),
-              height: verticalScale(75),
-              alignSelf: "center",
-            }}
+            style={{ width: scale(79), height: verticalScale(75) }}
             resizeMode="contain"
             source={require("../assets/search-no-result.png")}
           />
           <Text
-            style={{
-              fontSize: customTheme.fontSize.medium,
-              color: customTheme.colors.gray,
-              textAlign: "center",
-              marginTop: customTheme.spacing.small,
-            }}
+            color={customTheme.colors.gray}
+            fontSize={customTheme.fontSize.medium}
+            textAlign="center"
+            mt={customTheme.spacing.small}
           >
             No hay peticiones pendientes.
           </Text>
@@ -89,32 +149,29 @@ const FriendsScreen = () => {
       ) : (
         <FlatList
           data={friends}
-          keyExtractor={(item) => item.id}
+          keyExtractor={item => item.id}
           renderItem={renderFriend}
           contentContainerStyle={{ paddingBottom: 80 }}
         />
       )}
+
       <Div
         justifyContent="center"
-        bg={customTheme.colors.background}
         h={verticalScale(80)}
         p={customTheme.spacing.medium}
-        borderTopColor="rgb(223, 223, 220)"
         borderTopWidth={1}
+        borderTopColor="rgb(223, 223, 220)"
+        bg={customTheme.colors.background}
       >
-        <TouchableOpacity
-          style={{}}
-          onPress={() => console.log("Invitar Amigos")}
-        >
+        <TouchableOpacity onPress={handleSendInvites}>
           <Div
             h={verticalScale(45)}
-            justifyContent="center"
             alignItems="center"
+            justifyContent="center"
             bg={customTheme.colors.secondaryBackground}
-            flexDir="row"
+            rounded="lg"
           >
             <Text
-              textAlign="center"
               color={customTheme.colors.background}
               fontSize={customTheme.fontSize.medium}
               fontFamily="NotoSans-BoldItalic"
