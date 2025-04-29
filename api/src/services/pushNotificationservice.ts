@@ -31,6 +31,7 @@ export class PushNotificationService {
         body,
         data,
         _contentAvailable: true,
+        priority: 'high', 
       }as ExtendedExpoPushMessage);
     }
 
