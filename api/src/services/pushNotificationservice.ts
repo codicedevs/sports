@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { Expo, ExpoPushMessage } from 'expo-server-sdk';
-
+type ExtendedExpoPushMessage = ExpoPushMessage & { _contentAvailable?: boolean };
 @Injectable()
 export class PushNotificationService {
   private expo: Expo;
@@ -30,7 +30,8 @@ export class PushNotificationService {
         title,
         body,
         data,
-      });
+        _contentAvailable: true,
+      }as ExtendedExpoPushMessage);
     }
 
     const chunks = this.expo.chunkPushNotifications(messages);
