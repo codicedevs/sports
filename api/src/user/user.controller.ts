@@ -10,6 +10,7 @@ import {
     Patch,
     Query,
     BadRequestException,
+    Req,
 } from "@nestjs/common";
 import { CreateUserDto, UpdateUserDto } from "./user.dto";
 import { User } from "./user.entity";
@@ -24,6 +25,11 @@ import { ApiBearerAuth, ApiTags } from "@nestjs/swagger";
 import { Types } from "mongoose";
 import { ValidateObjectIdPipe } from "pipes/validate-object-id.pipe";
 import { Filter } from "types/types";
+import { JwtPayload } from "jsonwebtoken";
+import { Petition } from "petition/petition.entity";
+import { PetitionModelType, PetitionStatus } from "petition/petition.enum";
+import { CreatePetitionDto } from "petition/petition.dto";
+import { PetitionService } from "petition/petition.service";
 
 // All these endpoints are globally protected by the auth guard that requires a token
 
@@ -31,7 +37,9 @@ import { Filter } from "types/types";
 @ApiTags('users')
 @Controller("users")
 export class UserController {
-    constructor(private userService: UserService) { }
+    constructor(private userService: UserService,
+        private petitionService: PetitionService
+    ) { }
 
     /**
      * @returns
@@ -45,6 +53,20 @@ export class UserController {
         const users = await this.userService.findAll(filter);
         return users;
     }
+    @Get("friends-petitions")
+    async getFriendsPetitions(
+        @Req() request: Request
+    ) {
+        const { sub } = request['user'] as JwtPayload;
+        return this.petitionService.findAll({
+            where: {
+                receiver: new Types.ObjectId(sub),
+                status: PetitionStatus.Pending,
+                'reference.type': PetitionModelType.friend
+            }
+        })
+
+    }
 
     /**
      * @param id
@@ -56,6 +78,9 @@ export class UserController {
         const user = await this.userService.findByIdOrFail(objectId);
         return user;
     }
+
+
+
 
     @Get("search/find")
     async searchByName(@Query("name") name: string): Promise<User[]> {
@@ -101,20 +126,27 @@ export class UserController {
         const newUser = await this.userService.create(createUserDto);
         return newUser;
     }
-
+    // @Req() request: Request) {
+    //     const { sub } = request['user'] as JwtPayload;
     // Agregar un amigo
-    @Post(":userId/friends/:friendId")
-    async addFriend(
-        @Param("userId", new ValidateObjectIdPipe("usuario")) userId: string,
+    @Post("friends/:friendId")
+    async inviteFriend(
         @Param("friendId", new ValidateObjectIdPipe("amigo")) friendId: string,
+        @Req() request: Request
     ) {
-        const updatedUser = await this.userService.addFriend(
-            new Types.ObjectId(userId),
-            new Types.ObjectId(friendId),
-        );
-
-        return updatedUser;
+        const { sub } = request['user'] as JwtPayload;
+        let petition: CreatePetitionDto = {
+            emitter: new Types.ObjectId(new Types.ObjectId(sub)),
+            receiver: new Types.ObjectId(friendId),
+            reference: {
+                type: PetitionModelType.friend
+            },
+            status: PetitionStatus.Pending
+        }
+        return this.petitionService.create(petition)
     }
+
+
 
     /**
      * @param id

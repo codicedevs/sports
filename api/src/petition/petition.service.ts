@@ -9,7 +9,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Petition } from "./petition.entity";
 import { Match } from "match/match.entity";
 import { User } from "user/user.entity";
-import { HydratedDocument, Model, Types } from "mongoose";
+import { HydratedDocument, model, Model, Types } from "mongoose";
 import { PetitionModelType, PetitionStatus } from "./petition.enum";
 import { FindManyFilter } from "filter/filter.dto";
 import { PushNotificationService } from "services/pushNotificationservice";
@@ -26,10 +26,12 @@ type ModelHandlers = {
 const translate: Record<PetitionModelType, string> = {
   Group: "grupo",
   Match: "partido",
+  User: "usuario"
 };
 const plural: Record<PetitionModelType, string> = {
   Group: "groups",
   Match: "matches",
+  User: "users"
 };
 
 @Injectable()
@@ -58,6 +60,14 @@ export class PetitionService {
       validate: async (target) => {
         if (!target) {
           throw new NotFoundException("GRUPO no encontrado");
+        }
+      },
+    },
+    [PetitionModelType.friend]: {
+      model: this.userModel,
+      validate: async (target) => {
+        if (!target) {
+          throw new NotFoundException("USUARIO no encontrado");
         }
       },
     },
@@ -107,15 +117,73 @@ export class PetitionService {
       throw new BadRequestException("El emisor y receptor no pueden ser el mismo usuario");
     }
 
+
     // Obtener el modelo y la función de validación correspondiente
     const handler = this.modelHandlers[modelType];
     if (!handler) {
       throw new BadRequestException("Tipo de referencia no soportado");
     }
+
+    // APARTE SI ES PARA FRIENDS ----------------------------------
+    if (modelType == PetitionModelType.friend) {
+
+      if (emitterExist.friends.some(id => id.equals(receiver))) {
+        throw new BadRequestException("Ya es amigo")
+      }
+      const alreadyInvited = await this.petitionModel
+        .findOne({
+          receiver: new Types.ObjectId(receiver),
+          emitter: new Types.ObjectId(emitter),
+          reference: {
+            type: modelType
+          },
+          status: PetitionStatus.Pending
+        })
+        .exec();
+
+      if (alreadyInvited) {
+        throw new BadRequestException("Ya hay una solicitud pendiente")
+      }
+
+      if (receiverExist.bloquedUsers.some(id => id.equals(emitter))) {
+        throw new BadRequestException("El usuario te tiene bloqueado")
+      }
+      //SEGUIR
+      // Crear la petición
+      const newPetition = new this.petitionModel({
+        emitter: emitterExist._id,
+        receiver: receiverExist._id,
+        reference: {
+          type: modelType,
+        },
+        status: PetitionStatus.Pending,
+      });
+      await newPetition.save();
+      // ─────────────────────────────── Push‑notification (best‑effort)
+      if (receiverExist.pushToken) {
+        const message = `${emitterExist.name} ha solicitado que seas su amigo.`
+
+        await this.notificationService.sendPushNotification(
+          [receiverExist.pushToken],
+          `Solicitud de amistad`,
+          message,
+          { petitionId: newPetition._id.toString() },
+        );
+      }
+
+      return newPetition;
+
+
+    }
+    //SI NO ES FRIENDS -------------------------------------------------------------
+
+
+
     const target = await handler.model.findById(targetId).exec();
 
     // Validar el modelo objetivo (group o match)
     await handler.validate(target, emitterExist._id as Types.ObjectId);
+
 
     // Verificar si el emisor es el creador del partido
     const isEmitterCreator = new Types.ObjectId(target.userId).equals(
@@ -229,7 +297,7 @@ export class PetitionService {
  *                              – Tipo de referencia no soportado
  *                              - Emisor y receptor son el mismo usuairo
  */
-  async acceptPetition(petitionId: Types.ObjectId): Promise<Match | Group> {
+  async acceptPetition(petitionId: Types.ObjectId): Promise<Match | Group | User> {
     // Buscar la petición por su ID
 
     const petition: Petition = await this.petitionModel
@@ -252,15 +320,11 @@ export class PetitionService {
     if (!handler) {
       throw new BadRequestException("Tipo de referencia no soportado");
     }
-    const target = await handler.model.findById(targetId).exec();
     const emitter: User = await this.userModel.findById(petition.emitter._id).exec();
     const receiver: User = await this.userModel
       .findById(petition.receiver._id)
       .exec();
 
-    if (!target) {
-      throw new NotFoundException("Recurso no encontrado");
-    }
 
     if (!emitter) {
       throw new NotFoundException("Emisor no encontrado");
@@ -276,6 +340,35 @@ export class PetitionService {
     if ((petition.receiver._id as Types.ObjectId).equals(petition.emitter._id as Types.ObjectId)) {
       throw new BadRequestException("no pueden ser el emisor y el receptor el mismo usuario");
     }
+    //Si el modelo es friend --------------------------------------
+    if (modelType === PetitionModelType.friend) {
+      if (emitter.friends.some(id => id.equals(receiver._id as Types.ObjectId))) {
+        throw new BadRequestException("Ya es amigo")
+      }
+      if (receiver.bloquedUsers.some(id => id.equals(emitter._id as Types.ObjectId))) {
+        throw new BadRequestException("El usuario te tiene bloqueado")
+      }
+      await this.userModel
+        .findByIdAndUpdate(emitter._id, { $addToSet: { friends: petition.receiver._id } })
+        .exec();
+
+      await this.notificationService.sendPushNotification(
+        [emitter.pushToken],
+        `Usuario ${receiver.name}`,
+        `Te aceptó tu solictud de amistad`,
+      );
+
+      return emitter
+
+    }
+    //Si el modelo no es friend ---------------------------------------
+
+
+    const target = await handler.model.findById(targetId).exec();
+    if (!target) {
+      throw new NotFoundException("Recurso no encontrado");
+    }
+
 
     // Verificar si el partido ya ha alcanzado el límite de jugadores
     if (target.playersLimit && target.users.length >= target.playersLimit) {
@@ -413,18 +506,14 @@ export class PetitionService {
     const targetId = petition?.reference?.id
     const handler = this.modelHandlers[modelType];
     if (!handler) {
-      throw new BadRequestException("Petición corrupta");
+      throw new BadRequestException("Tipo de petición no soportada");
     }
-    const target = await handler.model.findById(targetId).exec();
+
     const emitter: User = await this.userModel.findById(petition.emitter._id).exec();
     const receiver: User = await this.userModel
       .findById(petition.receiver._id)
       .exec();
 
-    
-    if (!target) {
-      throw new NotFoundException("Recurso no encontrado");
-    }
 
     if (!emitter) {
       throw new NotFoundException("Emisor no encontrado");
@@ -433,7 +522,7 @@ export class PetitionService {
     if (!receiver) {
       throw new NotFoundException("Receptor no encontrado");
     }
-  
+
 
     if (petition.status !== PetitionStatus.Pending) {
       throw new BadRequestException("La solicitud ya ha sido procesada");
@@ -441,6 +530,28 @@ export class PetitionService {
     if ((petition.receiver._id as Types.ObjectId).equals(petition.emitter._id as Types.ObjectId)) {
       throw new BadRequestException("No pueden ser el emisor y el receptor el mismo usuario");
     }
+
+    // si es friends -----------------------------------------
+    if (modelType === PetitionModelType.friend) {
+      // Marcar la solicitud como rechazada
+      petition.status = PetitionStatus.Declined;
+
+      await petition.save();
+      await this.notificationService.sendPushNotification(
+        [emitter.pushToken],
+        "Solicitud Rechazada",
+        `El usuario ${receiver.name} ha rechazado tu solicitud de amistad`,
+        { petitionId: petition._id.toString() },
+      );
+      return petition;
+    }
+    // si no es friends --------------------------------------------
+    const target = await handler.model.findById(targetId).exec();
+
+    if (!target) {
+      throw new NotFoundException("Recurso no encontrado");
+    }
+
 
 
     // Marcar la solicitud como rechazada
@@ -451,7 +562,7 @@ export class PetitionService {
 
 
     // Enviar notificación al emisor (emitter) de que su petición ha sido rechazada
-  
+
     const isEmitterOwner = (target.userId as Types.ObjectId).equals(petition.emitter._id as Types.ObjectId)
     if (emitter?.pushToken) {
       let message: string = ""

@@ -25,7 +25,8 @@ import { UserModule } from "user/user.module";
       { name: Message.name, schema: MessageSchema },
     ]),
     ActivityModule,
-    UserModule
+    forwardRef(() => UserModule),
+
   ],
   controllers: [PetitionController],
   providers: [PetitionService, PushNotificationService, GroupsService, ChatroomService],
