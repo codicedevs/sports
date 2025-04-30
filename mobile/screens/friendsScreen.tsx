@@ -1,123 +1,100 @@
-import React, { useState } from "react";
-import { FlatList, TouchableOpacity, Image } from "react-native";
+// src/screens/FriendsScreen.tsx
+
+import React, { useState, useEffect } from "react";
+import {
+  FlatList,
+  TouchableOpacity,
+  ActivityIndicator,
+  Image,
+  Alert,
+} from "react-native";
 import { Div, Text } from "react-native-magnus";
 import { scale, verticalScale } from "react-native-size-matters";
+import useFetch from "../hooks/useGet";
+import { QUERY_KEYS } from "../types/query.types";
 import { customTheme } from "../utils/theme";
 import { useSession } from "../context/authProvider";
+import { fetchUsers, sendFriendRequest } from "../service/friendService";
 
-
-const API_BASE = "http://192.168.1.150:4002";
+interface RawUser { _id: string; name: string }
+interface User    { id: string;  name: string }
 
 const FriendsScreen = () => {
   const { currentUser } = useSession();
+  const token = currentUser?.token;
+  const userId = currentUser?._id; // tu propio ID
 
-  const [friends, setFriends] = useState([
-    { id: "1", name: "Abel Pintos" },
-    { id: "2", name: "Carlos Alberto Troncoso" },
-    { id: "3", name: "Abel Pintos" },
-    { id: "4", name: "Pedro Andres Galarza" },
-    { id: "5", name: "Abel Pintos" },
-    { id: "6", name: "Abel Pintos" },
-  ]);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [loadingIds, setLoadingIds] = useState<string[]>([]);
+  // 1) fetch users
+  const {
+    data: usersData,
+    isFetching: loadingUsers,
+    refetch: refetchUsers,
+  } = useFetch<{ results: RawUser[] }>(
+    () => fetchUsers().then(r => r.data),
+    [QUERY_KEYS.USERS]
+  );
+
+  // UI state
+  const [friends, setFriends]           = useState<User[]>([]);
+  const [selectedIds, setSelectedIds]   = useState<string[]>([]);
+  const [loadingIds, setLoadingIds]     = useState<string[]>([]);
   const [sentRequests, setSentRequests] = useState<string[]>([]);
-  const [errorMap, setErrorMap] = useState<Record<string, string>>({});
+  const [errorMap, setErrorMap]         = useState<Record<string,string>>({});
 
-  const toggleSelect = (id: string) => {
+  // map raw to UI users
+  useEffect(() => {
+    if (!usersData) return;
+    const mapped = usersData.results
+      .map(u => ({ id: u._id, name: u.name }))
+      .filter(u => u.id !== currentUser._id);
+    setFriends(mapped);
+  }, [usersData, currentUser._id]);
+
+  // toggle selection
+  const toggleSelect = (id: string) =>
     setSelectedIds(prev =>
-      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
     );
-  };
 
-  const handleRemove = (id: string) => {
-    setFriends(prev => prev.filter(f => f.id !== id));
-    setSelectedIds(prev => prev.filter(s => s !== id));
-    setErrorMap(prev => {
-      const copy = { ...prev };
-      delete copy[id];
-      return copy;
-    });
-  };
-
+  // send invites: now includes userId
   const handleSendInvites = async () => {
-    
+    if (!userId) {
+      Alert.alert("Error", "Usuario no identificado");
+      return;
+    }
+
     const toInvite = selectedIds.filter(id => !sentRequests.includes(id));
     if (!toInvite.length) return;
 
     setLoadingIds(prev => [...prev, ...toInvite]);
-    const newErrors = { ...errorMap };
+    const newErrs = { ...errorMap };
 
     for (const friendId of toInvite) {
       try {
-        const res = await fetch(
-          `${API_BASE}/users/${currentUser._id}/friends/${friendId}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-          }
-        );
-        if (!res.ok) throw new Error(`Error ${res.status}`);
-
+        // ahora pasamos también userId
+        await sendFriendRequest(userId, friendId);
         setSentRequests(prev => [...prev, friendId]);
-        delete newErrors[friendId];
-      } catch (err: any) {
-        newErrors[friendId] = err.message || "Ocurrió un error";
+        delete newErrs[friendId];
+      } catch (e: any) {
+        newErrs[friendId] = e.message || "Error al invitar";
+        const name = friends.find(f => f.id === friendId)?.name ?? friendId;
+        Alert.alert("Error al invitar", `No se pudo invitar a ${name}: ${e.message}`);
       }
     }
 
-    setErrorMap(newErrors);
-    setLoadingIds(prev => prev.filter(id => !toInvite.includes(id)));
+    setErrorMap(newErrs);
+    setLoadingIds(prev => prev.filter(x => !toInvite.includes(x)));
+    refetchUsers();
   };
 
-  const renderFriend = ({ item }: { item: { id: string; name: string } }) => {
-    const isSelected = selectedIds.includes(item.id);
-    const isLoading = loadingIds.includes(item.id);
-    const isSent = sentRequests.includes(item.id);
-    const error = errorMap[item.id];
-
+  // loading
+  if (loadingUsers) {
     return (
-      <TouchableOpacity onPress={() => toggleSelect(item.id)}>
-        <Div
-          row
-          alignItems="center"
-          justifyContent="space-between"
-          py={customTheme.spacing.small}
-          px={customTheme.spacing.large}
-          mb={customTheme.spacing.small}
-          bg={isSelected ? customTheme.colors.secondaryBackground : undefined}
-          rounded="md"
-        >
-          <Div row alignItems="center">
-            <Image
-              style={{ width: scale(22), height: scale(22) }}
-              resizeMode="cover"
-              source={require("../assets/user1.png")}
-            />
-            <Text ml={customTheme.spacing.medium} fontSize={customTheme.fontSize.small}>
-              {item.name}
-            </Text>
-          </Div>
-
-          <Div row alignItems="center">
-            {isSent && <Text color="green">✅</Text>}
-            {isLoading && <Text ml="sm">Enviando...</Text>}
-            <TouchableOpacity onPress={() => handleRemove(item.id)} style={{ marginLeft: 10 }}>
-              <Text fontFamily="bold" fontSize={customTheme.fontSize.small}>
-                X
-              </Text>
-            </TouchableOpacity>
-          </Div>
-        </Div>
-
-        {error && (
-          <Text color="red" fontSize={customTheme.fontSize.tiny} ml="lg">
-            {error}
-          </Text>
-        )}
-      </TouchableOpacity>
+      <Div flex={1} justifyContent="center" alignItems="center">
+        <ActivityIndicator size="large" />
+      </Div>
     );
-  };
+  }
 
   return (
     <Div flex={1} bg={customTheme.colors.background} p={customTheme.spacing.small}>
@@ -127,7 +104,7 @@ const FriendsScreen = () => {
         fontFamily="NotoSans-BoldItalic"
         fontSize={customTheme.fontSize.title}
       >
-        Amigos
+        Invitaciones
       </Text>
 
       {friends.length === 0 ? (
@@ -143,14 +120,63 @@ const FriendsScreen = () => {
             textAlign="center"
             mt={customTheme.spacing.small}
           >
-            No hay peticiones pendientes.
+            No hay usuarios disponibles.
           </Text>
         </Div>
       ) : (
         <FlatList
           data={friends}
           keyExtractor={item => item.id}
-          renderItem={renderFriend}
+          renderItem={({ item }) => {
+            const isSel  = selectedIds.includes(item.id);
+            const isLoad = loadingIds.includes(item.id);
+            const isSent = sentRequests.includes(item.id);
+            const err    = errorMap[item.id];
+
+            return (
+              <TouchableOpacity onPress={() => toggleSelect(item.id)}>
+                <Div
+                  row
+                  alignItems="center"
+                  justifyContent="space-between"
+                  py={customTheme.spacing.small}
+                  px={customTheme.spacing.medium}
+                  mb={customTheme.spacing.small}
+                  bg={isSel ? customTheme.colors.primary : undefined}
+                  rounded="md"
+                >
+                  <Div row alignItems="center">
+                    <Image
+                      style={{ width: scale(23), height: scale(23) }}
+                      resizeMode="cover"
+                      source={require("../assets/user1.png")}
+                    />
+                    <Text
+                      ml={customTheme.spacing.medium}
+                      fontSize={customTheme.fontSize.small}
+                      color={isSel ? customTheme.colors.background : undefined}
+                    >
+                      {item.name}
+                    </Text>
+                  </Div>
+                  <Div row alignItems="center">
+                    {isSent && <Text color="green">✅</Text>}
+                    {isLoad && (
+                      <ActivityIndicator
+                        size="small"
+                        color={customTheme.colors.primary}
+                      />
+                    )}
+                  </Div>
+                </Div>
+                {err && (
+                  <Text color="red" fontSize={customTheme.fontSize.tiny} ml="lg">
+                    {err}
+                  </Text>
+                )}
+              </TouchableOpacity>
+            );
+          }}
           contentContainerStyle={{ paddingBottom: 80 }}
         />
       )}
@@ -163,7 +189,10 @@ const FriendsScreen = () => {
         borderTopColor="rgb(223, 223, 220)"
         bg={customTheme.colors.background}
       >
-        <TouchableOpacity onPress={handleSendInvites}>
+        <TouchableOpacity
+          onPress={handleSendInvites}
+          disabled={!selectedIds.length}
+        >
           <Div
             h={verticalScale(45)}
             alignItems="center"
