@@ -1,18 +1,14 @@
-// src/service/friendService.ts
 
 import axios from "axios";
 import { User } from "../types/user.type";
 import Petition from "../types/petition.type";
 
-// --------------------------------------------------
-// Hardcodeamos aquí la URL de nuestro backend:
-const BASE_URL = "http://192.168.100.18:4002";
-// --------------------------------------------------
+// IP de backend:
+const BASE_URL = "http://192.168.1.15:4002";
+
 const api = axios.create({ baseURL: BASE_URL });
 
-/**
- * Llama esto desde tu componente una vez que tengas el token
- */
+
 export const setAuthToken = (token: string) => {
   if (token) {
     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -26,17 +22,17 @@ export interface PaginatedPetitions {
   totalCount: number;
 }
 
-/** Obtener todos los usuarios (para invitar) */
+
 export const fetchUsers = () =>
   api.get<{ results: User[] }>("/users");
 
-export const sendFriendRequest = (userId: string, friendId: string) =>
-    api.post(`/users/${userId}/friends/${friendId}`);
+export const sendFriendRequest = (friendId: string) =>{
+  api.post(`/users/friends/${friendId}`);}
 
-/** Ver solicitudes de amistad recibidas */
-export const getFriendPetitions = () =>
-  api.get<PaginatedPetitions>("/users/friends-petitions");
 
-/** Aceptar una petición concreta */
-export const acceptFriendRequest = (petitionId: string) =>
-  api.put(`/petitions/accept/${petitionId}`);
+export const getFriendPetitions = () =>{
+  api.get<PaginatedPetitions>("/users/friends-petitions");}
+
+
+export const acceptFriendRequest = (petitionId: string) =>{
+  api.put(`/petitions/accept/${petitionId}`);}

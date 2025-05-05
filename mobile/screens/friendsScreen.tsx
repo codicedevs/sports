@@ -1,5 +1,3 @@
-// src/screens/FriendsScreen.tsx
-
 import React, { useState, useEffect } from "react";
 import {
   FlatList,
@@ -14,80 +12,100 @@ import useFetch from "../hooks/useGet";
 import { QUERY_KEYS } from "../types/query.types";
 import { customTheme } from "../utils/theme";
 import { useSession } from "../context/authProvider";
-import { fetchUsers, sendFriendRequest } from "../service/friendService";
+import {
+  fetchUsers,
+  sendFriendRequest,
+  setAuthToken,
+} from "../service/friendService";
 
-interface RawUser { _id: string; name: string }
-interface User    { id: string;  name: string }
+interface RawUser {
+  _id: string;
+  name: string;
+}
+interface User {
+  id: string;
+  name: string;
+}
 
 const FriendsScreen = () => {
   const { currentUser } = useSession();
   const token = currentUser?.token;
-  const userId = currentUser?._id; // tu propio ID
+  const userId = currentUser?._id;
 
-  // 1) fetch users
   const {
     data: usersData,
     isFetching: loadingUsers,
     refetch: refetchUsers,
+    error: fetchError,
   } = useFetch<{ results: RawUser[] }>(
-    () => fetchUsers().then(r => r.data),
+    () => fetchUsers().then((r) => r.data),
     [QUERY_KEYS.USERS]
   );
 
-  // UI state
-  const [friends, setFriends]           = useState<User[]>([]);
-  const [selectedIds, setSelectedIds]   = useState<string[]>([]);
-  const [loadingIds, setLoadingIds]     = useState<string[]>([]);
-  const [sentRequests, setSentRequests] = useState<string[]>([]);
-  const [errorMap, setErrorMap]         = useState<Record<string,string>>({});
-
-  // map raw to UI users
   useEffect(() => {
-    if (!usersData) return;
-    const mapped = usersData.results
-      .map(u => ({ id: u._id, name: u.name }))
-      .filter(u => u.id !== currentUser._id);
-    setFriends(mapped);
-  }, [usersData, currentUser._id]);
+    if (token) {
+      setAuthToken(token);
+      refetchUsers();
+    }
+  }, [token, refetchUsers]);
 
-  // toggle selection
-  const toggleSelect = (id: string) =>
-    setSelectedIds(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+  const [friends, setFriends] = useState<User[]>([]);
+  useEffect(() => {
+    if (!usersData || !userId) return;
+
+    const currentFriendsIds: string[] = (currentUser?.friends || []).map((f) =>
+      typeof f === "string" ? f : (f as any)._id
     );
 
-  // send invites: now includes userId
+    const invitables = usersData.results
+      .filter((u) => u._id !== userId && !currentFriendsIds.includes(u._id))
+      .map((u) => ({ id: u._id, name: u.name }));
+
+    setFriends(invitables);
+  }, [usersData, userId, currentUser]);
+
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [loadingIds, setLoadingIds] = useState<string[]>([]);
+  const [sentRequests, setSentRequests] = useState<string[]>([]);
+  const [errorMap, setErrorMap] = useState<Record<string, string>>({});
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+    );
+  };
+
   const handleSendInvites = async () => {
     if (!userId) {
       Alert.alert("Error", "Usuario no identificado");
       return;
     }
-
-    const toInvite = selectedIds.filter(id => !sentRequests.includes(id));
+    const toInvite = selectedIds.filter((id) => !sentRequests.includes(id));
     if (!toInvite.length) return;
 
-    setLoadingIds(prev => [...prev, ...toInvite]);
+    setLoadingIds((prev) => [...prev, ...toInvite]);
     const newErrs = { ...errorMap };
 
     for (const friendId of toInvite) {
       try {
-        // ahora pasamos también userId
-        await sendFriendRequest(userId, friendId);
-        setSentRequests(prev => [...prev, friendId]);
+        await sendFriendRequest(friendId);
+        setSentRequests((prev) => [...prev, friendId]);
         delete newErrs[friendId];
       } catch (e: any) {
         newErrs[friendId] = e.message || "Error al invitar";
-        const name = friends.find(f => f.id === friendId)?.name ?? friendId;
-        Alert.alert("Error al invitar", `No se pudo invitar a ${name}: ${e.message}`);
+        const name = friends.find((f) => f.id === friendId)?.name ?? friendId;
+        Alert.alert(
+          "Error al invitar",
+          `No se pudo invitar a ${name}: ${e.message}`
+        );
       }
     }
 
     setErrorMap(newErrs);
-    setLoadingIds(prev => prev.filter(x => !toInvite.includes(x)));
+    setLoadingIds((prev) => prev.filter((x) => !toInvite.includes(x)));
     refetchUsers();
   };
 
-  // loading
   if (loadingUsers) {
     return (
       <Div flex={1} justifyContent="center" alignItems="center">
@@ -97,14 +115,18 @@ const FriendsScreen = () => {
   }
 
   return (
-    <Div flex={1} bg={customTheme.colors.background} p={customTheme.spacing.small}>
+    <Div
+      flex={1}
+      bg={customTheme.colors.background}
+      p={customTheme.spacing.small}
+    >
       <Text
         mb={customTheme.spacing.large}
         ml={customTheme.spacing.small}
         fontFamily="NotoSans-BoldItalic"
         fontSize={customTheme.fontSize.title}
       >
-        Invitaciones
+        Amigos
       </Text>
 
       {friends.length === 0 ? (
@@ -126,55 +148,86 @@ const FriendsScreen = () => {
       ) : (
         <FlatList
           data={friends}
-          keyExtractor={item => item.id}
+          keyExtractor={(item) => item.id}
           renderItem={({ item }) => {
-            const isSel  = selectedIds.includes(item.id);
+            const isSel = selectedIds.includes(item.id);
             const isLoad = loadingIds.includes(item.id);
             const isSent = sentRequests.includes(item.id);
-            const err    = errorMap[item.id];
+            const err = errorMap[item.id];
 
             return (
-              <TouchableOpacity onPress={() => toggleSelect(item.id)}>
-                <Div
-                  row
-                  alignItems="center"
-                  justifyContent="space-between"
-                  py={customTheme.spacing.small}
-                  px={customTheme.spacing.medium}
-                  mb={customTheme.spacing.small}
-                  bg={isSel ? customTheme.colors.primary : undefined}
-                  rounded="md"
-                >
+              <Div
+                row
+                alignItems="center"
+                justifyContent="space-between"
+                py={customTheme.spacing.small}
+                px={customTheme.spacing.medium}
+                mb={customTheme.spacing.small}
+                bg={isSel ? customTheme.colors.primary : undefined}
+                rounded="md"
+              >
+                <Div row alignItems="center" justifyContent="space-between"  w="100%">
                   <Div row alignItems="center">
                     <Image
                       style={{ width: scale(23), height: scale(23) }}
                       resizeMode="cover"
                       source={require("../assets/user1.png")}
                     />
-                    <Text
-                      ml={customTheme.spacing.medium}
-                      fontSize={customTheme.fontSize.small}
-                      color={isSel ? customTheme.colors.background : undefined}
-                    >
-                      {item.name}
-                    </Text>
+
+                    <TouchableOpacity onPress={() => toggleSelect(item.id)}>
+                      <Text
+                        ml={customTheme.spacing.medium}
+                        fontSize={customTheme.fontSize.small}
+                        color={
+                          isSel ? customTheme.colors.background : undefined
+                        }
+                      >
+                        {item.name}
+                      </Text>
+                    </TouchableOpacity>
                   </Div>
-                  <Div row alignItems="center">
-                    {isSent && <Text color="green">✅</Text>}
-                    {isLoad && (
-                      <ActivityIndicator
-                        size="small"
-                        color={customTheme.colors.primary}
-                      />
-                    )}
-                  </Div>
+
+                  {isSel && !isSent && !isLoad && (
+                    <Div>
+                      <TouchableOpacity
+                        onPress={() => toggleSelect(item.id)}
+                        style={{ marginLeft: 8 }}
+                      >
+                        <Text
+                          fontSize={customTheme.fontSize.medium}
+                          color={customTheme.colors.danger}
+                        >
+                          X
+                        </Text>
+                      </TouchableOpacity>
+                    </Div>
+                  )}
                 </Div>
+
+                <Div row alignItems="center">
+                  {isLoad && (
+                    <ActivityIndicator
+                      size="small"
+                      color={customTheme.colors.primary}
+                    />
+                  )}
+                  {isSent && (
+                    <Text color="green" fontSize={customTheme.fontSize.medium}>
+                      ✅
+                    </Text>
+                  )}
+                </Div>
+
                 {err && (
-                  <Text color="red" fontSize={customTheme.fontSize.tiny} ml="lg">
+                  <Text
+                    color="red"
+                    fontSize={customTheme.fontSize.tiny}
+                    ml="lg"
+                  >
                     {err}
                   </Text>
                 )}
-              </TouchableOpacity>
+              </Div>
             );
           }}
           contentContainerStyle={{ paddingBottom: 80 }}
@@ -191,7 +244,7 @@ const FriendsScreen = () => {
       >
         <TouchableOpacity
           onPress={handleSendInvites}
-          disabled={!selectedIds.length}
+          disabled={selectedIds.length === 0}
         >
           <Div
             h={verticalScale(45)}
