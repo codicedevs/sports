@@ -23,6 +23,14 @@ import { navigate } from "./utils/navigation";
 
 const queryClient = new QueryClient();
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
+
 export default function App() {
   const [fontsLoaded] = useFonts({
     "NotoSans-Italic": require("./assets/fonts/NotoSans-Italic-VariableFont_wdth,wght.ttf"),
@@ -41,6 +49,18 @@ export default function App() {
   const navigationRef = createNavigationContainerRef();
 
   useEffect(() => {
+    async function checkInitialNotification() {
+      const response = await Notifications.getLastNotificationResponseAsync();
+      const data = response?.notification?.request?.content?.data;
+  
+      if (data?.screen) {
+        console.log("App abierta desde notificación:", data);
+        navigate(data.screen, data.params ?? {});
+      }
+    }
+  
+    checkInitialNotification();
+  
     const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
       const data = response.notification.request.content.data;
       console.log("Notificación tocada:", data);
@@ -52,6 +72,7 @@ export default function App() {
   
     return () => subscription.remove();
   }, []);
+  
 
   if (!fontsLoaded) {
     return null;
