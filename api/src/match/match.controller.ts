@@ -12,6 +12,7 @@ import {
   Query,
   UseInterceptors,
   UploadedFiles,
+  Req,
 } from "@nestjs/common";
 import { MatchService } from "./match.service";
 import { CreateMatchDto } from "./match.dto";
@@ -32,6 +33,8 @@ import { FilesInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { extname, join } from "path";
 import { existsSync, mkdirSync } from "fs";
+import { JwtPayload } from "jsonwebtoken";
+import { CreatePetitionDto } from "petition/petition.dto";
 
 @ApiBearerAuth()
 @ApiTags("matches")
@@ -92,6 +95,49 @@ export class MatchController {
       files,
     };
   }
+  //Envía petición al admin del match
+  @Post(':matchId/petition')
+  async sendPetition(
+    @Param("matchId", new ValidateObjectIdPipe()) matchId: string,
+    @Req() request: Request
+  ) {
+    const { sub } = request['user'] as JwtPayload;
+    const userId = new Types.ObjectId(sub)
+    let petition: CreatePetitionDto = {
+      emitter: userId,
+      reference: {
+        type: PetitionModelType.match,
+        id: new Types.ObjectId(matchId)
+      },
+      status: PetitionStatus.Pending
+    }
+    return this.petitionService.create(petition)
+
+  }
+
+  @Post(':matchId/invite/:userId')
+  async sendInvitation(
+    @Param("matchId", new ValidateObjectIdPipe()) matchId: string,
+    @Param("userId", new ValidateObjectIdPipe("usuario")) userId: string,
+    @Req() request: Request
+  ) {
+    const { sub } = request['user'] as JwtPayload;
+    const adminId = new Types.ObjectId(sub);
+    const match = await this.matchService.findOne(new Types.ObjectId(matchId))
+    if (!match.userId.equals(adminId)) {
+      throw new BadRequestException("El usuario no es admin del partido")
+    }
+    const petition: CreatePetitionDto = {
+      emitter: adminId,
+      receiver: new Types.ObjectId(userId),
+      reference: {
+        id: new Types.ObjectId(matchId),
+        type: PetitionModelType.match,
+      },
+      status: PetitionStatus.Pending
+    }
+    return this.petitionService.create(petition)
+  }
   @Public()
   @Get()
   async findAll(@Query() filter: Filter) {
@@ -129,6 +175,19 @@ export class MatchController {
   @Get("/available")
   async getAvailableMatches() {
     return await this.matchService.getAvailableMatches();
+  }
+  @Get("petitions")
+  async getMatchesPetitions(
+    @Req() request: Request
+  ) {
+    const { sub } = request['user'] as JwtPayload;
+    return this.petitionService.findAll({
+      where: {
+        receiver: new Types.ObjectId(sub),
+        status: PetitionStatus.Pending,
+        'reference.type': PetitionModelType.match
+      }
+    })
   }
 
   @Get("/findForDate/users/:userId")
@@ -208,7 +267,7 @@ export class MatchController {
     return updatedMatch;
   }
   @Patch(":matchId/users/:userId/remove")
-  @UseGuards(MatchPlayerGuard)
+  //@UseGuards(MatchPlayerGuard)
   async removeUserFromMatch(
     @Param("matchId", new ValidateObjectIdPipe("partido")) matchId: string,
     @Param("userId", new ValidateObjectIdPipe("usuario")) userId: string,
