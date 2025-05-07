@@ -34,6 +34,9 @@ export class Petition extends Document {
     default: PetitionStatus.Pending,
   })
   status: PetitionStatus;
+
+  @Prop({ type: Boolean, required: true})
+  isInvitation: boolean
 }
 
 export const PetitionSchema = SchemaFactory.createForClass(Petition);

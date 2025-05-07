@@ -67,4 +67,7 @@
   - `results`: array con las peticiones.  
   - `totalCount`: número total de peticiones.
  
-En el caso del que las referencias 
+ 
+ ### Regla de negocio básica
+ - **Petición**: el *emitter* NO es administrador del recurso ⇒ solicita unirse. isInvitation = false
+ - **Invitación**: el *emitter* SÍ es administrador ⇒ invita a otro usuario. isInvitation = true

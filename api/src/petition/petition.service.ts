@@ -77,9 +77,9 @@ export class PetitionService {
    * Crea una nueva petición (o invitación) asociada a un partido o a un grupo.
    *
    * ### Regla de negocio básica
-   * - **Petición**: el *emitter* NO es administrador del recurso ⇒ solicita unirse.
-   * - **Invitación**: el *emitter* SÍ es administrador ⇒ invita a otro usuario.
-   *
+   * - **Petición**: el *emitter* NO es administrador del recurso ⇒ solicita unirse. isInvitation = false
+   * - **Invitación**: el *emitter* SÍ es administrador ⇒ invita a otro usuario. isInvitation = true
+   * 
    * Para cada (usuario, recurso) solo puede existir:
    * 1. Una petición *emitida*     (user ➜ recurso)
    * 2. Una invitación *recibida*  (recurso ➜ user)
@@ -152,7 +152,6 @@ export class PetitionService {
       if (receiverExist.bloquedUsers.some(id => id.equals(emitter))) {
         throw new BadRequestException("El usuario te tiene bloqueado")
       }
-      //SEGUIR
       // Crear la petición
       const newPetition = new this.petitionModel({
         emitter: emitterExist._id,
@@ -161,6 +160,7 @@ export class PetitionService {
           type: modelType,
         },
         status: PetitionStatus.Pending,
+        isInvitation: false
       });
       await newPetition.save();
       // ─────────────────────────────── Push‑notification (best‑effort)
@@ -272,6 +272,7 @@ export class PetitionService {
         type: modelType,
       },
       status: PetitionStatus.Pending,
+      isInvitation: isEmitterAdmin
     });
     await newPetition.save();
 
