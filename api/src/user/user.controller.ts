@@ -126,9 +126,6 @@ export class UserController {
         const newUser = await this.userService.create(createUserDto);
         return newUser;
     }
-    // @Req() request: Request) {
-    //     const { sub } = request['user'] as JwtPayload;
-    // Agregar un amigo
     @Post("friends/:friendId")
     async inviteFriend(
         @Param("friendId", new ValidateObjectIdPipe("amigo")) friendId: string,
