@@ -85,6 +85,7 @@ export class PetitionService {
    * 2. Una invitación *recibida*  (recurso ➜ user)
    * Una vez aceptada/rechazada no se puede volver a enviar otra.
    *
+   * Si el modelo es Group o Match entonces si no recibe id de receiver le pone el del admin del group o match
    * @param createPetitionDto – `{ emitter, receiver, reference: { id, type } }`
    * @returns La petición recién persistida.
    *
@@ -94,6 +95,9 @@ export class PetitionService {
    *                              – Cupo del recurso completo
    *                              – Tipo de referencia no soportado
    *                              - Emisor y receptor son el mimso usuario
+   *                              - Si ni el emisor ni el receptor son admins del recurso
+   *                              - Si es una invitación y el receptor se encuntra en el recurso
+   *                              - Si es una petición y el emisor se encuentra en el recurso
    */
   async create(createPetitionDto: CreatePetitionDto): Promise<Petition> {
     const { emitter, receiver, reference } = createPetitionDto;
@@ -103,14 +107,14 @@ export class PetitionService {
     // ───────────────────────────────────────── Validaciones básicas ──
     // TODO: mover a pipes/guards genéricos ('shouldExistGuard')
     const emitterExist = await this.userModel.findById(emitter).exec();
-    const receiverExist = await this.userModel.findById(receiver).exec();
 
+    let receiverExist = await this.userModel.findById(receiver).exec();
+    //Si es friends y no recibe receptor tira error, si recibió receptor pero no existe, tira error
+    if((receiver && !receiverExist) || (!receiverExist && modelType === PetitionModelType.friend)){
+      throw new NotFoundException("RECEPTOR de la peticion no encontrado");
+    }
     if (!emitterExist) {
       throw new NotFoundException("EMISOR de la peticion no encontrado");
-    }
-
-    if (!receiverExist) {
-      throw new NotFoundException("RECEPTOR de la peticion no encontrado");
     }
 
     if ((receiver).equals(emitter)) {
@@ -177,18 +181,38 @@ export class PetitionService {
     }
     //SI NO ES FRIENDS -------------------------------------------------------------
 
-
+  
 
     const target = await handler.model.findById(targetId).exec();
 
     // Validar el modelo objetivo (group o match)
     await handler.validate(target, emitterExist._id as Types.ObjectId);
 
+    if(!receiverExist){
+      receiverExist= await this.userModel.findById(new Types.ObjectId(target.userId)).exec()
+    }
+    if(!receiverExist){
+      throw new NotFoundException("RECEPTOR de la peticion no encontrado");
+    }
+
 
     // Verificar si el emisor es el creador del partido
-    const isEmitterCreator = new Types.ObjectId(target.userId).equals(
+    const isEmitterAdmin = new Types.ObjectId(target.userId).equals(
       emitterExist.id,
     );
+    // Verificar si el emisor es el creador del partido
+    const isReceiverAdmin = new Types.ObjectId(target.userId).equals(
+      receiverExist.id,
+    );
+    
+    if(!isEmitterAdmin && !isReceiverAdmin){
+      throw new BadRequestException("Alguno de los dos, el emisor o el receptor, tienen que ser admin del recurso")
+    }
+    const isEmitterIn = target.users.some(id => id.equals(emitter._id as Types.ObjectId))
+    const isReceiverIn = target.users.some(id => id.equals(receiver._id as Types.ObjectId))
+    if (isEmitterAdmin && isReceiverIn || isReceiverAdmin && isEmitterIn) {
+      throw new BadRequestException("El usuario ya se encuentra en el recurso")
+    }
 
     // Verificar si ya existe una petición con el mismo emitter y match
     const existingPetitionEmitter = await this.petitionModel
@@ -206,7 +230,7 @@ export class PetitionService {
       existingPetitionEmitter.status == PetitionStatus.Declined
     ) {
       throw new BadRequestException("Petición previamente rechazada");
-    } else if (existingPetitionEmitter && !isEmitterCreator) {
+    } else if (existingPetitionEmitter && !isEmitterAdmin) {
       // Si no es el creador y ya existe una solicitud, se lanza la excepción
       throw new BadRequestException(
         `Ya existe una petición de este usuario para este ${translate[modelType]}`,
@@ -222,10 +246,10 @@ export class PetitionService {
       })
       .exec();
 
-    if (existingPetitionReceiver && isEmitterCreator && existingPetitionReceiver.status == PetitionStatus.Declined) {
+    if (existingPetitionReceiver && isEmitterAdmin && existingPetitionReceiver.status == PetitionStatus.Declined) {
       throw new BadRequestException("Invitación previamente rechazada");
     }
-    else if (existingPetitionReceiver && isEmitterCreator) {
+    else if (existingPetitionReceiver && isEmitterAdmin) {
       throw new BadRequestException(
         `Ya existe una invitación a este usuario para este ${translate[modelType]}`,
       );
@@ -253,7 +277,7 @@ export class PetitionService {
 
     // ─────────────────────────────── Push‑notification (best‑effort)
     if (receiverExist.pushToken) {
-      const message = isEmitterCreator
+      const message = isEmitterAdmin
         ? `${emitterExist.name} ha solicitado que te unas a su ${translate[modelType]}.`
         : `${emitterExist.name} ha solicitado unirse a tu ${translate[modelType]}.`;
       await this.notificationService.sendPushNotification(
@@ -338,7 +362,7 @@ export class PetitionService {
       throw new BadRequestException("La solicitud ya ha sido procesada");
     }
     if ((petition.receiver._id as Types.ObjectId).equals(petition.emitter._id as Types.ObjectId)) {
-      throw new BadRequestException("no pueden ser el emisor y el receptor el mismo usuario");
+      throw new BadRequestException("No pueden ser el emisor y el receptor el mismo usuario");
     }
     //Si el modelo es friend --------------------------------------
     if (modelType === PetitionModelType.friend) {
