@@ -27,7 +27,7 @@ export default function InviteModal({
   const [query, setQuery] = useState("");
   const [selectedPlayers, setSelectedPlayers] = useState<User[]>([]);
   const { currentUser } = useSession();
-
+  if (!matchId) return null//throw new Error("¡Todo es basura!");
   const getInitials = (name: string): string => {
     return name
       .trim()
@@ -61,9 +61,12 @@ export default function InviteModal({
   );
 
   if (!playersData || !petitionsData) return null;
+  console.debug(matchId);
+  // console.debug("111", petitionsData)
+  // console.debug("222", playersData)
 
   const playersWithPetitionIds =
-    petitionsData?.results.map((pWP) => pWP.receiver._id) ?? [];
+    petitionsData?.results.map((pWP) => pWP.receiver?._id) ?? [];
 
   const filteredPlayers = playersData.results.filter(
     (p: User) =>
