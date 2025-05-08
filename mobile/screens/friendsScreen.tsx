@@ -199,18 +199,18 @@ const FriendsScreen: React.FC<FriendsScreenProps> = ({ matchId }) => {
                 fontSize={customTheme.fontSize.medium}
                 fontFamily="NotoSans-BoldItalic"
               >
-                Invitar Amigos
+                Agregar Amigos
               </Text>
             </Div>
           </TouchableOpacity>
         </Div>
-      </Div>
 
-      <InviteModal
-        open={inviteModalOpen}
-        setOpen={setInviteModalOpen}
-        reference={{ type: "Match", id: matchId }}
-      />
+        <InviteModal
+          open={inviteModalOpen}
+          setOpen={setInviteModalOpen}
+          reference="friends"
+        />
+      </Div>
     </>
   );
 };

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Div, Image, Modal, Text } from "react-native-magnus";
 import { customTheme } from "../../utils/theme";
 import Autocomplete from "react-native-autocomplete-input";
@@ -6,36 +6,62 @@ import { scale, verticalScale } from "react-native-size-matters";
 import { User } from "../../types/user.type";
 import userService from "../../service/user.service";
 import petitionService from "../../service/petition.service";
-import useFetch from "../../hooks/useGet";
-import { QUERY_KEYS } from "../../types/query.types";
 import { useSession } from "../../context/authProvider";
 import { useGlobalUI } from "../../context/globalUiContext";
 import Petition from "../../types/petition.type";
 
+type Reference = "match" | "friends";
+
 interface InviteModalProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  matchId: string;
+  matchId?: string;
+  reference: Reference;
 }
 
 export default function InviteModal({
   open,
   setOpen,
   matchId,
+  reference,
 }: InviteModalProps) {
   const { showSnackBar } = useGlobalUI();
+  const { currentUser } = useSession();
   const [query, setQuery] = useState("");
   const [selectedPlayers, setSelectedPlayers] = useState<User[]>([]);
-  const { currentUser } = useSession();
-  if (!matchId) return null//throw new Error("¡Todo es basura!");
-  const getInitials = (name: string): string => {
-    return name
-      .trim()
-      .split(/\s+/)
-      .map((word) => word.slice(0, 1))
-      .join("")
-      .toUpperCase();
-  };
+  const [playersData, setPlayersData] = useState<User[] | null>(null);
+  const [petitionsData, setPetitionsData] = useState<Petition[] | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const playersRes = await userService.getAll();
+        const petitionsRes =
+          reference === "match" && matchId
+            ? await petitionService.getAll({
+                where: {
+                  "reference.type": "Match",
+                  "reference.id": matchId,
+                  status: ["pending", "accepted", "declined"],
+                },
+              })
+            : { results: [] };
+
+        setPlayersData(playersRes.results);
+        setPetitionsData(petitionsRes.results);
+      } catch (err) {
+        console.error("Error fetching players or petitions", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [open, reference, matchId]);
 
   const handlePlayersSelected = (player: User) => {
     if (!selectedPlayers.some((p) => p._id === player._id)) {
@@ -44,34 +70,15 @@ export default function InviteModal({
     }
   };
 
-  const { data: playersData } = useFetch(userService.getAll, [
-    QUERY_KEYS.USERS,
-  ]);
-
-  const { data: petitionsData } = useFetch<{ results: Petition[] }>(
-    () =>
-      petitionService.getAll({
-        where: {
-          "reference.type": "Match",
-          "reference.id": matchId,
-          status: ["pending", "accepted", "declined"],
-        },
-      }),
-    [QUERY_KEYS.PETITIONS, matchId]
-  );
-
-  if (!playersData || !petitionsData) return null;
-  console.debug(matchId);
-  // console.debug("111", petitionsData)
-  // console.debug("222", playersData)
+  if (loading || !playersData || !petitionsData) return null;
 
   const playersWithPetitionIds =
-    petitionsData?.results.map((pWP) => pWP.receiver?._id) ?? [];
+    petitionsData.map((pWP) => pWP.receiver?._id) ?? [];
 
-  const filteredPlayers = playersData.results.filter(
+  const filteredPlayers = playersData.filter(
     (p: User) =>
       p.name.toLowerCase().includes(query.toLowerCase()) &&
-      !selectedPlayers.some((sp: User) => sp._id === p._id) &&
+      !selectedPlayers.some((sp) => sp._id === p._id) &&
       p._id !== currentUser?._id &&
       !playersWithPetitionIds.includes(p._id)
   );
@@ -124,7 +131,6 @@ export default function InviteModal({
         </Button>
       </Div>
 
-      {/* autocomplete */}
       <Div position="relative">
         <Autocomplete
           data={filteredPlayers}
@@ -156,19 +162,12 @@ export default function InviteModal({
                 flexDir="row"
                 alignItems="center"
               >
-                <Text
-                  fontSize={customTheme.fontSize.small}
-                  fontFamily={customTheme.fontFamily.bold}
-                  color="white"
-                >
-                  <Image
-                    source={require("../../assets/user1.png")}
-                    resizeMode="contain"
-                    w={scale(22)}
-                    h={scale(22)}
-                  />
-                </Text>
-
+                <Image
+                  source={require("../../assets/user1.png")}
+                  resizeMode="contain"
+                  w={scale(22)}
+                  h={scale(22)}
+                />
                 <Text
                   style={{ padding: 5, borderWidth: 0, marginLeft: scale(5) }}
                   fontFamily="NotoSans-Variable"
@@ -189,7 +188,6 @@ export default function InviteModal({
           }}
         />
 
-        {/* jug selecc. */}
         <Div mt={60} p={customTheme.spacing.medium}>
           {selectedPlayers.length > 0 && (
             <Text

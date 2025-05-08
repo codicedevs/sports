@@ -476,7 +476,7 @@ const MatchDetail: React.FC<Props> = ({ navigation, route }) => {
           right={0}
           bg="black"
         ></Div>
-        <InviteModal open={inviteOpen} setOpen={setInviteOpen} matchId={id} />
+        <InviteModal open={inviteOpen} setOpen={setInviteOpen} matchId={id} reference="match" />
       </Div>
     </>
   );
