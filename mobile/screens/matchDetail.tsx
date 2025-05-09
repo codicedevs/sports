@@ -25,7 +25,7 @@ import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import * as Clipboard from "expo-clipboard";
 import { useGlobalUI } from "../context/globalUiContext";
 import petitionService from "../service/petition.service";
-import { PetitionModelType, PetitionStatus } from "../types/petition.type";
+import { PetitionModelType } from "../types/petition.type";
 
 type TabKey = "partido" | "jugadores" | "actividad" | "equipos";
 

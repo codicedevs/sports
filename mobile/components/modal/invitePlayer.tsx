@@ -8,7 +8,9 @@ import userService from "../../service/user.service";
 import petitionService from "../../service/petition.service";
 import { useSession } from "../../context/authProvider";
 import { useGlobalUI } from "../../context/globalUiContext";
-import Petition from "../../types/petition.type";
+import Petition, { PetitionModelType } from "../../types/petition.type";
+import { sendFriendRequest } from "../../service/friendService";
+
 
 type Reference = "match" | "friends";
 
@@ -75,12 +77,22 @@ export default function InviteModal({
   const playersWithPetitionIds =
     petitionsData.map((pWP) => pWP.receiver?._id) ?? [];
 
+  const currentFriendIds = (currentUser?.friends || []).map((f: any) =>
+    typeof f === "string" ? f : f._id
+  );
+
+  const rejectedPlayerIds = petitionsData
+  .filter((p) => p.status === "declined")
+  .map((p) => p.receiver?._id);
+
   const filteredPlayers = playersData.filter(
     (p: User) =>
       p.name.toLowerCase().includes(query.toLowerCase()) &&
       !selectedPlayers.some((sp) => sp._id === p._id) &&
       p._id !== currentUser?._id &&
-      !playersWithPetitionIds.includes(p._id)
+      (!playersWithPetitionIds.includes(p._id) || reference === "friends") &&
+      (reference !== "friends" || !currentFriendIds.includes(p._id)) &&
+      !rejectedPlayerIds.includes(p._id) 
   );
 
   const handleRemovePlayer = (id: string) => {
@@ -94,7 +106,7 @@ export default function InviteModal({
           emitter: currentUser._id,
           receiver: player._id,
           reference: {
-            type: "Match",
+            type: PetitionModelType.Match,
             id: matchId,
           },
         };
@@ -105,6 +117,20 @@ export default function InviteModal({
       setOpen(false);
     } catch (error) {
       console.error("Error al enviar las invitaciones:", error);
+    }
+  }
+
+  async function handleSendFriend() {
+    try {
+      for (const player of selectedPlayers) {
+        await sendFriendRequest(player._id);
+      }
+      showSnackBar("success", "¡Solicitudes enviadas!");
+      setSelectedPlayers([]);
+      setOpen(false);
+    } catch (error) {
+      console.error("Error al enviar solicitudes de amistad:", error);
+      showSnackBar("error", "Error al enviar solicitudes.");
     }
   }
 
@@ -247,7 +273,7 @@ export default function InviteModal({
         {selectedPlayers.length > 0 && (
           <Button
             bg={customTheme.colors.secondaryBackground}
-            onPress={handleSendInvitations}
+            onPress={reference === "match" ? handleSendInvitations : handleSendFriend}
             w="100%"
             h={scale(45)}
             rounded="md"
@@ -258,7 +284,7 @@ export default function InviteModal({
               fontSize={customTheme.fontSize.medium}
               fontFamily="NotoSans-BoldItalic"
             >
-              Enviar invitación
+              {reference === "match" ? "Enviar invitación" : "Enviar solicitud"}
             </Text>
           </Button>
         )}

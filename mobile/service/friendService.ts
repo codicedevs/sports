@@ -3,7 +3,7 @@ import axios from "axios";
 import { User } from "../types/user.type";
 import Petition from "../types/petition.type";
 
-// IP de backend:
+
 const BASE_URL = "http://192.168.1.6:4002";
 
 const api = axios.create({ baseURL: BASE_URL });

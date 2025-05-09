@@ -19,7 +19,7 @@ interface RawUser {
   name: string;
 }
 interface User {
-  id: string;
+  _id: string;
   name: string;
 }
 
@@ -55,24 +55,12 @@ const FriendsScreen: React.FC<FriendsScreenProps> = ({ matchId }) => {
   useEffect(() => {
     if (!usersData || !userId) return;
 
-    // const currentFriendsIds: string[] = (currentUser.friends || [])
-    //   .filter((f): f is string | { _id: string } => !!f && (typeof f === "string" || !!(f as any)._id))
-    //   .map(f => (typeof f === "string" ? f : (f as any)._id));
-
     setFriends(usersData.results);
-
-    //     .filter(u => u && u._id && u._id !== userId && !currentFriendsIds.includes(u._id))
-    //     .map(u => ({ id: u._id, name: u.name }))
-    // );
   }, [usersData, userId, currentUser.friends]);
 
   const handleRemove = (id: string) => {
-    setFriends((prev) => prev.filter((u) => u.id !== id));
+    setFriends((prev) => prev.filter((u) => u._id !== id));
   };
-
-  // const handleOpenModal = () => {
-  //   setInviteModalOpen(true);
-  // };
 
   if (!currentUser || !currentUser._id) {
     return (
@@ -133,7 +121,7 @@ const FriendsScreen: React.FC<FriendsScreenProps> = ({ matchId }) => {
         ) : (
           <FlatList
             data={friends}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item._id}
             renderItem={({ item }) => (
               <Div
                 row
@@ -159,7 +147,7 @@ const FriendsScreen: React.FC<FriendsScreenProps> = ({ matchId }) => {
                   </Text>
                 </Div>
                 <TouchableOpacity
-                  onPress={() => handleRemove(item.id)}
+                  onPress={() => handleRemove(item._id)}
                   style={{ padding: 8 }}
                 >
                   <Text
