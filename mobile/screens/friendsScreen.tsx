@@ -53,9 +53,17 @@ const FriendsScreen: React.FC<FriendsScreenProps> = ({ matchId }) => {
 
   const [friends, setFriends] = useState<User[]>([]);
   useEffect(() => {
-    if (!usersData || !userId) return;
+    if (!usersData || !userId || !currentUser.friends) return;
 
-    setFriends(usersData.results);
+    const friendIds = (currentUser.friends || []).map((f: any) =>
+      typeof f === "string" ? f : f._id
+    );
+
+    const onlyFriends = usersData.results.filter(
+      (user) => user._id !== userId && friendIds.includes(user._id)
+    );
+
+    setFriends(onlyFriends);
   }, [usersData, userId, currentUser.friends]);
 
   const handleRemove = (id: string) => {

@@ -42,16 +42,21 @@ export default function InviteModal({
       setLoading(true);
       try {
         const playersRes = await userService.getAll();
-        const petitionsRes =
-          reference === "match" && matchId
-            ? await petitionService.getAll({
-                where: {
+        const petitionsRes = await petitionService.getAll({
+          where:
+            reference === "match" && matchId
+              ? {
                   "reference.type": "Match",
                   "reference.id": matchId,
                   status: ["pending", "accepted", "declined"],
-                },
-              })
-            : { results: [] };
+                }
+              : reference === "friends"
+              ? {
+                  "reference.type": "User",
+                  status: ["pending", "accepted", "declined"],
+                }
+              : {},
+        });
 
         setPlayersData(playersRes.results);
         setPetitionsData(petitionsRes.results);
@@ -74,25 +79,29 @@ export default function InviteModal({
 
   if (loading || !playersData || !petitionsData) return null;
 
-  const playersWithPetitionIds =
-    petitionsData.map((pWP) => pWP.receiver?._id) ?? [];
-
   const currentFriendIds = (currentUser?.friends || []).map((f: any) =>
     typeof f === "string" ? f : f._id
   );
 
-  const rejectedPlayerIds = petitionsData
-  .filter((p) => p.status === "declined")
-  .map((p) => p.receiver?._id);
+  const pendingFriendIds =
+    reference === "friends"
+      ? petitionsData
+          .filter((p) => p.status === "pending")
+          .map((p) => p.receiver?._id)
+      : [];
+
+  const playersWithPetitionIds =
+    petitionsData.map((pWP) => pWP.receiver?._id) ?? [];
 
   const filteredPlayers = playersData.filter(
     (p: User) =>
       p.name.toLowerCase().includes(query.toLowerCase()) &&
       !selectedPlayers.some((sp) => sp._id === p._id) &&
       p._id !== currentUser?._id &&
-      (!playersWithPetitionIds.includes(p._id) || reference === "friends") &&
-      (reference !== "friends" || !currentFriendIds.includes(p._id)) &&
-      !rejectedPlayerIds.includes(p._id) 
+      (reference !== "friends" ||
+        (!currentFriendIds.includes(p._id) &&
+          !pendingFriendIds.includes(p._id))) &&
+      (reference !== "match" || !playersWithPetitionIds.includes(p._id))
   );
 
   const handleRemovePlayer = (id: string) => {
