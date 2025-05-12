@@ -7,7 +7,7 @@ import useFetch from "../hooks/useGet";
 import Petition from "../types/petition.type";
 import { QUERY_KEYS } from "../types/query.types";
 import { customTheme } from "../utils/theme";
-import MatchInvitation from "../components/cards/invitationCard";
+import MatchInvitation from "../components/cards/InvitationCard";
 import { ScrollView } from "react-native-gesture-handler";
 import { scale, verticalScale } from "react-native-size-matters";
 import { Image } from "react-native";

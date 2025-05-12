@@ -20,12 +20,12 @@ import MatchModalHandler from "../components/modal/matchModalHandler";
 import Field from "../components/matche/Detail/field";
 import PlayerStatusList from "../components/matche/Detail/playerStatusList";
 import InviteModal from "../components/modal/invitePlayer";
-import { ActivityScreen } from "./activityScreen";
+import { ActivityScreen } from "./ActivityScreen";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import * as Clipboard from "expo-clipboard";
 import { useGlobalUI } from "../context/globalUiContext";
 import petitionService from "../service/petition.service";
-import { PetitionModelType, PetitionStatus } from "../types/petition.type";
+import { PetitionModelType } from "../types/petition.type";
 
 type TabKey = "partido" | "jugadores" | "actividad" | "equipos";
 
@@ -476,7 +476,7 @@ const MatchDetail: React.FC<Props> = ({ navigation, route }) => {
           right={0}
           bg="black"
         ></Div>
-        <InviteModal open={inviteOpen} setOpen={setInviteOpen} matchId={id} />
+        <InviteModal open={inviteOpen} setOpen={setInviteOpen} matchId={id} reference="match" />
       </Div>
     </>
   );

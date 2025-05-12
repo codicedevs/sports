@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Div, Image, Modal, Text } from "react-native-magnus";
 import { customTheme } from "../../utils/theme";
 import Autocomplete from "react-native-autocomplete-input";
@@ -6,36 +6,69 @@ import { scale, verticalScale } from "react-native-size-matters";
 import { User } from "../../types/user.type";
 import userService from "../../service/user.service";
 import petitionService from "../../service/petition.service";
-import useFetch from "../../hooks/useGet";
-import { QUERY_KEYS } from "../../types/query.types";
 import { useSession } from "../../context/authProvider";
 import { useGlobalUI } from "../../context/globalUiContext";
-import Petition from "../../types/petition.type";
+import Petition, { PetitionModelType } from "../../types/petition.type";
+import { sendFriendRequest } from "../../service/friendService";
+
+
+type Reference = "match" | "friends";
 
 interface InviteModalProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  matchId: string;
+  matchId?: string;
+  reference: Reference;
 }
 
 export default function InviteModal({
   open,
   setOpen,
   matchId,
+  reference,
 }: InviteModalProps) {
   const { showSnackBar } = useGlobalUI();
+  const { currentUser } = useSession();
   const [query, setQuery] = useState("");
   const [selectedPlayers, setSelectedPlayers] = useState<User[]>([]);
-  const { currentUser } = useSession();
+  const [playersData, setPlayersData] = useState<User[] | null>(null);
+  const [petitionsData, setPetitionsData] = useState<Petition[] | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const getInitials = (name: string): string => {
-    return name
-      .trim()
-      .split(/\s+/)
-      .map((word) => word.slice(0, 1))
-      .join("")
-      .toUpperCase();
-  };
+  useEffect(() => {
+    if (!open) return;
+
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const playersRes = await userService.getAll();
+        const petitionsRes = await petitionService.getAll({
+          where:
+            reference === "match" && matchId
+              ? {
+                  "reference.type": "Match",
+                  "reference.id": matchId,
+                  status: ["pending", "accepted", "declined"],
+                }
+              : reference === "friends"
+              ? {
+                  "reference.type": "User",
+                  status: ["pending", "accepted", "declined"],
+                }
+              : {},
+        });
+
+        setPlayersData(playersRes.results);
+        setPetitionsData(petitionsRes.results);
+      } catch (err) {
+        console.error("Error fetching players or petitions", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [open, reference, matchId]);
 
   const handlePlayersSelected = (player: User) => {
     if (!selectedPlayers.some((p) => p._id === player._id)) {
@@ -44,33 +77,31 @@ export default function InviteModal({
     }
   };
 
-  const { data: playersData } = useFetch(userService.getAll, [
-    QUERY_KEYS.USERS,
-  ]);
+  if (loading || !playersData || !petitionsData) return null;
 
-  const { data: petitionsData } = useFetch<{ results: Petition[] }>(
-    () =>
-      petitionService.getAll({
-        where: {
-          "reference.type": "Match",
-          "reference.id": matchId,
-          status: ["pending", "accepted", "declined"],
-        },
-      }),
-    [QUERY_KEYS.PETITIONS, matchId]
+  const currentFriendIds = (currentUser?.friends || []).map((f: any) =>
+    typeof f === "string" ? f : f._id
   );
 
-  if (!playersData || !petitionsData) return null;
+  const pendingFriendIds =
+    reference === "friends"
+      ? petitionsData
+          .filter((p) => p.status === "pending")
+          .map((p) => p.receiver?._id)
+      : [];
 
   const playersWithPetitionIds =
-    petitionsData?.results.map((pWP) => pWP.receiver._id) ?? [];
+    petitionsData.map((pWP) => pWP.receiver?._id) ?? [];
 
-  const filteredPlayers = playersData.results.filter(
+  const filteredPlayers = playersData.filter(
     (p: User) =>
       p.name.toLowerCase().includes(query.toLowerCase()) &&
-      !selectedPlayers.some((sp: User) => sp._id === p._id) &&
+      !selectedPlayers.some((sp) => sp._id === p._id) &&
       p._id !== currentUser?._id &&
-      !playersWithPetitionIds.includes(p._id)
+      (reference !== "friends" ||
+        (!currentFriendIds.includes(p._id) &&
+          !pendingFriendIds.includes(p._id))) &&
+      (reference !== "match" || !playersWithPetitionIds.includes(p._id))
   );
 
   const handleRemovePlayer = (id: string) => {
@@ -84,7 +115,7 @@ export default function InviteModal({
           emitter: currentUser._id,
           receiver: player._id,
           reference: {
-            type: "Match",
+            type: PetitionModelType.Match,
             id: matchId,
           },
         };
@@ -95,6 +126,20 @@ export default function InviteModal({
       setOpen(false);
     } catch (error) {
       console.error("Error al enviar las invitaciones:", error);
+    }
+  }
+
+  async function handleSendFriend() {
+    try {
+      for (const player of selectedPlayers) {
+        await sendFriendRequest(player._id);
+      }
+      showSnackBar("success", "¡Solicitudes enviadas!");
+      setSelectedPlayers([]);
+      setOpen(false);
+    } catch (error) {
+      console.error("Error al enviar solicitudes de amistad:", error);
+      showSnackBar("error", "Error al enviar solicitudes.");
     }
   }
 
@@ -121,7 +166,6 @@ export default function InviteModal({
         </Button>
       </Div>
 
-      {/* autocomplete */}
       <Div position="relative">
         <Autocomplete
           data={filteredPlayers}
@@ -153,19 +197,12 @@ export default function InviteModal({
                 flexDir="row"
                 alignItems="center"
               >
-                <Text
-                  fontSize={customTheme.fontSize.small}
-                  fontFamily={customTheme.fontFamily.bold}
-                  color="white"
-                >
-                  <Image
-                    source={require("../../assets/user1.png")}
-                    resizeMode="contain"
-                    w={scale(22)}
-                    h={scale(22)}
-                  />
-                </Text>
-
+                <Image
+                  source={require("../../assets/user1.png")}
+                  resizeMode="contain"
+                  w={scale(22)}
+                  h={scale(22)}
+                />
                 <Text
                   style={{ padding: 5, borderWidth: 0, marginLeft: scale(5) }}
                   fontFamily="NotoSans-Variable"
@@ -186,7 +223,6 @@ export default function InviteModal({
           }}
         />
 
-        {/* jug selecc. */}
         <Div mt={60} p={customTheme.spacing.medium}>
           {selectedPlayers.length > 0 && (
             <Text
@@ -246,7 +282,7 @@ export default function InviteModal({
         {selectedPlayers.length > 0 && (
           <Button
             bg={customTheme.colors.secondaryBackground}
-            onPress={handleSendInvitations}
+            onPress={reference === "match" ? handleSendInvitations : handleSendFriend}
             w="100%"
             h={scale(45)}
             rounded="md"
@@ -257,7 +293,7 @@ export default function InviteModal({
               fontSize={customTheme.fontSize.medium}
               fontFamily="NotoSans-BoldItalic"
             >
-              Enviar invitación
+              {reference === "match" ? "Enviar invitación" : "Enviar solicitud"}
             </Text>
           </Button>
         )}

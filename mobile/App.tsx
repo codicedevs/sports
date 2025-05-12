@@ -17,6 +17,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import registerForPushNotificationsAsync from "./notifications/pushNotifications";
 import { GlobalUIProvider } from "./context/globalUiContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const queryClient = new QueryClient();
 
@@ -33,7 +34,7 @@ export default function App() {
     "NotoSans_SemiCondensed-ExtraBold": require("./assets/fonts/NotoSans_SemiCondensed-ExtraBold.ttf"),
     "NotoSans-Black": require("./assets/fonts/NotoSans-Black.ttf"),
     "NotoSans-ExtraBold": require("./assets/fonts/NotoSans-ExtraBold.ttf"),
-    "NotoSans-ExtraBoldItalic": require("./assets/fonts/NotoSans-ExtraBoldItalic.ttf")
+    "NotoSans-ExtraBoldItalic": require("./assets/fonts/NotoSans-ExtraBoldItalic.ttf"),
   });
 
   if (!fontsLoaded) {
@@ -49,7 +50,11 @@ export default function App() {
               <GlobalUIProvider>
                 <PushNotificationInitializer />
                 <SafeAreaView style={{ flex: 1 }}>
-                  <StatusBar translucent backgroundColor={'white'} style="dark" />
+                  <StatusBar
+                    translucent
+                    backgroundColor={"white"}
+                    style="dark"
+                  />
                   <AppNavigator />
                 </SafeAreaView>
               </GlobalUIProvider>
@@ -78,3 +83,13 @@ function PushNotificationInitializer() {
 
   return null;
 }
+
+const clearAsyncStorage = async () => {
+  try {
+    await AsyncStorage.clear();
+    console.log("AsyncStorage borrado");
+  } catch (error) {
+    console.error("Error al borrar AsyncStorage:", error);
+  }
+};
+clearAsyncStorage();

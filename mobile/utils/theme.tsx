@@ -100,6 +100,9 @@ export const customTheme: CustomThemeType = {
     medium: scale(16),
     large: scale(24),
     xl: scale(32),
+    xxl: scale(40),
+    xxxl: scale(58)
+    
   },
   shadowColor: "black",
   name: "myTheme",

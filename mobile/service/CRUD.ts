@@ -18,7 +18,9 @@ export class CRUDService<T> extends HttpService {
     };
 
     create = async (data: T) => {
+        console.log(123123)
         const res = await this.post("/", data);
+        console.log(23)
         return res.data;
        
     };

@@ -10,7 +10,8 @@ export enum AppScreens {
     MATCH_DETAIL = 'MatchDetail',
     MATCH_SCREEN = 'MatchScreen',
     MATCH_HANDLER = 'MatchHandler',
-    USER_SCREEN = 'User_Screen'
+    USER_SCREEN = 'User_Screen',
+    FRIEND_SCREEN = 'Friends_Screen'
 }
 
 export type AppScreensParamList = {
@@ -23,6 +24,7 @@ export type AppScreensParamList = {
     [AppScreens.MATCH_SCREEN]: undefined;
     [AppScreens.MATCH_HANDLER]: {id?: string};
     [AppScreens.USER_SCREEN]: undefined;
+    [AppScreens.FRIEND_SCREEN]: undefined;
 }
 
 export type AppScreenProps<T extends AppScreens> = {

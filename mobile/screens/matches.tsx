@@ -9,8 +9,8 @@ import { scale, verticalScale } from 'react-native-size-matters';
 import zonesService from '../service/zones.service';
 import sportmodeService from '../service/sportmode.service';
 import SportModeButton from '../components/matche/Form/sportModeButton';
-import MatchesCards from '../components/cards/matchesCards';
-import MatchesCardSK from '../components/cards/matchesCardSK';
+import MatchesCards from '../components/cards/MatchesCards';
+import MatchesCardSK from '../components/cards/MatchesCardSK';
 import ConfirmPreferencesModal from '../components/modal/confirmPreferences';
 
 type FiltersProps = {
