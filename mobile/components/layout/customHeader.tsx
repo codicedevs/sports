@@ -92,8 +92,8 @@ export const CustomHeader = () => {
             onPress={() => navigation.navigate(AppScreens.USER_SCREEN)}
           >
             <Image
-              style={{ height: scale(27), width: scale(22) }}
-              source={require("../../assets/match/bellInclinada.png")}
+              style={{ height: scale(24), width: scale(22) }}
+              source={require("../../assets/iconUser.png")} //../../assets/match/bellInclinada.png
             />
             <Div
               position="absolute"

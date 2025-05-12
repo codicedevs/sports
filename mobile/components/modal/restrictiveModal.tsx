@@ -56,6 +56,8 @@ const RestrictiveModal = () => {
         }
       };
 
+      
+
     const loginQuery = useMutate(login, (res) => { setCurrentUser(res.user) }, (err) => { console.error(err) })
 
     if (!isModalVisible) return
