@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { forwardRef, Module } from "@nestjs/common";
 import { MongooseModule } from "@nestjs/mongoose";
 import { UserController } from "./user.controller";
 import { UserService } from "./user.service";
@@ -7,6 +7,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { jwtSetting } from "settings";
 import { Petition, PetitionSchema } from "petition/petition.entity";
 import { Match, MatchSchema } from "match/match.entity";
+import { PetitionModule } from "petition/petition.module";
 
 @Module({
     imports: [
@@ -19,6 +20,7 @@ import { Match, MatchSchema } from "match/match.entity";
             secret: jwtSetting.JWT_ACCESS_SECRET,
             signOptions: { expiresIn: jwtSetting.JWT_ACCESS_EXPIRES },
         }),
+        forwardRef(() => PetitionModule),
     ],
     controllers: [UserController],
     providers: [UserService],

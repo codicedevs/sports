@@ -5,5 +5,6 @@ export enum PetitionStatus {
 }
 export enum PetitionModelType{
     match = "Match",
-    group = "Group"
+    group = "Group",
+    friend = "User"
 }

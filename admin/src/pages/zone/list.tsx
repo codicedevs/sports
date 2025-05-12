@@ -9,7 +9,11 @@ import {
   StyledSearchHeader,
 } from "../../styled/globalStyled";
 import { Zone } from "../../types/zone.type";
-import { useDeleteZonesMutation, useGetZonesQuery } from "../../store/features/zone";
+import {
+  useDeleteZonesMutation,
+  useGetZonesQuery,
+  useLazyGetZonesQuery,
+} from "../../store/features/zone";
 const { Search } = Input;
 
 const getColumns = (
@@ -27,7 +31,7 @@ const getColumns = (
       dataIndex: "name",
       key: "name",
     },
-  
+
     {
       title: "Acción",
       key: "action",
@@ -58,9 +62,12 @@ const ZoneList = () => {
   const navigate = useNavigate();
   const [deleteZone] = useDeleteZonesMutation();
   const [filter, setFilter] = useState<{}>();
-  const { data } = useGetZonesQuery(filter);
- 
-  const handleDeleteZone= (id: string) => {
+
+  // const { data } = useGetZonesQuery(filter);
+
+  const [trigger, { data }] = useLazyGetZonesQuery();
+
+  const handleDeleteZone = (id: string) => {
     deleteZone(id).unwrap();
   };
 
@@ -76,6 +83,9 @@ const ZoneList = () => {
         [filterName]: value,
       }));
     }
+    setTimeout(() => {
+      trigger({ name: { LIKE: filter } });
+    }, 1000);
   };
   const columns = getColumns(handleDeleteZone, navigate);
 
@@ -89,6 +99,7 @@ const ZoneList = () => {
           <Search
             placeholder="ingrese algun dato de interes"
             onChange={(e) => handleSearch("name", e.target.value)}
+            onSearch={(value) => console.log("nabde")}
             size="middle"
             name="like-name"
           />

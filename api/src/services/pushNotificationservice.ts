@@ -30,6 +30,7 @@ export class PushNotificationService {
         title,
         body,
         data,
+        channelId: "default",
       });
     }
 

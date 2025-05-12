@@ -80,6 +80,9 @@ export class User extends Document {
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }] })
   friends: Types.ObjectId[];
 
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }] })
+  bloquedUsers: Types.ObjectId[];
+
   @Prop()
   resetKey?: string;
 

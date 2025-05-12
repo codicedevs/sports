@@ -12,8 +12,8 @@ export class Reference {
   })
   type: PetitionModelType;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, required: true, refPath: "reference.type" })
-  id: Types.ObjectId;
+  @Prop({ type: mongoose.Schema.Types.ObjectId, required: false, refPath: "reference.type" })
+  id?: Types.ObjectId;
 }
 export const referenceSchema = SchemaFactory.createForClass(Reference)
 @Schema()
@@ -34,6 +34,9 @@ export class Petition extends Document {
     default: PetitionStatus.Pending,
   })
   status: PetitionStatus;
+
+  @Prop({ type: Boolean, required: true})
+  isInvitation: boolean
 }
 
 export const PetitionSchema = SchemaFactory.createForClass(Petition);

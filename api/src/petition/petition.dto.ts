@@ -9,9 +9,8 @@ export class CreatePetitionDto {
   @IsMongoId()
   readonly emitter: Types.ObjectId;
 
-  @IsNotEmpty()
   @IsMongoId()
-  readonly receiver: Types.ObjectId;
+  readonly receiver?: Types.ObjectId;
 
   reference: Reference;
 
