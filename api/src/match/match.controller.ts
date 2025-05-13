@@ -34,7 +34,7 @@ import { diskStorage } from "multer";
 import { extname, join } from "path";
 import { existsSync, mkdirSync } from "fs";
 import { JwtPayload } from "jsonwebtoken";
-import { CreatePetitionDto } from "petition/petition.dto";
+import { CreatePetitionDto, TextPetitionDto } from "petition/petition.dto";
 
 @ApiBearerAuth()
 @ApiTags("matches")
@@ -99,7 +99,8 @@ export class MatchController {
   @Post(':matchId/petition')
   async sendPetition(
     @Param("matchId", new ValidateObjectIdPipe()) matchId: string,
-    @Req() request: Request
+    @Req() request: Request,
+    @Body() text: TextPetitionDto
   ) {
     const { sub } = request['user'] as JwtPayload;
     const userId = new Types.ObjectId(sub)
@@ -111,7 +112,7 @@ export class MatchController {
       },
       status: PetitionStatus.Pending
     }
-    return this.petitionService.create(petition)
+    return this.petitionService.create({...petition, ...text})
 
   }
 
@@ -119,7 +120,8 @@ export class MatchController {
   async sendInvitation(
     @Param("matchId", new ValidateObjectIdPipe()) matchId: string,
     @Param("userId", new ValidateObjectIdPipe("usuario")) userId: string,
-    @Req() request: Request
+    @Req() request: Request,
+    @Body() text: TextPetitionDto
   ) {
     const { sub } = request['user'] as JwtPayload;
     const adminId = new Types.ObjectId(sub);
@@ -136,7 +138,7 @@ export class MatchController {
       },
       status: PetitionStatus.Pending
     }
-    return this.petitionService.create(petition)
+    return this.petitionService.create({...petition, ...text})
   }
   @Public()
   @Get()

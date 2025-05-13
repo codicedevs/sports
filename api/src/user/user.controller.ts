@@ -28,7 +28,7 @@ import { Filter } from "types/types";
 import { JwtPayload } from "jsonwebtoken";
 import { Petition } from "petition/petition.entity";
 import { PetitionModelType, PetitionStatus } from "petition/petition.enum";
-import { CreatePetitionDto } from "petition/petition.dto";
+import { CreatePetitionDto, TextPetitionDto } from "petition/petition.dto";
 import { PetitionService } from "petition/petition.service";
 
 // All these endpoints are globally protected by the auth guard that requires a token
@@ -129,7 +129,8 @@ export class UserController {
     @Post("friends/:friendId")
     async inviteFriend(
         @Param("friendId", new ValidateObjectIdPipe("amigo")) friendId: string,
-        @Req() request: Request
+        @Req() request: Request,
+        @Body() text: TextPetitionDto
     ) {
         const { sub } = request['user'] as JwtPayload;
         let petition: CreatePetitionDto = {
@@ -140,7 +141,7 @@ export class UserController {
             },
             status: PetitionStatus.Pending
         }
-        return this.petitionService.create(petition)
+        return this.petitionService.create({...petition, ...text})
     }
 
 
