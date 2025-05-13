@@ -8,7 +8,7 @@ import { JwtDecorator } from 'decorators/jwt-payload.decorator';
 import { ValidateObjectIdPipe } from 'pipes/validate-object-id.pipe';
 import { PetitionService } from 'petition/petition.service';
 import { PetitionModelType, PetitionStatus } from 'petition/petition.enum';
-import { CreatePetitionDto } from 'petition/petition.dto';
+import { CreatePetitionDto, TextPetitionDto } from 'petition/petition.dto';
 import { JwkKeyExportOptions } from 'crypto';
 
 @Controller('groups')
@@ -26,7 +26,8 @@ export class GroupsController {
   @Post(':groupId/petition')
   async sendPetition(
     @Param("groupId", new ValidateObjectIdPipe()) groupId: string,
-    @Req() request: Request
+    @Req() request: Request,
+    @Body() text: TextPetitionDto
   ) {
     const { sub } = request['user'] as JwtPayload
     const userId = new Types.ObjectId(sub)
@@ -39,13 +40,14 @@ export class GroupsController {
       status: PetitionStatus.Pending
     }
 
-    return this.petitionService.create(petition)
+    return this.petitionService.create({...petition, ...text})
   }
   @Post(':groupId/invite/:userId')
   async sendInvitation(
     @Param("groupId", new ValidateObjectIdPipe()) groupId: string,
     @Param("userId", new ValidateObjectIdPipe("usuario")) userId: string,
-    @Req() request: Request
+    @Req() request: Request,
+    @Body() text: TextPetitionDto
   ) {
     const { sub } = request['user'] as JwtPayload;
     const adminId = new Types.ObjectId(sub);
@@ -62,7 +64,7 @@ export class GroupsController {
       },
       status: PetitionStatus.Pending
     }
-    return this.petitionService.create(petition)
+    return this.petitionService.create({...petition, ...text})
 
   }
 
