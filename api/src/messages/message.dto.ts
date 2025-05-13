@@ -2,15 +2,19 @@ import { PartialType } from "@nestjs/swagger"
 import { Chatroom } from "chatroom/chatroom.entity"
 import { Types } from "mongoose"
 import { User } from "user/user.entity"
+import { MessageKind } from "./message.enum"
 
 export class CreateMessageDto {
-    chatroomId: string
-    senderId: string
-    message: string
+    chatroomId: string;
+    senderId: Types.ObjectId;
+    message: string;
+    kind: MessageKind;
+    foreignId?: Types.ObjectId;
 }
 export class SendMessageDto {
-    senderId: string
-    message: string
+    message: string;
+    kind: MessageKind;
+    foreignId?: Types.ObjectId;
 }
 
 export class UpdateMessageDto extends PartialType(CreateMessageDto) {}

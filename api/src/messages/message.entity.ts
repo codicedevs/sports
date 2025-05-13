@@ -3,6 +3,7 @@ import { Chatroom } from "chatroom/chatroom.entity";
 import { FilterPlugin } from "filter/filter.plugin";
 import mongoose, { Types, Document } from "mongoose";
 import { User } from "user/user.entity";
+import { MessageKind } from "./message.enum";
 
 @Schema({ timestamps: true }) // createdAt, updatedAt
 export class Message extends Document {
@@ -14,5 +15,12 @@ export class Message extends Document {
 
     @Prop()
     message: string;
+
+    @Prop({type: String, enum: MessageKind, default: MessageKind.text, required: true })
+    kind: MessageKind;
+
+    @Prop({ type: mongoose.Schema.Types.ObjectId, refPath: "kind" })
+    foreignId?: Types.ObjectId;
+
 }
 export const MessageSchema = SchemaFactory.createForClass(Message);
