@@ -37,7 +37,7 @@ export class PetitionController {
     const emitter = new Types.ObjectId(petition.emitter)
     const receiver = new Types.ObjectId(petition.receiver)
     
-    return this.petitionService.create({emitter, receiver, ...petition});
+    return this.petitionService.create({...petition, emitter, receiver});
   }
 
   @Put("accept/:petitionId")
