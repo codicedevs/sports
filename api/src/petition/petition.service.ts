@@ -160,7 +160,8 @@ export class PetitionService {
           type: modelType,
         },
         status: PetitionStatus.Pending,
-        isInvitation: false
+        isInvitation: false,
+        text: createPetitionDto.text
       });
       await newPetition.save();
       // ─────────────────────────────── Push‑notification (best‑effort)

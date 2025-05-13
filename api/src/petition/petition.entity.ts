@@ -27,7 +27,6 @@ export class Petition extends Document {
   @Prop({ type: referenceSchema })
   reference: Reference;
 
-
   @Prop({
     type: String,
     enum: PetitionStatus,
@@ -37,6 +36,9 @@ export class Petition extends Document {
 
   @Prop({ type: Boolean, required: true})
   isInvitation: boolean
+
+  @Prop({type: String})
+  text?: string
 }
 
 export const PetitionSchema = SchemaFactory.createForClass(Petition);

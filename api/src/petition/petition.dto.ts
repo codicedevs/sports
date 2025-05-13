@@ -17,7 +17,13 @@ export class CreatePetitionDto {
   @IsEnum(PetitionStatus)
   readonly status: PetitionStatus = PetitionStatus.Pending;
 
+  text?: string;
+
 }
 
 export class UpdatePetitionDto extends PartialType(CreatePetitionDto) {
+}
+
+export class TextPetitionDto {
+  text? : string;
 }
