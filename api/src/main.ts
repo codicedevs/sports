@@ -19,7 +19,7 @@ async function bootstrap() {
   process.env.TZ = "America/Argentina/Buenos_Aires";
   const app = await NestFactory.create<NestExpressApplication>(
       AppModule,
-    //   protocol == "https" ? { httpsOptions: { key, cert } } : undefined
+      protocol == "https" ? { httpsOptions: { key, cert } } : undefined
   );
 
   app.useGlobalPipes(
