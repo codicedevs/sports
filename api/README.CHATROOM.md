@@ -12,7 +12,7 @@ foreignId es el id del Group o Match al cual está ligado el chatroom.
 Si kind es Direct no tiene foreignId
 participants es sólo si el kind es direct, y tiene los ids d elos dos usuarios participantes
 messages es el array de los mensajes del chatroom
-Y el Message es
+Y el Message es:
 
 
  ```json
@@ -21,7 +21,7 @@ Y el Message es
   "senderId": "string", // El id del que lo envió
   "message": "string",
   "kind": "kind", //Por ahora no se usa
-  "foreignId": "string" //Por ahora no s eusa
+  "foreignId": "string" //Por ahora no se usa
  }
 ```
 chatroomId es el id del chatroom en el que se envía el mensaje,
@@ -43,7 +43,7 @@ Y el body es
 
 message es el texto del mensaje a enviar
 
-### Para enviar mensaje a User se usa
+### Para enviar mensaje directo se usa
 POST '/users/message/:receiverId'
 y el body es
 ```json
