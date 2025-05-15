@@ -186,13 +186,14 @@ export class UserController {
 
     //eliminar a un user de friends
 
-    @Delete(":userId/friends/:friendId")
+    @Delete("friends/:friendId")
     async removeFriend(
-        @Param("userId", new ValidateObjectIdPipe("usuario")) userId: string,
         @Param("friendId", new ValidateObjectIdPipe("amigo")) friendId: string,
+        @Req() request: Request,
     ) {
+        const { sub } = request['user'] as JwtPayload;
         const updatedUser = await this.userService.removeFriend(
-            new Types.ObjectId(userId),
+            new Types.ObjectId(sub),
             new Types.ObjectId(friendId),
         );
         if (!updatedUser) {
