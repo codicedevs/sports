@@ -8,12 +8,12 @@ export class CreateMessageDto {
     chatroomId: string;
     senderId: Types.ObjectId;
     message: string;
-    kind: MessageKind;
+    kind?: MessageKind = MessageKind.text;;
     foreignId?: Types.ObjectId;
 }
 export class SendMessageDto {
     message: string;
-    kind: MessageKind;
+    kind: MessageKind = MessageKind.text;
     foreignId?: Types.ObjectId;
 }
 

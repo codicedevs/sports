@@ -61,7 +61,7 @@ export class MessagesService {
     if (!handler) {
       throw new BadRequestException("Tipo de referencia no soportado");
     }
-    if (createMessageDto.kind !== MessageKind.text && !createMessageDto.foreignId) {
+    if (modelKind !== MessageKind.text && !createMessageDto.foreignId) {
       throw new BadRequestException("foreignId es obligatorio para Petition");
     }
     // Validar el modelo objetivo (group o match)
