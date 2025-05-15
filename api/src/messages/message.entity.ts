@@ -13,7 +13,7 @@ export class Message extends Document {
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: () => User })
     senderId: Types.ObjectId | User;
 
-    @Prop()
+    @Prop({required: true})
     message: string;
 
     @Prop({type: String, enum: MessageKind, default: MessageKind.text, required: true })

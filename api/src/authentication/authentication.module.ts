@@ -8,7 +8,6 @@ import { jwtSetting } from "settings";
 import { UserModule } from "user/user.module";
 import { GoogleAuthService } from "./google-auth-service";
 import { BlacklistService } from "./blackList.service";
-import { UserService } from "user/user.service";
 @Module({
   imports: [
     JwtModule.register({
@@ -24,7 +23,6 @@ import { UserService } from "user/user.service";
     EmailService,
     GoogleAuthService,
     BlacklistService,
-    UserService
   ],
   exports: [AuthService],
 })

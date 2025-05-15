@@ -8,6 +8,9 @@ import { jwtSetting } from "settings";
 import { Petition, PetitionSchema } from "petition/petition.entity";
 import { Match, MatchSchema } from "match/match.entity";
 import { PetitionModule } from "petition/petition.module";
+import { MessagesModule } from "messages/messages.module";
+import { ChatroomModule } from "chatroom/chatroom.module";
+import { Chatroom, ChatroomSchema } from "chatroom/chatroom.entity";
 
 @Module({
     imports: [
@@ -15,12 +18,15 @@ import { PetitionModule } from "petition/petition.module";
             { name: User.name, schema: UserSchema },
             { name: Petition.name, schema: PetitionSchema },
             { name: Match.name, schema: MatchSchema },
+            { name: Chatroom.name, schema: ChatroomSchema },
         ]),
         JwtModule.register({
             secret: jwtSetting.JWT_ACCESS_SECRET,
             signOptions: { expiresIn: jwtSetting.JWT_ACCESS_EXPIRES },
         }),
         forwardRef(() => PetitionModule),
+        forwardRef(() => MessagesModule),
+        forwardRef(() => ChatroomModule)
     ],
     controllers: [UserController],
     providers: [UserService],

@@ -12,6 +12,11 @@ import { FindManyFilter } from "filter/filter.dto";
 import { Petition } from "petition/petition.entity";
 import { Match } from "match/match.entity";
 import { Filter, FilterResponse } from "types/types";
+import { Chatroom } from "chatroom/chatroom.entity";
+import { ChatroomService } from "chatroom/chatroom.service";
+import { ChatroomKind } from "chatroom/chatroom.enum";
+import { MessagesService } from "messages/messages.service";
+import { SendMessageDto } from "messages/message.dto";
 
 
 @Injectable()
@@ -20,6 +25,9 @@ export class UserService {
         @InjectModel(User.name) private readonly userModel: Model<User>,
         @InjectModel(Match.name) private readonly matchModel: Model<Match>,
         @InjectModel(Petition.name) private readonly petitionModel: Model<Petition>,
+        @InjectModel(Chatroom.name) private readonly chatroomModel: Model<Chatroom>,
+        private readonly chatroomService: ChatroomService,
+        private readonly messagesService: MessagesService,
     ) { }
 
     /**
@@ -241,5 +249,33 @@ export class UserService {
         const tokens = users.map(user => user.pushToken).filter(token => !!token);
 
         return tokens;
+    }
+
+    async sendDirectMessage(senderId: Types.ObjectId, receiverId: Types.ObjectId, message: SendMessageDto) {
+        const senderExists = this.userModel.findById(senderId);
+        const receiverExists = this.userModel.findById(receiverId);
+        if (!senderExists) {
+            throw new NotFoundException(`Emisor con id ${senderId} no encontrado`)
+        }
+        if (!receiverExists) {
+            throw new NotFoundException(`Receptor con id ${receiverId} no encontrado`)
+        }
+        let chatroom = await this.chatroomModel.findOne({
+            participants: {$all: [senderId, receiverId]} //Contiene ambos IDs
+        }).exec()
+        if (!chatroom) {
+            chatroom = await this.chatroomService.create({
+                kind: ChatroomKind.direct,
+                participants: [senderId, receiverId]
+            })
+        }
+        const completeMessage = await this.messagesService.create({
+            chatroomId: chatroom._id as string,
+            senderId: senderId,
+            ...message
+        })
+
+        return completeMessage
+
     }
 }

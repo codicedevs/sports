@@ -30,6 +30,7 @@ import { Petition } from "petition/petition.entity";
 import { PetitionModelType, PetitionStatus } from "petition/petition.enum";
 import { CreatePetitionDto, TextPetitionDto } from "petition/petition.dto";
 import { PetitionService } from "petition/petition.service";
+import { SendMessageDto } from "messages/message.dto";
 
 // All these endpoints are globally protected by the auth guard that requires a token
 
@@ -144,6 +145,15 @@ export class UserController {
         return this.petitionService.create({...petition, ...text})
     }
 
+    @Post("message/:receiverId")
+    async sendMessage(
+        @Param("receiverId", new ValidateObjectIdPipe("receptor")) receiverId: string,
+        @Req() request: Request,
+        @Body() message: SendMessageDto
+    ){
+        const { sub } = request['user'] as JwtPayload;
+        return this.userService.sendDirectMessage(new Types.ObjectId(sub), new Types.ObjectId(receiverId), message)
+    }
 
 
     /**
