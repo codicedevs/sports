@@ -59,6 +59,10 @@ export class ChatroomService {
         if (!participants || participants.length !== 2) {
           throw new BadRequestException("Un chat directo necesita dos participantes");
         }
+        console.log(participants)
+        if(participants[0].equals(participants[1])){
+          throw new BadRequestException("Un chat directo necesita dos participantes distintos")
+        }
         const count = await this.userModel.countDocuments({ where:{_id: { $in: participants } }});
         if (count !== 2) throw new NotFoundException("Algún participante no existe");
       },

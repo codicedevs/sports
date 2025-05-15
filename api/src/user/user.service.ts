@@ -260,6 +260,9 @@ export class UserService {
         if (!receiverExists) {
             throw new NotFoundException(`Receptor con id ${receiverId} no encontrado`)
         }
+        if(senderId.equals(receiverId)){
+            throw new BadRequestException('Receptor y emisor tienen que ser usuarios distintos')
+        }
         let chatroom = await this.chatroomModel.findOne({
             participants: {$all: [senderId, receiverId]} //Contiene ambos IDs
         }).exec()
