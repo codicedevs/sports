@@ -51,3 +51,37 @@ y el body es
     "message": "string"
 }
 ```
+
+### Traer los chats directos con el último mensaje
+GET '/chatroom/user/direct'
+
+Devuelve un array de objetos, que tienen chatroomId, kind (Direct), participants,  y lastMessage,
+por ejemplo:
+
+```json
+[
+    {
+        "chatroomId": "682619d545873a2255da98f3",
+        "kind": "Direct",
+        "participants": [
+            "67db347b35e90c4535489413",
+            "679ba8a55768ea11f86cdf9e"
+        ],
+        "lastMessage": {
+            "_id": "68262a87c64db3030d0dca7d",
+            "chatroomId": "682619d545873a2255da98f3",
+            "senderId": "67db347b35e90c4535489413",
+            "message": "holaaaa",
+            "kind": "Text",
+            "createdAt": "2025-05-15T17:55:20.034Z",
+            "updatedAt": "2025-05-15T17:55:20.034Z",
+            "__v": 0
+        }
+    }
+]
+```
+
+### Traer los chats con el último mensaje
+GET '/chatroom/user'
+
+Es como el anterior, pero trae tambien los chats de group y matches

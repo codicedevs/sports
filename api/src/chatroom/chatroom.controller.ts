@@ -27,14 +27,26 @@ export class ChatroomController {
     }
     return this.messagesService.create({ chatroomId, senderId, ...(sendMessageDto) })
   }
-  
+
   @Get()
   findAll(@Query() filter: Filter) {
     return this.chatroomService.findAll(filter);
   }
-  @Get('user/:userId')
-  getLastMessage(@Param('userId', new ValidateObjectIdPipe("user")) userId: string) {
+  @Get('user')
+  getLastMessage(
+    @Req() request: Request
+  ) {
+    const { sub } = request['user'] as JwtPayload;
+    const userId = new Types.ObjectId(sub);
     return this.chatroomService.getUserChatroomsWithLastMessage(userId, [ChatroomKind.group, ChatroomKind.match])
+  }
+  @Get('user/direct')
+  getLastMessageDirect(
+    @Req() request: Request
+  ) {
+    const { sub } = request['user'] as JwtPayload;
+    const userId = new Types.ObjectId(sub);
+    return this.chatroomService.getUserChatroomsWithLastMessage(userId, [])
   }
 
   @Get(':id')

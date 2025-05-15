@@ -122,11 +122,11 @@ export class ChatroomService {
   }
 
 
-  async getUserChatroomsWithLastMessage(userId: string, models?: ChatroomKind[]): Promise<
+  async getUserChatroomsWithLastMessage(userId: Types.ObjectId, models?: ChatroomKind[]): Promise<
     Array<{
       chatroomId: Types.ObjectId;
-      type: ChatroomKind;
-      referenceId?: Types.ObjectId;
+      kind: ChatroomKind;
+      foreignId?: Types.ObjectId;
       participants?: Types.ObjectId[];
       lastMessage: Message | null;
     }>
@@ -138,8 +138,8 @@ export class ChatroomService {
 
     const results: Array<{
       chatroomId: Types.ObjectId;
-      type: ChatroomKind;
-      referenceId?: Types.ObjectId;
+      kind: ChatroomKind;
+      foreignId?: Types.ObjectId;
       participants?: Types.ObjectId[];
       lastMessage: Message | null;
     }> = [];
@@ -156,14 +156,14 @@ export class ChatroomService {
       const lastMessage = await this.getLastMessage(chat._id as Types.ObjectId);
       results.push({
         chatroomId: chat._id as Types.ObjectId,
-        type: ChatroomKind.direct,
+        kind: ChatroomKind.direct,
         participants: chat.participants,
         lastMessage,
       });
     }
 
     // 3) Chats de tipo Match / Group
-    const toCheck: ChatroomKind[] = models ?? [ChatroomKind.match, ChatroomKind.group];
+    const toCheck: ChatroomKind[] = models;
 
     for (const kind of toCheck) {
       // 'plural' mapea e.g. Match → "matches", Group → "groups"
@@ -180,8 +180,8 @@ export class ChatroomService {
         const lastMessage = await this.getLastMessage(chat._id as Types.ObjectId);
         results.push({
           chatroomId: chat._id as Types.ObjectId,
-          type: kind,
-          referenceId,
+          kind: kind,
+          foreignId: referenceId,
           lastMessage,
         });
       }
