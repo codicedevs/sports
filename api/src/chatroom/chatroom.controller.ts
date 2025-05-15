@@ -34,7 +34,7 @@ export class ChatroomController {
   }
   @Get('user/:userId')
   getLastMessage(@Param('userId', new ValidateObjectIdPipe("user")) userId: string) {
-    return this.chatroomService.getUserChatroomsWithLastMessage(userId, [ChatroomKind.group])
+    return this.chatroomService.getUserChatroomsWithLastMessage(userId, [ChatroomKind.group, ChatroomKind.match])
   }
 
   @Get(':id')
