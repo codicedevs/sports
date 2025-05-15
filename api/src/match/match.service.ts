@@ -21,7 +21,7 @@ import { SportMode } from "sport_modes/sport_mode.entity";
 import { PushNotificationService } from "services/pushNotificationservice";
 import { LocationsService } from "locations/locations.service";
 import { ChatroomService } from "chatroom/chatroom.service";
-import { ChatroomModelType } from "chatroom/chatroom.enum";
+import { ChatroomKind } from "chatroom/chatroom.enum";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { MatchUpdatedEvent } from "app-events.ts/match.events";
 import { MatchView } from "./match-view.model";
@@ -100,10 +100,8 @@ export class MatchService {
 
     //Creo un chatroom
     await this.chatroomService.create({
-      reference: {
-        type: ChatroomModelType.match,
-        id: savedMatch._id as Types.ObjectId
-      }
+      kind: ChatroomKind.match,
+      foreignId: savedMatch._id as Types.ObjectId
     })
 
     // Agregar el partido al array de matches de la location

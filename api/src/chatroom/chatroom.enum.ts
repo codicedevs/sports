@@ -1,4 +1,5 @@
-export enum ChatroomModelType{
+export enum ChatroomKind{
     match = "Match",
-    group = "Group"
+    group = "Group",
+    direct = "Direct"
 }

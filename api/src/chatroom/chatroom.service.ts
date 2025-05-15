@@ -3,7 +3,7 @@ import { CreateChatroomDto, UpdateChatroomDto } from './chatroom.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Chatroom } from './chatroom.entity';
 import { HydratedDocument, Model, Types } from 'mongoose';
-import { ChatroomModelType } from './chatroom.enum';
+import { ChatroomKind } from './chatroom.enum';
 import { Match } from 'match/match.entity';
 import { User } from 'user/user.entity';
 import { Group } from 'groups/group.entity';
@@ -11,15 +11,15 @@ import { Filter, FilterResponse } from 'types/types';
 import { Message } from 'messages/message.entity';
 
 type ModelHandlers = {
-  [key in ChatroomModelType]: {
-    model: Model<any>;
-    validate: (target: any) => Promise<void>;
+  [key in ChatroomKind]: {
+    model?: Model<any>;        // opcional
+    validate: (payload: CreateChatroomDto) => Promise<void>;
   };
 };
-
-const plural: Record<ChatroomModelType, string> = {
+const plural: Record<ChatroomKind, string> = {
   Match: "matches",
-  Group: "groups"
+  Group: "groups",
+  Direct: "direct"
 };
 @Injectable()
 export class ChatroomService {
@@ -30,43 +30,81 @@ export class ChatroomService {
     @InjectModel(Group.name) private readonly groupModel: Model<Group>,
     @InjectModel(Message.name) private readonly messageModel: Model<Message>,
   ) { }
+
   modelHandlers: ModelHandlers = {
-    [ChatroomModelType.match]: {
-      model: this.matchModel,
-      validate: async (target) => {
+    [ChatroomKind.match]: {
+      validate: async (chatroom) => {
+        if (!Types.ObjectId.isValid(chatroom.foreignId)) {
+          throw new BadRequestException("Id de partido inválido")
+        }
+        const target = await this.matchModel.findById(chatroom.foreignId).exec();
         if (!target) {
           throw new NotFoundException("PARTIDO no encontrado");
         }
       },
     },
-    [ChatroomModelType.group]: {
-      model: this.groupModel,
-      validate: async (target) => {
+    [ChatroomKind.group]: {
+      validate: async (chatroom) => {
+        if (!Types.ObjectId.isValid(chatroom.foreignId)) {
+          throw new BadRequestException("Id de grupo inválido")
+        }
+        const target = await this.groupModel.findById(chatroom.foreignId).exec();
         if (!target) {
           throw new NotFoundException("GRUPO no encontrado");
         }
       },
     },
+    [ChatroomKind.direct]: {
+      validate: async ({ participants }) => {
+        if (!participants || participants.length !== 2) {
+          throw new BadRequestException("Un chat directo necesita dos participantes");
+        }
+        const count = await this.userModel.countDocuments({ _id: { $in: participants } });
+        if (count !== 2) throw new NotFoundException("Algún participante no existe");
+      },
+    },
+
   };
 
   async create(createChatroomDto: CreateChatroomDto) {
-    const targetId = new Types.ObjectId(createChatroomDto.reference.id)
-    const modelType = createChatroomDto.reference.type
-    const handler = this.modelHandlers[modelType];
+    const modelKind = createChatroomDto.kind
+    const handler = this.modelHandlers[modelKind];
+
     if (!handler) {
       throw new BadRequestException("Tipo de referencia no soportado");
     }
-    const target = await handler.model.findById(targetId).exec();
-
+    if (createChatroomDto.kind !== ChatroomKind.direct && !createChatroomDto.foreignId) {
+      throw new BadRequestException("foreignId es obligatorio para Match/Group");
+    }
     // Validar el modelo objetivo (group o match)
-    await handler.validate(target);
+    await handler.validate(createChatroomDto);
     const chatroom = new this.chatroomModel({
       messages: [], ...createChatroomDto
     })
+    // Acá ya está todo bien formado, habría que ver que no haya otro chatroom igual
+    if (modelKind === ChatroomKind.direct) {
+      const existsChatroom = await this.chatroomModel.exists({
+        kind: modelKind,
+        participants: { $all: chatroom.participants, $size: 2 },
+      })
+      if (existsChatroom) {
+        throw new BadRequestException("Ya existe chat directo entre esos dos usuarios")
+      }
+    }
+    else {
+      const existsChatroom = await this.chatroomModel.exists({
+        kind: modelKind,
+        foreignId: createChatroomDto.foreignId
+      })
+      if (existsChatroom) {
+        throw new BadRequestException("Ya eexiste chat para este recurso")
+      }
+
+    }
 
     return chatroom.save()
   }
-  async getLastMessage(chatroomId: Types.ObjectId) {
+  async getLastMessage(chatroomId: Types.ObjectId): Promise<Message | null> {
     const lastMessage = await this.messageModel
       .findOne({ chatroomId })
       .sort({ createdAt: -1 }) // Ordenar por fecha de creación descendente
@@ -80,55 +118,71 @@ export class ChatroomService {
   }
 
 
-  async getUserChatroomsWithLastMessage(userId: string, models?: ChatroomModelType[]) {
+  async getUserChatroomsWithLastMessage(userId: string, models?: ChatroomKind[]): Promise<
+    Array<{
+      chatroomId: Types.ObjectId;
+      type: ChatroomKind;
+      referenceId?: Types.ObjectId;
+      participants?: Types.ObjectId[];
+      lastMessage: Message | null;
+    }>
+  > {
     const user = await this.userModel.findById(new Types.ObjectId(userId)).exec();
     if (!user) {
       throw new NotFoundException('Usuario no encontrado');
     }
 
-    const chatroomsWithLastMessages = [];
+    const results: Array<{
+      chatroomId: Types.ObjectId;
+      type: ChatroomKind;
+      referenceId?: Types.ObjectId;
+      participants?: Types.ObjectId[];
+      lastMessage: Message | null;
+    }> = [];
 
-    // Iterar por los tipos de modelo definidos en `plural`
-    let modelPairs = []
-    if (!models) {
-      modelPairs = Object.entries(plural)
-    }
-    else {
-      for (let model of models) {
-        modelPairs.push(model, plural[model])
+    // 2) Chats directos
+    const directChats = await this.chatroomModel.find({
+      where: {
+        kind: ChatroomKind.direct,
+        participants: { $in: [user._id] },
       }
-    }
-    for (const [modelType, pluralField] of modelPairs) {
-      if (!user[pluralField] || !Array.isArray(user[pluralField])) {
-        continue; // Si no hay datos en este tipo, omitir
-      }
+    }).exec();
 
-      // Buscar chatrooms relacionados con las referencias del usuario
-      for (const referenceId of user[pluralField]) {
-        const chatroom = await this.chatroomModel
-          .findOne({
-            'reference.id': referenceId,
-            'reference.type': modelType,
-          })
-          .populate({
-            path: 'messages',
-            options: { sort: { createdAt: -1 }, limit: 1 },
-          })
+    for (const chat of directChats) {
+      const lastMessage = await this.getLastMessage(chat._id as Types.ObjectId);
+      results.push({
+        chatroomId: chat._id as Types.ObjectId,
+        type: ChatroomKind.direct,
+        participants: chat.participants,
+        lastMessage,
+      });
+    }
+
+    // 3) Chats de tipo Match / Group
+    const toCheck: ChatroomKind[] = models ?? [ChatroomKind.match, ChatroomKind.group];
+
+    for (const kind of toCheck) {
+      // 'plural' mapea e.g. Match → "matches", Group → "groups"
+      const userField = plural[kind] as 'matches' | 'groups';
+      const refIds = (user as any)[userField] as Types.ObjectId[] | undefined;
+      if (!Array.isArray(refIds)) continue;
+
+      for (const referenceId of refIds) {
+        const chat = await this.chatroomModel
+          .findOne({ kind, foreignId: referenceId })
           .exec();
+        if (!chat) continue;
 
-        if (chatroom) {
-          const lastMessage = chatroom.messages[0] || null;
-          chatroomsWithLastMessages.push({
-            chatroomId: chatroom._id,
-            type: modelType,
-            referenceId,
-            lastMessage,
-          });
-        }
+        const lastMessage = await this.getLastMessage(chat._id as Types.ObjectId);
+        results.push({
+          chatroomId: chat._id as Types.ObjectId,
+          type: kind,
+          referenceId,
+          lastMessage,
+        });
       }
     }
-
-    return chatroomsWithLastMessages;
+    return results;
   }
 
 

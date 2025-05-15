@@ -9,7 +9,7 @@ import { PetitionModelType, PetitionStatus } from 'petition/petition.enum';
 import { Filter, FilterResponse } from 'types/types';
 import { Chatroom } from 'chatroom/chatroom.entity';
 import { ChatroomService } from 'chatroom/chatroom.service';
-import { ChatroomModelType } from 'chatroom/chatroom.enum';
+import { ChatroomKind } from 'chatroom/chatroom.enum';
 
 @Injectable()
 export class GroupsService {
@@ -30,10 +30,10 @@ export class GroupsService {
     const group = new this.groupModel({ userId: user._id, users: [user._id], ...groupData })
     const savedGroup = await group.save()
     //Creo un chatroom
-    await this.chatroomService.create({reference: {
-      type: ChatroomModelType.group,
-      id: savedGroup._id as Types.ObjectId
-    }})
+    await this.chatroomService.create({
+      kind: ChatroomKind.group,
+      foreignId: savedGroup._id as Types.ObjectId
+    })
     user.groups.push(savedGroup.id)
     await user.save();
 
