@@ -158,11 +158,17 @@ export class MatchService {
     }
     const usersToSendPush = [...match.users]
     match.users.push(userId);
+
     this.activityService.create({
       matchId: matchId,
       description: `Se unió ${user.name} al partido`
     })
+    
+    // -------- Actualizar el usuario
 
+    user.matches.push(matchId as any)
+    user.save()
+    //----------------
     const tokens = await this.userService.getTokenUsersIdsList(usersToSendPush)
 
     await this.pushNotificationService.sendPushNotification(
@@ -211,8 +217,6 @@ export class MatchService {
     if (new Types.ObjectId(userId).equals(match.userId)) { //si el usuario eliminado era el admin
       match.userId = match.users[0] //Ahora el adsmin pasa a ser otro jugador
     }
-
-
 
     // Guardar el partido actualizado
     const savedMatch = await match.save();
