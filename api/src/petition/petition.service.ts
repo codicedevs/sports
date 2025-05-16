@@ -273,7 +273,8 @@ export class PetitionService {
         type: modelType,
       },
       status: PetitionStatus.Pending,
-      isInvitation: isEmitterAdmin
+      isInvitation: isEmitterAdmin,
+      text: createPetitionDto.text
     });
     await newPetition.save();
 
