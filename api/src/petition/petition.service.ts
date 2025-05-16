@@ -110,7 +110,7 @@ export class PetitionService {
 
     let receiverExist = await this.userModel.findById(receiver).exec();
     //Si es friends y no recibe receptor tira error, si recibió receptor pero no existe, tira error
-    if((receiver && !receiverExist) || (!receiverExist && modelType === PetitionModelType.friend)){
+    if ((receiver && !receiverExist) || (!receiverExist && modelType === PetitionModelType.friend)) {
       throw new NotFoundException("RECEPTOR de la peticion no encontrado");
     }
     if (!emitterExist) {
@@ -182,17 +182,17 @@ export class PetitionService {
     }
     //SI NO ES FRIENDS -------------------------------------------------------------
 
-  
+
 
     const target = await handler.model.findById(targetId).exec();
 
     // Validar el modelo objetivo (group o match)
     await handler.validate(target, emitterExist._id as Types.ObjectId);
 
-    if(!receiverExist){
-      receiverExist= await this.userModel.findById(new Types.ObjectId(target.userId)).exec()
+    if (!receiverExist) {
+      receiverExist = await this.userModel.findById(new Types.ObjectId(target.userId)).exec()
     }
-    if(!receiverExist){
+    if (!receiverExist) {
       throw new NotFoundException("RECEPTOR de la peticion no encontrado");
     }
 
@@ -205,8 +205,8 @@ export class PetitionService {
     const isReceiverAdmin = new Types.ObjectId(target.userId).equals(
       receiverExist.id,
     );
-    
-    if(!isEmitterAdmin && !isReceiverAdmin){
+
+    if (!isEmitterAdmin && !isReceiverAdmin) {
       throw new BadRequestException("Alguno de los dos, el emisor o el receptor, tienen que ser admin del recurso")
     }
     const isEmitterIn = target.users.some(id => id.equals(emitter._id as Types.ObjectId))
@@ -379,6 +379,8 @@ export class PetitionService {
         .findByIdAndUpdate(emitter._id, { $addToSet: { friends: petition.receiver._id } })
         .exec();
 
+      petition.status = PetitionStatus.Accepted;
+      await petition.save();
       await this.notificationService.sendPushNotification(
         [emitter.pushToken],
         `Usuario ${receiver.name}`,
