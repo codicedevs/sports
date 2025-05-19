@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, HttpException, Injectable, InternalServerErrorException } from "@nestjs/common";
 import { OAuth2Client } from "google-auth-library";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
@@ -40,26 +40,41 @@ export class GoogleAuthService {
     user: Partial<User>;
     accessToken: string;
     refreshToken: string;
-  }>  {
-    let user = await this.userModel.findOne({ email: info.data.user.email }).exec();
+  }> {
+    try {
 
-    if (!user) {
-      user = await this.userService.create({
-        email: info.data.user.email,
-        name: info.data.user.name,
+
+      let user = await this.userModel.findOne({ email: info.data.user.email }).exec();
+
+      if (!user) {
+        user = await this.userService.create({
+          email: info.data.user.email,
+          name: info.data.user.name,
+        });
+      }
+
+      const payload = { sub: user.id, username: user.name, roles: user.roles };
+      const refreshToken = await this.jwtService.signAsync(payload, {
+        secret: jwtSetting.JWT_REFRESH_SECRET,
+        expiresIn: jwtSetting.JWT_REFRESH_EXPIRES,
       });
+      const access_token = await this.jwtService.signAsync(payload);
+      return {
+        user: user,
+        accessToken: access_token,
+        refreshToken: refreshToken,
+      };
     }
-
-    const payload = { sub: user.id, username: user.name, roles: user.roles };
-    const refreshToken = await this.jwtService.signAsync(payload, {
-      secret: jwtSetting.JWT_REFRESH_SECRET,
-      expiresIn: jwtSetting.JWT_REFRESH_EXPIRES,
-    });
-    const access_token = await this.jwtService.signAsync(payload);
-    return {
-      user: user,
-      accessToken: access_token,
-      refreshToken: refreshToken,
-    };
+    catch (err: any) {
+      // Detectamos un ValidationError de Mongoose
+      if (err.name === 'ValidationError') {
+        throw new BadRequestException(`Datos inválidos: ${Object.values(err.errors).map(e => (e as any).message).join(', ')}`);
+      }
+      // Otros errores
+      throw err instanceof HttpException
+        ? err
+        : new InternalServerErrorException(err.message || 'Error interno');
+    }
   }
 }
+

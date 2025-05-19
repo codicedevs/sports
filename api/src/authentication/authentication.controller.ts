@@ -8,6 +8,7 @@ import {
   Get,
   Req,
   BadRequestException,
+  HttpException,
 } from "@nestjs/common";
 import { Public } from "./public";
 import { AuthService } from "./authentication.service";
@@ -27,7 +28,7 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly googleAuthService: GoogleAuthService,
     private readonly userService: UserService
-  ) {}
+  ) { }
   /**
    * @param signInDto
    * @returns
@@ -54,33 +55,48 @@ export class AuthController {
    * @param token
    * @returns
    */
+  // @Public()
+  // @Post("google")
+  // async googleLogin(@Body() userInfo: SsoAuthInfoDto) {
+  //   console.log('📥 [googleLogin] Iniciando autenticación con Google SSO');
+  //   console.log('👉 Datos recibidos:', userInfo);
+
+  //   try {
+  //     const result = await this.googleAuthService.signInSSO(userInfo);
+  //     console.log('✅ [googleLogin] Autenticación exitosa:', result);
+  //     return result;
+  //   } catch (error) {
+  //     console.error('❌ [googleLogin] Error durante la autenticación:', error);
+
+  //     // Desglose del error
+  //     console.error('📝 Mensaje de error:', error.message || 'No hay mensaje');
+  //     console.error('🛠️ Stack:', error.stack || 'No hay stack trace');
+  //     console.error('🔑 Claves del error:', Object.keys(error));
+
+  //     throw {
+  //       message: error.message || 'Error desconocido durante la autenticación',
+  //       stack: error.stack || 'No stack trace available',
+  //       details: error.response || error,
+  //     };
+  //   } finally {
+  //     console.log('🔚 [googleLogin] Finalizó el método googleLogin');
+  //   }
+  // }
   @Public()
   @Post("google")
   async googleLogin(@Body() userInfo: SsoAuthInfoDto) {
-    console.log('📥 [googleLogin] Iniciando autenticación con Google SSO');
-    console.log('👉 Datos recibidos:', userInfo);
-
     try {
-      const result = await this.googleAuthService.signInSSO(userInfo);
-      console.log('✅ [googleLogin] Autenticación exitosa:', result);
-      return result;
-    } catch (error) {
-      console.error('❌ [googleLogin] Error durante la autenticación:', error);
-
-      // Desglose del error
-      console.error('📝 Mensaje de error:', error.message || 'No hay mensaje');
-      console.error('🛠️ Stack:', error.stack || 'No hay stack trace');
-      console.error('🔑 Claves del error:', Object.keys(error));
-
-      throw {
-        message: error.message || 'Error desconocido durante la autenticación',
-        stack: error.stack || 'No stack trace available',
-        details: error.response || error,
-      };
-    } finally {
-      console.log('🔚 [googleLogin] Finalizó el método googleLogin');
+      return await this.googleAuthService.signInSSO(userInfo);
+    } catch (error: any) {
+      // Si ya es un HttpException, relanzalo
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      // Si es otra cosa, convierte a 400 o 500 según convenga
+      throw new BadRequestException(error.message || 'Error en autenticación SSO');
     }
   }
+
 
   @Get('whoami')
   async whoamiUser(@Req() request: Request) {
