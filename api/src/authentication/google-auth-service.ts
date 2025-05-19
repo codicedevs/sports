@@ -66,6 +66,7 @@ export class GoogleAuthService {
       };
     }
     catch (err: any) {
+      console.error("[GoogleAuthService] signInSSO error:", err);
       // Detectamos un ValidationError de Mongoose
       if (err.name === 'ValidationError') {
         throw new BadRequestException(`Datos inválidos: ${Object.values(err.errors).map(e => (e as any).message).join(', ')}`);

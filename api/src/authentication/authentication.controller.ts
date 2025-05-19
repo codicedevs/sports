@@ -88,6 +88,7 @@ export class AuthController {
     try {
       return await this.googleAuthService.signInSSO(userInfo);
     } catch (error: any) {
+      console.error("[AuthenticationController] googleLogin error:", error);
       // Si ya es un HttpException, relanzalo
       if (error instanceof HttpException) {
         throw error;
