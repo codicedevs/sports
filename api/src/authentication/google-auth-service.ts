@@ -56,14 +56,8 @@ export class GoogleAuthService {
       expiresIn: jwtSetting.JWT_REFRESH_EXPIRES,
     });
     const access_token = await this.jwtService.signAsync(payload);
-    const {
-      password: pass,
-      resetKey,
-      resetKeyTimeStamp,
-      ...userWithoutPass
-    } = user;
     return {
-      user: userWithoutPass,
+      user: user,
       accessToken: access_token,
       refreshToken: refreshToken,
     };
