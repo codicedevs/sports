@@ -9,6 +9,13 @@ import { User } from 'user/user.entity';
 import { Group } from 'groups/group.entity';
 import { Filter, FilterResponse } from 'types/types';
 import { Message } from 'messages/message.entity';
+import { types } from '@babel/core';
+import { MessagesService } from 'messages/messages.service';
+
+type MessageWithAuthor = Message & {
+  author: 'me' | 'other';
+};
+
 
 type ModelHandlers = {
   [key in ChatroomKind]: {
@@ -29,6 +36,7 @@ export class ChatroomService {
     @InjectModel(Match.name) private readonly matchModel: Model<Match>,
     @InjectModel(Group.name) private readonly groupModel: Model<Group>,
     @InjectModel(Message.name) private readonly messageModel: Model<Message>,
+    private readonly messagesService: MessagesService
   ) { }
 
   modelHandlers: ModelHandlers = {
@@ -206,6 +214,44 @@ export class ChatroomService {
     }
 
     return chatroom;
+  }
+
+  async getDirectMessages(userId: Types.ObjectId, otherId: Types.ObjectId, filter: Filter){
+    const userExists = this.userModel.findById(userId)
+    const otherExists = this.userModel.findById(otherId)
+    if(!userExists || ! otherExists){
+      throw new NotFoundException("Usuario no existe")
+    }
+
+    let chatroom = await this.chatroomModel.findOne({
+            participants: {$all: [userId, otherId]} //Contiene ambos IDs
+        }).exec()
+    if(!chatroom){
+      chatroom = await this.create({
+        kind: ChatroomKind.direct,
+        participants: [userId, otherId]
+      })
+    }
+    const chatroomId = chatroom._id as Types.ObjectId
+    let newMessages: MessageWithAuthor[] = []
+    if (!filter.where){
+        filter.where = {}
+      }
+      filter.where= {...filter.where, ...{chatroomId: chatroomId}}
+      const messages =  await this.messagesService.findAll(filter);
+      const messageResults = messages.results 
+      messageResults.forEach((message: Message) =>{
+        newMessages.push({
+          ...message.toObject(),
+          author: (message.senderId as Types.ObjectId).equals(userId) ? "me" : "other"
+        })
+      })
+
+    return {
+      ...messages,
+      results: newMessages
+    }
+  
   }
 
   update(id: number, updateChatroomDto: UpdateChatroomDto) {

@@ -24,3 +24,4 @@ export class Message extends Document {
 
 }
 export const MessageSchema = SchemaFactory.createForClass(Message);
+MessageSchema.index({ chatroomId: 1, createdAt: -1 });
