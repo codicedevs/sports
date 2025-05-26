@@ -67,6 +67,9 @@ export class Match extends Document {
   @Prop({ type: FormationsSchema, required: false })
   formations?: Formations
 
+  @Prop()
+  description?: string
+
 }
 
 

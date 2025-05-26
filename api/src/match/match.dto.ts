@@ -48,6 +48,9 @@ export class CreateMatchDto {
 
   @IsOptional()
   formations?: Formations;
+
+  @IsOptional()
+  description?: string;
 }
 
 export class MatchDto extends CreateMatchDto {
