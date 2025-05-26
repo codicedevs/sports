@@ -85,3 +85,45 @@ por ejemplo:
 GET '/chatroom/user'
 
 Es como el anterior, pero trae tambien los chats de group y matches
+
+
+### Para traer los mensajes dentro de un chat
+GET '/chatroom/user/direct/:otherId'
+
+Me trae todos los mensajes de mi chatroom con el usuario de id otherId
+el resultado es
+```json
+{
+    "results": "MessageWithAuthor[]",
+    "totalCount": "number",
+    "page?": "number",
+    "limit?": "number"
+}
+```
+y MessageWithAuthor[] es como Message, pero tiene ademas author, que dice "me", u "other"
+
+Ejemplo de llamada
+http://localhost:3005/chatroom/user/direct/68236b0b3c787897b084d59a?limit=1
+
+ejemplo de respuesta
+
+```json
+{
+    "results": [
+        {
+            "_id": "6830b562111cca55dfb41b8b",
+            "chatroomId": "6830b2ee6b3e6d15779023e2",
+            "senderId": "68236b0b3c787897b084d59a",
+            "message": "Todo bien, vos",
+            "kind": "Text",
+            "createdAt": "2025-05-23T17:50:26.770Z",
+            "updatedAt": "2025-05-23T17:50:26.770Z",
+            "__v": 0,
+            "author": "other"
+        }
+    ],
+    "totalCount": 2,
+    "page": 1,
+    "limit": "1"
+}
+```
