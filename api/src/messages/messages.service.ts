@@ -9,6 +9,8 @@ import { Filter, FilterResponse } from 'types/types';
 import { ChatroomKind } from 'chatroom/chatroom.enum';
 import { MessageKind } from './message.enum';
 import { Petition } from 'petition/petition.entity';
+import { ChatroomGateway } from 'chatroom/chatroom.gateway';
+import { stringify } from 'querystring';
 type ModelHandlers = {
   [key in MessageKind]: {
     model?: Model<any>;        // opcional
@@ -34,6 +36,7 @@ export class MessagesService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
     @InjectModel(Message.name) private readonly messageModel: Model<Message>,
     @InjectModel(Petition.name) private readonly petitionModel: Model<Petition>,
+    private readonly chatroomGateway: ChatroomGateway,
   ) { }
   modelHandlers: ModelHandlers = {
     [MessageKind.petition]: {
@@ -82,22 +85,30 @@ export class MessagesService {
     }
     else {
       if (!senderExists[pluralChatroom[chatroomExists.kind]].some(id => (id as Types.ObjectId).equals(chatroomExists.foreignId))) {
+        console.log(chatroomExists.foreignId)
+        console.log("____________________________________________________________________________________--")
+        console.log(senderExists[pluralChatroom[chatroomExists.kind]])
         throw new UnauthorizedException(`El usuario no pertenece a este ${translateChatroom[chatroomExists.kind]}`)
       }
     }
 
     const message: HydratedDocument<Message> = new this.messageModel({ senderId: senderExists._id, chatroomId: chatroomExists._id, ...createMessageDto })
     chatroomExists.messages.push(message._id as Types.ObjectId)
+    this.chatroomGateway.server
+      .to(chatroomExists._id.toString())
+      .emit('newMessage', message);
     await chatroomExists.save();
+
     return message.save()
 
   }
 
-  async findAll(filter: Filter): Promise<FilterResponse<HydratedDocument<Message>>> {
+  async findAll(filter: Filter): Promise<FilterResponse<Message>> {
     // Construye la consulta con paginación
-    const results = await this.messageModel.find(filter).exec()
+    const resultsDesc = await this.messageModel.find(filter).sort({createdAt: -1}).exec()
     const totalCount = await this.messageModel.countDocuments(filter).exec()
 
+    const results = resultsDesc.reverse()
 
     // Retorna los resultados con metadatos de paginación
     return {

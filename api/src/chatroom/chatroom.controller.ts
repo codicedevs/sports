@@ -54,4 +54,23 @@ export class ChatroomController {
     return this.chatroomService.findOne(id);
   }
 
+  @Get(':id/messages')
+  async getMessages(@Param('id', new ValidateObjectIdPipe()) id: string,
+    @Query() filter: Filter) {
+      if (!filter.where){
+        filter.where = {}
+      }
+      filter.where= {...filter.where, ...{chatroomId: id}}
+      return await this.messagesService.findAll(filter)
+  }
+
+  @Get('user/direct/:otherId')
+  async getDirectMessages(@Param('otherId', new ValidateObjectIdPipe("Usuario")) otherId: string,
+  @Query() filter: Filter, @Req() request: Request){
+    const { sub } = request['user'] as JwtPayload;
+    const userId = new Types.ObjectId(sub);
+    return await this.chatroomService.getDirectMessages(userId,new Types.ObjectId(otherId), filter)
+  }
+
+
 }

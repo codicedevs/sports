@@ -13,6 +13,8 @@ import { Chatroom, ChatroomSchema } from "chatroom/chatroom.entity";
 import { Message, MessageSchema } from "messages/message.entity";
 import { ActivityModule } from "activity/activity.module";
 import { UserModule } from "user/user.module";
+import { MessagesService } from "messages/messages.service";
+import { ChatroomGateway } from "chatroom/chatroom.gateway";
 
 @Module({
   imports: [
@@ -29,7 +31,7 @@ import { UserModule } from "user/user.module";
 
   ],
   controllers: [PetitionController],
-  providers: [PetitionService, PushNotificationService, GroupsService, ChatroomService],
+  providers: [PetitionService, PushNotificationService, GroupsService, ChatroomService, MessagesService, ChatroomGateway],
   exports: [PetitionService]
 })
 export class PetitionModule { }

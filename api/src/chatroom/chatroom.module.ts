@@ -8,6 +8,7 @@ import { User, UserSchema } from 'user/user.entity';
 import { Group, GroupSchema } from 'groups/group.entity';
 import { Message, MessageSchema } from 'messages/message.entity';
 import { MessagesModule } from 'messages/messages.module';
+import { ChatroomGateway } from './chatroom.gateway';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { MessagesModule } from 'messages/messages.module';
       { name: Message.name, schema: MessageSchema }
     ])],
   controllers: [ChatroomController],
-  providers: [ChatroomService],
-  exports: [ChatroomService]
+  providers: [ChatroomService, ChatroomGateway],
+  exports: [ChatroomService, ChatroomGateway]
 })
 export class ChatroomModule { }
