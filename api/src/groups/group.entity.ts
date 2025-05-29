@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { IsMongoId, IsString } from "class-validator";
-import { FilterPlugin } from "filter/filter.plugin";
 import mongoose, { Document, ObjectId, Types } from "mongoose";
 import { User } from "user/user.entity";
 
