@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { FilterPlugin } from "filter/filter.plugin";
 import { Location } from "locations/location.entity";
 import mongoose, { Document, Types } from "mongoose";
 import { SportMode } from "sport_modes/sport_mode.entity";
@@ -56,7 +55,7 @@ export class Match extends Document {
   userId: Types.ObjectId; // Reference to the user who owns this partido
 
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }] })
-  users?: Types.ObjectId[]; // Array users reference
+  users?: Types.ObjectId[] | User[]; // Array users reference
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "SportMode", required: true })
   sportMode: Types.ObjectId | SportMode;
@@ -74,5 +73,4 @@ export class Match extends Document {
 
 
 export const MatchSchema = SchemaFactory.createForClass(Match);
-MatchSchema.plugin(FilterPlugin);
 MatchSchema.index({ dayOfWeek: 1, hour: 1 });

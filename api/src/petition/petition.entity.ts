@@ -2,7 +2,8 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import mongoose, { Document, Types } from "mongoose";
 import { PetitionModelType, PetitionStatus } from "./petition.enum";
 import { User } from "user/user.entity";
-import { FilterPlugin } from "filter/filter.plugin";
+import { Match } from "match/match.entity";
+import { Group } from "groups/group.entity";
 @Schema({ _id: false })
 export class Reference {
   @Prop({
@@ -13,7 +14,7 @@ export class Reference {
   type: PetitionModelType;
 
   @Prop({ type: mongoose.Schema.Types.ObjectId, required: false, refPath: "reference.type" })
-  id?: Types.ObjectId;
+  id?: Types.ObjectId | Match | User | Group;
 }
 export const referenceSchema = SchemaFactory.createForClass(Reference)
 @Schema()

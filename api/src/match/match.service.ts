@@ -27,6 +27,8 @@ import { MatchUpdatedEvent } from "app-events.ts/match.events";
 import { MatchView } from "./match-view.model";
 import { ActivityService } from "activity/activity.service";
 import { UserService } from "user/user.service";
+import { Petition } from "petition/petition.entity";
+import { Cron, CronExpression } from "@nestjs/schedule";
 
 
 
@@ -38,6 +40,7 @@ export class MatchService {
     @InjectModel(Location.name) private readonly locationModel: Model<Location>,
     @InjectModel(MatchView.name) private readonly matchViewModel: Model<MatchView>,
     @InjectModel(SportMode.name) private readonly sportModeModel: Model<SportMode>,
+    @InjectModel(Petition.name) private readonly petitionModel: Model<Petition>,
     private readonly petitionService: PetitionService,
     private readonly locationsService: LocationsService,
     private readonly sportModesService: SportModesService,
@@ -153,17 +156,17 @@ export class MatchService {
     }
 
     // Verifica si el usuario ya está en la lista del match
-    if (match.users.some((u) => u.toString() === userId.toString())) {
+    if ((match.users as Types.ObjectId[]).some((u) => u.toString() === userId.toString())) {
       throw new BadRequestException("El usuario ya está agregado al match");
     }
-    const usersToSendPush = [...match.users]
-    match.users.push(userId);
+    const usersToSendPush = [...match.users as Types.ObjectId[]];
+    (match.users as Types.ObjectId[]).push(userId);
 
     this.activityService.create({
       matchId: matchId,
       description: `Se unió ${user.name} al partido`
     })
-    
+
     // -------- Actualizar el usuario
 
     user.matches.push(matchId as any)
@@ -215,7 +218,7 @@ export class MatchService {
     match.users.splice(userIndex, 1);
 
     if (new Types.ObjectId(userId).equals(match.userId)) { //si el usuario eliminado era el admin
-      match.userId = match.users[0] //Ahora el adsmin pasa a ser otro jugador
+      match.userId = match.users[0] as Types.ObjectId //Ahora el adsmin pasa a ser otro jugador
     }
 
     // Guardar el partido actualizado
@@ -226,7 +229,7 @@ export class MatchService {
       description: `Se fue ${user.name} del partido`
     })
 
-    const tokens = await this.userService.getTokenUsersIdsList(match.users)
+    const tokens = await this.userService.getTokenUsersIdsList(match.users as Types.ObjectId[])
     await this.pushNotificationService.sendPushNotification(
       tokens,
       `Partido ${match.name}`,
@@ -287,7 +290,7 @@ export class MatchService {
     }
 
 
-    const tokens = await this.userService.getTokenUsersIdsList(oldMatch.users)
+    const tokens = await this.userService.getTokenUsersIdsList(oldMatch.users as Types.ObjectId[])
 
     let message: string = null
     if (updatedMatch.location && !oldMatch.location) {
@@ -917,5 +920,40 @@ export class MatchService {
     });
 
     return result;
+  }
+
+  @Cron(CronExpression.EVERY_HOUR)
+  async oneDayUntilMatch() {
+    //TODO: Lógica de riesgo de partido
+    //Traemos todos los partidos que falte entre 23 y 24 horas para que empiecen.
+    //Traemos todas las petitciones del partidos que esten pending
+    //Los jugadores ya confirmados vienen en el array users de cada match
+
+    const now = new Date();
+    const from = new Date(now.getTime() + 23 * 60 * 60 * 1000);
+    const to = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    const matches = await this.matchModel.find({ where: { date: { $gte: from, $lte: to } } }).populate('users').exec() //Me trae todos los partidos que faltan entre 23 y 24 hros para que empiecen.
+    //console.log(matches.length)
+    const petitions = await this.petitionModel.find({
+      where: {
+        isInvitation: true,
+        "reference.type": PetitionModelType.match,
+        "reference.id": { $in: matches.map(m => m._id) },
+        status: PetitionStatus.Pending
+      }
+    }).populate("reference.id").populate("receiver").exec()
+
+
+    //Por cada usuario confirmado de cada match mando una notificacion avisando que falta un dia.
+    for (const match of matches) {
+      this.pushNotificationService.sendPushNotification((match.users as User[]).map(user => user.pushToken), `Partido ${match.name}`, "Falta un día") //
+    }
+
+    //Por cada ususairo pendiente mando una notificacion con el nombre del match avisando que falta un dia y que tiene que aceptar o rechazar la petition
+
+    for (const petition of petitions) {
+      this.pushNotificationService.sendPushNotification([(petition.receiver as User).pushToken], `Partido ${(petition.reference.id as Match).name}`, "Falta un día. Por favor confirmar asistencia")
+    }
+
   }
 }  

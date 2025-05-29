@@ -101,7 +101,7 @@ export class PetitionService {
    */
   async create(createPetitionDto: CreatePetitionDto): Promise<Petition> {
     const { emitter, receiver, reference } = createPetitionDto;
-    const targetId = reference.id
+    const targetId = reference.id as Types.ObjectId
     const modelType = reference.type
 
     // ───────────────────────────────────────── Validaciones básicas ──
@@ -339,7 +339,7 @@ export class PetitionService {
     }
 
     const modelType = petition?.reference?.type
-    const targetId = petition?.reference?.id
+    const targetId = petition?.reference?.id as Types.ObjectId
 
     // Ahora 'match' y 'emitter' son objetos completos, no solo IDs
 
