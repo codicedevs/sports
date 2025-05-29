@@ -22,6 +22,7 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 import { FilterPlugin } from 'filter/filter.plugin';
 import { MatchViewModule } from 'match/match-view.module';
 import { ActivityModule } from './activity/activity.module';
+import { ScheduleModule } from '@nestjs/schedule';
 @Module({
     imports: [
         MongooseModule.forRoot('mongodb+srv://admin:k1k1r1ki@codice.9kqgu.mongodb.net/', {
@@ -56,11 +57,12 @@ import { ActivityModule } from './activity/activity.module';
         ChatroomModule,
         GroupsModule,
         MatchViewModule,
-        ActivityModule
+        ActivityModule,
+        ScheduleModule.forRoot()
     ],
     controllers: [AppController],
     providers: [
-        AppService
+        AppService,
     ],
 })
 
