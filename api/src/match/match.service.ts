@@ -275,8 +275,14 @@ export class MatchService {
 
   async update(id: Types.ObjectId, updateMatchDto: UpdateMatchDto): Promise<Match> {
     const oldMatch = await this.matchModel.findById(id).exec();
+
+    const date: Date|undefined = updateMatchDto.date && moment.tz(updateMatchDto.date, 'America/Argentina/Buenos_Aires').toDate();
+    const updateMatch = {...updateMatchDto,
+      dayOfWeek: date && date.getDay(),
+      hour: date && date.getHours()
+    }
     const updatedMatch = await this.matchModel
-      .findByIdAndUpdate(id, updateMatchDto, {
+      .findByIdAndUpdate(id, updateMatch, {
         new: true,
       })
       .exec();
