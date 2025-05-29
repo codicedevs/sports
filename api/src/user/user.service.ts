@@ -59,7 +59,7 @@ export class UserService {
      */
     async searchUsersbyName(searchTerm: string): Promise<User[]> {
         const regex = new RegExp(searchTerm, "i");
-        const users = await this.userModel.find({ name: regex }).exec();
+        const users = await this.userModel.find({where:{ name: regex }}).exec();
 
         return users;
     }

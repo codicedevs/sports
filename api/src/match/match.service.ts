@@ -398,7 +398,7 @@ export class MatchService {
     }
 
     // 4. Eliminar el partido de las ubicaciones que lo tienen en su lista de partidos
-    const locations = await this.locationModel.find({ matches: id }).exec();
+    const locations = await this.locationModel.find({where:{ matches: id }}).exec();
 
     for (const location of locations) {
       const matchIndex = location.matches.findIndex(
