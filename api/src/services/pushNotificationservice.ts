@@ -19,6 +19,9 @@ export class PushNotificationService {
     const messages: ExpoPushMessage[] = [];
     
     for (let pushToken of tokens) {
+      if(!pushToken){
+        continue;
+      }
       if (!Expo.isExpoPushToken(pushToken)) {
         this.logger.error(`Push token ${pushToken} is not a valid Expo push token`);
         continue;
