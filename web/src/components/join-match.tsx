@@ -11,11 +11,13 @@ import joinPlayerToMatch from "@/services/join-player"
 import whatsapp from "../../assets/wsapp.svg"
 import googleSignIn from "@/services/google-sign-in"
 import getMatch from "@/services/get-match"
+import getPlayers from "@/services/get-players"
 import Match from "@/components/match"
 
 function JoinMatch() {
     const [hasJoined, setHasJoined] = useState(false)
     const [match, setMatch] = useState<Match | null>(null)
+    const [players, setPlayers] = useState<string[]>([])
     const [loading, setLoading] = useState(true)
     const params = useParams() as { id: string } | null
 
@@ -68,13 +70,22 @@ function JoinMatch() {
             if (!params?.id) {
                 throw new Error('ID de partido no encontrado')
             }
-            const res = await getMatch(params?.id)
+            const res = await getMatch(params.id)
             setMatch(res)
+            // fetchPlayers()
         } catch (error) {
-            console.error("Error al traer el partido:", error)
+            console.error("Error al traer el partido/jugadores:", error)
         } finally {
             setLoading(false)
         }
+    }
+
+    async function fetchPlayers() {
+        if (!params?.id) {
+            throw new Error('ID de partido no encontrado')
+        }
+        const res = await getPlayers(params.id)
+        console.log(res);
     }
 
     function copyToClipboard() {
@@ -117,7 +128,7 @@ function JoinMatch() {
 
     return (
         <>
-            {match && <Match match={match} />}
+            {match && <Match players={players} match={match} />}
             <div className="fixed bottom-0 max-w-[480px] w-full rounded-t-lg">
                 <div className="bg-[#D9FA53] rounded-t-lg">
                     <button onClick={gmailSSO} className="p-4 text-xl font-bold flex justify-center items-center italic gap-2 w-full">

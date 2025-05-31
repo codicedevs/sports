@@ -1,14 +1,12 @@
 import type { Match, User } from "@/types"
 import { format } from "@formkit/tempo"
 
-const Match = ({ match }: { match: Match }) => {
-    const owner = match.users.find((user: User) => user._id === match.userId)
-
+const Match = ({ match, players }: { match: Match, players: any }) => {
     return (
         <div className="p-4 text-[#151515]">
             <div className="bg-[#151515] rounded-lg p-4 grid gap-2">
-                <p title={match.name} className="text-[#D9FA53] first-letter:uppercase whitespace-nowrap text-ellipsis overflow-hidden">
-                    {owner?.name} te ha invitado a un partido
+                <p title={match.user.name} className="text-[#D9FA53] first-letter:uppercase whitespace-nowrap text-ellipsis overflow-hidden">
+                    {match.user.name} te ha invitado a un partido
                 </p>
                 <div className="flex gap-2">
                     <div className="flex gap-2 items-center">
@@ -69,16 +67,16 @@ const Match = ({ match }: { match: Match }) => {
                     </div>
                 </div>
             </div>
-            <div>
+            {/* <div>
                 <p className="italic mt-6 mb-1">Jugadores</p>
                 <div className="flex rounded-lg border border-[#151515] p-4 h-full">
                     <ul className="list-disc list-inside">
-                        {match.users.map((user: User) => (
+                        {players?.map((user: User) => (
                             <li key={user._id} className="text-sm pl-2 capitalize">{user.name}</li>
                         ))}
                     </ul>
                 </div>
-            </div>
+            </div> */}
         </div>
     )
 }
