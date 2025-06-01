@@ -24,12 +24,12 @@ const Match = ({ match, players }: { match: Match, players: any }) => {
                         </svg>
                         <p className="capitalize text-sm text-white whitespace-nowrap text-ellipsis overflow-hidden">
                             {match?.date ? format(new Date(match?.date), "ddd DD MMM HH:mm", 'es') : 'A definir'}
-                            {match?.date ? <span className="text-xs">hs</span> : ''}
+                            {match?.date ? <span className="text-xs"> hs</span> : ''}
                         </p>
                     </div>
                 </div>
                 <p title={match.name} className="text-sm text-white whitespace-nowrap text-ellipsis overflow-hidden flex items-center gap-1">
-                    <span className="text-xs">📍</span>{match?.location?.address ? match.location.address : ''}
+                    <span className="text-xs">📍</span>{match?.location?.address ? match.location.address : 'A definir'}
                 </p>
             </div>
             <div>
@@ -38,11 +38,9 @@ const Match = ({ match, players }: { match: Match, players: any }) => {
                     <div className="w-[136px] shrink-0 grid place-items-center py-4 px-3 bg-[#D9FA53] rounded-l-lg border-r border-dashed border-[#151515]">
                         <p className="capitalize">
                             {match?.date ? format(new Date(match?.date), "dddd", 'es') : 'Día a definir'}
-                            {match?.date ? <span className="text-xs">hs</span> : ''}
                         </p>
                         <p className="italic font-black text-[56px]">
                             {match?.date ? format(new Date(match?.date), "DD", 'es') : '00'}
-                            {match?.date ? <span className="text-xs">º</span> : ''}
                         </p>
                         <div className="flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
@@ -51,14 +49,14 @@ const Match = ({ match, players }: { match: Match, players: any }) => {
                             </svg>
                             <p>
                                 {match?.date ? format(new Date(match?.date), "HH:mm", 'es') : 'A definir'}
-                                {match?.date ? <span className="text-xs">hs</span> : ''}
+                                {match?.date ? <span className="text-xs"> hs</span> : ''}
                             </p>
                         </div>
                     </div>
                     <div className="p-4 overflow-hidden whitespace-nowrap w-full flex flex-col justify-between">
                         <div>
-                            <p className="font-extrabold text-2xl uppercase italic text-ellipsis overflow-hidden">{match?.location?.name}</p>
-                            <p className="font-extrabold text-2xl uppercase italic text-ellipsis overflow-hidden">{match?.location?.address}</p>
+                            <p className="font-extrabold text-2xl uppercase italic text-ellipsis overflow-hidden">{match?.location?.name ? match.location.name : 'Cancha'}</p>
+                            <p className="font-extrabold text-2xl uppercase italic text-ellipsis overflow-hidden">{match?.location?.address ? match.location.address : 'A definir'}</p>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="flex items-center gap-1">
