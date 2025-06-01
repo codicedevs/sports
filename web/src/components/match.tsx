@@ -29,7 +29,7 @@ const Match = ({ match, players }: { match: Match, players: any }) => {
                     </div>
                 </div>
                 <p title={match.name} className="text-sm text-white whitespace-nowrap text-ellipsis overflow-hidden flex items-center gap-1">
-                    <span className="text-xs">📍</span>{match.location.address}
+                    <span className="text-xs">📍</span>{match?.location?.address ? match.location.address : ''}
                 </p>
             </div>
             <div>
@@ -57,8 +57,8 @@ const Match = ({ match, players }: { match: Match, players: any }) => {
                     </div>
                     <div className="p-4 overflow-hidden whitespace-nowrap w-full flex flex-col justify-between">
                         <div>
-                            <p className="font-extrabold text-2xl uppercase italic text-ellipsis overflow-hidden">{match.location.name}</p>
-                            <p className="font-extrabold text-2xl uppercase italic text-ellipsis overflow-hidden">{match.location.address}</p>
+                            <p className="font-extrabold text-2xl uppercase italic text-ellipsis overflow-hidden">{match?.location?.name}</p>
+                            <p className="font-extrabold text-2xl uppercase italic text-ellipsis overflow-hidden">{match?.location?.address}</p>
                         </div>
                         <div className="flex items-center gap-2">
                             <div className="flex items-center gap-1">
