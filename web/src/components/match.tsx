@@ -23,7 +23,8 @@ const Match = ({ match, players }: { match: Match, players: any }) => {
                             <path d="M13.87 2.38C12.34 0.85 10.3 0 8.13 0C5.96 0 3.92 0.85 2.38 2.38C0.850001 3.91 0 5.95 0 8.13C0 10.31 0.850001 12.34 2.38 13.88C3.91 15.42 5.99 16.26 8.13 16.26C10.27 16.26 12.34 15.41 13.88 13.88C15.42 12.35 16.26 10.3 16.26 8.13C16.26 5.96 15.41 3.92 13.88 2.39L13.87 2.38ZM14.77 8.12C14.77 9.89 14.08 11.56 12.82 12.82C11.57 14.07 9.9 14.77 8.12 14.77C6.35 14.77 4.68 14.08 3.42 12.82C2.17 11.56 1.47 9.9 1.47 8.12C1.47 6.34 2.16 4.68 3.42 3.42C4.68 2.17 6.34 1.47 8.12 1.47C9.9 1.47 11.56 2.16 12.82 3.42C14.07 4.68 14.77 6.34 14.77 8.12Z" fill="#FEFFFA" />
                         </svg>
                         <p className="capitalize text-sm text-white whitespace-nowrap text-ellipsis overflow-hidden">
-                            {format(new Date(match.date), "ddd DD MMM HH:mm", 'es')} <span>hs</span>
+                            {match?.date ? format(new Date(match?.date), "ddd DD MMM HH:mm", 'es') : 'A definir'}
+                            {match?.date ? <span className="text-xs">hs</span> : ''}
                         </p>
                     </div>
                 </div>
@@ -35,14 +36,23 @@ const Match = ({ match, players }: { match: Match, players: any }) => {
                 <p className="italic mt-6 mb-1">Partido</p>
                 <div className="flex rounded-lg border border-[#151515]">
                     <div className="w-[136px] shrink-0 grid place-items-center py-4 px-3 bg-[#D9FA53] rounded-l-lg border-r border-dashed border-[#151515]">
-                        <p className="capitalize">{format(new Date(match.date), "dddd", 'es')}</p>
-                        <p className="italic font-black text-[56px]">{format(new Date(match.date), "DD", 'es')}</p>
+                        <p className="capitalize">
+                            {match?.date ? format(new Date(match?.date), "dddd", 'es') : 'Día a definir'}
+                            {match?.date ? <span className="text-xs">hs</span> : ''}
+                        </p>
+                        <p className="italic font-black text-[56px]">
+                            {match?.date ? format(new Date(match?.date), "DD", 'es') : '00'}
+                            {match?.date ? <span className="text-xs">º</span> : ''}
+                        </p>
                         <div className="flex items-center gap-2">
                             <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 17 17" fill="none">
                                 <path d="M11.74 9.1L8.86 7.67V4.02C8.86 3.61 8.53 3.28 8.12 3.28C7.71 3.28 7.38 3.61 7.38 4.02V8.12C7.38 8.4 7.54 8.65 7.79 8.78L11.07 10.42C11.17 10.47 11.29 10.5 11.4 10.5C11.68 10.5 11.93 10.34 12.06 10.1C12.15 9.93 12.17 9.72 12.11 9.53C12.05 9.34 11.91 9.18 11.74 9.1Z" fill="#151515" />
                                 <path d="M13.87 2.38C12.34 0.85 10.3 0 8.13 0C5.96 0 3.92 0.85 2.38 2.38C0.850001 3.91 0 5.95 0 8.13C0 10.31 0.850001 12.34 2.38 13.88C3.91 15.42 5.99 16.26 8.13 16.26C10.27 16.26 12.34 15.41 13.88 13.88C15.42 12.35 16.26 10.3 16.26 8.13C16.26 5.96 15.41 3.92 13.88 2.39L13.87 2.38ZM14.77 8.12C14.77 9.89 14.08 11.56 12.82 12.82C11.57 14.07 9.9 14.77 8.12 14.77C6.35 14.77 4.68 14.08 3.42 12.82C2.17 11.56 1.47 9.9 1.47 8.12C1.47 6.34 2.16 4.68 3.42 3.42C4.68 2.17 6.34 1.47 8.12 1.47C9.9 1.47 11.56 2.16 12.82 3.42C14.07 4.68 14.77 6.34 14.77 8.12Z" fill="#151515" />
                             </svg>
-                            <p>{format(new Date(match.date), "HH:mm", 'es')} <span>hs</span></p>
+                            <p>
+                                {match?.date ? format(new Date(match?.date), "HH:mm", 'es') : 'A definir'}
+                                {match?.date ? <span className="text-xs">hs</span> : ''}
+                            </p>
                         </div>
                     </div>
                     <div className="p-4 overflow-hidden whitespace-nowrap w-full flex flex-col justify-between">
