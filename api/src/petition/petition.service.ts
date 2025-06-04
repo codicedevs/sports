@@ -379,6 +379,10 @@ export class PetitionService {
         .findByIdAndUpdate(emitter._id, { $addToSet: { friends: petition.receiver._id } })
         .exec();
 
+      await this.userModel
+        .findByIdAndUpdate(receiver._id, { $addToSet: { friends: petition.emitter._id } })
+        .exec();
+
       petition.status = PetitionStatus.Accepted;
       await petition.save();
       await this.notificationService.sendPushNotification(

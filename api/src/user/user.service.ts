@@ -228,11 +228,17 @@ export class UserService {
         if (!user) {
             throw new NotFoundException("Usuario no encontrado");
         }
+        const friend = await this.userModel.findById(friendId).exec();
+        if (!user) {
+            throw new NotFoundException("Usuario no encontrado");
+        }
 
         // Filter out the friendId from the friends array
         user.friends = user.friends.filter((f) => !f.equals(friendId));
+        friend.friends = friend.friends.filter((f) => !f.equals(userId));
 
-        return user.save();
+        await friend.save();
+        return await user.save();
     }
 
     async getTokenUsersIdsList(userIds: Types.ObjectId[]): Promise<string[]> {
