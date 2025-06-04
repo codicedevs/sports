@@ -6,6 +6,7 @@ import { Zone } from "zones/zone.entity";
 import { Sport } from "sports/sport.entity";
 import { SportMode } from "sport_modes/sport_mode.entity";
 import { Group } from "groups/group.entity";
+import { RatingScores } from "player-review/player-review.entity";
 
 // Subschema: Interval
 @Schema({ _id: false })
@@ -110,6 +111,12 @@ export class User extends Document {
 
   @Prop({ type: String, required: false })
   phone?: string;
+
+  @Prop()
+  ratings: RatingScores
+
+  @Prop()
+  averageRating: number
 }
 
 // Creación de esquemas

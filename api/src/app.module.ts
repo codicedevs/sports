@@ -23,9 +23,10 @@ import { FilterPlugin } from 'filter/filter.plugin';
 import { MatchViewModule } from 'match/match-view.module';
 import { ActivityModule } from './activity/activity.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { PlayerReviewModule } from './player-review/player-review.module';
 @Module({
     imports: [
-        MongooseModule.forRoot('mongodb+srv://admin:k1k1r1ki@codice.9kqgu.mongodb.net/', {
+        MongooseModule.forRoot('mongodb+srv://admin:k1k1r1ki@codice.9kqgu.mongodb.net/cato?retryWrites=true&w=majority', { //cato?retryWrites=true&w=majority
             connectionFactory: (connection) => {
                 connection.plugin(FilterPlugin);
                 return connection;
@@ -58,7 +59,8 @@ import { ScheduleModule } from '@nestjs/schedule';
         GroupsModule,
         MatchViewModule,
         ActivityModule,
-        ScheduleModule.forRoot()
+        ScheduleModule.forRoot(),
+        PlayerReviewModule
     ],
     controllers: [AppController],
     providers: [
