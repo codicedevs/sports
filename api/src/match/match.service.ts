@@ -276,8 +276,9 @@ export class MatchService {
   async update(id: Types.ObjectId, updateMatchDto: UpdateMatchDto): Promise<Match> {
     const oldMatch = await this.matchModel.findById(id).exec();
 
-    const date: Date|undefined = updateMatchDto.date && moment.tz(updateMatchDto.date, 'America/Argentina/Buenos_Aires').toDate();
-    const updateMatch = {...updateMatchDto,
+    const date: Date | undefined = updateMatchDto.date && moment.tz(updateMatchDto.date, 'America/Argentina/Buenos_Aires').toDate();
+    const updateMatch = {
+      ...updateMatchDto,
       dayOfWeek: date && date.getDay(),
       hour: date && date.getHours()
     }
@@ -404,7 +405,7 @@ export class MatchService {
     }
 
     // 4. Eliminar el partido de las ubicaciones que lo tienen en su lista de partidos
-    const locations = await this.locationModel.find({where:{ matches: id }}).exec();
+    const locations = await this.locationModel.find({ where: { matches: id } }).exec();
 
     for (const location of locations) {
       const matchIndex = location.matches.findIndex(
@@ -942,50 +943,53 @@ export class MatchService {
     else filter.where = { "reference.id": new Types.ObjectId(matchId), "reference.type": PetitionModelType.match }
     const petitions = (await this.petitionService.findAll(filter)).results;
     const adminId: Types.ObjectId = matchExists.userId
-      
+
     const acceptedSet = new Set<string>();
-    const pendingSet  = new Set<string>();
+    const pendingSet = new Set<string>();
     const declinedSet = new Set<string>();
 
     const accepted: User[] = [];
-    const pending : User[] = [];
+    const pending: User[] = [];
     const declined: User[] = [];
-    
-    matchExists.users &&(matchExists.users as User[]).forEach(u => {
-    if (!acceptedSet.has(u.id)) {
-      acceptedSet.add(u.id);
-      accepted.push(u);
-    }
-  });
-    
-      petitions.forEach(p => {
-    const emitterIsAdmin = (p.emitter._id as Types.ObjectId).equals(adminId);
-    const u = emitterIsAdmin ? (p.receiver as User) : (p.emitter as User);
-    const uid = u.id;
 
-    // Si ya está en accepted, lo ignoramos para otras listas
-    if (acceptedSet.has(uid)) return;
+    matchExists.users && (matchExists.users as User[]).forEach(u => {
+      if (!acceptedSet.has(u.id)) {
+        acceptedSet.add(u.id);
+        accepted.push(u);
+      }
+    });
 
-    switch (p.status) {
-      case PetitionStatus.Pending:
-        if (!pendingSet.has(uid)) {
-          pendingSet.add(uid);
-          pending.push(u);
-        }
-        break;
+    petitions.forEach(p => {
+      if(!p.emitter || !p.receiver){
+        return
+      }
+      const emitterIsAdmin = (p.emitter._id as Types.ObjectId).equals(adminId);
+      const u = emitterIsAdmin ? (p.receiver as User) : (p.emitter as User);
+      const uid = u.id;
 
-      case PetitionStatus.Declined:
-        if (!declinedSet.has(uid)) {
-          declinedSet.add(uid);
-          declined.push(u);
-        }
-        break;
-      // Accepted no hace nada: ya lo tenemos vía match.users
-    }
-  });
+      // Si ya está en accepted, lo ignoramos para otras listas
+      if (acceptedSet.has(uid)) return;
 
-  return { pending, accepted, declined };
-}
+      switch (p.status) {
+        case PetitionStatus.Pending:
+          if (!pendingSet.has(uid)) {
+            pendingSet.add(uid);
+            pending.push(u);
+          }
+          break;
+
+        case PetitionStatus.Declined:
+          if (!declinedSet.has(uid)) {
+            declinedSet.add(uid);
+            declined.push(u);
+          }
+          break;
+        // Accepted no hace nada: ya lo tenemos vía match.users
+      }
+    });
+
+    return { pending, accepted, declined };
+  }
 
   @Cron(CronExpression.EVERY_HOUR)
   async oneDayUntilMatch() {
