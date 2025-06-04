@@ -928,6 +928,65 @@ export class MatchService {
     return result;
   }
 
+  async getUsersStatusByMatch(matchId: Types.ObjectId, filter: Filter): Promise<{
+    pending: User[];
+    accepted: User[];
+    declined: User[];
+  }> {
+    const matchExists = await this.matchModel.findById(matchId).populate('users').exec()
+    if (!matchExists) {
+      throw new NotFoundException(`Match #${matchId} not found`)
+    }
+    if (!filter) filter = {}
+    if (filter?.where) filter.where = { ...filter.where, "reference.id": new Types.ObjectId(matchId), "reference.type": PetitionModelType.match }
+    else filter.where = { "reference.id": new Types.ObjectId(matchId), "reference.type": PetitionModelType.match }
+    const petitions = (await this.petitionService.findAll(filter)).results;
+    const adminId: Types.ObjectId = matchExists.userId
+      
+    const acceptedSet = new Set<string>();
+    const pendingSet  = new Set<string>();
+    const declinedSet = new Set<string>();
+
+    const accepted: User[] = [];
+    const pending : User[] = [];
+    const declined: User[] = [];
+    
+    matchExists.users &&(matchExists.users as User[]).forEach(u => {
+    if (!acceptedSet.has(u.id)) {
+      acceptedSet.add(u.id);
+      accepted.push(u);
+    }
+  });
+    
+      petitions.forEach(p => {
+    const emitterIsAdmin = (p.emitter._id as Types.ObjectId).equals(adminId);
+    const u = emitterIsAdmin ? (p.receiver as User) : (p.emitter as User);
+    const uid = u.id;
+
+    // Si ya está en accepted, lo ignoramos para otras listas
+    if (acceptedSet.has(uid)) return;
+
+    switch (p.status) {
+      case PetitionStatus.Pending:
+        if (!pendingSet.has(uid)) {
+          pendingSet.add(uid);
+          pending.push(u);
+        }
+        break;
+
+      case PetitionStatus.Declined:
+        if (!declinedSet.has(uid)) {
+          declinedSet.add(uid);
+          declined.push(u);
+        }
+        break;
+      // Accepted no hace nada: ya lo tenemos vía match.users
+    }
+  });
+
+  return { pending, accepted, declined };
+}
+
   @Cron(CronExpression.EVERY_HOUR)
   async oneDayUntilMatch() {
     //TODO: Lógica de riesgo de partido

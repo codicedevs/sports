@@ -268,6 +268,13 @@ export class MatchController {
 
     return updatedMatch;
   }
+  @Get(":matchId/users/status")
+  async getUsersStatusByMatch(
+    @Query() filter: Filter, @Param("matchId", new ValidateObjectIdPipe("match")) matchId: string,
+  ) {
+    return this.matchService.getUsersStatusByMatch(new Types.ObjectId(matchId), filter)
+  }
+
   @Patch(":matchId/users/:userId/remove")
   //@UseGuards(MatchPlayerGuard)
   async removeUserFromMatch(
@@ -292,6 +299,7 @@ export class MatchController {
     return this.matchService.getPetitionsByMatch(new Types.ObjectId(matchId), filter)
   }
 
+  
   @Put(":id")
   @UseGuards(MatchOwnerGuard) // solo el creador del partido puede editar el partido
   async update(
