@@ -194,6 +194,17 @@ export class UserController {
         return deletedUser;
     }
 
+     /**
+     * @returns
+     */
+    @Delete()
+    async deleteUser(@Req() request: Request) {
+        const { sub } = request['user'] as JwtPayload;
+        const id = new Types.ObjectId(sub)
+        const deletedUser = await this.userService.delete(id);
+        return deletedUser;
+    }
+
     //eliminar a un user de friends
 
     @Delete("friends/:friendId")

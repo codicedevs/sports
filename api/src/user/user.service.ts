@@ -17,6 +17,7 @@ import { ChatroomService } from "chatroom/chatroom.service";
 import { ChatroomKind } from "chatroom/chatroom.enum";
 import { MessagesService } from "messages/messages.service";
 import { SendMessageDto } from "messages/message.dto";
+import { Group } from "groups/group.entity";
 
 
 @Injectable()
@@ -26,6 +27,7 @@ export class UserService {
         @InjectModel(Match.name) private readonly matchModel: Model<Match>,
         @InjectModel(Petition.name) private readonly petitionModel: Model<Petition>,
         @InjectModel(Chatroom.name) private readonly chatroomModel: Model<Chatroom>,
+        @InjectModel(Group.name) private readonly groupModel: Model<Group>,
         private readonly chatroomService: ChatroomService,
         private readonly messagesService: MessagesService,
     ) { }
@@ -59,7 +61,7 @@ export class UserService {
      */
     async searchUsersbyName(searchTerm: string): Promise<User[]> {
         const regex = new RegExp(searchTerm, "i");
-        const users = await this.userModel.find({where:{ name: regex }}).exec();
+        const users = await this.userModel.find({ where: { name: regex } }).exec();
 
         return users;
     }
@@ -101,7 +103,7 @@ export class UserService {
     async getUserPetitions(userId: string): Promise<Petition[]> {
         const objectId = new Types.ObjectId(userId);
         const petitions = await this.petitionModel
-            .find({ receiver: objectId })
+            .find({ where: { receiver: objectId } })
             .populate({
                 path: "match", // Popula los partidos
                 model: "Match", // Modelo de los partidos
@@ -193,9 +195,97 @@ export class UserService {
      * @returns
      */
     async delete(id: Types.ObjectId): Promise<User> {
-        const user = await this.findByIdOrFail(id); // Ensure user exists
+        // ────────────── 1) Borrar usuario (y obtenerlo) ────────────────
+        const user = await this.userModel.findById(id).exec();
+        if (!user) throw new NotFoundException('Usuario no encontrado');
         await this.userModel.findByIdAndDelete(id).exec();
-        return user; // Return the deleted user
+        // ────────────── 2) Quitarme de la lista de amigos ──────────────
+        if (user.friends?.length) {
+            await this.userModel.updateMany(
+                { _id: { $in: user.friends } },
+                { $pull: { friends: id } },
+            ).exec();
+        }
+
+        // ────────────── 3) Sacarme de groups (todos) ───────────────────
+        // 3-A) Pull global
+        if (user.groups?.length) {
+            await this.groupModel.updateMany(
+                { _id: { $in: user.groups } },
+                { $pull: { users: id } },
+            ).exec();
+
+            // 3-B) Reasignar owner donde era admin
+            const owned = await this.groupModel
+                .find({
+                    where: {
+                        _id: { $in: user.groups },
+                        userId: id,
+                    }
+                })
+                .select('_id users')   // solo lo necesario
+                .lean();
+            const ops = owned
+                .map(m => {
+                    const remaining = (m.users as Types.ObjectId[]).filter(u => !u.equals(id));
+                    if (!remaining.length) return null;       // sin owner → puedes borrarlo o dejarlo sin userId
+                    return {
+                        updateOne: {
+                            filter: { _id: m._id },
+                            update: { $set: { userId: remaining[0] } }, // 1.er usuario restante
+                        },
+                    };
+                })
+                .filter(Boolean);
+
+            if (ops.length) await this.groupModel.bulkWrite(ops);
+        }
+
+        // ────────────── 4) Sacarme de matches PASADOS ──────────────────
+        if (user.matches?.length) {
+            const now = new Date();
+
+            // 4-A) Pull global
+            await this.matchModel.updateMany(
+                { _id: { $in: user.matches }, date: { $lt: now } },
+                { $pull: { users: id } },
+            );
+
+            // 4-B) Reasignar owner donde era admin
+            const owned = await this.matchModel
+                .find({
+                    where: {
+                        _id: { $in: user.matches },
+                        date: { $lt: now },
+                        userId: id
+                    }
+                })
+                .select('_id users')   // solo lo necesario
+                .lean();
+
+            const ops = owned
+                .map(m => {
+                    const remaining = (m.users as Types.ObjectId[]).filter(u => !u.equals(id));
+                    if (!remaining.length) return null;       // sin owner → puedes borrarlo o dejarlo sin userId
+                    return {
+                        updateOne: {
+                            filter: { _id: m._id },
+                            update: { $set: { userId: remaining[0] } }, // 1.er usuario restante
+                        },
+                    };
+                })
+                .filter(Boolean);
+
+            if (ops.length) await this.matchModel.bulkWrite(ops);
+        }
+
+        // ──────────────  5) Borrar peticiones donde esté como emisor o receptor ────────────────
+
+        await this.petitionModel.deleteMany({ $or: [{ receiver: id }, { emitter: id }] })
+
+
+        // ────────────── 6) Devuelvo el usuario borrado ────────────────
+        return user;
     }
 
     async addFriend(userId: Types.ObjectId, friendId: Types.ObjectId): Promise<User> {
@@ -245,8 +335,10 @@ export class UserService {
         // Buscamos todos los usuarios cuyos _id estén en el array y que tengan definido un pushToken
         const users = await this.userModel
             .find({
-                _id: { $in: userIds },
-                pushToken: { $exists: true, $ne: null }
+                where: {
+                    _id: { $in: userIds },
+                    pushToken: { $exists: true, $ne: null }
+                }
             })
             .select('pushToken')
             .exec();
@@ -266,11 +358,11 @@ export class UserService {
         if (!receiverExists) {
             throw new NotFoundException(`Receptor con id ${receiverId} no encontrado`)
         }
-        if(senderId.equals(receiverId)){
+        if (senderId.equals(receiverId)) {
             throw new BadRequestException('Receptor y emisor tienen que ser usuarios distintos')
         }
         let chatroom = await this.chatroomModel.findOne({
-            participants: {$all: [senderId, receiverId]} //Contiene ambos IDs
+            participants: { $all: [senderId, receiverId] } //Contiene ambos IDs
         }).exec()
         if (!chatroom) {
             chatroom = await this.chatroomService.create({

@@ -11,6 +11,7 @@ import { PetitionModule } from "petition/petition.module";
 import { MessagesModule } from "messages/messages.module";
 import { ChatroomModule } from "chatroom/chatroom.module";
 import { Chatroom, ChatroomSchema } from "chatroom/chatroom.entity";
+import { Group, GroupSchema } from "groups/group.entity";
 
 @Module({
     imports: [
@@ -19,6 +20,7 @@ import { Chatroom, ChatroomSchema } from "chatroom/chatroom.entity";
             { name: Petition.name, schema: PetitionSchema },
             { name: Match.name, schema: MatchSchema },
             { name: Chatroom.name, schema: ChatroomSchema },
+            { name: Group.name, schema: GroupSchema },
         ]),
         JwtModule.register({
             secret: jwtSetting.JWT_ACCESS_SECRET,

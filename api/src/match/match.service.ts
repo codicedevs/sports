@@ -218,7 +218,7 @@ export class MatchService {
     match.users.splice(userIndex, 1);
 
     if (new Types.ObjectId(userId).equals(match.userId)) { //si el usuario eliminado era el admin
-      match.userId = match.users[0] as Types.ObjectId //Ahora el adsmin pasa a ser otro jugador
+      match.userId = match.users[0] as Types.ObjectId //Ahora el admin pasa a ser otro jugador
     }
 
     // Guardar el partido actualizado
