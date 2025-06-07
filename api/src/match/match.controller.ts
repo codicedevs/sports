@@ -35,6 +35,7 @@ import { extname, join } from "path";
 import { existsSync, mkdirSync } from "fs";
 import { JwtPayload } from "jsonwebtoken";
 import { CreatePetitionDto, TextPetitionDto } from "petition/petition.dto";
+import { PushNotificationService } from "services/pushNotificationservice";
 
 @ApiBearerAuth()
 @ApiTags("matches")
@@ -44,7 +45,8 @@ export class MatchController {
     private readonly matchService: MatchService,
     private readonly zonesService: ZonesService,
     private readonly petitionService: PetitionService,
-  ) { }
+    private readonly pushNotificationService: PushNotificationService, // Assuming you have a push notification service
+  ) {}
   @Post()
   async createMatch(@Body() createMatchDto: CreateMatchDto) {
     if (!Types.ObjectId.isValid(createMatchDto.userId)) {
@@ -60,15 +62,16 @@ export class MatchController {
     return newMatch;
   }
   @Public()
-  @Post(':matchId/upload-asset')
+  @Post(":matchId/upload-asset")
   @UseInterceptors(
-    FilesInterceptor('files', 10, { // 'files' es el nombre del campo en form-data, y 10 es el máximo de archivos permitidos
+    FilesInterceptor("files", 10, {
+      // 'files' es el nombre del campo en form-data, y 10 es el máximo de archivos permitidos
       storage: diskStorage({
         destination: (req, file, callback) => {
           // Extrae el matchId de los parámetros de la ruta
           const matchId = req.params.matchId;
           // Define la ruta donde se guardarán los archivos
-          const uploadPath = join(process.cwd(), 'public', matchId);
+          const uploadPath = join(process.cwd(), "public", matchId);
           // Si la carpeta no existe, la crea de forma recursiva
           if (!existsSync(uploadPath)) {
             mkdirSync(uploadPath, { recursive: true });
@@ -77,7 +80,8 @@ export class MatchController {
         },
         filename: (req, file, callback) => {
           // Genera un nombre único para el archivo
-          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const uniqueSuffix =
+            Date.now() + "-" + Math.round(Math.random() * 1e9);
           const fileExtName = extname(file.originalname);
           const filename = `${uniqueSuffix}${fileExtName}`;
           callback(null, filename);
@@ -86,7 +90,7 @@ export class MatchController {
     }),
   )
   uploadMatchFiles(
-    @Param('matchId', new ValidateObjectIdPipe()) matchId: string,
+    @Param("matchId", new ValidateObjectIdPipe()) matchId: string,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
     console.log(`Archivos recibidos para el match ${matchId}:`, files);
@@ -96,38 +100,37 @@ export class MatchController {
     };
   }
   //Envía petición al admin del match
-  @Post(':matchId/petition')
+  @Post(":matchId/petition")
   async sendPetition(
     @Param("matchId", new ValidateObjectIdPipe()) matchId: string,
     @Req() request: Request,
-    @Body() text: TextPetitionDto
+    @Body() text: TextPetitionDto,
   ) {
-    const { sub } = request['user'] as JwtPayload;
-    const userId = new Types.ObjectId(sub)
+    const { sub } = request["user"] as JwtPayload;
+    const userId = new Types.ObjectId(sub);
     let petition: CreatePetitionDto = {
       emitter: userId,
       reference: {
         type: PetitionModelType.match,
-        id: new Types.ObjectId(matchId)
+        id: new Types.ObjectId(matchId),
       },
-      status: PetitionStatus.Pending
-    }
-    return this.petitionService.create({...petition, ...text})
-
+      status: PetitionStatus.Pending,
+    };
+    return this.petitionService.create({ ...petition, ...text });
   }
 
-  @Post(':matchId/invite/:userId')
+  @Post(":matchId/invite/:userId")
   async sendInvitation(
     @Param("matchId", new ValidateObjectIdPipe()) matchId: string,
     @Param("userId", new ValidateObjectIdPipe("usuario")) userId: string,
     @Req() request: Request,
-    @Body() text: TextPetitionDto
+    @Body() text: TextPetitionDto,
   ) {
-    const { sub } = request['user'] as JwtPayload;
+    const { sub } = request["user"] as JwtPayload;
     const adminId = new Types.ObjectId(sub);
-    const match = await this.matchService.findOne(new Types.ObjectId(matchId))
+    const match = await this.matchService.findOne(new Types.ObjectId(matchId));
     if (!match.userId.equals(adminId)) {
-      throw new BadRequestException("El usuario no es admin del partido")
+      throw new BadRequestException("El usuario no es admin del partido");
     }
     const petition: CreatePetitionDto = {
       emitter: adminId,
@@ -136,9 +139,9 @@ export class MatchController {
         id: new Types.ObjectId(matchId),
         type: PetitionModelType.match,
       },
-      status: PetitionStatus.Pending
-    }
-    return this.petitionService.create({...petition, ...text})
+      status: PetitionStatus.Pending,
+    };
+    return this.petitionService.create({ ...petition, ...text });
   }
   @Public()
   @Get()
@@ -179,17 +182,15 @@ export class MatchController {
     return await this.matchService.getAvailableMatches();
   }
   @Get("petitions")
-  async getMatchesPetitions(
-    @Req() request: Request
-  ) {
-    const { sub } = request['user'] as JwtPayload;
+  async getMatchesPetitions(@Req() request: Request) {
+    const { sub } = request["user"] as JwtPayload;
     return this.petitionService.findAll({
       where: {
         receiver: new Types.ObjectId(sub),
         status: PetitionStatus.Pending,
-        'reference.type': PetitionModelType.match
-      }
-    })
+        "reference.type": PetitionModelType.match,
+      },
+    });
   }
 
   @Get("/findForDate/users/:userId")
@@ -270,9 +271,13 @@ export class MatchController {
   }
   @Get(":matchId/users/status")
   async getUsersStatusByMatch(
-    @Query() filter: Filter, @Param("matchId", new ValidateObjectIdPipe("match")) matchId: string,
+    @Query() filter: Filter,
+    @Param("matchId", new ValidateObjectIdPipe("match")) matchId: string,
   ) {
-    return this.matchService.getUsersStatusByMatch(new Types.ObjectId(matchId), filter)
+    return this.matchService.getUsersStatusByMatch(
+      new Types.ObjectId(matchId),
+      filter,
+    );
   }
 
   @Patch(":matchId/users/:userId/remove")
@@ -294,12 +299,15 @@ export class MatchController {
 
   @Get(":matchId/petitions")
   async getPetitionsByMatch(
-    @Query() filter: Filter, @Param("matchId", new ValidateObjectIdPipe("match")) matchId: string,
+    @Query() filter: Filter,
+    @Param("matchId", new ValidateObjectIdPipe("match")) matchId: string,
   ) {
-    return this.matchService.getPetitionsByMatch(new Types.ObjectId(matchId), filter)
+    return this.matchService.getPetitionsByMatch(
+      new Types.ObjectId(matchId),
+      filter,
+    );
   }
 
-  
   @Put(":id")
   @UseGuards(MatchOwnerGuard) // solo el creador del partido puede editar el partido
   async update(
@@ -331,5 +339,25 @@ export class MatchController {
   async remove(@Param("id", new ValidateObjectIdPipe()) id: string) {
     await this.matchService.remove(new Types.ObjectId(id));
     return { message: "Partido eliminado" };
+  }
+
+  @Post("send")
+  @Public()
+  async sendNotification(
+    @Body()
+    sendNotificationDto: {
+      tokens: string[];
+      title: string;
+      body: string;
+      data: any;
+    },
+  ) {
+    const { tokens, title, body, data } = sendNotificationDto;
+    return this.pushNotificationService.sendPushNotification(
+      tokens,
+      title,
+      body,
+      data,
+    );
   }
 }

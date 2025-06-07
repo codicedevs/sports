@@ -1,5 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Expo, ExpoPushMessage } from 'expo-server-sdk';
+import { Injectable, Logger } from "@nestjs/common";
+import { Expo, ExpoPushMessage } from "expo-server-sdk";
 
 @Injectable()
 export class PushNotificationService {
@@ -17,19 +17,23 @@ export class PushNotificationService {
     data?: any,
   ) {
     const messages: ExpoPushMessage[] = [];
-    
+
     for (let pushToken of tokens) {
-      if(!pushToken){
+      if (!pushToken) {
         continue;
       }
       if (!Expo.isExpoPushToken(pushToken)) {
-        this.logger.error(`Push token ${pushToken} is not a valid Expo push token`);
+        this.logger.error(
+          `Push token ${pushToken} is not a valid Expo push token`,
+        );
         continue;
       }
 
+      console.log("DATA", data);
+
       messages.push({
         to: pushToken,
-        sound: 'default',
+        sound: "default",
         title,
         body,
         data,
@@ -48,7 +52,7 @@ export class PushNotificationService {
         this.logger.error(error);
       }
     }
-    
+
     return tickets;
   }
 }
